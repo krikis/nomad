@@ -3,6 +3,4 @@
 :coffeescript
   $ ->
     window.router = new Nomad.Routers.PostsRouter(posts: #{@posts.to_json.html_safe})
-    Backbone.history.start
-      pushState: true
-      root: "/posts"
+    Backbone.history.start()
