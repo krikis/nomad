@@ -23,6 +23,7 @@ gem 'jquery-rails'
 gem 'rails-backbone'
 gem "haml-rails"
 gem "coffee-filter"
+gem 'haml_assets'
 
 group :test, :development do
   gem "rspec-rails", "~> 2.6"
