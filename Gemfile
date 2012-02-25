@@ -29,6 +29,7 @@ group :test, :development do
   gem "rspec-rails", "~> 2.6"
   gem 'fabrication'
   gem 'timecop'
+  gem 'jasmine-rails'
 end
 
 # To use ActiveModel has_secure_password
