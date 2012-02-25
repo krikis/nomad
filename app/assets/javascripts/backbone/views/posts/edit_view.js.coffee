@@ -4,7 +4,13 @@ class Nomad.Views.Posts.EditView extends Backbone.View
   template : JST["backbone/templates/posts/edit"]
 
   events :
+    "click .index" : "index"
     "submit #edit-post" : "update"
+    
+  index : (e) -> 
+    e.preventDefault()
+    Backbone.history.navigate $(e.target).attr("href"), trigger: true
+    
 
   update : (e) ->
     e.preventDefault()

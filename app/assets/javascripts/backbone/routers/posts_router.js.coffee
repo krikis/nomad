@@ -1,14 +1,14 @@
 class Nomad.Routers.PostsRouter extends Backbone.Router
+  routes:
+    "new"      : "newPost"
+    "index"    : "index"
+    ":id/edit" : "edit"
+    ":id"      : "show"
+    ".*"       : "index"
+
   initialize: (options) ->
     @posts = new Nomad.Collections.PostsCollection()
     @posts.reset options.posts
-
-  routes:
-    "/new"      : "newPost"
-    "/index"    : "index"
-    "/:id/edit" : "edit"
-    "/:id"      : "show"
-    ".*"        : "index"
 
   newPost: ->
     @view = new Nomad.Views.Posts.NewView(collection: @posts)
