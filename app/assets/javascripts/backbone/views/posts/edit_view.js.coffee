@@ -18,7 +18,7 @@ class Nomad.Views.Posts.EditView extends Backbone.View
     @model.save(null,
       success : (post) =>
         @model = post
-        Backbone.history.navigate "#{@model.id}", trigger: true
+        Backbone.history.navigate "posts/#{@model.id}", trigger: true
     )
 
   render : ->

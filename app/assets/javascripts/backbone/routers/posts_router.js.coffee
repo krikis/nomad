@@ -5,7 +5,6 @@ class Nomad.Routers.PostsRouter extends Backbone.Router
     "posts/:id/edit" : "edit"
     "posts/:id"      : "show"
     "posts.*"        : "index"
-    ".*"             : "redirectToIndex"
 
   initialize: (options) ->
     @posts = new Nomad.Collections.PostsCollection()
@@ -30,6 +29,3 @@ class Nomad.Routers.PostsRouter extends Backbone.Router
 
     @view = new Nomad.Views.Posts.EditView(model: post)
     $("#posts").html(@view.render().el)
-    
-  redirectToIndex: () ->
-    Backbone.history.navigate "posts"

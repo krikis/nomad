@@ -28,7 +28,7 @@ class Nomad.Views.Posts.NewView extends Backbone.View
     @collection.create(@model.toJSON(),
       success: (post) =>
         @model = post
-        Backbone.history.navigate "#{@model.id}", trigger: true
+        Backbone.history.navigate "posts/#{@model.id}", trigger: true
 
       error: (post, jqXHR) =>
         @model.set({errors: $.parseJSON(jqXHR.responseText)})
