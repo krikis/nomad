@@ -4,6 +4,7 @@ class Nomad.Views.Posts.NewView extends Backbone.View
   template: JST["backbone/templates/posts/new"]
 
   events:
+    "click .index" : "index"
     "submit #new-post": "save"
 
   constructor: (options) ->
@@ -14,6 +15,10 @@ class Nomad.Views.Posts.NewView extends Backbone.View
       this.render()
     )
 
+  index : (e) -> 
+    e.preventDefault()
+    Backbone.history.navigate $(e.target).attr("href"), trigger: true
+
   save: (e) ->
     e.preventDefault()
     e.stopPropagation()
@@ -23,7 +28,7 @@ class Nomad.Views.Posts.NewView extends Backbone.View
     @collection.create(@model.toJSON(),
       success: (post) =>
         @model = post
-        window.location.hash = "/#{@model.id}"
+        Backbone.history.navigate "#{@model.id}", trigger: true
 
       error: (post, jqXHR) =>
         @model.set({errors: $.parseJSON(jqXHR.responseText)})

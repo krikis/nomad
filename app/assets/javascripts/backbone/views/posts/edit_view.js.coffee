@@ -9,8 +9,7 @@ class Nomad.Views.Posts.EditView extends Backbone.View
     
   index : (e) -> 
     e.preventDefault()
-    Backbone.history.navigate $(e.target).attr("href"), trigger: true
-    
+    Backbone.history.navigate $(e.target).attr("href"), trigger: true    
 
   update : (e) ->
     e.preventDefault()
@@ -19,7 +18,7 @@ class Nomad.Views.Posts.EditView extends Backbone.View
     @model.save(null,
       success : (post) =>
         @model = post
-        window.location.hash = "/#{@model.id}"
+        Backbone.history.navigate "#{@model.id}", trigger: true
     )
 
   render : ->

@@ -4,12 +4,12 @@ class Nomad.Views.Posts.IndexView extends Backbone.View
   template: JST["backbone/templates/posts/index"]
   
   events:
-    'click .new': 'addNew'
+    'click .new':     'new'
 
   initialize: () ->
     @options.posts.bind('reset', @addAll)
-    
-  addNew: (e) ->
+  
+  new: (e) ->
     e.preventDefault()
     Backbone.history.navigate $(e.target).attr("href"), trigger: true
 
