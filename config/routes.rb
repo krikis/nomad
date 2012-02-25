@@ -1,6 +1,6 @@
 Nomad::Application.routes.draw do
   match '/' => 'posts#index'
-  resources :posts, :only => [:index, :create, :update, :destroy]
+  resources :posts
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
