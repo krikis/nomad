@@ -30,7 +30,23 @@ group :test, :development do
   gem 'fabrication'
   gem 'timecop'
   gem 'jasmine-rails'
+
+  gem 'spork', '~> 0.9.0.rc9' # Spork keeps a process running to speed up tests
+  gem 'guard-spork'          # Guard/Spork integration
+  gem 'guard-rspec'          # Guard automatically runs tests
+  gem 'guard-cucumber'
+  gem 'fuubar'
+  gem 'guard-rails-assets'
+  gem 'guard-jasmine-headless-webkit'
 end
+
+group :mac_development do
+  # bundle config without :linux_development
+  gem 'rb-fsevent'
+  gem 'rb-readline'
+  gem 'growl'
+end
+
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
