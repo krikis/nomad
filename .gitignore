@@ -15,3 +15,6 @@
 /tmp
 
 /.rvmrc
+public/assets/
+jhw.*
+.jhw-cache/
