@@ -38,6 +38,7 @@ group :test, :development do
   gem 'fuubar'
   gem 'guard-rails-assets'
   gem 'guard-jasmine-headless-webkit'
+  gem 'database_cleaner'
 end
 
 group :mac_development do
