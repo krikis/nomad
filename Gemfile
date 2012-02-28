@@ -21,9 +21,10 @@ end
 
 gem 'jquery-rails'
 gem 'rails-backbone'
+gem "backbone-support"
 gem "haml-rails"
-gem "coffee-filter"
 gem 'haml_assets'
+gem "coffee-filter"
 
 group :test, :development do
   gem "rspec-rails", "~> 2.6"
@@ -37,7 +38,7 @@ group :test, :development do
   gem 'guard-cucumber'
   gem 'fuubar'
   gem 'guard-rails-assets'
-  gem 'guard-jasmine-headless-webkit'
+  gem 'guard-jasmine-headless-webkit' # works with qt 4.7.4
   gem 'database_cleaner'
 end
 

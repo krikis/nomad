@@ -15,6 +15,7 @@
 #= require underscore
 #= require backbone
 #= require backbone_rails_sync
+#= require backbone-support
 #= require backbone_datalink
 #= require backbone/nomad
 #= require_tree .
