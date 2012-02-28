@@ -33,7 +33,7 @@ end
 # end
 
 guard 'rails-assets' do
-  watch(%r{^.*/assets/.+$})
+  watch(%r{^.*/assets/javascripts/.*\.(js|coffee)$})
   watch('config/application.rb')
 end
 

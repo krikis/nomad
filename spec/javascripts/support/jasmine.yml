@@ -1,14 +1,12 @@
 src_files:
-  - "public/**/*.{js,coffee}"
-  # - "vendor/**/*.{js,coffee}"
-  # - "lib/**/*.{js,coffee}"
-  # - "app/**/*.{js,coffee}"
+  - "vendor/**/*.{js,coffee}"
+  - "lib/**/*.{js,coffee}"
+  - "app/**/*.{js,coffee}"
 
 stylesheets:
-  - "public/**/*.css"
-  # - "vendor/**/*.css"
-  # - "lib/**/*.css"
-  # - "app/**/*.css"
+  - "vendor/**/*.css"
+  - "lib/**/*.css"
+  - "app/**/*.css"
 
 helpers:
   - "helpers/**/*.{js,coffee}"
