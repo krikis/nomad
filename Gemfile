@@ -27,14 +27,15 @@ gem 'haml_assets'
 gem "coffee-filter"
 
 group :test, :development do
+  gem 'guard-bundler'
   gem "rspec-rails", "~> 2.6"
   gem 'fabrication'
   gem 'timecop'
   gem 'jasmine-rails'
 
   gem 'spork', '~> 0.9.0.rc9' # Spork keeps a process running to speed up tests
-  gem 'guard-spork'          # Guard/Spork integration
-  gem 'guard-rspec'          # Guard automatically runs tests
+  gem 'guard-spork'           # Guard/Spork integration
+  gem 'guard-rspec'           # Guard automatically runs tests
   gem 'guard-cucumber'
   gem 'fuubar'
   gem 'guard-rails-assets'
