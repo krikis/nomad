@@ -1,5 +1,5 @@
 src_files:
-  - [ 'application.js' ]
+  - [ 'application.js', 'application.css' ]
 helpers:
   - "helpers/**/*"
 spec_files:
