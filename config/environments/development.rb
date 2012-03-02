@@ -34,4 +34,6 @@ Nomad::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = false
+
+  config.assets.prefix = "../spec/javascripts/generated/assets"
 end

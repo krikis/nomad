@@ -1,3 +1,3 @@
 describe "Simple Test", ->
-  it "ensures that meaningOfLife() returns the right value", ->
-    expect(window.Nomad).toBeDefined()
+  it "ensures that the Nomad object is defined", ->
+    expect(Nomad).toBeDefined()

@@ -39,7 +39,7 @@ end
 
 spec_location = "spec/javascripts/%s_spec"
 
-guard 'jasmine-headless-webkit' do #, :run_before => 'bundle exec rake assets:clean assets:precompile' do
+guard 'jasmine-headless-webkit', :run_before => 'bundle exec rake assets:clean assets:precompile RAILS_ENV=development' do
   watch(%r{^app/assets/javascripts/(.*)\.(js|coffee)}) { |m| newest_js_file(spec_location % m[1]) }
   watch(%r{^lib/assets/javascripts/(.*)\.(js|coffee)}) { |m| newest_js_file(spec_location % m[1]) }
   watch(%r{^spec/javascripts/(.*)_spec\..*}) { |m| newest_js_file(spec_location % m[1]) }
