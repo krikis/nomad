@@ -32,14 +32,15 @@ end
 #   watch(%r{^app/views/(.+)/.*\.(erb|haml)$})          { |m| "spec/requests/#{m[1]}_spec.rb" }
 # end
 
-guard 'rails-assets' do
-  watch(%r{^.*/assets/.*\.(js|coffee)})
-  watch('config/application.rb')
-end
+# guard 'rails-assets' do
+#   watch(%r{^app/assets/.*\.hamlc})
+#   watch('config/application.rb')
+# end
 
 spec_location = "spec/javascripts/%s_spec"
 
-guard 'jasmine-headless-webkit' do
-  watch(%r{^.*/assets/(.*)\.(js|coffee)}) { |m| newest_js_file(spec_location % m[1]) }
+guard 'jasmine-headless-webkit' do #, :run_before => 'bundle exec rake assets:clean assets:precompile' do
+  watch(%r{^app/assets/javascripts/(.*)\.(js|coffee)}) { |m| newest_js_file(spec_location % m[1]) }
+  watch(%r{^lib/assets/javascripts/(.*)\.(js|coffee)}) { |m| newest_js_file(spec_location % m[1]) }
   watch(%r{^spec/javascripts/(.*)_spec\..*}) { |m| newest_js_file(spec_location % m[1]) }
 end

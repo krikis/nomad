@@ -14,6 +14,8 @@ window.Nomad =
   Collections: {}
   Routers: {}
   Views: {}
+  
+console.log "test"
 
 window.meaningOfLife = () ->
   42
