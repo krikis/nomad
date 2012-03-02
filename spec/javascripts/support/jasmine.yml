@@ -1,9 +1,11 @@
-src_files:
-  - [ 'application.js', 'application.css' ]
+src_files: 
+  - [ 'application.coffee' ]
 helpers:
   - "helpers/**/*"
 spec_files:
   - "**/*_spec.*"
 src_dir:
-  - app/assets
+  - app/assets/javascripts
+  - lib/assets/javascripts
+  - vendor/assets/javascripts
 spec_dir: spec/javascripts
