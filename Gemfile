@@ -13,6 +13,7 @@ group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
   gem 'bootstrap-sass', '~> 2.0.1'
+  # gem 'twitter-bootstrap-rails'
 
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
   # gem 'therubyracer'
@@ -22,13 +23,13 @@ end
 
 gem 'jquery-rails'
 gem 'rails-backbone'
-gem "backbone-support"
-gem "haml-rails"
+gem 'backbone-support'
+gem 'haml-rails'
 gem 'haml_assets'
-gem "coffee-filter"
+gem 'coffee-filter'
 
 group :test, :development do
-  gem "rspec-rails", "~> 2.6"
+  gem 'rspec-rails', '~> 2.6'
   gem 'fabrication'
   gem 'timecop'
 
