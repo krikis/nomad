@@ -15,8 +15,3 @@ window.Nomad =
   Routers: {}
   Views: {}
   
-console.log "test"
-
-window.meaningOfLife = () ->
-  42
-  
