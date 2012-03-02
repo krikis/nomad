@@ -12,10 +12,17 @@
 #
 #= require jquery
 #= require jquery_ujs
+#= require bootstrap
 #= require underscore
 #= require backbone
 #= require backbone_rails_sync
 #= require backbone-support
 #= require backbone_datalink
-#= require ./backbone/nomad
+#
+#= require backbone-forms.js
+#= require jquery-ui-editors.js
+#= require uploader.js
+#
+#= require backbone/nomad
+#
 #= require_tree .

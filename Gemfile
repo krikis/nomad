@@ -12,7 +12,7 @@ gem 'sqlite3'
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
-  gem 'bootstrap-sass'
+  gem 'bootstrap-sass', '~> 2.0.1'
 
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
   # gem 'therubyracer'
@@ -31,7 +31,6 @@ group :test, :development do
   gem "rspec-rails", "~> 2.6"
   gem 'fabrication'
   gem 'timecop'
-  gem 'jasmine-rails'
 
   gem 'spork', '~> 0.9.0.rc9' # Spork keeps a process running to speed up tests
   gem 'guard-spork'           # Guard/Spork integration
