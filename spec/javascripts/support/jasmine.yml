@@ -1,12 +1,9 @@
 src_files:
-  - "**/*"
+  - [ 'application.js' ]
 helpers:
   - "helpers/**/*"
 spec_files:
   - "**/*_spec.*"
 src_dir:
-  - app/assets/javascripts
-  - app/assets/templates
-  - lib/assets/javascripts
-  - vendor/assets/javascripts
+  - public
 spec_dir: spec/javascripts
