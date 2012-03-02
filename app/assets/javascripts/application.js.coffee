@@ -24,6 +24,6 @@
 #= require jquery-ui-editors.js
 #= require uploader.js
 #
-#= require backbone/nomad
+#= require nomad
 #
 #= require_tree .
