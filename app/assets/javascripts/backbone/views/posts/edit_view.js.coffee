@@ -1,7 +1,7 @@
 Nomad.Views.Posts ||= {}
 
 class Nomad.Views.Posts.EditView extends Backbone.View
-  # template : JST["backbone/templates/posts/edit"]
+  # template : JST["posts/edit"]
   template: _.template($('#posts-edit').html())
 
   events :

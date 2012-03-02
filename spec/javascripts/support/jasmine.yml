@@ -1,11 +1,12 @@
 src_files:
   - "**/*"
 helpers:
-  - helpers/**/*
+  - "helpers/**/*"
 spec_files:
   - "**/*_spec.*"
-src_dir: 
+src_dir:
   - app/assets/javascripts
+  - app/assets/templates
   - lib/assets/javascripts
   - vendor/assets/javascripts
 spec_dir: spec/javascripts

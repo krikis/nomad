@@ -1,7 +1,7 @@
 Nomad.Views.Posts ||= {}
 
 class Nomad.Views.Posts.PostView extends Backbone.View
-  template: JST["backbone/templates/posts/post"]
+  template: JST["posts/post"]
 
   events:
     "click .index" :   "index"
