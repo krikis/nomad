@@ -1,5 +1,5 @@
 #= require_self
-#= require_tree ../../templates
+#= require_tree ./templates
 #= require_tree ./models
 #= require_tree ./views
 #= require_tree ./routers
@@ -14,3 +14,7 @@ window.Nomad =
   Collections: {}
   Routers: {}
   Views: {}
+
+window.meaningOfLife = () ->
+  42
+  

@@ -2,10 +2,10 @@
 %form#new-post{:name => "post"}
   .field
     %label{:for => "title"} title:
-    %input#title{:name => "title", :type => "text", :value => "<%= title %>"}
+    %input#title{:name => "title", :type => "text", :value => "#{ @title }"}
   .field
     %label{:for => "content"} content:
-    %input#content{:name => "content", :type => "text", :value => "<%= content %>"}
+    %input#content{:name => "content", :type => "text", :value => "#{ @content }"}
   .actions
     %input{:type => "submit", :value => "Create Post"}/
 %a{:class => "index", :href => "posts"} Back

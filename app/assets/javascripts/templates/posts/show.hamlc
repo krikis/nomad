@@ -1,8 +1,8 @@
 %p
   %b Title:
-  <%= title %>
+  #{ @title }
 %p
   %b Content:
-  <%= content %>
-%a{:class => "edit", :href => "posts/<%= id %>/edit"} Edit
+  #{ @content }
+%a{:class => "edit", :href => "posts/#{ @id }/edit"} Edit
 %a{:class => "index", :href => "posts"} Back
