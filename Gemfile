@@ -43,15 +43,18 @@ group :test, :development do
   gem 'guard-rails-assets'
   gem 'guard-jasmine-headless-webkit' # works with qt 4.7.4
   gem 'database_cleaner'
-end
 
-group :mac_development do
-  # bundle config without :linux_development
-  gem 'rb-fsevent'
-  gem 'rb-readline'
-  gem 'growl'
+  require 'rbconfig'
+  case RbConfig::CONFIG['host_os']
+  when /darwin/
+    gem 'rb-fsevent'
+    gem 'rb-readline'
+    gem 'growl'
+  when /linux/
+    gem 'rb-inotify'
+    gem 'libnotify'
+  end
 end
-
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
