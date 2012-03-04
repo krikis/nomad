@@ -1,3 +1,14 @@
+GIT
+  remote: git://github.com/dzello/jasmine-headless-webkit.git
+  revision: 0217bf7b5ee798fa003acadcde6b56e65efd6d26
+  specs:
+    jasmine-headless-webkit (0.8.4)
+      coffee-script
+      jasmine-core (~> 1.1)
+      multi_json
+      rainbow
+      sprockets (~> 2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -97,12 +108,6 @@ GEM
     hike (1.2.1)
     i18n (0.6.0)
     jasmine-core (1.1.0)
-    jasmine-headless-webkit (0.8.4)
-      coffee-script
-      jasmine-core (~> 1.1)
-      multi_json
-      rainbow
-      sprockets (~> 2)
     journey (1.0.3)
     jquery-rails (2.0.0)
       railties (>= 3.2.0.beta, < 5.0)
@@ -206,6 +211,7 @@ DEPENDENCIES
   haml-rails
   haml_assets
   haml_coffee_assets
+  jasmine-headless-webkit!
   jquery-rails
   rails (= 3.2.1)
   rails-backbone

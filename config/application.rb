@@ -65,5 +65,8 @@ module Nomad
       g.stylesheets         false
       g.javascripts         false
     end
+
+    require Rails.root.join('config/haml_coffee_assets.rb')
+    config.hamlcoffee.merge!(HamlCoffeeAssets::Engine::APP_CONFIG)
   end
 end

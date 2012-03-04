@@ -41,6 +41,7 @@ group :test, :development do
   gem 'guard-cucumber'
   gem 'fuubar'
   gem 'guard-rails-assets'
+  gem 'jasmine-headless-webkit', :git => "git://github.com/dzello/jasmine-headless-webkit.git"
   gem 'guard-jasmine-headless-webkit' # works with qt 4.7.4
   gem 'database_cleaner'
 
