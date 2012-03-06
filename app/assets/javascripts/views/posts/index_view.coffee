@@ -2,7 +2,6 @@ Nomad.Views.Posts ||= {}
 
 class Nomad.Views.Posts.IndexView extends Backbone.View
   template: JST["posts/index"]
-  # template: _.template($('#posts-index').html())
   
   events:
     'click .new':     'new'
@@ -39,6 +38,6 @@ class Nomad.Views.Posts.IndexView extends Backbone.View
 
   render: =>
     $(@el).html(@template(posts: @options.posts.toJSON() ))
-    @addAll()
+    # @addAll()
 
     return this
