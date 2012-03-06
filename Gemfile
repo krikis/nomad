@@ -29,6 +29,7 @@ gem 'backbone-support'
 gem 'haml-rails'
 gem 'haml_assets'
 gem 'coffee-filter'
+gem 'sanitize'
 
 group :test, :development do
   gem 'rspec-rails', '~> 2.6'
