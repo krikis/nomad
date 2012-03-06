@@ -14,3 +14,4 @@ window.Nomad =
   Collections: {}
   Routers: {}
   Views: {}
+  
