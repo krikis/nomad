@@ -4,16 +4,11 @@ class Nomad.Views.Posts.PostView extends Backbone.View
   template: JST["posts/post"]
 
   events:
-    "click .index" :   "index"
-    'click .show':     "show"
-    'click .edit':     "edit"
-    "click .destroy" : "destroy"
+    'click .show':    'show'
+    'click .edit':    'edit'
+    'click .destroy': 'destroy'
 
   tagName: "tr"  
-
-  index : (e) -> 
-    e.preventDefault()
-    Backbone.history.navigate $(e.target).attr("href"), trigger: true
 
   show : (e) -> 
     e.preventDefault()

@@ -1,6 +1,6 @@
 class Post < ActiveRecord::Base
 
-  before_validation :sanitize_attributes
+  # before_validation :sanitize_attributes
 
   private
 

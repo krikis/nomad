@@ -8,8 +8,8 @@
     %th
   - _.each @posts, (post) ->
     %tr
-      %td #{ post.title }
-      %td #{ post.content }
+      %td= post.title
+      %td= post.content
       %td
         %a{:class => "show", :href => "posts/#{ post.id }"} Show
       %td
