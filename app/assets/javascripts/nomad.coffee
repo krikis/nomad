@@ -4,11 +4,6 @@
 #= require_tree ./views
 #= require_tree ./routers
 
-_.templateSettings =
-  evaluate: /\{\%([\s\S]+?)\%\}/g
-  interpolate: /\{\{([\s\S]+?)\}\}/g
-  escape: /\{\{\-([\s\S]+?)\}\}/g
-
 window.Nomad =
   Models: {}
   Collections: {}
