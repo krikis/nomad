@@ -2,7 +2,7 @@ Nomad.Views.Posts ||= {}
 
 class Nomad.Views.Posts.IndexView extends Backbone.View
   template: JST["posts/index"]
-  
+
   events:
     'click .new':     'new'
     'click .show':    'show'
@@ -11,19 +11,19 @@ class Nomad.Views.Posts.IndexView extends Backbone.View
 
   initialize: () ->
     @options.posts.bind('reset', @addAll)
-  
+
   new: (e) ->
     e.preventDefault()
     Backbone.history.navigate $(e.target).attr("href"), trigger: true
 
-  show : (e) -> 
+  show : (e) ->
     e.preventDefault()
     Backbone.history.navigate $(e.target).attr("href"), trigger: true
-  
-  edit : (e) -> 
+
+  edit : (e) ->
     e.preventDefault()
     Backbone.history.navigate $(e.target).attr("href"), trigger: true
-  
+
   destroy: () ->
     @model.destroy()
     @remove()
@@ -38,6 +38,6 @@ class Nomad.Views.Posts.IndexView extends Backbone.View
 
   render: =>
     $(@el).html(@template(posts: @options.posts.toJSON() ))
-    # @addAll()
+    @addAll()
 
     return this
