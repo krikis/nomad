@@ -1,4 +1,4 @@
-Observer =
+@Observer =
   bindTo: (source, event, callback) ->
     source.on event, callback, this
     @bindings = @bindings or []

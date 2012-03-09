@@ -6,6 +6,7 @@
 #= require_tree ./routers
 
 _.extend Backbone.View::, @LinkHandler
+_.extend Backbone.View::, @Observer
 
 window.Nomad =
   Models: {}
