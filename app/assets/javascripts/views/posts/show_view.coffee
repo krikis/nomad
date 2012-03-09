@@ -8,12 +8,10 @@ class Nomad.Views.Posts.ShowView extends Backbone.View
     "click .edit" : "index"
 
   index : (e) -> 
-    e.preventDefault()
-    Backbone.history.navigate $(e.target).attr("href"), trigger: true
+    @followLink e
 
   edit : (e) -> 
-    e.preventDefault()
-    Backbone.history.navigate $(e.target).attr("href"), trigger: true
+    @followLink e
 
   render: ->
     $(@el).html(@template(@model.toJSON() ))

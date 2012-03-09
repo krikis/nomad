@@ -11,12 +11,10 @@ class Nomad.Views.Posts.PostView extends Backbone.View
   tagName: "tr"  
 
   show : (e) -> 
-    e.preventDefault()
-    Backbone.history.navigate $(e.target).attr("href"), trigger: true
+    @followLink e
 
   edit : (e) -> 
-    e.preventDefault()
-    Backbone.history.navigate $(e.target).attr("href"), trigger: true
+    @followLink e
 
   destroy: () ->
     @model.destroy()

@@ -7,14 +7,12 @@ class Nomad.Views.Posts.EditView extends Backbone.View
     "click .index" : "index"
     "click .show"  : "index"
     "submit #edit-post" : "update"
-    
-  index : (e) -> 
-    e.preventDefault()
-    Backbone.history.navigate $(e.target).attr("href"), trigger: true    
-    
-  show : (e) -> 
-    e.preventDefault()
-    Backbone.history.navigate $(e.target).attr("href"), trigger: true
+
+  index : (e) ->  
+    @followLink e
+
+  show : (e) ->
+    @followLink e
 
   update : (e) ->
     e.preventDefault()

@@ -16,8 +16,7 @@ class Nomad.Views.Posts.NewView extends Backbone.View
     )
 
   index : (e) -> 
-    e.preventDefault()
-    Backbone.history.navigate $(e.target).attr("href"), trigger: true
+    @followLink e
 
   save: (e) ->
     e.preventDefault()

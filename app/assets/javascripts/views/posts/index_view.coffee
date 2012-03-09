@@ -10,8 +10,7 @@ class Nomad.Views.Posts.IndexView extends Backbone.View
     @options.posts.bind('reset', @addAll)
 
   new: (e) ->
-    e.preventDefault()
-    Backbone.history.navigate $(e.target).attr("href"), trigger: true
+    @followLink e
 
   addAll: () =>
     @options.posts.each(@addOne)

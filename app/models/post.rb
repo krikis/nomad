@@ -2,6 +2,8 @@ class Post < ActiveRecord::Base
 
   # before_validation :sanitize_attributes
 
+  validates_presence_of :title
+
   private
 
   def sanitize_attributes

@@ -17,7 +17,7 @@
 #= require underscore
 #= require backbone
 ## require backbone_rails_sync
-#= require ./logic/backbone.authtokenadapter
+#= require backbone.authtokenadapter
 #= require backbone-support
 #= require backbone_datalink
 #
