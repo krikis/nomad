@@ -5,9 +5,6 @@ class Nomad.Views.Posts.IndexView extends Backbone.View
 
   events:
     'click .new':     'new'
-    'click .show':    'show'
-    'click .edit':    'edit'
-    'click .destroy': 'destroy'
 
   initialize: () ->
     @options.posts.bind('reset', @addAll)
@@ -15,19 +12,6 @@ class Nomad.Views.Posts.IndexView extends Backbone.View
   new: (e) ->
     e.preventDefault()
     Backbone.history.navigate $(e.target).attr("href"), trigger: true
-
-  show : (e) ->
-    e.preventDefault()
-    Backbone.history.navigate $(e.target).attr("href"), trigger: true
-
-  edit : (e) ->
-    e.preventDefault()
-    Backbone.history.navigate $(e.target).attr("href"), trigger: true
-
-  destroy: () ->
-    @model.destroy()
-    @remove()
-    return false
 
   addAll: () =>
     @options.posts.each(@addOne)
