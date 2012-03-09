@@ -13,6 +13,7 @@ class PostsController < ApplicationController
   # GET /posts/1
   # GET /posts/1.json
   def show
+    @posts = Post.all
     @post = Post.find(params[:id])
 
     respond_to do |format|
@@ -24,6 +25,7 @@ class PostsController < ApplicationController
   # GET /posts/new
   # GET /posts/new.json
   def new
+    @posts = Post.all
     @post = Post.new
 
     respond_to do |format|
@@ -34,6 +36,7 @@ class PostsController < ApplicationController
 
   # GET /posts/1/edit
   def edit
+    @posts = Post.all
     @post = Post.find(params[:id])
   end
 

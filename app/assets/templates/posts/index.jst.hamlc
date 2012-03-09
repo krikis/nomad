@@ -6,15 +6,5 @@
     %th
     %th
     %th
-  -# - _.each @posts, (post) ->
-  -#   %tr
-  -#     %td= post.title
-  -#     %td= post.content
-  -#     %td
-  -#       %a{:class => "show", :href => "posts/#{ post.id }"} Show
-  -#     %td
-  -#       %a{:class => "edit", :href => "posts/#{ post.id }/edit"} Edit
-  -#     %td
-  -#       %a.destroy{:class => "destroy", :href => "posts/#{ post.id }/destroy"} Destroy
 %br/
 %a{:class => "new", :href => "posts/new"} New Post
