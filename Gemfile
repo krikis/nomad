@@ -46,6 +46,7 @@ group :test, :development do
   gem 'guard-jasmine-headless-webkit' # works with qt 4.7.4
   gem 'capybara-webkit'
   gem 'database_cleaner'
+  gem "cucumber-rails"
 
   require 'rbconfig'
   case RbConfig::CONFIG['host_os']
