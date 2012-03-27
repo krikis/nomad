@@ -8,7 +8,7 @@ class Nomad.Routers.PostsRouter extends Backbone.Router
 
   initialize: (options) ->
     @posts = new Nomad.Collections.PostsCollection()
-    @posts.reset options.posts
+    @posts.fetch()
     
   newPost: ->
     @view = new Nomad.Views.Posts.NewView(collection: @posts)

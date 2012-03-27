@@ -8,3 +8,4 @@ class Nomad.Models.Post extends Backbone.Model
 class Nomad.Collections.PostsCollection extends Backbone.Collection
   model: Nomad.Models.Post
   url: '/posts'
+  localStorage: new Backbone.LocalStorage("PostsCollection")
