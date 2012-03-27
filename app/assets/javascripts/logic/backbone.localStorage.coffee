@@ -36,8 +36,9 @@
     create: (model) ->
       unless model.id
         id = guid()
+        store = model.localStorage or model.collection.localStorage
         # make sure the id is unique within the model's collection
-        id = guid() while id in model.collection.localStorage.records
+        id = guid() while id in store.records
         model.id = model.attributes[model.idAttribute] = id
       @localStorage().setItem @name + "-" + model.id, JSON.stringify(model)
       @records.push model.id.toString()
