@@ -16,7 +16,7 @@
 #= require bootstrap
 #= require underscore
 #= require backbone
-#= require backbone.localStorage
+## require backbone.localStorage
 ## require backbone_rails_sync
 #= require backbone.authtokenadapter
 #= require backbone-support
