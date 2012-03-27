@@ -34,7 +34,11 @@
     # Add a model, giving it a (hopefully)-unique GUID, if it doesn't already
     # have an id of it's own.
     create: (model) ->
-      model.id = model.attributes[model.idAttribute] = guid()  unless model.id
+      unless model.id
+        id = guid()
+        # make sure the id is unique within the model's collection
+        id = guid() while id in model.collection.localStorage.records
+        model.id = model.attributes[model.idAttribute] = id
       @localStorage().setItem @name + "-" + model.id, JSON.stringify(model)
       @records.push model.id.toString()
       @save()
