@@ -11,6 +11,7 @@ guard 'spork', :rspec_env => { 'RAILS_ENV' => 'test' },
   watch(%r{^config/initializers/.+\.rb$})
   watch(%r{^lib/(.+)\.rb$})
   watch('spec/spec_helper.rb')
+  watch('spec/javascripts/support/jasmine.yml')
 end
 
 # guard 'rspec', :version => 2, :cli => "--drb -f Fuubar --colour" do

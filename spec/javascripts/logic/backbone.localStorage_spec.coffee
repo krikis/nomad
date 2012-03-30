@@ -127,3 +127,25 @@ describe "localStorage on models", ->
     remoteModel = new MyRemoteModel()
     method = Backbone.getSyncMethod(remoteModel)
     expect(method).toEqual Backbone.ajaxSync #
+    
+describe "#create", ->
+  TestCollection = Backbone.Collection.extend(localStorage: new Backbone.LocalStorage("TestCollection"))
+  OtherTestCollection = Backbone.Collection.extend(localStorage: new Backbone.LocalStorage("OtherTestCollection"))
+  collection = undefined
+  other_collection = undefined
+  attributes =
+    title: "The Tempest"
+    author: "Bill Shakespeare"
+    length: 123
+  ids = undefined
+
+  beforeEach ->
+    window.localStorage.clear()
+    collection = new TestCollection()
+    other_collection = new OtherTestCollection()
+    
+  it "should generate a unique object id within the scope of a collection", ->
+    sinon.stub @, "guid", ->
+      ids ||= ["used_id", "unique_id"]
+      ids.pop
+  

@@ -1,5 +1,7 @@
 src_files: 
-  - [ 'application.coffee' ]
+  - 'application.coffee'
+  - 'sinon.js'
+  - 'rosie.js'
 helpers:
   - "helpers/**/*"
 spec_files:
@@ -7,6 +9,7 @@ spec_files:
 src_dir:
   - app/assets/javascripts
   - app/assets/templates
+  - spec/javascripts/support
   - lib/assets/javascripts
   - vendor/assets/javascripts
 spec_dir: spec/javascripts
