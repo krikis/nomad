@@ -1,14 +1,15 @@
 describe "localStorage on collections", ->
-
-  TestCollection = Backbone.Collection.extend(localStorage: new Backbone.LocalStorage("TestCollection"))
+  
+  TestCollection = Backbone.Collection.extend()
   collection = undefined
   attributes =
     title: "The Tempest"
     author: "Bill Shakespeare"
     length: 123
 
-  beforeEach ->
+  beforeEach ->  
     window.localStorage.clear()
+    TestCollection::localStorage = new Backbone.LocalStorage("TestCollection")
     collection = new TestCollection()
 
   it "should be empty initially", ->
@@ -84,68 +85,74 @@ describe "localStorage on collections", ->
     expect(collection.first().id).toEqual collection.first().get("_id") #
 
 describe "localStorage on models", ->
-  
+
   TestModel = Backbone.Model.extend(
     defaults:
       title: "The Tempest"
       author: "Bill Shakespeare"
       length: 123
-
-    localStorage: new Backbone.LocalStorage("TestModel")
   )
-  
+
   model = undefined
-  
+
   beforeEach ->
     window.localStorage.clear()
+    TestModel::localStorage = new Backbone.LocalStorage("TestModel")
     model = new TestModel()
-  
+
   it "should overwrite unsaved changes when fetching", ->
     model.save()
     model.set title: "Wombat's Fun Adventure"
     model.fetch()
     expect(model.get("title")).toEqual "The Tempest" # "model created"
-  
+
   it "should persist changes", ->
     model.save author: "William Shakespeare"
     model.fetch()
     expect(model.get("author")).toEqual "William Shakespeare" # "author successfully updated"
     expect(model.get("length")).toEqual 123 # "verify length is still there"
-  
+
   it "should remove model when destroying", ->
     model.save author: "fnord"
     expect(TestModel::localStorage.findAll().length).toEqual 1 # "model removed"
     model.destroy()
     expect(TestModel::localStorage.findAll().length).toEqual 0 # "model removed"
-  
+
   it "should use local sync", ->
     method = Backbone.getSyncMethod(model)
-    expect(method).toEqual Backbone.localSync # 
-  
-  it "remoteModel should use ajax sync", ->    
+    expect(method).toEqual Backbone.localSync #
+
+  it "remoteModel should use ajax sync", ->
     MyRemoteModel = Backbone.Model.extend()
     remoteModel = new MyRemoteModel()
     method = Backbone.getSyncMethod(remoteModel)
     expect(method).toEqual Backbone.ajaxSync #
-    
+
 describe "#create", ->
-  TestCollection = Backbone.Collection.extend(localStorage: new Backbone.LocalStorage("TestCollection"))
-  OtherTestCollection = Backbone.Collection.extend(localStorage: new Backbone.LocalStorage("OtherTestCollection"))
+  TestCollection = Backbone.Collection.extend()
+  OtherTestCollection = Backbone.Collection.extend()
   collection = undefined
   other_collection = undefined
-  attributes =
-    title: "The Tempest"
-    author: "Bill Shakespeare"
-    length: 123
   ids = undefined
 
   beforeEach ->
     window.localStorage.clear()
+    TestCollection::localStorage = new Backbone.LocalStorage("TestCollection")
+    OtherTestCollection::localStorage = new Backbone.LocalStorage("OtherTestCollection")
     collection = new TestCollection()
     other_collection = new OtherTestCollection()
-    
+
   it "should generate a unique object id within the scope of a collection", ->
-    sinon.stub @, "guid", ->
-      ids ||= ["used_id", "unique_id"]
-      ids.pop
-  
+    sinon.stub collection.localStorage, "guid", ->
+      ids ||= ["other_unique_id", "unique_id", "used_id"]
+      id = ids.pop()
+    collection.create id: "used_id"         # this id is in use in the same collection
+    other_collection.create id: "unique_id" # this id is in use in another collection
+    collection.create
+      title: "The Tempest"
+      author: "Bill Shakespeare"
+      length: 123
+    # last model has a unique id within collection scope
+    expect(collection.last().get("id")).toEqual "unique_id" 
+
+

@@ -1,23 +1,20 @@
-# 
+#
 # Backbone localStorage Adapter
 # Adapted from https://github.com/jeromegn/Backbone.localStorage
-# 
+#
 
 (->
   # A simple module to replace `Backbone.sync` with *localStorage*-based
   # persistence. Models are given GUIDS, and saved into a JSON object. Simple
   # as that.
-  
+
   # Generate four random hex digits.
   S4 = ->
     (((1 + Math.random()) * 0x10000) | 0).toString(16).substring 1
-  
+
   # Our Store is represented by a single JS object in *localStorage*. Create it
   # with a meaningful name, like the name you'd give a table.
   # window.Store is deprectated, use Backbone.LocalStorage instead
-  guid = ->
-    S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4()
-    
   Backbone.LocalStorage = window.Store = (name) ->
     @name = name
     store = @localStorage().getItem(@name)
@@ -25,20 +22,24 @@
     return
 
   _.extend Backbone.LocalStorage::,
-  
+
     # Save the current state of the **Store** to *localStorage*.
     save: ->
       @localStorage().setItem @name, @records.join(",")
       return
 
+    # Generate a pseudo-GUID by concatenating random hexadecimal.
+    guid: ->
+      S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4()
+
     # Add a model, giving it a (hopefully)-unique GUID, if it doesn't already
     # have an id of it's own.
     create: (model) ->
       unless model.id
-        id = guid()
+        id = @guid()
         store = model.localStorage or model.collection.localStorage
         # make sure the id is unique within the model's collection
-        id = guid() while id in store.records
+        id = @guid() while id in store.records
         model.id = model.attributes[model.idAttribute] = id
       @localStorage().setItem @name + "-" + model.id, JSON.stringify(model)
       @records.push model.id.toString()
@@ -79,15 +80,15 @@
   # window.Store.sync and Backbone.localSync is deprectated, use Backbone.LocalStorage.sync instead
   Backbone.LocalStorage.sync = window.Store.sync = Backbone.localSync = (method, model, options, error) ->
     store = model.localStorage or model.collection.localStorage
-    
+
     # Backwards compatibility with Backbone <= 0.3.3
     if typeof options is "function"
       options =
         success: options
         error: error
-        
+
     resp = undefined
-    
+
     switch method
       when "read"
         resp = (if model.id isnt `undefined` then store.find(model) else store.findAll())
@@ -97,7 +98,7 @@
         resp = store.update(model)
       when "delete"
         resp = store.destroy(model)
-        
+
     if resp
       options.success resp
     else
@@ -105,7 +106,7 @@
     return
 
   Backbone.ajaxSync = Backbone.sync
-  
+
   Backbone.getSyncMethod = (model) ->
     return Backbone.localSync  if model.localStorage or (model.collection and model.collection.localStorage)
     Backbone.ajaxSync
