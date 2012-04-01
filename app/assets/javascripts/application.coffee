@@ -22,6 +22,7 @@
 #= require backbone-support
 #= require backbone_datalink
 #
+#= require faye-browser.js
 #= require backbone-forms.js
 #= require jquery-ui-editors.js
 #= require uploader.js

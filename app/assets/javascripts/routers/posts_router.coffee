@@ -8,6 +8,9 @@ class Nomad.Routers.PostsRouter extends Backbone.Router
 
   initialize: (options) ->
     @posts = new Nomad.Collections.PostsCollection()
+    new BackboneSync.FayeSubscriber(@posts,
+      channel: "posts"
+    )
     @posts.fetch()
     
   newPost: ->
