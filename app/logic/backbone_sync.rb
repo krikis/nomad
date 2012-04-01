@@ -1,3 +1,6 @@
+require 'net/http'
+require 'uri'
+
 module BackboneSync
   module Rails
     module Faye
@@ -5,18 +8,16 @@ module BackboneSync
       self.root_address = 'http://localhost:9292'
 
       module Observer
-        puts "TESTEN\n\n\n"
         def after_update(model)
-          Event.new(model, :update).publish
+          Event.new(model, :update).broadcast
         end
 
         def after_create(model)
-          puts "#{model.inspect} created"
-          Event.new(model, :create).publish
+          Event.new(model, :create).broadcast
         end
 
         def after_destroy(model)
-          Event.new(model, :destroy).publish
+          Event.new(model, :destroy).broadcast
         end
       end
 
