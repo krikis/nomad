@@ -17,7 +17,6 @@ class Nomad.Views.Posts.EditView extends Backbone.View
   update : (e) ->
     e.preventDefault()
     e.stopPropagation()
-
     @model.save(null,
       success : (post) =>
         @model = post

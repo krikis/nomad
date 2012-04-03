@@ -7,7 +7,7 @@ class Nomad.Views.Posts.IndexView extends Backbone.View
     'click .new':     'new'
 
   initialize: () ->
-    @options.posts.bind('reset', @addAll)
+    @options.posts.bind 'add', @render, @
 
   new: (e) ->
     @followLink e

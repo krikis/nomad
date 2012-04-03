@@ -16,11 +16,10 @@ class Nomad.Views.Posts.PostView extends Backbone.View
   edit : (e) -> 
     @followLink e
 
-  destroy: () ->
+  destroy: (e) ->
     @model.destroy()
-    @unbindFromAll()
-    @off()
-    @remove()
+    console.log @leave
+    @leave()
     return false
 
   render: ->

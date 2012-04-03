@@ -25,7 +25,7 @@ BackboneSync.FayeSubscriber = (->
     self = @
     $.each params, (id, attributes) ->
       model = new self.collection.model(attributes)
-      self.collection.add model
+      self.collection.create model
 
   FayeSubscriber::destroy = (params) ->
     self = @

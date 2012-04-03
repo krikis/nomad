@@ -3,13 +3,9 @@
     source.on event, callback, @
     @bindings ||= _([])
     @bindings.push source
-      
-  leave: ->
-    @unbind()
-    @unbindFromAll()
-    @remove()
 
   unbindFromAll: ->
-    @bindings.each (source) ->
-      source.off null, null, @
-    @bindings = _([])
+    if @bindings?
+      @bindings.each (source) ->
+        source.off null, null, @
+      @bindings = _([])
