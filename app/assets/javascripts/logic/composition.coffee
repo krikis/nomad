@@ -11,6 +11,10 @@
     @renderChild view
     $(@el).append view.el
 
+  appendChildTo: (view, container) ->
+    @renderChild view
+    $(container).append view.el
+
   renderChildInto: (view, container) ->
     @renderChild view
     $(container).empty().append view.el

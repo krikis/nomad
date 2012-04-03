@@ -12,15 +12,14 @@ class Nomad.Views.Posts.IndexView extends Backbone.View
   new: (e) ->
     @followLink e
 
-  addAll: () =>
-    @options.posts.each(@addOne)
-
   addOne: (post) =>
-    view = new Nomad.Views.Posts.PostView({model : post})
-    @$("tbody").append(view.render().el)
+    @appendChildTo(
+      new Nomad.Views.Posts.PostView({model : post}), 
+      @$("tbody")
+    )
 
   render: =>
-    $(@el).html(@template(posts: @options.posts.toJSON() ))
-    @addAll()
+    $(@el).html @template()
+    @options.posts.each(@addOne)
 
     return this
