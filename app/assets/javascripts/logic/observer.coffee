@@ -1,14 +1,15 @@
 @Observer =
   bindTo: (source, event, callback) ->
-    source.on event, callback, this
-    @bindings = @bindings or []
-    @bindings.push
-      source: source
-      event: event
-      callback: callback
+    source.on event, callback, @
+    @bindings ||= _([])
+    @bindings.push source
+      
+  leave: ->
+    @unbind()
+    @unbindFromAll()
+    @remove()
 
   unbindFromAll: ->
-    _.each @bindings, (binding) ->
-      binding.source.off binding.event, binding.callback
-
-    @bindings = []
+    @bindings.each (source) ->
+      source.off null, null, @
+    @bindings = _([])

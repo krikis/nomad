@@ -14,21 +14,21 @@ class Nomad.Routers.PostsRouter extends Backbone.Router
     @posts.fetch()
     
   newPost: ->
-    @view = new Nomad.Views.Posts.NewView(collection: @posts)
+    @setView(new Nomad.Views.Posts.NewView(collection: @posts))
     $("#posts").html(@view.render().el)
 
   index: ->
-    @view = new Nomad.Views.Posts.IndexView(posts: @posts)
+    @setView(new Nomad.Views.Posts.IndexView(posts: @posts))
     $("#posts").html(@view.render().el)
 
   show: (id) ->
     post = @posts.get(id)
 
-    @view = new Nomad.Views.Posts.ShowView(model: post)
+    @setView(new Nomad.Views.Posts.ShowView(model: post))
     $("#posts").html(@view.render().el)
 
   edit: (id) ->
     post = @posts.get(id)
 
-    @view = new Nomad.Views.Posts.EditView(model: post)
+    @setView(new Nomad.Views.Posts.EditView(model: post))
     $("#posts").html(@view.render().el)
