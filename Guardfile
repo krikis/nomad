@@ -44,4 +44,5 @@ guard 'jasmine-headless-webkit' do #, :run_before => 'bundle exec rake assets:cl
   watch(%r{^app/assets/javascripts/(.*)\.(js|coffee)}) { |m| newest_js_file(spec_location % m[1]) }
   watch(%r{^lib/assets/javascripts/(.*)\.(js|coffee)}) { |m| newest_js_file(spec_location % m[1]) }
   watch(%r{^spec/javascripts/(.*)_spec\..*}) { |m| newest_js_file(spec_location % m[1]) }
+  watch(%r{^spec/javascripts/(.*)_factory\..*}) { "spec" }
 end

@@ -2,14 +2,16 @@ src_files:
   - 'application.coffee'
   - 'sinon.js'
   - 'rosie.js'
+  - '*_factory.*'
 helpers:
-  - "helpers/**/*"
+  - 'helpers/**/*'
 spec_files:
-  - "**/*_spec.*"
+  - '**/*_spec.*'
 src_dir:
   - app/assets/javascripts
   - app/assets/templates
   - spec/javascripts/support
+  - spec/javascripts/factories
   - lib/assets/javascripts
   - vendor/assets/javascripts
 spec_dir: spec/javascripts
