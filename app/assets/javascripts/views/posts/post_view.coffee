@@ -18,7 +18,6 @@ class Nomad.Views.Posts.PostView extends Backbone.View
 
   destroy: (e) ->
     @model.destroy()
-    console.log @leave
     @leave()
     return false
 
