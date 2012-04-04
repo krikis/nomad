@@ -41,14 +41,13 @@ group :test, :development do
   gem 'guard-rspec'           # Guard automatically runs tests
   gem 'guard-cucumber'
   gem 'fuubar'
-  gem 'guard-rails-assets'
-  gem 'jasmine-headless-webkit', :git => "git://github.com/dzello/jasmine-headless-webkit.git"
-  gem 'guard-jasmine-headless-webkit' # works with qt 4.7.4
+  # gem 'jasmine-headless-webkit', :git => "git://github.com/dzello/jasmine-headless-webkit.git"
+  # gem 'guard-jasmine-headless-webkit' # works with qt 4.7.4
   gem 'capybara-webkit'
   gem 'database_cleaner'
   gem 'cucumber-rails'
-  # gem 'jasminerice'
-  # gem 'guard-jasmine'
+  gem 'jasminerice'
+  gem 'guard-jasmine'
 
   require 'rbconfig'
   case RbConfig::CONFIG['host_os']

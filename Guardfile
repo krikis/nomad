@@ -38,11 +38,25 @@ end
 #   watch('config/application.rb')
 # end
 
-spec_location = "spec/javascripts/%s_spec"
+# spec_location = "spec/javascripts/%s_spec"
+# 
+# guard 'jasmine-headless-webkit' do #, :run_before => 'bundle exec rake assets:clean assets:precompile RAILS_ENV=development' do
+#   watch(%r{^app/assets/javascripts/(.*)\.(js|coffee)}) { |m| newest_js_file(spec_location % m[1]) }
+#   watch(%r{^lib/assets/javascripts/(.*)\.(js|coffee)}) { |m| newest_js_file(spec_location % m[1]) }
+#   watch(%r{^spec/javascripts/(.*)_spec\..*}) { |m| newest_js_file(spec_location % m[1]) }
+#   watch(%r{^spec/javascripts/(.*)_factory\..*}) { "spec/javascripts" }
+# end
 
-guard 'jasmine-headless-webkit' do #, :run_before => 'bundle exec rake assets:clean assets:precompile RAILS_ENV=development' do
-  watch(%r{^app/assets/javascripts/(.*)\.(js|coffee)}) { |m| newest_js_file(spec_location % m[1]) }
-  watch(%r{^lib/assets/javascripts/(.*)\.(js|coffee)}) { |m| newest_js_file(spec_location % m[1]) }
-  watch(%r{^spec/javascripts/(.*)_spec\..*}) { |m| newest_js_file(spec_location % m[1]) }
-  watch(%r{^spec/javascripts/(.*)_factory\..*}) { "spec" }
+guard 'jasmine' do
+  watch(%r{spec/javascripts/spec\.(js\.coffee|js|coffee)$})         { 'spec/javascripts' }
+  watch(%r{^spec/javascripts/(.*)_factory\..*})                     { 'spec/javascripts' }
+  watch(%r{spec/javascripts/.+_spec\.(js\.coffee|js|coffee)$})
+  watch(%r{app/assets/javascripts/(.+?)\.(js\.coffee|js|coffee)$})  { |m| "spec/javascripts/#{m[1]}_spec.#{m[2]}" }
 end
+
+guard 'cucumber' do
+  watch(%r{^features/.+\.feature$})
+  watch(%r{^features/support/.+$})                      { 'features' }
+  watch(%r{^features/step_definitions/(.+)_steps\.rb$}) { |m| Dir[File.join("**/#{m[1]}.feature")][0] || 'features' }
+end
+

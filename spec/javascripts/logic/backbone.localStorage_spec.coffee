@@ -1,9 +1,9 @@
 describe "localStorage on collections", ->
-  
+
   TestCollection = Backbone.Collection.extend()
   collection = undefined
 
-  beforeEach ->  
+  beforeEach ->
     window.localStorage.clear()
     TestCollection::localStorage = new Backbone.LocalStorage("TestCollection")
     collection = new TestCollection()
@@ -149,6 +149,6 @@ describe "#create", ->
       author: "Bill Shakespeare"
       length: 123
     # last model has a unique id within collection scope
-    expect(collection.last().get("id")).toEqual "unique_id" 
+    expect(collection.last().get("id")).toEqual "unique_id"
 
 
