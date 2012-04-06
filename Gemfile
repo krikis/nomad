@@ -34,6 +34,7 @@ gem 'sanitize'
 group :test, :development do
   gem 'rspec-rails', '~> 2.6'
   gem 'fabrication'
+  gem 'factory_girl_rails'
   gem 'timecop'
 
   gem 'spork', '~> 0.9.0.rc9' # Spork keeps a process running to speed up tests
@@ -43,11 +44,12 @@ group :test, :development do
   gem 'fuubar'
   # gem 'jasmine-headless-webkit', :git => "git://github.com/dzello/jasmine-headless-webkit.git"
   # gem 'guard-jasmine-headless-webkit' # works with qt 4.7.4
-  gem 'capybara-webkit'
+  # gem 'capybara-webkit'
   gem 'database_cleaner'
   gem 'cucumber-rails'
   gem 'jasminerice'
   gem 'guard-jasmine'
+  gem 'poltergeist'
 
   require 'rbconfig'
   case RbConfig::CONFIG['host_os']
