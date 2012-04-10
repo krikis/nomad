@@ -51,6 +51,7 @@ group :test, :development do
   gem 'guard-jasmine'
   gem 'poltergeist'
   gem 'steak'
+  gem 'guard-livereload'
 
   require 'rbconfig'
   case RbConfig::CONFIG['host_os']

@@ -14,24 +14,24 @@ guard 'spork', :rspec_env => { 'RAILS_ENV' => 'test' },
   watch('spec/javascripts/support/jasmine.yml')
 end
 
-# guard 'rspec', :version => 2, :cli => "--drb -f Fuubar --colour" do
-#   watch(%r{^spec/.+_spec\.rb$})
-#   watch(%r{^lib/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
-#   watch('spec/spec_helper.rb')  { "spec" }
-# 
-#   # Rails example
-#   watch(%r{^spec/.+_spec\.rb$})
-#   watch(%r{^app/(.+)\.rb$})                           { |m| "spec/#{m[1]}_spec.rb" }
-#   watch(%r{^lib/(.+)\.rb$})                           { |m| "spec/lib/#{m[1]}_spec.rb" }
-#   watch(%r{^app/controllers/(.+)_(controller)\.rb$})  { |m| ["spec/routing/#{m[1]}_routing_spec.rb", "spec/#{m[2]}s/#{m[1]}_#{m[2]}_spec.rb", "spec/acceptance/#{m[1]}_spec.rb"] }
-#   watch(%r{^spec/support/(.+)\.rb$})                  { "spec" }
-#   watch(%r{^spec/fabricators/(.+)\.rb$})              { |m| "spec" }
-#   watch('spec/spec_helper.rb')                        { "spec" }
-#   watch('config/routes.rb')                           { "spec/routing" }
-#   watch('app/controllers/application_controller.rb')  { "spec/controllers" }
-#   # Capybara request specs
-#   watch(%r{^app/views/(.+)/.*\.(erb|haml)$})          { |m| "spec/requests/#{m[1]}_spec.rb" }
-# end
+guard 'rspec', :version => 2, :cli => "--drb -f Fuubar --colour" do
+  watch(%r{^spec/.+_spec\.rb$})
+  watch(%r{^app/(.+)\.rb$})                           { |m| "spec/#{m[1]}_spec.rb" }
+  watch(%r{^lib/(.+)\.rb$})                           { |m| "spec/lib/#{m[1]}_spec.rb" }
+  watch(%r{^app/controllers/(.+)_(controller)\.rb$})  { |m| ["spec/routing/#{m[1]}_routing_spec.rb", "spec/#{m[2]}s/#{m[1]}_#{m[2]}_spec.rb", "spec/acceptance"] }
+  watch(%r{^spec/fabricators/(.+)\.rb$})              { "spec" }
+  watch(%r{^spec/support/(.+)\.rb$})                  { "spec" }
+  watch('spec/spec_helper.rb')                        { "spec" }
+  watch('config/routes.rb')                           { "spec/routing" }
+  watch('app/controllers/application_controller.rb')  { "spec/controllers" }
+  # Capybara request specs
+  watch(%r{^app/views/(.+)/.*\.(erb|haml)$})          { |m| "spec/requests/#{m[1]}_spec.rb" }
+  # Steak acceptance specs
+  watch(%r{^spec/acceptance/support/(.+)\.rb$})       { "spec/acceptance" }
+  watch('spec/acceptance/acceptance_helper.rb')       { "spec/acceptance" }
+  watch('app/assets/javascripts')                     { "spec/acceptance" }
+  watch('app/assets/templates')                       { "spec/acceptance" }
+end
 
 # guard 'rails-assets' do
 #   watch(%r{^app/assets/.*\.hamlc})
@@ -52,11 +52,20 @@ guard 'jasmine' do
   watch(%r{^spec/javascripts/(.*)_factory\..*})                     { 'spec/javascripts' }
   watch(%r{spec/javascripts/.+_spec\.(js\.coffee|js|coffee)$})
   watch(%r{app/assets/javascripts/(.+?)\.(js\.coffee|js|coffee)$})  { |m| "spec/javascripts/#{m[1]}_spec.#{m[2]}" }
+  watch('app/assets/templates')                                    { 'spec/javascripts' }
 end
 
-guard 'cucumber' do
-  watch(%r{^features/.+\.feature$})
-  watch(%r{^features/support/.+$})                      { 'features' }
-  watch(%r{^features/step_definitions/(.+)_steps\.rb$}) { |m| Dir[File.join("**/#{m[1]}.feature")][0] || 'features' }
-end
+# guard 'cucumber' do
+#   watch(%r{^features/.+\.feature$})
+#   watch(%r{^features/support/.+$})                      { 'features' }
+#   watch(%r{^features/step_definitions/(.+)_steps\.rb$}) { |m| Dir[File.join("**/#{m[1]}.feature")][0] || 'features' }
+# end
 
+# guard 'livereload' do
+#   watch(%r{app/views/.+\.(erb|haml|slim)})
+#   watch(%r{app/helpers/.+\.rb})
+#   watch(%r{public/.+\.(css|js|html)})
+#   watch(%r{config/locales/.+\.yml})
+#   # Rails Assets Pipeline
+#   watch(%r{(app|vendor)/assets/\w+/(.+\.(css|js|html)).*})  { |m| "/assets/#{m[2]}" }
+# end
