@@ -24,8 +24,7 @@ Spork.each_run do
 
     config.before(:suite) do
       Fabrication.clear_definitions
-      DatabaseCleaner[:active_record].clean_with(:truncation)
-      # DatabaseCleaner[:active_record].strategy = :transaction
+      DatabaseCleaner.clean_with :truncation
     end
 
     config.before(:each) do

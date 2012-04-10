@@ -50,6 +50,7 @@ group :test, :development do
   gem 'jasminerice'
   gem 'guard-jasmine'
   gem 'poltergeist'
+  gem 'steak'
 
   require 'rbconfig'
   case RbConfig::CONFIG['host_os']
