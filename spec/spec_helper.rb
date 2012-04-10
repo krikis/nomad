@@ -11,6 +11,17 @@ Spork.prefork do
   require File.expand_path("../../config/environment", __FILE__)
   require 'rspec/rails'
   require 'rspec/autorun'
+  require 'capybara/poltergeist'
+
+  # Capybara defaults to XPath selectors rather than Webrat's default of CSS3. In
+  # order to ease the transition to Capybara we set the default here. If you'd
+  # prefer to use XPath just remove this line and adjust any selectors in your
+  # steps to use the XPath syntax.
+  Capybara.default_selector = :css
+
+  # Capybara.javascript_driver = :webkit
+  Capybara.javascript_driver = :poltergeist
+  Capybara.app_host = "http://nomad.dev/"
 end
 
 Spork.each_run do
@@ -28,10 +39,19 @@ Spork.each_run do
     end
 
     config.before(:each) do
-      DatabaseCleaner.start
+      Capybara.reset_sessions!
+      if example.metadata[:js]
+        DatabaseCleaner.strategy = :truncation
+      else
+        DatabaseCleaner.strategy = :transaction
+        DatabaseCleaner.start
+      end
     end
 
     config.after(:each) do
+      if example.metadata[:js]
+        page.execute_script('window.localStorage.clear()')
+      end
       DatabaseCleaner.clean
     end
 

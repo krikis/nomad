@@ -7,6 +7,14 @@ gem 'rails', '3.2.1'
 
 gem 'sqlite3'
 
+gem 'jquery-rails'
+gem 'rails-backbone'
+gem 'backbone-support'
+gem 'haml-rails'
+gem 'haml_assets'
+gem 'coffee-filter'
+gem 'sanitize'
+
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
@@ -23,16 +31,9 @@ group :assets do
   gem 'uglifier', '>= 1.0.3'
 end
 
-gem 'jquery-rails'
-gem 'rails-backbone'
-gem 'backbone-support'
-gem 'haml-rails'
-gem 'haml_assets'
-gem 'coffee-filter'
-gem 'sanitize'
-
 group :test, :development do
   gem 'rspec-rails', '~> 2.6'
+  gem 'shoulda-matchers'
   gem 'fabrication'
   gem 'factory_girl_rails'
   gem 'timecop'
@@ -51,18 +52,21 @@ group :test, :development do
   gem 'guard-jasmine'
   gem 'poltergeist'
   gem 'steak'
+  gem 'launchy'
   gem 'guard-livereload'
+end
 
-  require 'rbconfig'
-  case RbConfig::CONFIG['host_os']
-  when /darwin/
-    gem 'rb-fsevent'
-    gem 'rb-readline'
-    gem 'growl'
-  when /linux/
-    gem 'rb-inotify'
-    gem 'libnotify'
-  end
+group :mac_development do
+  # bundle config without :linux_development
+  gem 'rb-fsevent'
+  gem 'rb-readline'
+  gem 'growl'
+end
+
+group :linux_development do
+  # bundle config without :mac_development
+  gem 'rb-inotify'
+  gem 'libnotify'
 end
 
 # To use ActiveModel has_secure_password

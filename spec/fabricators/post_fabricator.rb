@@ -1,4 +1,4 @@
 Fabricator(:post) do
-  title "MyString"
-  content "MyString"
+  title "My Title"
+  content "My Content"
 end

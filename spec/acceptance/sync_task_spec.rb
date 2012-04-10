@@ -1,13 +1,12 @@
 require 'acceptance/acceptance_helper'
 
-feature 'Sync task', %q{
-  In order to keep the list of tasks in sync accross users
-  As a user updating a task
-  I want the task shown to another user being updated accordingly
-} do
+feature 'post synchronization' do
 
-  scenario 'first scenario' do
-    true.should == true
+  scenario 'creates a post on the client when the server creates a post', :js => true do
+    page.visit '/'
+    post = Fabricate(:post)
+    page.should have_content(post.title)
+    page.should have_content(post.content)
   end
 
 end
