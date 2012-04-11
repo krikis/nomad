@@ -21,8 +21,8 @@ Spork.prefork do
 
   # Capybara.javascript_driver = :webkit
   Capybara.javascript_driver = :poltergeist
-  Capybara.app_host = "http://nomad.dev/"
-  Capybara.run_server = false
+  # Capybara.app_host = "http://nomad.dev/"
+  # Capybara.run_server = false
 end
 
 Spork.each_run do
