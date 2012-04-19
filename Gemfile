@@ -47,13 +47,16 @@ group :test, :development do
   # gem 'guard-jasmine-headless-webkit' # works with qt 4.7.4
   # gem 'capybara-webkit'
   gem 'database_cleaner'
-  gem 'cucumber-rails'
   gem 'jasminerice'
   gem 'guard-jasmine'
   gem 'poltergeist'
   gem 'steak'
   gem 'launchy'
   gem 'guard-livereload'
+end
+
+group :test do
+  gem 'cucumber-rails'
 end
 
 group :mac_development do
