@@ -1,4 +1,4 @@
-describe "Answer model", ->
+describe "Answer", ->
   Answer = undefined
   beforeEach ->
     Answer = Nomad.Models.Answer
@@ -16,20 +16,4 @@ describe "Answer model", ->
       
     it "sets the 'values' atribute to an empty object by default", ->
       expect(answer.get('values')).toEqual {}
-      
-  
-describe "the Answers collection", ->
-  Answers = undefined
-  beforeEach ->
-    Answers = Nomad.Collections.Answers
-    
-  it "has the Answer model for model", ->
-    expect(Answers::model).toEqual Nomad.Models.Answer
-    
-  it "lives in the '/answers' url", ->
-    expect(Answers::url).toEqual '/answers'
-    
-  describe "localStorage", ->
-    it "has a localStorage defined using the 'Answers' namespace", ->
-      expect(Answers::localStorage.name).toEqual 'Answers'
       
