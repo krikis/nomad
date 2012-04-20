@@ -1,0 +1,1 @@
+class Nomad.Routers.AnswersRouter extends Backbone.Router
