@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'spork'
-#uncomment the following line to use spork with the debugger
-#require 'spork/ext/ruby-debug'
+# uncomment the following line to use spork with the debugger
+# require 'spork/ext/ruby-debug'
 
 Spork.prefork do
   # Loading more in this block will cause your tests to run faster. However,
@@ -23,20 +23,11 @@ Spork.prefork do
   Capybara.javascript_driver = :poltergeist
   # Capybara.app_host = "http://nomad.dev/"
   # Capybara.run_server = false
-
-  # Check whether Faye server is running
-  begin
-    Timeout.timeout(1) do
-      uri = URI.parse(BackboneSync::Rails::Faye.root_address)
-      TCPSocket.new(uri.host, uri.port).close
-    end
-  rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Timeout::Error
-    raise "Could not connect to Faye"
-  end
 end
 
 Spork.each_run do
   # This code will be run each time you run your specs.
+
   # Requires supporting ruby files with custom matchers and macros, etc,
   # in spec/support/ and its subdirectories.
   Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}

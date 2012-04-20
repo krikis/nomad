@@ -9,7 +9,7 @@ feature 'list answers' do
   end
 
   scenario 'provides a new answer button', :js => true do
-
+  
   end
 
 end

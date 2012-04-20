@@ -48,7 +48,7 @@ group :test do
   gem 'database_cleaner'
   gem 'guard-jasmine'
   gem 'poltergeist'
-  gem 'launchy'
+  # gem 'launchy'
   gem 'guard-livereload'
 
   # gem 'cucumber-rails'
