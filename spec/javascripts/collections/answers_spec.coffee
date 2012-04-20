@@ -8,6 +8,9 @@ describe "Answers", ->
 
   it "lives in the '/answers' url", ->
     expect(Answers::url).toEqual '/answers'
+    
+  it "orders answers by created_at", ->
+    
 
   describe "localStorage", ->
     it "has a localStorage defined using the 'Answers' namespace", ->
