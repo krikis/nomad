@@ -1,0 +1,9 @@
+#answers
+
+:coffeescript
+  $ ->
+    window.router = new Nomad.Routers.AnswersRouter()
+    Backbone.history.start
+      pushState: true
+  	if #{@redirect.inspect}
+      Backbone.history.navigate "answers"
