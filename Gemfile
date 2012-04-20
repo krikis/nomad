@@ -32,31 +32,33 @@ group :assets do
 end
 
 group :test, :development do
-  gem 'rspec-rails', '~> 2.6'
-  gem 'shoulda-matchers'
-  gem 'fabrication'
-  # gem 'factory_girl_rails'
-  gem 'timecop'
-
-  gem 'spork', '~> 0.9.0.rc9' # Spork keeps a process running to speed up tests
-  gem 'guard-spork'           # Guard/Spork integration
-  gem 'guard-rspec'           # Guard automatically runs tests
-  # gem 'guard-cucumber'
-  gem 'fuubar'
-  # gem 'jasmine-headless-webkit', :git => "git://github.com/dzello/jasmine-headless-webkit.git"
-  # gem 'guard-jasmine-headless-webkit' # works with qt 4.7.4
-  # gem 'capybara-webkit'
-  gem 'database_cleaner'
   gem 'jasminerice'
-  gem 'guard-jasmine'
-  gem 'poltergeist'
-  # gem 'steak'
-  gem 'launchy'
-  gem 'guard-livereload'
 end
 
 group :test do
+  gem 'rspec-rails', '~> 2.6'
+  gem 'shoulda-matchers'
+  gem 'fabrication'
+  gem 'timecop'
+
+  gem 'spork', '~> 0.9.0.rc9'
+  gem 'guard-spork'
+  gem 'guard-rspec'
+  gem 'fuubar'
+  gem 'database_cleaner'
+  gem 'guard-jasmine'
+  gem 'poltergeist'
+  gem 'launchy'
+  gem 'guard-livereload'
+
   # gem 'cucumber-rails'
+  # gem 'guard-cucumber'
+
+  # gem 'jasmine-headless-webkit', :git => "git://github.com/dzello/jasmine-headless-webkit.git"
+  # gem 'guard-jasmine-headless-webkit' # works with qt 4.7.4
+  # gem 'capybara-webkit'
+  # gem 'steak'
+  # gem 'factory_girl_rails'
 end
 
 group :mac_development do
