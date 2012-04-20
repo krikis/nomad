@@ -56,7 +56,7 @@ group :test, :development do
 end
 
 group :test do
-  gem 'cucumber-rails'
+  # gem 'cucumber-rails'
 end
 
 group :mac_development do
