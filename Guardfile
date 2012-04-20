@@ -26,10 +26,8 @@ guard 'rspec', :version => 2, :cli => "--drb -f Fuubar --colour" do
   watch('config/routes.rb')                           { "spec/routing" }
   watch('app/controllers/application_controller.rb')  { "spec/controllers" }
   # Capybara request specs
-  watch(%r{^app/views/(.+)/.*\.(erb|haml)$})          { |m| "spec/requests/#{m[1]}_spec.rb" }
+  watch(%r{^app/views/(.+)/(.*)\.(erb|haml)$})          { |m| ["spec/requests/#{m[1]}_spec.rb", "spec/views/#{m[1]}/#{m[2]}.#{m[3]}_spec.rb"] }
   # Steak acceptance specs
-  watch(%r{^spec/acceptance/support/(.+)\.rb$})       { "spec/acceptance" }
-  watch('spec/acceptance/acceptance_helper.rb')       { "spec/acceptance" }
   watch('app/assets/javascripts')                     { "spec/acceptance" }
   watch('app/assets/templates')                       { "spec/acceptance" }
 end
