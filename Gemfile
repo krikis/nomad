@@ -35,13 +35,13 @@ group :test, :development do
   gem 'rspec-rails', '~> 2.6'
   gem 'shoulda-matchers'
   gem 'fabrication'
-  gem 'factory_girl_rails'
+  # gem 'factory_girl_rails'
   gem 'timecop'
 
   gem 'spork', '~> 0.9.0.rc9' # Spork keeps a process running to speed up tests
   gem 'guard-spork'           # Guard/Spork integration
   gem 'guard-rspec'           # Guard automatically runs tests
-  gem 'guard-cucumber'
+  # gem 'guard-cucumber'
   gem 'fuubar'
   # gem 'jasmine-headless-webkit', :git => "git://github.com/dzello/jasmine-headless-webkit.git"
   # gem 'guard-jasmine-headless-webkit' # works with qt 4.7.4
@@ -50,7 +50,7 @@ group :test, :development do
   gem 'jasminerice'
   gem 'guard-jasmine'
   gem 'poltergeist'
-  gem 'steak'
+  # gem 'steak'
   gem 'launchy'
   gem 'guard-livereload'
 end
