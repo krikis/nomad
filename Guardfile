@@ -15,6 +15,14 @@ guard 'spork', :rspec_env => { 'RAILS_ENV' => 'test' },
   watch('spec/javascripts/support/jasmine.yml')
 end
 
+guard 'jasmine' do
+  watch(%r{spec/javascripts/spec\.(js\.coffee|js|coffee)$})         { 'spec/javascripts' }
+  watch(%r{^spec/javascripts/(.*)_factory\..*})                     { 'spec/javascripts' }
+  watch(%r{spec/javascripts/.+_spec\.(js\.coffee|js|coffee)$})
+  watch(%r{app/assets/javascripts/(.+?)\.(js\.coffee|js|coffee)$})  { |m| "spec/javascripts/#{m[1]}_spec.#{m[2]}" }
+  watch('app/assets/templates')                                    { 'spec/javascripts' }
+end
+
 guard 'rspec', :version => 2, :cli => "--drb -f Fuubar --colour" do
   watch(%r{^spec/.+_spec\.rb$})
   watch(%r{^app/(.+)\.rb$})                           { |m| "spec/#{m[1]}_spec.rb" }
@@ -46,14 +54,6 @@ end
 #   watch(%r{^spec/javascripts/(.*)_spec\..*}) { |m| newest_js_file(spec_location % m[1]) }
 #   watch(%r{^spec/javascripts/(.*)_factory\..*}) { "spec/javascripts" }
 # end
-
-guard 'jasmine' do
-  watch(%r{spec/javascripts/spec\.(js\.coffee|js|coffee)$})         { 'spec/javascripts' }
-  watch(%r{^spec/javascripts/(.*)_factory\..*})                     { 'spec/javascripts' }
-  watch(%r{spec/javascripts/.+_spec\.(js\.coffee|js|coffee)$})
-  watch(%r{app/assets/javascripts/(.+?)\.(js\.coffee|js|coffee)$})  { |m| "spec/javascripts/#{m[1]}_spec.#{m[2]}" }
-  watch('app/assets/templates')                                    { 'spec/javascripts' }
-end
 
 # guard 'cucumber' do
 #   watch(%r{^features/.+\.feature$})
