@@ -1,11 +1,12 @@
 class Nomad.Routers.AnswersRouter extends Backbone.Router
   
   routes:
-    "":        "index"
-    "new/:id": "new"
+    "answers/index": "index"
+    "answers/new":   "new"
+    "answers*":      "index"
     
   index: ->
     
-  new: (id)->
+  new: ->
     
   

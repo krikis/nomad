@@ -2,8 +2,11 @@ describe "AnswerSpec", ->
   beforeEach ->
     @answer = new Nomad.Models.Answer
     @answer.collection = 
-      url: "/collection"                                    # stub the model's collection url
-      localStorage: new Backbone.LocalStorage("Collection") # stub the model's localStorage
+      url: "/collection" # stub the model's collection url
+    @server = sinon.fakeServer.create()
+  
+  afterEach ->
+    @server.restore()
     
   describe "defaults", ->    
     it "sets the 'patient_id' attribute to 'null' by default", ->
