@@ -19,5 +19,5 @@ public/assets/
 jhw.*
 .jhw-cache/
 spec/javascripts/generated/
-
+.DS_Store
 
