@@ -56,11 +56,12 @@ describe "AnswersRouterSpec", ->
   describe "handlers", ->
     beforeEach ->
       @collection = new Backbone.Collection
+      @fetchStub = sinon.stub(@collection, "fetch").returns null
       @answerListViewStub = sinon.stub(Nomad.Views.Answers, "IndexView").
-        returns(new Backbone.View)
+        returns new Backbone.View
       @answersCollectionStub = sinon.
         stub(Nomad.Collections, "Answers").
-        returns(@collection)
+        returns @collection
       
     afterEach ->
       Nomad.Views.Answers.IndexView.restore()
@@ -74,6 +75,10 @@ describe "AnswersRouterSpec", ->
         it "creates an Answer list collection", ->
           expect(@answersCollectionStub).toHaveBeenCalledOnce()
           expect(@answerListViewStub).toHaveBeenCalledWith
-            collection: @collection
+            answers: @collection
+            
+        it "fetches the Answer list from storage", ->
+          expect(@fetchStub).toHaveBeenCalledOnce()
+          expect(@fetchStub).toHaveBeenCalledWith()
     
   
