@@ -11,27 +11,23 @@ BackboneSync.FayeSubscriber = (->
     @client.subscribe "/sync/" + @channel, _.bind(@receive, @)
 
   FayeSubscriber::receive = (message) ->
-    self = @
-    $.each message, (event, eventArguments) ->
-      self[event] eventArguments
+    $.each message, (event, eventArguments) =>
+      @[event] eventArguments
 
   FayeSubscriber::update = (params) ->
-    self = @
-    $.each params, (id, attributes) ->
-      model = self.collection.get(id)
+    $.each params, (id, attributes) =>
+      model = @collection.get(id)
       model.set attributes
 
   FayeSubscriber::create = (params) ->
-    self = @
-    $.each params, (id, attributes) ->
-      model = new self.collection.model(attributes)
-      self.collection.create model
+    $.each params, (id, attributes) =>
+      model = new @collection.model(attributes)
+      @collection.create model
 
   FayeSubscriber::destroy = (params) ->
-    self = @
-    $.each params, (id, attributes) ->
-      model = self.collection.get(id)
-      self.collection.remove model
+    $.each params, (id, attributes) =>
+      model = @collection.get(id)
+      @collection.remove model
 
   FayeSubscriber
 )()

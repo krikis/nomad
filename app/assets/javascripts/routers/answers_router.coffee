@@ -8,7 +8,7 @@ class Nomad.Routers.AnswersRouter extends Backbone.Router
   index: ->
     @answers = new Nomad.Collections.Answers
     @setView new Nomad.Views.Answers.IndexView
-                   answers: @answers
+                   collection: @answers
     @answers.fetch()
     
   new: ->

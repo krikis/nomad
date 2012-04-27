@@ -50,6 +50,9 @@ describe "AnswerSpec", ->
       @validationSpy = sinon.spy()
       @answer.bind "error", @validationSpy
       
+    afterEach ->
+      @answer.unbind()
+      
     it "does not save when the 'patient_id' attribute is empty", ->
       @answer.save
         patient_id: ''

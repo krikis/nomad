@@ -75,7 +75,7 @@ describe "AnswersRouterSpec", ->
         it "creates an Answer list collection", ->
           expect(@answersCollectionStub).toHaveBeenCalledOnce()
           expect(@answerListViewStub).toHaveBeenCalledWith
-            answers: @collection
+            collection: @collection
             
         it "fetches the Answer list from storage", ->
           expect(@fetchStub).toHaveBeenCalledOnce()

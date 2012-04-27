@@ -11,9 +11,8 @@ class Nomad.Views.Posts.NewView extends Backbone.View
     super(options)
     @model = new @collection.model()
 
-    @model.bind("change:errors", () =>
-      this.render()
-    )
+    @bindTo @model, "change:errors", () ->
+      @render()
 
   index : (e) -> 
     @followLink e

@@ -7,7 +7,7 @@ class Nomad.Views.Posts.IndexView extends Backbone.View
     'click .new':     'new'
 
   initialize: () ->
-    @options.posts.bind 'add', @render, @
+    @bindTo @options.posts, 'add', @render
 
   new: (e) ->
     @followLink e
@@ -18,7 +18,7 @@ class Nomad.Views.Posts.IndexView extends Backbone.View
       @$("tbody")
     )
 
-  render: =>
+  render: ->
     $(@el).html @template()
     @options.posts.each(@addOne)
 
