@@ -13,6 +13,10 @@ describe "IndexViewSpec", ->
   describe "Rendering", ->
     beforeEach ->
       @answerView = new Backbone.View
+      @answerView.render = ->
+        @el = $('<div>')
+        @
+      @answerRenderSpy = sinon.spy(@answerView, "render")
       @answerViewStub = sinon.stub(Nomad.Views.Answers, "AnswerView").
         returns @answerView
       @answer1 = new Backbone.Model id: 1  
@@ -31,6 +35,14 @@ describe "IndexViewSpec", ->
       expect(@answerViewStub).toHaveBeenCalledWith model: @answer1
       expect(@answerViewStub).toHaveBeenCalledWith model: @answer2
       expect(@answerViewStub).toHaveBeenCalledWith model: @answer3
+      
+    it "renders each answer view", ->
+      expect(@answerView.render).toHaveBeenCalledThrice()
+      
+    it "appends the answers to the answer list", ->
+      expect($(@view.el).children().length).toEqual 3
+      
+    
       
       
       
