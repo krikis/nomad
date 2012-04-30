@@ -42,6 +42,9 @@ describe "IndexViewSpec", ->
     it "appends the answers to the answer list", ->
       expect($(@view.el).children().length).toEqual 3
       
+    it "returns the view itself for chaining", ->
+      expect(@view.render()).toEqual @view
+      
     
       
       

@@ -1,0 +1,7 @@
+%div
+  %p= @id
+  - if Object.keys(@values).length == 0
+    %p There are no answers
+  - else
+    - _.each @values, (value, key)->
+      %p= "#{key} => #{value}"

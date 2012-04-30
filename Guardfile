@@ -16,11 +16,11 @@ guard 'spork', :rspec_env => { 'RAILS_ENV' => 'test' },
 end
 
 guard 'jasmine' do
-  watch(%r{spec/javascripts/spec\.(js\.coffee|js|coffee)$})         { 'spec/javascripts' }
-  watch(%r{^spec/javascripts/(.*)_factory\..*})                     { 'spec/javascripts' }
+  watch(%r{spec/javascripts/spec\.(js\.coffee|js|coffee)$})        { 'spec/javascripts' }
+  watch(%r{^spec/javascripts/(.*)_factory\..*})                    { 'spec/javascripts' }
   watch(%r{spec/javascripts/.+_spec\.(js\.coffee|js|coffee)$})
-  watch(%r{app/assets/javascripts/(.+?)\.(js\.coffee|js|coffee)$})  { |m| "spec/javascripts/#{m[1]}_spec.#{m[2]}" }
-  watch('app/assets/templates')                                    { 'spec/javascripts' }
+  watch(%r{app/assets/javascripts/(.+?)\.(js\.coffee|js|coffee)$}) { |m| "spec/javascripts/#{m[1]}_spec.#{m[2]}" }
+  watch(%r{app/assets/javascripts/templates/(.+?)\.hamlc$})        { |m| "spec/javascripts/views/#{m[1]}_view_spec.coffee" }
 end
 
 guard 'rspec', :version => 2, :cli => "--drb -f Fuubar --colour" do
@@ -47,7 +47,7 @@ end
 # end
 
 # spec_location = "spec/javascripts/%s_spec"
-# 
+#
 # guard 'jasmine-headless-webkit' do #, :run_before => 'bundle exec rake assets:clean assets:precompile RAILS_ENV=development' do
 #   watch(%r{^app/assets/javascripts/(.*)\.(js|coffee)}) { |m| newest_js_file(spec_location % m[1]) }
 #   watch(%r{^lib/assets/javascripts/(.*)\.(js|coffee)}) { |m| newest_js_file(spec_location % m[1]) }
