@@ -1,5 +1,6 @@
 %div
-  %p= @id
+  %p.id= @id
+  %p.patient_id= @patient_id
   - if Object.keys(@values).length == 0
     %p There are no answers
   - else

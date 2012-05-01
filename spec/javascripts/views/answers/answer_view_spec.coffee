@@ -30,3 +30,17 @@ describe "AnswerViewSpec", ->
       it "lists the values", ->
         expect($("#fixture")).toHaveText new RegExp(@model.get("values").v_1)
         
+    describe "when the id paragraph is clicked", ->
+      beforeEach ->
+        @clock = sinon.useFakeTimers()        
+        $("#fixture").append @view.render().el
+        $("#fixture .id").trigger('click')
+    
+      afterEach ->
+        @clock.restore()
+        
+      it "hides the patient_id paragraph", ->
+        @clock.tick 600
+        expect($('#fixture .patient_id')).not.toBeVisible()
+        
+        
