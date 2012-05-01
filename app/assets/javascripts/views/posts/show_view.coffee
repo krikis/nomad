@@ -15,4 +15,4 @@ class Nomad.Views.Posts.ShowView extends Backbone.View
 
   render: ->
     $(@el).html(@template(@model.toJSON() ))
-    return this
+    @

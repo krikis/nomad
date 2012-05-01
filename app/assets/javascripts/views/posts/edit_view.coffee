@@ -25,7 +25,5 @@ class Nomad.Views.Posts.EditView extends Backbone.View
 
   render : ->
     $(@el).html(@template(@model.toJSON() ))
-
-    this.$("form").backboneLink(@model)
-
-    return this
+    @$("form").backboneLink(@model)
+    @

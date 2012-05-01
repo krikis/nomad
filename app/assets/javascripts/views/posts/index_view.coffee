@@ -21,5 +21,4 @@ class Nomad.Views.Posts.IndexView extends Backbone.View
   render: ->
     $(@el).html @template()
     @options.posts.each(@addOne)
-
-    return this
+    @

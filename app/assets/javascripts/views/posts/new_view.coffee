@@ -34,7 +34,5 @@ class Nomad.Views.Posts.NewView extends Backbone.View
 
   render: ->
     $(@el).html(@template(@model.toJSON() ))
-
-    this.$("form").backboneLink(@model)
-
-    return this
+    @$("form").backboneLink(@model)
+    @

@@ -45,14 +45,14 @@
       @save()
       model
 
-    # Update a model by replacing its copy in `this.data`.
+    # Update a model by replacing its copy in `@data`.
     update: (model) ->
       @localStorage().setItem @name + "-" + model.id, JSON.stringify(model)
       @records.push model.id.toString()  unless _.include(@records, model.id.toString())
       @save()
       model
 
-    # Retrieve a model from `this.data` by id.
+    # Retrieve a model from `@data` by id.
     find: (model) ->
       JSON.parse @localStorage().getItem(@name + "-" + model.id)
 
@@ -60,9 +60,9 @@
     findAll: ->
       _(@records).chain().map((id) ->
         JSON.parse @localStorage().getItem(@name + "-" + id)
-      , this).compact().value()
+      , @).compact().value()
 
-    # Delete a model from `this.data`, returning it.
+    # Delete a model from `@data`, returning it.
     destroy: (model) ->
       @localStorage().removeItem @name + "-" + model.id
       @records = _.reject(@records, (record_id) ->
@@ -113,7 +113,7 @@
   # Override 'Backbone.sync' to default to localSync,
   # the original 'Backbone.sync' is still available in 'Backbone.ajaxSync'
   Backbone.sync = (method, model, options, error) ->
-    Backbone.getSyncMethod(model).apply this, [ method, model, options, error ]
+    Backbone.getSyncMethod(model).apply @, [ method, model, options, error ]
     return
   return
 )()
