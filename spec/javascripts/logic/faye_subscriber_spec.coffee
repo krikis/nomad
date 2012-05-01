@@ -41,6 +41,24 @@ describe "FayeSubscriber", ->
         toHaveBeenCalledWith("/sync/" + @channel, 
                              @subscriber.receive, 
                              @subscriber)
+                             
+  describe "#receive", ->
+    beforeEach ->
+      @subscriber = new BackboneSync.FayeSubscriber @collection,
+                                                    channel: @channel
+      @subscriber.method_1 = sinon.stub()
+      @subscriber.method_2 = sinon.stub()
+                                                    
+    it "calls a method for each entry in the message", ->
+      @subscriber.receive
+        method_1:
+          id: {attribute_1: "test"}
+        method_2:
+          id: {attribute_2: "receive"}            
+      expect(@subscriber.method_1).toHaveBeenCalledWith(id: {attribute_1: "test"})      
+      expect(@subscriber.method_2).toHaveBeenCalledWith(id: {attribute_2: "receive"})
+        
+    
   
 
 
