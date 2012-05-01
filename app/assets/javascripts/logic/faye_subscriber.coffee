@@ -1,31 +1,31 @@
-@BackboneSync = @BackboneSync or {}
-BackboneSync.FayeSubscriber = (->
+@BackboneSync ||= {}
+@BackboneSync.FayeSubscriber = (->
   FayeSubscriber = (collection, options) ->
-    @collection = collection
     @client = new Faye.Client("http://nomad.dev:9292/faye")
+    @collection = collection
     @channel = options.channel
     @subscribe()
     return
 
   FayeSubscriber::subscribe = ->
-    @client.subscribe "/sync/" + @channel, _.bind(@receive, @)
+    @client.subscribe "/sync/" + @channel, @receive, @
 
   FayeSubscriber::receive = (message) ->
-    $.each message, (event, eventArguments) =>
+    _.each message, (eventArguments, event) =>
       @[event] eventArguments
 
   FayeSubscriber::update = (params) ->
-    $.each params, (id, attributes) =>
+    _.each params, (attributes, id) =>
       model = @collection.get(id)
       model.set attributes
 
   FayeSubscriber::create = (params) ->
-    $.each params, (id, attributes) =>
+    _.each params, (attributes, id) =>
       model = new @collection.model(attributes)
       @collection.create model
 
   FayeSubscriber::destroy = (params) ->
-    $.each params, (id, attributes) =>
+    _.each params, (attributes, id) =>
       model = @collection.get(id)
       @collection.remove model
 
