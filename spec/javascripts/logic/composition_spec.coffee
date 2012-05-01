@@ -48,7 +48,8 @@ describe "CompositeView", ->
     afterEach ->
       @leaveStub.restore()
       
-    it "initializes the children field as a wrapped empty array should it be undefined", ->
+    it "initializes the children field as a wrapped empty array 
+        should it be undefined", ->
       @view.children = undefined
       @view._leaveChildren()
       expect(@view.children).toBeDefined()
@@ -127,7 +128,8 @@ describe "CompositeView", ->
       renderChildStub.restore()
     
     it "renders the child into the container after emptying it", ->
-      container = $("<div class='container'><div class='some_content'></div></div>")
+      container = $("<div class='container'>
+                     <div class='some_content'></div></div>")
       @child.el.className = "child"
       @view.renderChildInto @child, container
       expect(container).toContain ".child"
@@ -143,7 +145,8 @@ describe "CompositeView", ->
       expect(renderStub).toHaveBeenCalled()
       renderStub.restore()
       
-    it "initializes the children field as a wrapped empty array should it be undefined", ->
+    it "initializes the children field as a wrapped empty array 
+        should it be undefined", ->
       @view.children = undefined
       @view.renderChild @child
       expect(@view.children).toBeDefined()
