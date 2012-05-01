@@ -3,9 +3,20 @@
     @unbind()
     @unbindFromAll()
     @remove()
-    if @children?
-      @_leaveChildren()
-      @_removeFromParent()
+    @_leaveChildren()
+    @_removeFromParent()
+
+  _leaveChildren: ->  
+    @children ||= _([])
+    @children.chain().clone().each (view) ->
+      view.leave()  if view.leave
+
+  _removeFromParent: ->
+    @parent._removeChild @ if @parent
+
+  _removeChild: (view) ->
+    index = @children.indexOf(view)
+    @children.splice index, 1
 
   appendChild: (view) ->
     @renderChild view
@@ -23,15 +34,4 @@
     view.render()
     @children ||= _([])
     @children.push view
-    view.parent = this
-
-  _leaveChildren: ->  
-    @children.chain().clone().each (view) ->
-      view.leave()  if view.leave
-
-  _removeFromParent: ->
-    @parent._removeChild this  if @parent
-
-  _removeChild: (view) ->  
-    index = @children.indexOf(view)
-    @children.splice index, 1
+    view.parent = @
