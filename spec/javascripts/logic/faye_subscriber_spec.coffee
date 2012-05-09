@@ -16,6 +16,7 @@ describe "FayeSubscriber", ->
 
   describe "new", ->
     beforeEach ->
+      # stub before creation because of callback binding
       @subscribeStub = sinon.stub(BackboneSync.FayeSubscriber::, "subscribe")
       @subscriber = new BackboneSync.FayeSubscriber @collection,
                                                     channel: @channel

@@ -6,6 +6,7 @@
 #= require_tree ./views
 #= require_tree ./routers
 
+_.extend Backbone.Model::,  @Versioning
 _.extend Backbone.View::,   @LinkHandler
 _.extend Backbone.View::,   @Observer
 _.extend Backbone.View::,   @Composition
