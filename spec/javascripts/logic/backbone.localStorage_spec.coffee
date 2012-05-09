@@ -193,7 +193,7 @@ describe "Bacbone.LocalStorage", ->
         setItem 'TestModel-test_id-patches',
                 JSON.stringify(patches)
       @model.fetch()
-      expect(@model._patches[0]).toEqual patches[0]
+      expect(@model._patches).toEqual patches
       
   describe '#findAll', ->    
     beforeEach ->
@@ -203,7 +203,7 @@ describe "Bacbone.LocalStorage", ->
       TestCollection::localStorage = new Backbone.
                                        LocalStorage("TestCollection")
       @collection = new TestCollection()
-      @collection.create Factory.build('answer', id: 'test_id')
+      @collection.create Factory.build('answer')
       
     afterEach ->
       @setAllPatchesStub.restore()
@@ -217,5 +217,40 @@ describe "Bacbone.LocalStorage", ->
       @collection.reset()
       @collection.fetch(add: true)
       expect(@setPatchesStub).toHaveBeenCalled()
+      
+  describe '#setAllPatches', ->
+    beforeEach ->
+      TestCollection = Backbone.Collection.extend()
+      @setPatchesStub = sinon.stub Backbone.LocalStorage::, 'setPatches'
+      TestCollection::localStorage = new Backbone.
+                                       LocalStorage("TestCollection")
+      @collection = new TestCollection()
+      @collection.create Factory.build('answer')
+      
+    afterEach ->
+      @setPatchesStub.restore()
+      
+    it 'calls setPatches for all models in a collection', ->
+      @collection.fetch()
+      expect(@setPatchesStub).toHaveBeenCalled()
+      
+  describe '#setPatches', ->
+    beforeEach ->
+      TestCollection = Backbone.Collection.extend()
+      TestCollection::localStorage = new Backbone.
+                                       LocalStorage("TestCollection")
+      @collection = new TestCollection()
+      @collection.create Factory.build('answer', id: 'test_id')
+      
+    it 'fetches _patches for a model being added to a collection', ->
+      patches = ['some', 'patches']
+      window.localStorage.
+        setItem 'TestCollection-test_id-patches',
+                JSON.stringify(patches)
+      @collection.reset()
+      @collection.fetch(add: true)
+      expect(@collection.models[0]._patches).toEqual patches
+      
+    
 
 

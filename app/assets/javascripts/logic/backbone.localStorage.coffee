@@ -71,9 +71,15 @@
         JSON.parse @localStorage().getItem(@name + "-" + id)
       , @).compact().value()
       
-    setAllPatches: (collection, options) ->  
+    setAllPatches: (collection, options) -> 
+      _.each(collection.models, (model) =>
+        @setPatches  model, collection, options
+      )
       
     setPatches: (model, collection, options) ->
+      patches = JSON.parse @localStorage().
+                  getItem(@name + "-" + model.id + "-patches")
+      model._patches = patches if patches?
 
     # Delete a model from `@data`, returning it.
     destroy: (model) ->
