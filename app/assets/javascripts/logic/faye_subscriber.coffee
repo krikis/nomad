@@ -1,11 +1,15 @@
 @BackboneSync ||= {}
 @BackboneSync.FayeSubscriber = (->
   FayeSubscriber = (collection, options) ->
-    @client = new Faye.Client("http://nomad.dev:9292/faye")
+    window.client ||= new Faye.Client("http://nomad.dev:9292/faye")
+    @client = window.client
     @collection = collection
     @channel = options.channel
     @subscribe()
     return
+
+  FayeSubscriber::publish = (data)->
+    @client.publish "/server/" + @channel, data
 
   FayeSubscriber::subscribe = ->
     @client.subscribe "/sync/" + @channel, @receive, @
