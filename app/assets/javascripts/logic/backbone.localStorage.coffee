@@ -64,10 +64,16 @@
       JSON.parse @localStorage().getItem(@name + "-" + model.id)
 
     # Return the array of all models currently in storage.
-    findAll: ->
+    findAll: (collection) ->
+      collection?.on 'reset', @setAllPatches, @
+      collection?.on 'add', @setPatches, @
       _(@records).chain().map((id) ->
         JSON.parse @localStorage().getItem(@name + "-" + id)
       , @).compact().value()
+      
+    setAllPatches: (collection, options) ->  
+      
+    setPatches: (model, collection, options) ->
 
     # Delete a model from `@data`, returning it.
     destroy: (model) ->
@@ -97,7 +103,7 @@
 
     switch method
       when "read"
-        resp = (if model.id isnt `undefined` then store.find(model) else store.findAll())
+        resp = (if model.id isnt `undefined` then store.find(model) else store.findAll(model))
       when "create"
         resp = store.create(model)
       when "update"

@@ -180,28 +180,42 @@ describe "Bacbone.LocalStorage", ->
 
   describe '#find', ->
     beforeEach ->
-      @TestModel = Backbone.Model.extend()
-      @dummy_model = new @TestModel Factory.build("answer")
-      @dummy_model.localStorage = new Backbone.LocalStorage("TestModel")
-      @dummy_model.collection =
-        url: "/collection" # stub the model's collection url
-      @dummy_model.save(
-        synced: true
-        values:
-          v_1: "other_value_1"
-          v_2: "value_2"
-      )
-
-    it "fetches _patches from the localStorage", ->
-      window.localStorage.
-        setItem "TestModel-test_id-patches",
-                JSON.stringify(@dummy_model._patches)
-      @model = new @TestModel Factory.build("answer", id: "test_id")
-      @model.localStorage = new Backbone.LocalStorage("TestModel")
+      TestModel = Backbone.Model.extend()
+      @model = new TestModel Factory.build('answer', id: 'test_id')
+      @model.localStorage = new Backbone.LocalStorage('TestModel')
       @model.collection =
-        url: "/collection" # stub the model's collection url
+        url: '/collection' # stub the model's collection url
       @model.save()
+
+    it 'fetches _patches from the localStorage', ->
+      patches = ['some', 'patches']
+      window.localStorage.
+        setItem 'TestModel-test_id-patches',
+                JSON.stringify(patches)
       @model.fetch()
-      expect(@model._patches[0]).toEqual @dummy_model._patches[0]
+      expect(@model._patches[0]).toEqual patches[0]
+      
+  describe '#findAll', ->    
+    beforeEach ->
+      TestCollection = Backbone.Collection.extend()
+      @setAllPatchesStub = sinon.stub Backbone.LocalStorage::, 'setAllPatches'
+      @setPatchesStub = sinon.stub Backbone.LocalStorage::, 'setPatches'
+      TestCollection::localStorage = new Backbone.
+                                       LocalStorage("TestCollection")
+      @collection = new TestCollection()
+      @collection.create Factory.build('answer', id: 'test_id')
+      
+    afterEach ->
+      @setAllPatchesStub.restore()
+      @setPatchesStub.restore()
+    
+    it 'binds setAllPatches to the collection reset event', ->
+      @collection.fetch()
+      expect(@setAllPatchesStub).toHaveBeenCalled()
+    
+    it 'binds setPatches to the collection add event', ->
+      @collection.reset()
+      @collection.fetch(add: true)
+      expect(@setPatchesStub).toHaveBeenCalled()
 
 
