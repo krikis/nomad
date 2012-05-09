@@ -48,12 +48,19 @@
     # Update a model by replacing its copy in `@data`.
     update: (model) ->
       @localStorage().setItem @name + "-" + model.id, JSON.stringify(model)
-      @records.push model.id.toString()  unless _.include(@records, model.id.toString())
+      if model._patches?
+        @localStorage().setItem @name + "-" + model.id + "-patches", 
+                                JSON.stringify(model._patches)
+      unless _.include(@records, model.id.toString())
+        @records.push model.id.toString()  
       @save()
       model
 
     # Retrieve a model from `@data` by id.
     find: (model) ->
+      patches = JSON.parse @localStorage().
+                  getItem(@name + "-" + model.id + "-patches")
+      model._patches = patches if patches?
       JSON.parse @localStorage().getItem(@name + "-" + model.id)
 
     # Return the array of all models currently in storage.
@@ -102,7 +109,6 @@
       options.success resp
     else
       options.error "Record not found"
-    return
 
   Backbone.ajaxSync = Backbone.sync
 

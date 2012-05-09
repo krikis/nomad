@@ -1,4 +1,7 @@
 describe "Bacbone.LocalStorage", ->
+  beforeEach ->
+    window.localStorage.clear()
+
   describe "localStorage on collections", ->
 
     TestCollection = Backbone.Collection.extend()
@@ -133,23 +136,72 @@ describe "Bacbone.LocalStorage", ->
     ids = undefined
 
     beforeEach ->
-      window.localStorage.clear()
-      TestCollection::localStorage = new Backbone.LocalStorage("TestCollection")
-      OtherTestCollection::localStorage = new Backbone.LocalStorage("OtherTestCollection")
+      TestCollection::localStorage = new Backbone.
+                                       LocalStorage("TestCollection")
+      OtherTestCollection::localStorage = new Backbone.
+                                            LocalStorage("OtherTestCollection")
       collection = new TestCollection()
       other_collection = new OtherTestCollection()
 
-    it "should generate a unique object id within the scope of a collection", ->
+    it "should generate a unique object id
+        within the scope of a collection", ->
       sinon.stub collection.localStorage, "guid", ->
         ids ||= ["other_unique_id", "unique_id", "used_id"]
         id = ids.pop()
-      collection.create id: "used_id"         # this id is in use in the same collection
-      other_collection.create id: "unique_id" # this id is in use in another collection
+      # this id is in use in the same collection
+      collection.create id: "used_id"
+      # this id is in use in another collection
+      other_collection.create id: "unique_id"
       collection.create
         title: "The Tempest"
         author: "Bill Shakespeare"
         length: 123
       # last model has a unique id within collection scope
       expect(collection.last().get("id")).toEqual "unique_id"
+
+  describe '#update', ->
+    beforeEach ->
+      TestModel = Backbone.Model.extend()
+      @model = new TestModel Factory.build("answer")
+      @model.localStorage = new Backbone.LocalStorage("TestModel")
+      @model.collection =
+        url: "/collection" # stub the model's collection url
+
+    it 'saves _patches to the localStorage', ->
+      @model.save(
+        synced: true
+        values:
+          v_1: "other_value_1"
+          v_2: "value_2"
+      )
+      expect(window.localStorage.
+               getItem("TestModel-" + @model.id + "-patches")).
+        toEqual JSON.stringify(@model._patches)
+
+  describe '#find', ->
+    beforeEach ->
+      @TestModel = Backbone.Model.extend()
+      @dummy_model = new @TestModel Factory.build("answer")
+      @dummy_model.localStorage = new Backbone.LocalStorage("TestModel")
+      @dummy_model.collection =
+        url: "/collection" # stub the model's collection url
+      @dummy_model.save(
+        synced: true
+        values:
+          v_1: "other_value_1"
+          v_2: "value_2"
+      )
+
+    it "fetches _patches from the localStorage", ->
+      window.localStorage.
+        setItem "TestModel-test_id-patches",
+                JSON.stringify(@dummy_model._patches)
+      @model = new @TestModel Factory.build("answer", id: "test_id")
+      @model.localStorage = new Backbone.LocalStorage("TestModel")
+      @model.collection =
+        url: "/collection" # stub the model's collection url
+      @model.save()
+      @model.fetch()
+      expect(@model._patches[0]).toEqual @dummy_model._patches[0]
 
 
