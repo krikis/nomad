@@ -1,8 +1,4 @@
-@Versioning = 
-
-  initialize: (attributes, options) ->
-    @on 'change', @addPatch, @
-    
+@Versioning =     
   addPatch: ->
     if @get('synced')
       @_patches ||= _([])
