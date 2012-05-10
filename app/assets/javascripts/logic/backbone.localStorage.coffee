@@ -31,6 +31,14 @@
     # Generate a pseudo-GUID by concatenating random hexadecimal.
     guid: ->
       S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4()
+      
+    # Generates the key a model is stored with in the localStorage
+    storageKeyFor: (model) ->
+      "#{@name}-#{if _.isObject(model) then model.id else model}"
+      
+    # Generates the key a model's patches are stored with in the localStorage
+    patchesKeyFor: (model) ->
+      "#{@name}-#{if _.isObject(model) then model.id else model}-patches"
 
     # Add a model, giving it a (hopefully)-unique GUID, if it doesn't already
     # have an id of it's own.
@@ -40,16 +48,16 @@
         # make sure the id is unique within the model's collection
         model.id = @guid() while @find(model)?
         model.attributes[model.idAttribute] = model.id
-      @localStorage().setItem @name + "-" + model.id, JSON.stringify(model)
+      @localStorage().setItem @storageKeyFor(model), JSON.stringify(model)
       @records.push model.id.toString()
       @save()
       model
 
     # Update a model by replacing its copy in `@data`.
     update: (model) ->
-      @localStorage().setItem @name + "-" + model.id, JSON.stringify(model)
+      @localStorage().setItem @storageKeyFor(model), JSON.stringify(model)
       if model._patches?
-        @localStorage().setItem @name + "-" + model.id + "-patches",
+        @localStorage().setItem @patchesKeyFor(model),
                                 JSON.stringify(model._patches)
       unless _.include(@records, model.id.toString())
         @records.push model.id.toString()
@@ -59,16 +67,16 @@
     # Retrieve a model from `@data` by id.
     find: (model) ->
       patches = JSON.parse @localStorage().
-                  getItem(@name + "-" + model.id + "-patches")
+                  getItem(@patchesKeyFor model)
       model._patches = patches if patches?
-      JSON.parse @localStorage().getItem(@name + "-" + model.id)
+      JSON.parse @localStorage().getItem(@storageKeyFor model)
 
     # Return the array of all models currently in storage.
     findAll: (collection) ->
       collection?.on 'reset', @setAllPatches, @
       collection?.on 'add', @setPatches, @
       _(@records).chain().map((id) ->
-        JSON.parse @localStorage().getItem(@name + "-" + id)
+        JSON.parse @localStorage().getItem(@storageKeyFor id)
       , @).compact().value()
 
     setAllPatches: (collection, options) ->
@@ -78,13 +86,13 @@
 
     setPatches: (model, collection, options) ->
       patches = JSON.parse @localStorage().
-                  getItem(@name + "-" + model.id + "-patches")
+                  getItem(@patchesKeyFor model)
       model._patches = patches if patches?
 
     # Delete a model from `@data`, returning it.
     destroy: (model) ->
-      @localStorage().removeItem @name + "-" + model.id + "-patches"
-      @localStorage().removeItem @name + "-" + model.id
+      @localStorage().removeItem @patchesKeyFor(model)
+      @localStorage().removeItem @storageKeyFor(model)
       @records = _.reject(@records, (record_id) ->
         record_id is model.id.toString()
       )
