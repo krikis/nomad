@@ -49,10 +49,10 @@
     update: (model) ->
       @localStorage().setItem @name + "-" + model.id, JSON.stringify(model)
       if model._patches?
-        @localStorage().setItem @name + "-" + model.id + "-patches", 
+        @localStorage().setItem @name + "-" + model.id + "-patches",
                                 JSON.stringify(model._patches)
       unless _.include(@records, model.id.toString())
-        @records.push model.id.toString()  
+        @records.push model.id.toString()
       @save()
       model
 
@@ -70,12 +70,12 @@
       _(@records).chain().map((id) ->
         JSON.parse @localStorage().getItem(@name + "-" + id)
       , @).compact().value()
-      
-    setAllPatches: (collection, options) -> 
+
+    setAllPatches: (collection, options) ->
       _.each(collection.models, (model) =>
         @setPatches  model, collection, options
       )
-      
+
     setPatches: (model, collection, options) ->
       patches = JSON.parse @localStorage().
                   getItem(@name + "-" + model.id + "-patches")
@@ -83,6 +83,7 @@
 
     # Delete a model from `@data`, returning it.
     destroy: (model) ->
+      @localStorage().removeItem @name + "-" + model.id + "-patches"
       @localStorage().removeItem @name + "-" + model.id
       @records = _.reject(@records, (record_id) ->
         record_id is model.id.toString()

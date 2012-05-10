@@ -129,47 +129,40 @@ describe "Bacbone.LocalStorage", ->
       expect(method).toEqual Backbone.ajaxSync #
 
   describe "#create", ->
-    TestCollection = Backbone.Collection.extend()
-    OtherTestCollection = Backbone.Collection.extend()
-    collection = undefined
-    other_collection = undefined
-    ids = undefined
-
     beforeEach ->
+      TestCollection = Backbone.Collection.extend()
+      OtherTestCollection = Backbone.Collection.extend()
       TestCollection::localStorage = new Backbone.
                                        LocalStorage("TestCollection")
       OtherTestCollection::localStorage = new Backbone.
                                             LocalStorage("OtherTestCollection")
-      collection = new TestCollection()
-      other_collection = new OtherTestCollection()
+      @collection = new TestCollection()
+      @other_collection = new OtherTestCollection()
+      @ids = undefined
 
     it "should generate a unique object id
         within the scope of a collection", ->
-      sinon.stub collection.localStorage, "guid", ->
-        ids ||= ["other_unique_id", "unique_id", "used_id"]
-        id = ids.pop()
+      sinon.stub @collection.localStorage, "guid", ->
+        @ids ||= ["other_unique_id", "unique_id", "used_id"]
+        id = @ids.pop()
       # this id is in use in the same collection
-      collection.create id: "used_id"
+      @collection.create id: "used_id"
       # this id is in use in another collection
-      other_collection.create id: "unique_id"
-      collection.create
-        title: "The Tempest"
-        author: "Bill Shakespeare"
-        length: 123
+      @other_collection.create id: "unique_id"
+      @collection.create Factory.build("answer", id: null)
       # last model has a unique id within collection scope
-      expect(collection.last().get("id")).toEqual "unique_id"
+      expect(@collection.last().get("id")).toEqual "unique_id"
 
   describe '#update', ->
     beforeEach ->
       TestModel = Backbone.Model.extend()
-      @model = new TestModel Factory.build("answer")
+      @model = new TestModel Factory.build("answer", synced: true)
       @model.localStorage = new Backbone.LocalStorage("TestModel")
       @model.collection =
         url: "/collection" # stub the model's collection url
 
-    it 'saves _patches to the localStorage', ->
+    it 'saves _patches to the localStorage', ->  
       @model.save(
-        synced: true
         values:
           v_1: "other_value_1"
           v_2: "value_2"
@@ -250,6 +243,27 @@ describe "Bacbone.LocalStorage", ->
       @collection.reset()
       @collection.fetch(add: true)
       expect(@collection.models[0]._patches).toEqual patches
+      
+  describe '#destroy', ->
+    beforeEach ->
+      TestModel = Backbone.Model.extend()
+      @model = new TestModel Factory.build('answer', id: 'test_id')
+      @model.localStorage = new Backbone.LocalStorage('TestModel')
+      @model.collection =
+        url: '/collection' # stub the model's collection url
+    
+    it 'cleans up the paches in de localStorage after destroing', ->
+      @model._patches = ['some', 'patches']
+      @model.save()
+      expect(window.localStorage.
+               getItem("TestModel-" + @model.id + "-patches")).
+        toEqual JSON.stringify(@model._patches)
+      @model.destroy()
+      expect(window.localStorage.
+               getItem("TestModel-" + @model.id + "-patches")).
+        toBeNull()
+    
+      
       
     
 
