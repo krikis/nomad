@@ -4,7 +4,7 @@ describe 'Sync', ->
       @publishStub = sinon.stub(BackboneSync.FayeClient::, "publish")
       TestCollection = Backbone.Collection.extend(
         initialize: ->
-          new BackboneSync.FayeClient(@,
+          @fayeClient = new BackboneSync.FayeClient(@,
             channel: @constructor.name.toLowerCase()
           )
       )
