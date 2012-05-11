@@ -1,4 +1,4 @@
-describe "FayeSubscriber", ->
+describe "FayeClient", ->
   beforeEach ->
     delete window.client
     @fayeClientStub = {}
@@ -17,8 +17,8 @@ describe "FayeSubscriber", ->
   describe "new", ->
     beforeEach ->
       # stub before creation because of callback binding
-      @subscribeStub = sinon.stub(BackboneSync.FayeSubscriber::, "subscribe")
-      @subscriber = new BackboneSync.FayeSubscriber @collection,
+      @subscribeStub = sinon.stub(BackboneSync.FayeClient::, "subscribe")
+      @subscriber = new BackboneSync.FayeClient @collection,
                                                     channel: @channel
 
     afterEach ->
@@ -35,13 +35,13 @@ describe "FayeSubscriber", ->
       expect(@subscribeStub).toHaveBeenCalled()
 
     it "does not fire up a new Faye client if one is already running", ->
-      @otherSubscriber = new BackboneSync.FayeSubscriber @collection,
+      @otherSubscriber = new BackboneSync.FayeClient @collection,
                                                     channel: @channel
       expect(@clientConstructorStub).toHaveBeenCalledOnce()
       
   describe "#publish", ->
     beforeEach ->
-      @subscriber = new BackboneSync.FayeSubscriber @collection,
+      @subscriber = new BackboneSync.FayeClient @collection,
                                                     channel: @channel
                                                     
     it "calls the publish method on the faye client object", ->
@@ -52,7 +52,7 @@ describe "FayeSubscriber", ->
 
   describe "#subscribe", ->
     beforeEach ->
-      @subscriber = new BackboneSync.FayeSubscriber @collection,
+      @subscriber = new BackboneSync.FayeClient @collection,
                                                     channel: @channel
 
     it "calls the subscribe method on the faye client object", ->
@@ -63,7 +63,7 @@ describe "FayeSubscriber", ->
 
   describe "#receive", ->
     beforeEach ->
-      @subscriber = new BackboneSync.FayeSubscriber @collection,
+      @subscriber = new BackboneSync.FayeClient @collection,
                                                     channel: @channel
       @subscriber.method_1 = sinon.stub()
       @subscriber.method_2 = sinon.stub()

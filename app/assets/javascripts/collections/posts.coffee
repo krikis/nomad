@@ -1,6 +1,6 @@
 class Nomad.Collections.PostsCollection extends Backbone.Collection
   initialize: ->
-    new BackboneSync.FayeSubscriber(@,
+    new BackboneSync.FayeClient(@,
       channel: "posts"
     )
   model: Nomad.Models.Post

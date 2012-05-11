@@ -1,6 +1,6 @@
 @BackboneSync ||= {}
-@BackboneSync.FayeSubscriber = (->
-  FayeSubscriber = (collection, options) ->
+@BackboneSync.FayeClient = (->
+  FayeClient = (collection, options) ->
     window.client ||= new Faye.Client("http://nomad.dev:9292/faye")
     @client = window.client
     @collection = collection
@@ -8,30 +8,30 @@
     @subscribe()
     return
 
-  FayeSubscriber::publish = (data)->
+  FayeClient::publish = (data)->
     @client.publish "/server/" + @channel, data
 
-  FayeSubscriber::subscribe = ->
+  FayeClient::subscribe = ->
     @client.subscribe "/sync/" + @channel, @receive, @
 
-  FayeSubscriber::receive = (message) ->
+  FayeClient::receive = (message) ->
     _.each message, (eventArguments, event) =>
       @[event] eventArguments
 
-  FayeSubscriber::update = (params) ->
+  FayeClient::update = (params) ->
     _.each params, (attributes, id) =>
       model = @collection.get(id)
       model.set attributes
 
-  FayeSubscriber::create = (params) ->
+  FayeClient::create = (params) ->
     _.each params, (attributes, id) =>
       model = new @collection.model(attributes)
       @collection.create model
 
-  FayeSubscriber::destroy = (params) ->
+  FayeClient::destroy = (params) ->
     _.each params, (attributes, id) =>
       model = @collection.get(id)
       @collection.remove model
 
-  FayeSubscriber
+  FayeClient
 )()
