@@ -9,12 +9,20 @@
 # Override the Backbone.Model constructor and add the 
 # on change @addPatch versioning callback to it
 Backbone.Model = ((Model) ->
+  # Define the new constructor
   Backbone.Model = (attributes, options) ->
     Model.apply @, arguments
     @on 'change', @addPatch, @
     return
-  _.extend(Backbone.Model, Model)  
-  _.extend(Backbone.Model::, Model::)
+  # Clone static properties
+  _.extend(Backbone.Model, Model)
+  # Clone prototype
+  Backbone.Model:: = ((Prototype) ->
+    Prototype:: = Model::
+    new Prototype    
+  )(->)
+  # Update constructor in prototype
+  Backbone.Model::constructor = Backbone.Model
   Backbone.Model
 ) Backbone.Model
 # Make sure the collection uses the new Backbone.Model 
