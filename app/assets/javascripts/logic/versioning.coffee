@@ -1,4 +1,7 @@
 @Versioning =     
+  hasPatches: ->
+    @_patches?.size() > 0
+
   addPatch: ->
     if @get('synced')
       @_patches ||= _([])
