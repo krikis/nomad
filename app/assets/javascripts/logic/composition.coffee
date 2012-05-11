@@ -35,3 +35,6 @@
     @children ||= _([])
     @children.push view
     view.parent = @
+
+# extend Backbone.View
+_.extend Backbone.View::,   @Composition

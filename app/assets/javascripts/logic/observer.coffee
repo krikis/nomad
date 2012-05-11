@@ -9,3 +9,6 @@
       @bindings.each (source) ->
         source.off null, null, @
       @bindings = _([])
+      
+# extend Backbone.View
+_.extend Backbone.View::,   @Observer

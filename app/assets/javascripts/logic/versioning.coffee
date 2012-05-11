@@ -10,3 +10,6 @@
     diff = @dmp.diff_main JSON.stringify(@previousAttributes()), JSON.stringify(@)
     patch = @dmp.patch_make JSON.stringify(@previousAttributes()), diff
     @dmp.patch_toText(patch)
+    
+# extend Backbone.Model
+_.extend Backbone.Model::,  @Versioning
