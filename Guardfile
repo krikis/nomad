@@ -69,3 +69,22 @@ end
 #   # Rails Assets Pipeline
 #   watch(%r{(app|vendor)/assets/\w+/(.+\.(css|js|html)).*})  { |m| "/assets/#{m[2]}" }
 # end
+
+guard 'pow' do
+  watch('.powrc')
+  watch('.powenv')
+  watch('.rvmrc')
+  watch('Gemfile')
+  watch('Gemfile.lock')
+  watch('config/application.rb')
+  watch('config/environment.rb')
+  watch(%r{^config/environments/.*\.rb$})
+  watch(%r{^config/initializers/.*\.rb$})
+end
+
+# Add files and commands to this file, like the example:
+#   watch(%r{file/path}) { `command(s)` }
+#
+guard 'shell' do
+  watch(/(.*).txt/) {|m| `tail #{m[0]}` }
+end

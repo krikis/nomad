@@ -14,6 +14,8 @@ gem 'haml-rails'
 gem 'haml_assets'
 gem 'coffee-filter'
 gem 'sanitize'
+gem 'faye'
+gem 'thin'
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -50,6 +52,8 @@ group :test do
   gem 'poltergeist'
   # gem 'launchy'
   gem 'guard-livereload'
+  gem 'guard-pow'
+  gem 'guard-shell'
 
   # gem 'cucumber-rails'
   # gem 'guard-cucumber'
