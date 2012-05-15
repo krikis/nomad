@@ -1,9 +1,10 @@
 require 'rubygems'
 
-ROOT_DIR = File.expand_path(File.dirname(__FILE__))
-File.open(File.join(ROOT_DIR, '..', 'tmp', 'pids', 'faye.pid'), 'w') do |f|
-  f << Process.pid
-end
+# ROOT_DIR = File.expand_path(File.dirname(__FILE__))
+# File.open(File.join(ROOT_DIR, '..', 'tmp', 'pids', 'faye.pid'), 'w') do |f|
+#   f << Process.pid
+#   f << "\n"
+# end
 
 port   = ARGV[0] || 9292
 secure = ARGV[1] == 'ssl'

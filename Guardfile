@@ -15,6 +15,13 @@ guard 'spork', :rspec_env => { 'RAILS_ENV' => 'test' },
   watch('spec/javascripts/support/jasmine.yml')
 end
 
+# Add files and commands to this file, like the example:
+#   watch(%r{file/path}) { `command(s)` }
+#
+guard 'shell' do
+  # watch(%r{file/path}) { `command(s)` }
+end
+
 guard 'jasmine' do
   watch(%r{spec/javascripts/spec\.(js\.coffee|js|coffee)$})        { 'spec/javascripts' }
   watch(%r{^spec/javascripts/(.*)_factory\..*})                    { 'spec/javascripts' }
@@ -80,11 +87,4 @@ guard 'pow' do
   watch('config/environment.rb')
   watch(%r{^config/environments/.*\.rb$})
   watch(%r{^config/initializers/.*\.rb$})
-end
-
-# Add files and commands to this file, like the example:
-#   watch(%r{file/path}) { `command(s)` }
-#
-guard 'shell' do
-  # watch(/(.*).txt/) {|m| `tail #{m[0]}` }
 end
