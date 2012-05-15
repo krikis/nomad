@@ -13,7 +13,7 @@ shared = File.expand_path('../../shared', __FILE__)
 require File.expand_path('../app', __FILE__)
 Faye::WebSocket.load_adapter('thin')
 
-# Faye::Logging.log_level = :debug
+# Faye::Logging.log_level = :info
 
 EM.run {
   thin = Rack::Handler.get('thin')
@@ -27,5 +27,13 @@ EM.run {
       }
     end
   end
+
+  client = App.get_client
+
+  client.subscribe('/server/*') do |message|
+    client.publish('/sync/posts', :message => 'test')
+  end
+
+  client.publish('/sync/posts', 'hello' => 'world')
 }
 

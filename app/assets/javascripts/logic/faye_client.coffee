@@ -1,7 +1,7 @@
 @BackboneSync ||= {}
 @BackboneSync.FayeClient = (->
   FayeClient = (collection, options) ->
-    Faye.Logging.logLevel = if window.development then 'debug' else 'error'
+    Faye.Logging.logLevel = if window.development then 'info' else 'error'
     window.client ||= new Faye.Client("http://nomad.dev:9292/faye")
     # disable all non-websocket after connection to enforce websockets
     # client.disable('long-polling'); 
