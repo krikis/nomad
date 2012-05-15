@@ -86,5 +86,5 @@ end
 #   watch(%r{file/path}) { `command(s)` }
 #
 guard 'shell' do
-  watch(/(.*).txt/) {|m| `tail #{m[0]}` }
+  # watch(/(.*).txt/) {|m| `tail #{m[0]}` }
 end
