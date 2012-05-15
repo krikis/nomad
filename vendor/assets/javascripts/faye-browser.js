@@ -13,7 +13,7 @@ Faye.extend = function(dest, source, overwrite) {
 };
 
 Faye.extend(Faye, {
-  VERSION:          '0.8.1',
+  VERSION:          '0.8.2',
   
   BAYEUX_VERSION:   '1.0',
   ID_LENGTH:        128,
@@ -53,7 +53,7 @@ Faye.extend(Faye, {
       while (i--) clone[i] = Faye.copyObject(object[i]);
       return clone;
     } else if (typeof object === 'object') {
-      clone = {};
+      clone = (object === null) ? null : {};
       for (key in object) clone[key] = Faye.copyObject(object[key]);
       return clone;
     } else {
@@ -141,6 +141,10 @@ Faye.extend(Faye, {
       });
     
     return JSON.stringify(object);
+  },
+  
+  logger: function(message) {
+    if (typeof console !== 'undefined') console.log(message);
   },
   
   timestamp: function() {
@@ -539,7 +543,6 @@ Faye.Extensible = {
 };
 
 Faye.extend(Faye.Extensible, Faye.Logging);
-
 
 Faye.Channel = Faye.Class({
   initialize: function(name) {
@@ -1901,7 +1904,6 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
 Faye.extend(Faye.Transport.WebSocket.prototype, Faye.Deferrable);
 Faye.Transport.register('websocket', Faye.Transport.WebSocket);
 
-
 Faye.Transport.EventSource = Faye.extend(Faye.Class(Faye.Transport, {
   initialize: function(client, endpoint) {
     Faye.Transport.prototype.initialize.call(this, client, endpoint);
@@ -1909,6 +1911,14 @@ Faye.Transport.EventSource = Faye.extend(Faye.Class(Faye.Transport, {
     
     var socket = new EventSource(endpoint + '/' + client.getClientId()),
         self   = this;
+    
+    socket.onopen = function() {
+      self.trigger('up');
+    };
+    
+    socket.onerror = function() {
+      self.trigger('down');
+    };
     
     socket.onmessage = function(event) {
       self.receive(JSON.parse(event.data));
@@ -2002,7 +2012,6 @@ Faye.Transport.XHR = Faye.extend(Faye.Class(Faye.Transport, {
 });
 
 Faye.Transport.register('long-polling', Faye.Transport.XHR);
-
 
 Faye.Transport.CORS = Faye.extend(Faye.Class(Faye.Transport, {
   request: function(message, timeout) {
