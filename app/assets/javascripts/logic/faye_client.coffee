@@ -1,7 +1,12 @@
 @BackboneSync ||= {}
 @BackboneSync.FayeClient = (->
   FayeClient = (collection, options) ->
+    # Faye.Logging.logLevel = 'debug'
     window.client ||= new Faye.Client("http://nomad.dev:9292/faye")
+    # disable all non-websocket after connection to enforce websockets
+    # client.disable('long-polling'); 
+    # client.disable('cross-origin-long-polling'); 
+    # client.disable('callback-polling');
     @client = window.client
     @collection = collection
     @channel = options.channel
