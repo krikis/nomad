@@ -1,26 +1,41 @@
-port   = @args[:port] || 9292
-secure = @args[:ssl] == 'ssl'
+require File.expand_path('../app',    __FILE__)
+require File.expand_path('../client', __FILE__)
 
-require File.expand_path('../app', __FILE__)
-Faye::WebSocket.load_adapter('thin')
+class SyncServer
 
-# Faye::Logging.log_level = :info
+  def initialize(port = nil, ssl = nil)
+    @port = port || 9292
+    @secure = ssl == 'ssl'
+  end
 
-EM.run {
-  thin = Rack::Handler.get('thin')
-  thin.run(App, :Port => port) do |s|
+  def run
+    Faye::WebSocket.load_adapter('thin')
+    # Faye::Logging.log_level = :info
 
-    if secure
-      s.ssl = true
-      s.ssl_options = {
-        :private_key_file => shared + '/server.key',
-        :cert_chain_file  => shared + '/server.crt'
-      }
+    EM.run {
+      setup_server
+      setup_server_side_client
+    }
+  end
+
+  def setup_server
+    thin = Rack::Handler.get('thin')
+    thin.run(App, :Port => @port) do |s|
+      # TODO:: fix ssl certificate paths
+      if @secure
+        s.ssl = true
+        s.ssl_options = {
+          :private_key_file => 'path/to/server.key',
+          :cert_chain_file  => 'path/to/server.crt'
+        }
+      end
     end
   end
 
-  @client = App.get_client
-
-  require File.expand_path('../client', __FILE__)
-}
+  def setup_server_side_client
+    server_side_client = ServerSideClient.new(App.get_client)
+    server_side_client.subscribe
+    server_side_client.publish
+  end
+end
 

@@ -34,6 +34,8 @@ guard 'rspec', :version => 2, :cli => "--drb -f Fuubar --colour" do
   watch(%r{^spec/.+_spec\.rb$})
   watch(%r{^app/(.+)\.rb$})                           { |m| "spec/#{m[1]}_spec.rb" }
   watch(%r{^lib/(.+)\.rb$})                           { |m| "spec/lib/#{m[1]}_spec.rb" }
+  watch(%r{^lib/(.+)\.rake$})                         { |m| "spec/lib/#{m[1]}_spec.rb" }
+  watch(%r{^faye/(.+)\.rb$})                          { |m| "spec/faye/#{m[1]}_spec.rb" }
   watch(%r{^app/controllers/(.+)_(controller)\.rb$})  { |m| ["spec/routing/#{m[1]}_routing_spec.rb", "spec/#{m[2]}s/#{m[1]}_#{m[2]}_spec.rb", "spec/acceptance"] }
   watch(%r{^spec/fabricators/(.+)\.rb$})              { "spec" }
   watch(%r{^spec/support/(.+)\.rb$})                  { "spec" }
@@ -43,6 +45,7 @@ guard 'rspec', :version => 2, :cli => "--drb -f Fuubar --colour" do
   # Capybara request specs
   watch(%r{^app/views/(.+)/(.*)\.(erb|haml)$})        { |m| ["spec/requests/#{m[1]}_spec.rb", "spec/views/#{m[1]}/#{m[2]}.#{m[3]}_spec.rb"] }
   # Steak acceptance specs
+  watch('spec/faye/faye_helper.rb')                   { "spec/faye" }
   watch('spec/acceptance/acceptance_helper.rb')       { "spec/acceptance" }
   watch('app/assets/javascripts')                     { "spec/acceptance" }
   watch('app/assets/templates')                       { "spec/acceptance" }
