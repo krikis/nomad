@@ -1,14 +1,5 @@
-require 'rubygems'
-
-# ROOT_DIR = File.expand_path(File.dirname(__FILE__))
-# File.open(File.join(ROOT_DIR, '..', 'tmp', 'pids', 'faye.pid'), 'w') do |f|
-#   f << Process.pid
-#   f << "\n"
-# end
-
-port   = ARGV[0] || 9292
-secure = ARGV[1] == 'ssl'
-shared = File.expand_path('../../shared', __FILE__)
+port   = @args[:port] || 9292
+secure = @args[:ssl] == 'ssl'
 
 require File.expand_path('../app', __FILE__)
 Faye::WebSocket.load_adapter('thin')
@@ -28,12 +19,8 @@ EM.run {
     end
   end
 
-  client = App.get_client
+  @client = App.get_client
 
-  client.subscribe('/server/*') do |message|
-    client.publish('/sync/posts', :message => 'test')
-  end
-
-  client.publish('/sync/posts', 'hello' => 'world')
+  require File.expand_path('../client', __FILE__)
 }
 
