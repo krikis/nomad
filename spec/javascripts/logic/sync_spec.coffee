@@ -1,13 +1,7 @@
 describe 'Sync', ->
   describe 'objectLocks', ->
     beforeEach ->
-      TestCollection = Backbone.Collection.extend(
-        initialize: ->
-          @channel = @constructor.name.toLowerCase()
-          @fayeClient = new BackboneSync.FayeClient(@,
-            channel: @channel
-          )
-      )
+      TestCollection = Backbone.Collection.extend()
       @collection = new TestCollection
       model = 
         id: 'some_id'
@@ -28,13 +22,7 @@ describe 'Sync', ->
   describe 'prepareSync', ->
     beforeEach ->
       @publishStub = sinon.stub(BackboneSync.FayeClient::, "publish")
-      TestCollection = Backbone.Collection.extend(
-        initialize: ->
-          @channel = @constructor.name.toLowerCase()
-          @fayeClient = new BackboneSync.FayeClient(@,
-            channel: @channel
-          )
-      )
+      TestCollection = Backbone.Collection.extend()
       @collection = new TestCollection
       model = 
         id: 'some_id'

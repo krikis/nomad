@@ -19,7 +19,7 @@ describe "FayeClient", ->
       # stub before creation because of callback binding
       @subscribeStub = sinon.stub(BackboneSync.FayeClient::, "subscribe")
       @subscriber = new BackboneSync.FayeClient @collection,
-                                                    channel: @channel
+                                                channel: @channel
 
     afterEach ->
       @subscribeStub.restore()
@@ -36,13 +36,13 @@ describe "FayeClient", ->
 
     it "does not fire up a new Faye client if one is already running", ->
       @otherSubscriber = new BackboneSync.FayeClient @collection,
-                                                    channel: @channel
+                                                     channel: @channel
       expect(@clientConstructorStub).toHaveBeenCalledOnce()
       
   describe "#publish", ->
     beforeEach ->
       @subscriber = new BackboneSync.FayeClient @collection,
-                                                    channel: @channel
+                                                channel: @channel
                                                     
     it "calls the publish method on the faye client object", ->
       data = sinon.stub()
@@ -53,7 +53,7 @@ describe "FayeClient", ->
   describe "#subscribe", ->
     beforeEach ->
       @subscriber = new BackboneSync.FayeClient @collection,
-                                                    channel: @channel
+                                                channel: @channel
 
     it "calls the subscribe method on the faye client object", ->
       expect(@fayeClientStub.subscribe).
@@ -64,7 +64,7 @@ describe "FayeClient", ->
   describe "#receive", ->
     beforeEach ->
       @subscriber = new BackboneSync.FayeClient @collection,
-                                                    channel: @channel
+                                                channel: @channel
       @subscriber.method_1 = sinon.stub()
       @subscriber.method_2 = sinon.stub()
 
