@@ -11,7 +11,9 @@ guard 'spork', :rspec_env => { 'RAILS_ENV' => 'test' },
   watch(%r{^config/environments/.+\.rb$})
   watch(%r{^config/initializers/.+\.rb$})
   watch(%r{^lib/(.+)\.rb$})
+  watch(%r{^faye/(.+)\.rb$})
   watch('spec/spec_helper.rb')
+  watch(%r{^spec/support/(.+)\.rb$})
   watch('spec/javascripts/support/jasmine.yml')
 end
 
