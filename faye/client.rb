@@ -11,7 +11,7 @@ class ServerSideClient
   end
 
   def on_server_message(message)
-    @client.publish('/sync/posts', :message => 'test')
+    @client.publish("/sync/#{message["channel"]}", {'test' => 'message'})
   end
 
   def publish

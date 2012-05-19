@@ -30,9 +30,11 @@ describe ServerSideClient do
   end
 
   describe '#on_server_message' do
-    it 'calls publish on the client attribute' do
-      client.should_receive(:publish)
-      subject.on_server_message(stub)
+    it 'publishes on the channel declared in the message' do
+      message = stub
+      message.stub(:[]) {|key| key}
+      client.should_receive(:publish).with('/sync/channel', an_instance_of(Hash))
+      subject.on_server_message(message)
     end
   end
 

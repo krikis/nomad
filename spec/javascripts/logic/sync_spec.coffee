@@ -34,7 +34,6 @@ describe 'Sync', ->
     
     it 'publishes the channel and a list of locks to the server', ->
       @collection.prepareSync()
-      console.log @collection.channel
       expect(@publishStub).toHaveBeenCalledWith
         channel: 'testcollection'
         locks: ['some_id']
