@@ -15,8 +15,24 @@ describe ServerSideClient do
 
   describe '#subscribe' do
     it 'calls subscribe on the client attribute' do
-      client.should_receive(:subscribe)
+      client.should_receive(:subscribe).with('/server/*')
       subject.subscribe
+    end
+
+    it 'calls on_server_message when receiving a message' do
+      callback = nil
+      client.stub(:subscribe) {|channel, proc| callback = proc}
+      subject.subscribe
+      message = stub
+      subject.should_receive(:on_server_message).with(message)
+      callback.call(message)
+    end
+  end
+
+  describe '#on_server_message' do
+    it 'calls publish on the client attribute' do
+      client.should_receive(:publish)
+      subject.on_server_message(stub)
     end
   end
 

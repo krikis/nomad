@@ -6,8 +6,12 @@ class ServerSideClient
 
   def subscribe
     @client.subscribe('/server/*') do |message|
-      @client.publish('/sync/posts', :message => 'test')
+      on_server_message(message)
     end
+  end
+
+  def on_server_message(message)
+    @client.publish('/sync/posts', :message => 'test')
   end
 
   def publish
