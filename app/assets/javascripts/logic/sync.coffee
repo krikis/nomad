@@ -1,6 +1,8 @@
 @Sync = 
   prepareSync: ->
-    @fayeClient.publish {locks: @objectLocks()}
+    @fayeClient.publish
+      channel: @channel
+      locks: @objectLocks()
     
   objectLocks: ->
     _(@models).chain().map((model) ->

@@ -8,7 +8,7 @@ describe 'Versioning', ->
 
   describe '#hasPatches', ->
     beforeEach ->
-      TestModel = Backbone.Model.extend()
+      class TestModel extends Backbone.Model
       @model = new TestModel Factory.build("answer")
 
     context 'when the model has no patches', ->
@@ -24,7 +24,7 @@ describe 'Versioning', ->
 
   describe '#createPatch', ->
     beforeEach ->
-      TestModel = Backbone.Model.extend()
+      class TestModel extends Backbone.Model
       @model = new TestModel Factory.build("answer", synced: true)
       @model.collection =
         url: "/collection" # stub the model's collection url
@@ -45,7 +45,7 @@ describe 'Versioning', ->
 
   describe '#addPatch', ->
     beforeEach ->
-      TestModel = Backbone.Model.extend()
+      class TestModel extends Backbone.Model
       @model = new TestModel Factory.build("answer")
       @model.collection =
         url: "/collection" # stub the model's collection url

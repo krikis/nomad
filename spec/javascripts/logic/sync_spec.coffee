@@ -1,7 +1,7 @@
 describe 'Sync', ->
   describe 'objectLocks', ->
     beforeEach ->
-      TestCollection = Backbone.Collection.extend()
+      class TestCollection extends Backbone.Collection
       @collection = new TestCollection
       model = 
         id: 'some_id'
@@ -22,7 +22,7 @@ describe 'Sync', ->
   describe 'prepareSync', ->
     beforeEach ->
       @publishStub = sinon.stub(BackboneSync.FayeClient::, "publish")
-      TestCollection = Backbone.Collection.extend()
+      class TestCollection extends Backbone.Collection
       @collection = new TestCollection
       model = 
         id: 'some_id'
@@ -32,7 +32,10 @@ describe 'Sync', ->
     afterEach ->
       @publishStub.restore()
     
-    it 'publishes a list of locks to the server', ->
+    it 'publishes the channel and a list of locks to the server', ->
       @collection.prepareSync()
-      expect(@publishStub).toHaveBeenCalledWith {locks: ['some_id']}
+      console.log @collection.channel
+      expect(@publishStub).toHaveBeenCalledWith
+        channel: 'testcollection'
+        locks: ['some_id']
   

@@ -4,7 +4,7 @@ describe "Bacbone.LocalStorage", ->
 
   describe "localStorage on collections", ->
 
-    TestCollection = Backbone.Collection.extend()
+    class TestCollection extends Backbone.Collection
     collection = undefined
 
     beforeEach ->
@@ -123,15 +123,15 @@ describe "Bacbone.LocalStorage", ->
       expect(method).toEqual Backbone.localSync #
 
     it "remoteModel should use ajax sync", ->
-      MyRemoteModel = Backbone.Model.extend()
+      class MyRemoteModel extends Backbone.Model
       remoteModel = new MyRemoteModel()
       method = Backbone.getSyncMethod(remoteModel)
       expect(method).toEqual Backbone.ajaxSync #
 
   describe "#create", ->
     beforeEach ->
-      TestCollection = Backbone.Collection.extend()
-      OtherTestCollection = Backbone.Collection.extend()
+      class TestCollection extends Backbone.Collection
+      class OtherTestCollection extends Backbone.Collection
       TestCollection::localStorage = new Backbone.
                                        LocalStorage("TestCollection")
       OtherTestCollection::localStorage = new Backbone.
@@ -155,7 +155,7 @@ describe "Bacbone.LocalStorage", ->
 
   describe '#update', ->
     beforeEach ->
-      TestModel = Backbone.Model.extend()
+      class TestModel extends Backbone.Model
       @model = new TestModel Factory.build("answer", synced: true)
       @model.localStorage = new Backbone.LocalStorage("TestModel")
       @model.collection =
@@ -173,7 +173,7 @@ describe "Bacbone.LocalStorage", ->
 
   describe '#find', ->
     beforeEach ->
-      TestModel = Backbone.Model.extend()
+      class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('answer', id: 'test_id')
       @model.localStorage = new Backbone.LocalStorage('TestModel')
       @model.collection =
@@ -190,7 +190,7 @@ describe "Bacbone.LocalStorage", ->
       
   describe '#findAll', ->    
     beforeEach ->
-      TestCollection = Backbone.Collection.extend()
+      class TestCollection extends Backbone.Collection
       @setAllPatchesStub = sinon.stub Backbone.LocalStorage::, 'setAllPatches'
       @setPatchesStub = sinon.stub Backbone.LocalStorage::, 'setPatches'
       TestCollection::localStorage = new Backbone.
@@ -213,7 +213,7 @@ describe "Bacbone.LocalStorage", ->
       
   describe '#setAllPatches', ->
     beforeEach ->
-      TestCollection = Backbone.Collection.extend()
+      class TestCollection extends Backbone.Collection
       @setPatchesStub = sinon.stub Backbone.LocalStorage::, 'setPatches'
       TestCollection::localStorage = new Backbone.
                                        LocalStorage("TestCollection")
@@ -229,7 +229,7 @@ describe "Bacbone.LocalStorage", ->
       
   describe '#setPatches', ->
     beforeEach ->
-      TestCollection = Backbone.Collection.extend()
+      class TestCollection extends Backbone.Collection
       TestCollection::localStorage = new Backbone.
                                        LocalStorage("TestCollection")
       @collection = new TestCollection()
@@ -246,7 +246,7 @@ describe "Bacbone.LocalStorage", ->
       
   describe '#destroy', ->
     beforeEach ->
-      TestModel = Backbone.Model.extend()
+      class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('answer', id: 'test_id')
       @model.localStorage = new Backbone.LocalStorage('TestModel')
       @model.collection =
