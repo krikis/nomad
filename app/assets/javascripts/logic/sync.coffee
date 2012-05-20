@@ -1,13 +1,13 @@
-@Sync = 
+@Sync =
   prepareSync: ->
     @fayeClient.publish
-      channel: @channel
-      locks: @objectLocks()
-    
-  objectLocks: ->
+      collection: @channel
+      object_ids: @changedObjects()
+
+  changedObjects: ->
     _(@models).chain().map((model) ->
       model.id if model.hasPatches()
     ).compact().value()
-    
+
 # extend Backbone.Collection
 _.extend Backbone.Collection::, Sync

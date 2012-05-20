@@ -6,7 +6,7 @@ describe 'prepareSync', ->
       console.log message
     )
     class TestCollection extends Backbone.Collection
-    @collection = new TestCollection
+    @collection = new TestCollection([], channel: 'testChannel')
     model =
       id: 'some_id'
       hasPatches: -> true
@@ -15,7 +15,7 @@ describe 'prepareSync', ->
   afterEach ->
     @fayeClientSpy.restore()
 
-  it 'publishes the channel and a list of locks to the server', ->
+  it 'publishes the channel and a list of changed objects to the server', ->
     runs ->
       @collection.prepareSync()
     waitsFor (->
