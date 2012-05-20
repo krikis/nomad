@@ -30,10 +30,16 @@ describe ServerSideClient do
   end
 
   describe '#on_server_message' do
+    it 'collects the most recent version of the objects in the message' do
+      message = {collection: 'Posts', object_ids: ['some_id']}
+      
+      
+    end
+    
     it 'publishes on the channel declared in the message' do
       message = stub
       message.stub(:[]) {|key| key}
-      client.should_receive(:publish).with('/sync/channel', an_instance_of(Hash))
+      client.should_receive(:publish).with('/sync/collection', an_instance_of(Hash))
       subject.on_server_message(message)
     end
   end

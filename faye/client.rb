@@ -11,12 +11,12 @@ class ServerSideClient
   end
 
   def on_server_message(message)
-    @client.publish("/sync/#{message["channel"]}", {'test' => 'message'})
+    @client.publish("/sync/#{message["collection"]}", {'test' => 'message'})
   end
 
   def publish
     EM.add_periodic_timer(30) {
-      @client.publish('/sync/posts', 'hello' => 'world')
+      @client.publish('/sync/Posts', 'hello' => 'world')
     }
   end
 end
