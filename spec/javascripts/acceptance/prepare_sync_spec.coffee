@@ -1,19 +1,18 @@
 describe 'prepareSync', ->
   beforeEach ->
     window.receive_called = false
-    @fayeClientSpy = sinon.stub(BackboneSync.FayeClient::, 'receive', (message)->
+    @fayeClientStub = sinon.stub(BackboneSync.FayeClient::, 'receive', (message)->
       window.receive_called = true
-      console.log message
     )
     class TestCollection extends Backbone.Collection
-    @collection = new TestCollection([], channel: 'testChannel')
+    @collection = new TestCollection([], channel: 'Post')
     model =
       id: 'some_id'
       hasPatches: -> true
     @collection.models = [model]
 
   afterEach ->
-    @fayeClientSpy.restore()
+    @fayeClientStub.restore()
 
   it 'publishes the channel and a list of changed objects to the server', ->
     runs ->
@@ -22,4 +21,4 @@ describe 'prepareSync', ->
       window.receive_called
     ), 'receive to get called', 5000
     runs ->
-      expect(@fayeClientSpy).toHaveBeenCalledWith({test: 'message'})
+      expect(@fayeClientStub).toHaveBeenCalledWith({objects: []})
