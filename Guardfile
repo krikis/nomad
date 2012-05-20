@@ -25,7 +25,7 @@ guard 'shell' do
   # watch(%r{file/path}) { `command(s)` }
 end
 
-guard 'jasmine' do
+guard 'jasmine', :console => :always, :errors => :always do
   watch(%r{spec/javascripts/spec\.(js\.coffee|js|coffee)$})        { 'spec/javascripts' }
   watch(%r{^spec/javascripts/(.*)_factory\..*})                    { 'spec/javascripts' }
   watch(%r{spec/javascripts/.+_spec\.(js\.coffee|js|coffee)$})

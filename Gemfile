@@ -48,7 +48,7 @@ group :test do
   gem 'guard-rspec'
   gem 'fuubar'
   gem 'database_cleaner'
-  gem 'guard-jasmine'
+  gem 'guard-jasmine', :git => 'git://github.com/esposito/guard-jasmine.git'
   gem 'poltergeist'
   # gem 'launchy'
   gem 'guard-livereload'
