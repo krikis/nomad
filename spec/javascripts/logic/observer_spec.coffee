@@ -33,7 +33,8 @@ describe "Observer", ->
       @callback = sinon.stub()
       @event = "test_event"
       @model.on @event, @callback, @view
-      @view.bindings = _([@model])
+      @view.bindings ||= _([])
+      @view.bindings.push @model
 
     it "unbinds each source in bindings", ->
       @model.trigger @event
