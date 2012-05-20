@@ -10,7 +10,7 @@ describe "Bacbone.LocalStorage", ->
     beforeEach ->
       window.localStorage.clear()
       TestCollection::localStorage = new Backbone.LocalStorage("TestCollection")
-      collection = new TestCollection()
+      collection = new TestCollection([], channel: 'testChannel')
 
     it "should be empty initially", ->
       expect(collection.length).toEqual 0 # "empty initially"
@@ -70,7 +70,7 @@ describe "Bacbone.LocalStorage", ->
 
     it "should load from session store without server request", ->
       collection.create Factory.build('post')
-      secondTestCollection = new TestCollection()
+      secondTestCollection = new TestCollection([], channel: 'testChannel')
       secondTestCollection.fetch()
       expect(1).toEqual secondTestCollection.length #
 
@@ -80,7 +80,7 @@ describe "Bacbone.LocalStorage", ->
         model: Model
         localStorage: new Store("strangeID")
       )
-      collection = new Collection()
+      collection = new Collection([], channel: 'testChannel')
       collection.create {}
       expect(collection.first().id).toEqual collection.first().get("_id") #
 
@@ -136,8 +136,8 @@ describe "Bacbone.LocalStorage", ->
                                        LocalStorage("TestCollection")
       OtherTestCollection::localStorage = new Backbone.
                                             LocalStorage("OtherTestCollection")
-      @collection = new TestCollection()
-      @other_collection = new OtherTestCollection()
+      @collection = new TestCollection([], channel: 'testChannel')
+      @other_collection = new OtherTestCollection([], channel: 'testChannel')
       @ids = undefined
 
     it "should generate a unique object id
@@ -195,7 +195,7 @@ describe "Bacbone.LocalStorage", ->
       @setPatchesStub = sinon.stub Backbone.LocalStorage::, 'setPatches'
       TestCollection::localStorage = new Backbone.
                                        LocalStorage("TestCollection")
-      @collection = new TestCollection()
+      @collection = new TestCollection([], channel: 'testChannel')
       @collection.create Factory.build('answer')
       
     afterEach ->
@@ -217,7 +217,7 @@ describe "Bacbone.LocalStorage", ->
       @setPatchesStub = sinon.stub Backbone.LocalStorage::, 'setPatches'
       TestCollection::localStorage = new Backbone.
                                        LocalStorage("TestCollection")
-      @collection = new TestCollection()
+      @collection = new TestCollection([], channel: 'testChannel')
       @collection.create Factory.build('answer')
       
     afterEach ->
@@ -232,7 +232,7 @@ describe "Bacbone.LocalStorage", ->
       class TestCollection extends Backbone.Collection
       TestCollection::localStorage = new Backbone.
                                        LocalStorage("TestCollection")
-      @collection = new TestCollection()
+      @collection = new TestCollection([], channel: 'testChannel')
       @collection.create Factory.build('answer', id: 'test_id')
       
     it 'fetches _patches for a model being added to a collection', ->

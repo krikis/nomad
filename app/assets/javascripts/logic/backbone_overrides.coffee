@@ -30,7 +30,10 @@ Backbone.Collection = ((Collection) ->
   Backbone.Collection = (models, options = {}) ->
     Collection.apply @, arguments
     @channel = options.channel
-    @channel ||= @constructor.name.toLowerCase()
+    @channel ||= @model::constructor.name
+    unless @channel? and @channel.length > 0
+      throw new Error('Channel undefined: either set a valid Backbone.Model ' +
+                      'or pass a channel option!')
     @fayeClient = new BackboneSync.FayeClient(@,
       channel: @channel
     )

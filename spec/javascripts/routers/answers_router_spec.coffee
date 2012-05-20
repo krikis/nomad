@@ -55,7 +55,7 @@ describe "AnswersRouterSpec", ->
     
   describe "handlers", ->
     beforeEach ->
-      @collection = new Backbone.Collection
+      @collection = new Backbone.Collection([], channel: 'testChannel')
       @fetchStub = sinon.stub(@collection, "fetch").returns null
       @answerListViewStub = sinon.stub(Nomad.Views.Answers, "IndexView").
         returns new Backbone.View

@@ -6,7 +6,7 @@ describe "FayeClient", ->
     @fayeClientStub.publish = sinon.stub()
     @clientConstructorStub = sinon.stub(Faye, "Client")
     @clientConstructorStub.returns @fayeClientStub
-    @collection = new Backbone.Collection
+    @collection = new Backbone.Collection([], channel: 'testChannel')
     @channel = "test_channel"
   afterEach ->
     @clientConstructorStub.restore()

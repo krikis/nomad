@@ -24,7 +24,8 @@ describe "IndexViewSpec", ->
       @answer3 = new Backbone.Model id: 3
       @view.collection = new Backbone.Collection [@answer1,
                                                   @answer2,
-                                                  @answer3]
+                                                  @answer3],
+                                                 channel: 'testChannel'
       @view.render()
       
     afterEach ->
