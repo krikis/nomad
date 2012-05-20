@@ -1,5 +1,6 @@
 describe 'prepareSync', ->
   beforeEach ->
+    window.receive_called = false
     @fayeClientSpy = sinon.stub(BackboneSync.FayeClient::, 'receive', (message)->
       window.receive_called = true
       console.log message
