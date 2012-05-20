@@ -33,7 +33,11 @@ Spork.each_run do
 
   # Requires supporting ruby files with custom matchers and macros, etc,
   # in spec/support/ and its subdirectories.
-  Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
+  Dir[Rails.root.join("spec/support/**/*.rb")].each do |file|
+    # skip faye_server as it is included in the spork prefork block
+    next if file =~ /support\/faye_server_helper.rb/
+    require file
+  end
 
   RSpec.configure do |config|
     config.mock_with :rspec
