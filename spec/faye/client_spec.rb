@@ -30,17 +30,44 @@ describe ServerSideClient do
   end
 
   describe '#on_server_message' do
-    it 'collects the most recent version of the objects in the message' do
-      message = {collection: 'Posts', object_ids: ['some_id']}
+    context 'when the model in the message is a valid constant' do
+      context 'and it responds to find_by_id' do
+        let(:message) { {'model' => 'Post', 'object_ids' => ['some_id']} }
 
+        it 'collects the most recent version of the objects in the message' do
+          Post.should_receive(:find_by_id).with('some_id')
+          subject.on_server_message(message)
+        end
 
+        it 'publishes on the channel declared in the message' do
+          client.should_receive(:publish).with('/sync/Post', an_instance_of(Hash))
+          subject.on_server_message(message)
+        end
+
+        it 'publishes the JSON for the collected objects' do
+          json_object = stub
+          Post.stub(:find_by_id).and_return(stub(:to_json => json_object))
+          client.should_receive(:publish).with(an_instance_of(String), {'objects' => [json_object]})
+          subject.on_server_message(message)
+        end
+      end
+
+      context 'and it does not respond to find_by_id' do
+        let(:message) { {'model' => 'Rails', 'object_ids' => ['some_id']} }
+        it 'does not try to collect objects' do
+          Test.should_not_receive(:find_by_id)
+          subject.on_server_message(message)
+        end
+      end
     end
 
-    it 'publishes on the channel declared in the message' do
-      message = stub
-      message.stub(:[]) {|key| key}
-      client.should_receive(:publish).with('/sync/model', an_instance_of(Hash))
-      subject.on_server_message(message)
+    context 'when the model in the message is no valid constant' do
+      let(:model) { 'NotAnExistingConstant' }
+      let(:message) { {'model' => model, 'object_ids' => ['some_id']} }
+      it 'does not try to constantize it' do
+        model.should_not_receive(:constantize)
+        subject.on_server_message(message)
+      end
     end
   end
 
