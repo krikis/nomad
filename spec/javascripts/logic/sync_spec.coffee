@@ -35,5 +35,5 @@ describe 'Sync', ->
     it 'publishes the channel and a list of changed objects to the server', ->
       @collection.prepareSync()
       expect(@publishStub).toHaveBeenCalledWith
-        collection: 'testChannel'
+        model: 'testChannel'
         object_ids: ['some_id']

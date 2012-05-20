@@ -24,7 +24,7 @@ describe SyncServer do
     subject { SyncServer.new }
     before do
       Faye::WebSocket.stub(:load_adapter)
-      EM.stub(:run) {|block| block.call}
+      EM.stub(:run) {|&block| block.call}
       subject.stub(:setup_server)
       subject.stub(:setup_server_side_client)
     end
@@ -54,7 +54,7 @@ describe SyncServer do
     subject { SyncServer.new }
     let(:adapter) { stub 'adapter'}
     before do
-      adapter.stub(:run) {|app, options, block| block.call}
+      adapter.stub(:run) {|app, options, &block| block.call}
       Rack::Handler.stub(:get => adapter)
     end
 

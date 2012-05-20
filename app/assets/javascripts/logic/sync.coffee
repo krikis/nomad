@@ -1,7 +1,7 @@
 @Sync =
   prepareSync: ->
     @fayeClient.publish
-      collection: @channel
+      model: @channel
       object_ids: @changedObjects()
 
   changedObjects: ->

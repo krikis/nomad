@@ -11,7 +11,7 @@ class ServerSideClient
   end
 
   def on_server_message(message)
-    @client.publish("/sync/#{message["collection"]}", {'test' => 'message'})
+    @client.publish("/sync/#{message["model"]}", {'test' => 'message'})
   end
 
   def publish

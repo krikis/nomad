@@ -21,7 +21,7 @@ describe ServerSideClient do
 
     it 'calls on_server_message when receiving a message' do
       callback = nil
-      client.stub(:subscribe) {|channel, proc| callback = proc}
+      client.stub(:subscribe) {|channel, &proc| callback = proc}
       subject.subscribe
       message = stub
       subject.should_receive(:on_server_message).with(message)
@@ -32,20 +32,20 @@ describe ServerSideClient do
   describe '#on_server_message' do
     it 'collects the most recent version of the objects in the message' do
       message = {collection: 'Posts', object_ids: ['some_id']}
-      
-      
+
+
     end
-    
+
     it 'publishes on the channel declared in the message' do
       message = stub
       message.stub(:[]) {|key| key}
-      client.should_receive(:publish).with('/sync/collection', an_instance_of(Hash))
+      client.should_receive(:publish).with('/sync/model', an_instance_of(Hash))
       subject.on_server_message(message)
     end
   end
 
   describe '#publish' do
-    before { EM.stub(:add_periodic_timer) {|time, block| block.call } }
+    before { EM.stub(:add_periodic_timer) {|time, &block| block.call } }
 
     it 'calls publish on the client attribute' do
       client.should_receive(:publish)
