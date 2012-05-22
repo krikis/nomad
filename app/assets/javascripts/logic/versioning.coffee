@@ -4,8 +4,9 @@
 
   addPatch: ->
     if @get('synced')
-      @_patches ||= _([])
-      @_patches.push @createPatch()
+      @_patches ||= {}
+      @_patches.list ||= _([])
+      @_patches.list.push @createPatch()
 
   createPatch: ->
     window.dmp ||= new diff_match_patch

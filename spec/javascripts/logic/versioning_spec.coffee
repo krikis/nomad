@@ -54,15 +54,20 @@ describe 'Versioning', ->
     afterEach ->
       @createPatchSpy.restore()
 
-    describe '#when the object was synced to the server', ->
-      it 'initializes _patches as an empty array', ->
+    context 'when the object was synced to the server', ->
+      it 'initializes _patches', ->
         expect(@model._patches).toBeUndefined()
         @model.save(synced: true)
         expect(@model._patches).toBeDefined()
-        expect(@model._patches._wrapped).toBeDefined()
-        expect(@model._patches._wrapped.constructor.name).toEqual("Array")
+        
+      it 'initializes _patches.list as an empty array', ->
+        expect(@model._patches?.list).toBeUndefined()
+        @model.save(synced: true)
+        expect(@model._patches?.list).toBeDefined()
+        expect(@model._patches?.list._wrapped).toBeDefined()
+        expect(@model._patches?.list._wrapped.constructor.name).toEqual("Array")
 
-      it 'saves a patch for the update', ->
+      it 'saves a patch for the update to the _patches.list', ->
         @model.set(
           synced: true
           values:
@@ -70,4 +75,4 @@ describe 'Versioning', ->
             v_2: "value_2"
         )
         @model.save()
-        expect(@model._patches.first()).toEqual @createPatchSpy.returnValues[0]
+        expect(@model._patches?.list.first()).toEqual @createPatchSpy.returnValues[0]

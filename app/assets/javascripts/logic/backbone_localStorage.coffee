@@ -38,7 +38,7 @@
       
     # Generates the key a model's patches are stored with in the localStorage
     patchesKeyFor: (model) ->
-      "#{@name}-#{if _.isObject(model) then model.id else model}-patches"
+      "#{@storageKeyFor(model)}-patches"
 
     # Add a model, giving it a (hopefully)-unique GUID, if it doesn't already
     # have an id of it's own.

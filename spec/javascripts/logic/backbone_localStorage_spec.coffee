@@ -127,6 +127,20 @@ describe 'Bacbone.LocalStorage', ->
       remoteModel = new MyRemoteModel()
       method = Backbone.getSyncMethod(remoteModel)
       expect(method).toEqual Backbone.ajaxSync #
+      
+  describe '#patchesKeyFor', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      class TestCollection extends Backbone.Collection
+        model: TestModel
+      TestCollection::localStorage = new Backbone.
+                                       LocalStorage('TestCollection')
+      @collection = new TestCollection
+      @model = @collection.create Factory.build('answer', id: null)
+      
+    it 'returns the storage key for the model appended with -patches', ->
+      expect(@collection.localStorage.patchesKeyFor(@model)).
+        toEqual "#{@collection.localStorage.storageKeyFor(@model)}-patches"
 
   describe '#create', ->
     beforeEach ->
