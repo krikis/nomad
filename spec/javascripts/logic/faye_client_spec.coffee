@@ -55,11 +55,17 @@ describe "FayeClient", ->
       @subscriber = new BackboneSync.FayeClient @collection,
                                                 channel: @channel
 
-    it "calls the subscribe method on the faye client object", ->
+    it "subscribes the wrapped client to the channel", ->
       expect(@fayeClientStub.subscribe).
         toHaveBeenCalledWith("/sync/" + @channel,
                              @subscriber.receive,
                              @subscriber)
+                             
+    it 'subscribes the wrapped client to a personal channel', ->
+      expect(@fayeClientStub.subscribe).
+          toHaveBeenCalledWith("/sync/#{@channel}/#{Nomad.clientId}",
+                               @subscriber.receive,
+                               @subscriber)
 
   describe "#receive", ->
     beforeEach ->
