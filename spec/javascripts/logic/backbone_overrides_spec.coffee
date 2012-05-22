@@ -36,7 +36,7 @@ describe 'Overrides', ->
       afterEach ->
         @fayeClientStub.restore()
 
-      it 'sets the channel to the constructor name', ->
+      it 'sets the channel to the associated model\'s constructor name', ->
         expect(@collection.channel).toEqual 'TestModel'
         
       it 'sets the channel to the channel option if provided', ->
@@ -45,6 +45,15 @@ describe 'Overrides', ->
           model: TestModel
         @collection = new TestCollection([], channel: 'testChannel')
         expect(@collection.channel).toEqual 'testChannel'
+        
+      it 'retains the channel if it was defined in the collection class', ->
+        class TestModel extends Backbone.Model
+        class TestCollection extends Backbone.Collection
+          model: TestModel
+          channel: 'predefined'
+        @collection = new TestCollection([], channel: 'testChannel')
+        expect(@collection.channel).toEqual 'predefined'
+        
         
       it 'throws an error if no channel could be set', ->
         class TestModel extends Backbone.Model

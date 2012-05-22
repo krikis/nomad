@@ -29,7 +29,7 @@ Backbone.Collection = ((Collection) ->
   # Define the new constructor
   Backbone.Collection = (models, options = {}) ->
     Collection.apply @, arguments
-    @channel = options.channel
+    @channel ||= options.channel
     @channel ||= @model::constructor.name
     unless @channel? and @channel.length > 0
       throw new Error('Channel undefined: either set a valid Backbone.Model ' +
