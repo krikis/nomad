@@ -7,14 +7,13 @@ Spork.prefork do
   # Loading more in this block will cause your tests to run faster. However,
   # if you change any configuration or code from libraries loaded here, you'll
   # need to restart spork for it take effect.
-  # Start faye server
-  require_relative 'support/faye_server_helper'
   # Require rails
   ENV["RAILS_ENV"] ||= 'test'
   require File.expand_path("../../config/environment", __FILE__)
   require 'rspec/rails'
   require 'rspec/autorun'
   require 'capybara/poltergeist'
+  require 'andand'
 
   # Capybara defaults to XPath selectors rather than Webrat's default of CSS3. In
   # order to ease the transition to Capybara we set the default here. If you'd
@@ -26,6 +25,9 @@ Spork.prefork do
   Capybara.javascript_driver = :poltergeist
   # Capybara.app_host = "http://nomad.dev/"
   # Capybara.run_server = false
+
+  # Start faye server
+  require_relative 'support/faye_server_helper'
 end
 
 Spork.each_run do
