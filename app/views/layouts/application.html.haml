@@ -3,12 +3,13 @@
   %head
     %title Nomad
     = stylesheet_link_tag    "application", :media => "all"
+    -# set some environment variables
+    :coffeescript
+      @development = #{Rails.env.development?.inspect}
+      @clientId = '#{request.session_options[:id]}'
     = javascript_include_tag "application"
     = csrf_meta_tags
     = favicon_link_tag
   %body
-    :coffeescript
-      @development = #{Rails.env.development?.inspect}
-      @clientId = '#{request.session_options[:id]}'
       
     = yield
