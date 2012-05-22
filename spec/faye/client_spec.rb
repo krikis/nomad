@@ -41,9 +41,15 @@ describe ServerSideClient do
           subject.on_server_message(message)
         end
 
-        it 'publishes to the sending client only' do
+        it 'publishes to the sending client only if a client_id was provided' do
           client.should_receive(:publish).with('/sync/Post/some_unique_id', an_instance_of(Hash))
           subject.on_server_message(message)
+        end
+
+        it 'publishes to the provided channel if there is no client_id' do
+          client.should_receive(:publish).with('/sync/Post', an_instance_of(Hash))
+          subject.on_server_message({'model' => 'Post',
+                                     'object_ids' => ['some_id']})
         end
 
         it 'publishes the JSON for the collected objects' do
