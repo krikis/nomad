@@ -57,6 +57,10 @@ module Nomad
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
 
+    # HamlCoffee options
+    config.hamlcoffee.autoclose = 'meta,img,link,br,hr,input,area,param,col,base'
+    config.hamlcoffee.preserve = 'pre,textarea,abbr'
+
     config.generators do |g|
       g.template_engine     :haml
       g.orm                 :active_record
@@ -66,8 +70,5 @@ module Nomad
       g.stylesheets         false
       g.javascripts         false
     end
-
-    require Rails.root.join('config/haml_coffee_assets.rb')
-    config.hamlcoffee.merge!(HamlCoffeeAssets::Engine::APP_CONFIG)
   end
 end
