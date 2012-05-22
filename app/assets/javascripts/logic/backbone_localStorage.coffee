@@ -81,7 +81,7 @@
 
     setAllPatches: (collection, options) ->
       _.each(collection.models, (model) =>
-        @setPatches  model, collection, options
+        @setPatches model, collection, options
       )
 
     setPatches: (model, collection, options) ->

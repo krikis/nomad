@@ -1,95 +1,95 @@
-describe "Bacbone.LocalStorage", ->
+describe 'Bacbone.LocalStorage', ->
   beforeEach ->
     window.localStorage.clear()
 
-  describe "localStorage on collections", ->
+  describe 'localStorage on collections', ->
 
     class TestCollection extends Backbone.Collection
     collection = undefined
 
     beforeEach ->
       window.localStorage.clear()
-      TestCollection::localStorage = new Backbone.LocalStorage("TestCollection")
+      TestCollection::localStorage = new Backbone.LocalStorage('TestCollection')
       collection = new TestCollection([], channel: 'testChannel')
 
-    it "should be empty initially", ->
-      expect(collection.length).toEqual 0 # "empty initially"
+    it 'should be empty initially', ->
+      expect(collection.length).toEqual 0 # 'empty initially'
       collection.fetch()
-      expect(collection.length).toEqual 0 # "empty read"
+      expect(collection.length).toEqual 0 # 'empty read'
 
-    it "should create item", ->
+    it 'should create item', ->
       collection.create Factory.build('post')
-      expect(collection.length).toEqual 1 # "one item added"
-      expect(collection.first().get("title")).toEqual "The Tempest" # "title was read"
-      expect(collection.first().get("author")).toEqual "Bill Shakespeare" # "author was read"
-      expect(collection.first().get("length")).toEqual 123 # "length was read"
+      expect(collection.length).toEqual 1 # 'one item added'
+      expect(collection.first().get('title')).toEqual 'The Tempest' # 'title was read'
+      expect(collection.first().get('author')).toEqual 'Bill Shakespeare' # 'author was read'
+      expect(collection.first().get('length')).toEqual 123 # 'length was read'
 
-    it "should discard unsaved changes on fetch", ->
+    it 'should discard unsaved changes on fetch', ->
       collection.create Factory.build('post')
-      collection.first().set title: "Wombat's Fun Adventure"
-      expect(collection.first().get("title")).toEqual "Wombat's Fun Adventure" # "title changed, but not saved"
+      collection.first().set title: 'Wombat\'s Fun Adventure'
+      expect(collection.first().get('title')).toEqual 'Wombat\'s Fun Adventure' # 'title changed, but not saved'
       collection.fetch()
-      expect(collection.first().get("title")).toEqual "The Tempest" # "title was read"
+      expect(collection.first().get('title')).toEqual 'The Tempest' # 'title was read'
 
-    it "should persist changes", ->
+    it 'should persist changes', ->
       collection.create Factory.build('post')
-      expect(collection.first().get("author")).toEqual "Bill Shakespeare" # "author was read"
-      collection.first().save author: "William Shakespeare"
+      expect(collection.first().get('author')).toEqual 'Bill Shakespeare' # 'author was read'
+      collection.first().save author: 'William Shakespeare'
       collection.fetch()
-      expect(collection.first().get("author")).toEqual "William Shakespeare" # "verify author update"
+      expect(collection.first().get('author')).toEqual 'William Shakespeare' # 'verify author update'
 
-    it "should allow to change id", ->
+    it 'should allow to change id', ->
       collection.create Factory.build('post')
       collection.first().save
-        id: "1-the-tempest"
-        author: "William Shakespeare"
+        id: '1-the-tempest'
+        author: 'William Shakespeare'
 
-      expect(collection.first().get("id")).toEqual "1-the-tempest" # "verify ID update"
-      expect(collection.first().get("title")).toEqual "The Tempest" # "verify title is still there"
-      expect(collection.first().get("author")).toEqual "William Shakespeare" # "verify author update"
-      expect(collection.first().get("length")).toEqual 123 # "verify length is still there"
+      expect(collection.first().get('id')).toEqual '1-the-tempest' # 'verify ID update'
+      expect(collection.first().get('title')).toEqual 'The Tempest' # 'verify title is still there'
+      expect(collection.first().get('author')).toEqual 'William Shakespeare' # 'verify author update'
+      expect(collection.first().get('length')).toEqual 123 # 'verify length is still there'
       collection.fetch()
-      expect(collection.length).toEqual 2 # "should not auto remove first object when changing ID"
+      expect(collection.length).toEqual 2 # 'should not auto remove first object when changing ID'
 
-    it "should remove from collection", ->
+    it 'should remove from collection', ->
       _(23).times (index) ->
         collection.create id: index
 
       _(collection.toArray()).chain().clone().each (book) ->
         book.destroy()
 
-      expect(collection.length).toEqual 0 # "item was destroyed and collection is empty"
+      expect(collection.length).toEqual 0 # 'item was destroyed and collection is empty'
       collection.fetch()
-      expect(collection.length).toEqual 0 # "item was destroyed and collection is empty even after fetch"
+      expect(collection.length).toEqual 0 # 'item was destroyed and collection is empty even after fetch'
 
-    it "should not try to load items from localstorage if they are not there anymore", ->
+    it 'should not try to load items from localstorage if they are not there anymore', ->
       collection.create Factory.build('post')
       localStorage.clear()
       collection.fetch()
       expect(0).toEqual collection.length #
 
-    it "should load from session store without server request", ->
+    it 'should load from session store without server request', ->
       collection.create Factory.build('post')
       secondTestCollection = new TestCollection([], channel: 'testChannel')
       secondTestCollection.fetch()
       expect(1).toEqual secondTestCollection.length #
 
-    it "should cope with arbitrary idAttributes", ->
-      Model = Backbone.Model.extend(idAttribute: "_id")
+    it 'should cope with arbitrary idAttributes', ->
+      Model = Backbone.Model.extend(idAttribute: '_id')
       Collection = Backbone.Collection.extend(
         model: Model
-        localStorage: new Store("strangeID")
+        localStorage: new Store('strangeID')
       )
       collection = new Collection([], channel: 'testChannel')
       collection.create {}
-      expect(collection.first().id).toEqual collection.first().get("_id") #
+      expect(collection.first().id).toEqual collection.first().get('_id') #
 
-  describe "localStorage on models", ->
+  describe 'localStorage on models', ->
 
     TestModel = Backbone.Model.extend(
       defaults:
-        title: "The Tempest"
-        author: "Bill Shakespeare"
+        title: 'The Tempest'
+        author: 'Bill Shakespeare'
         length: 123
     )
 
@@ -97,78 +97,78 @@ describe "Bacbone.LocalStorage", ->
 
     beforeEach ->
       window.localStorage.clear()
-      TestModel::localStorage = new Backbone.LocalStorage("TestModel")
+      TestModel::localStorage = new Backbone.LocalStorage('TestModel')
       model = new TestModel()
 
-    it "should overwrite unsaved changes when fetching", ->
+    it 'should overwrite unsaved changes when fetching', ->
       model.save()
-      model.set title: "Wombat's Fun Adventure"
+      model.set title: 'Wombat\'s Fun Adventure'
       model.fetch()
-      expect(model.get("title")).toEqual "The Tempest" # "model created"
+      expect(model.get('title')).toEqual 'The Tempest' # 'model created'
 
-    it "should persist changes", ->
-      model.save author: "William Shakespeare"
+    it 'should persist changes', ->
+      model.save author: 'William Shakespeare'
       model.fetch()
-      expect(model.get("author")).toEqual "William Shakespeare" # "author successfully updated"
-      expect(model.get("length")).toEqual 123 # "verify length is still there"
+      expect(model.get('author')).toEqual 'William Shakespeare' # 'author successfully updated'
+      expect(model.get('length')).toEqual 123 # 'verify length is still there'
 
-    it "should remove model when destroying", ->
-      model.save author: "fnord"
-      expect(TestModel::localStorage.findAll().length).toEqual 1 # "model removed"
+    it 'should remove model when destroying', ->
+      model.save author: 'fnord'
+      expect(TestModel::localStorage.findAll().length).toEqual 1 # 'model removed'
       model.destroy()
-      expect(TestModel::localStorage.findAll().length).toEqual 0 # "model removed"
+      expect(TestModel::localStorage.findAll().length).toEqual 0 # 'model removed'
 
-    it "should use local sync", ->
+    it 'should use local sync', ->
       method = Backbone.getSyncMethod(model)
       expect(method).toEqual Backbone.localSync #
 
-    it "remoteModel should use ajax sync", ->
+    it 'remoteModel should use ajax sync', ->
       class MyRemoteModel extends Backbone.Model
       remoteModel = new MyRemoteModel()
       method = Backbone.getSyncMethod(remoteModel)
       expect(method).toEqual Backbone.ajaxSync #
 
-  describe "#create", ->
+  describe '#create', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       class OtherTestCollection extends Backbone.Collection
       TestCollection::localStorage = new Backbone.
-                                       LocalStorage("TestCollection")
+                                       LocalStorage('TestCollection')
       OtherTestCollection::localStorage = new Backbone.
-                                            LocalStorage("OtherTestCollection")
+                                            LocalStorage('OtherTestCollection')
       @collection = new TestCollection([], channel: 'testChannel')
       @other_collection = new OtherTestCollection([], channel: 'testChannel')
       @ids = undefined
 
-    it "should generate a unique object id
-        within the scope of a collection", ->
-      sinon.stub @collection.localStorage, "guid", ->
-        @ids ||= ["other_unique_id", "unique_id", "used_id"]
+    it 'should generate a unique object id
+        within the scope of a collection', ->
+      sinon.stub @collection.localStorage, 'guid', ->
+        @ids ||= ['other_unique_id', 'unique_id', 'used_id']
         id = @ids.pop()
       # this id is in use in the same collection
-      @collection.create id: "used_id"
+      @collection.create id: 'used_id'
       # this id is in use in another collection
-      @other_collection.create id: "unique_id"
-      @collection.create Factory.build("answer", id: null)
+      @other_collection.create id: 'unique_id'
+      @collection.create Factory.build('answer', id: null)
       # last model has a unique id within collection scope
-      expect(@collection.last().get("id")).toEqual "unique_id"
+      expect(@collection.last().get('id')).toEqual 'unique_id'
 
   describe '#update', ->
     beforeEach ->
       class TestModel extends Backbone.Model
-      @model = new TestModel Factory.build("answer", synced: true)
-      @model.localStorage = new Backbone.LocalStorage("TestModel")
+      @model = new TestModel Factory.build('answer', synced: true)
+      @model.localStorage = new Backbone.LocalStorage('TestModel')
       @model.collection =
-        url: "/collection" # stub the model's collection url
+        url: '/collection' # stub the model's collection url
 
     it 'saves _patches to the localStorage', ->  
       @model.save(
         values:
-          v_1: "other_value_1"
-          v_2: "value_2"
+          v_1: 'other_value_1'
+          v_2: 'value_2'
       )
       expect(window.localStorage.
-               getItem("TestModel-" + @model.id + "-patches")).
+               getItem('TestModel-' + @model.id + '-patches')).
         toEqual JSON.stringify(@model._patches)
 
   describe '#find', ->
@@ -194,7 +194,7 @@ describe "Bacbone.LocalStorage", ->
       @setAllPatchesStub = sinon.stub Backbone.LocalStorage::, 'setAllPatches'
       @setPatchesStub = sinon.stub Backbone.LocalStorage::, 'setPatches'
       TestCollection::localStorage = new Backbone.
-                                       LocalStorage("TestCollection")
+                                       LocalStorage('TestCollection')
       @collection = new TestCollection([], channel: 'testChannel')
       @collection.create Factory.build('answer')
       
@@ -216,7 +216,7 @@ describe "Bacbone.LocalStorage", ->
       class TestCollection extends Backbone.Collection
       @setPatchesStub = sinon.stub Backbone.LocalStorage::, 'setPatches'
       TestCollection::localStorage = new Backbone.
-                                       LocalStorage("TestCollection")
+                                       LocalStorage('TestCollection')
       @collection = new TestCollection([], channel: 'testChannel')
       @collection.create Factory.build('answer')
       
@@ -231,7 +231,7 @@ describe "Bacbone.LocalStorage", ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       TestCollection::localStorage = new Backbone.
-                                       LocalStorage("TestCollection")
+                                       LocalStorage('TestCollection')
       @collection = new TestCollection([], channel: 'testChannel')
       @collection.create Factory.build('answer', id: 'test_id')
       
@@ -256,11 +256,11 @@ describe "Bacbone.LocalStorage", ->
       @model._patches = ['some', 'patches']
       @model.save()
       expect(window.localStorage.
-               getItem("TestModel-" + @model.id + "-patches")).
+               getItem('TestModel-' + @model.id + '-patches')).
         toEqual JSON.stringify(@model._patches)
       @model.destroy()
       expect(window.localStorage.
-               getItem("TestModel-" + @model.id + "-patches")).
+               getItem('TestModel-' + @model.id + '-patches')).
         toBeNull()
     
       
