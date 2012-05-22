@@ -1,4 +1,5 @@
 class ServerSideClient
+  include Faye::Logging
 
   def initialize(client)
     @client = client
@@ -24,7 +25,7 @@ class ServerSideClient
 
   def publish
     EM.add_periodic_timer(30) {
-      @client.publish('/sync/Posts', 'hello' => 'world')
+      @client.publish('/sync/Post', 'hello' => 'world')
     }
   end
 end
