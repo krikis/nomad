@@ -1,3 +1,4 @@
-describe "Simple Test", ->
-  it "ensures that the Nomad object is defined", ->
-    expect(Nomad).toBeDefined()
+describe 'Nomad', ->
+  describe '.clientId', ->
+    it 'is set to window.clientId', ->
+      expect(Nomad.clientId).toEqual window.clientId

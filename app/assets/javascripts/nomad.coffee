@@ -12,4 +12,5 @@ window.Nomad =
   Collections: {}
   Routers: {}
   Views: {}
+  clientId: window.clientId
 
