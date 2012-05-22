@@ -7,7 +7,7 @@ class Nomad.Routers.PostsRouter extends Backbone.Router
     "posts.*"        : "index"
 
   initialize: (options) ->
-    @posts = new Nomad.Collections.PostsCollection([], {channel: 'posts'})
+    @posts = new Nomad.Collections.PostsCollection
     @posts.fetch()
     
   newPost: ->
