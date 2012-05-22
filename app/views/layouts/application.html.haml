@@ -9,5 +9,6 @@
   %body
     :coffeescript
       @development = #{Rails.env.development?.inspect}
+      @clientId = '#{request.session_options[:id]}'
       
     = yield
