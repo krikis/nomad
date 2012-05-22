@@ -18,7 +18,7 @@ class ServerSideClient
           object = model.find_by_id object_id
           object.to_json if object
         end.compact
-        @client.publish("/sync/#{message['model']}", {'objects' => models})
+        @client.publish("/sync/#{message['model']}/#{message['client_id']}", {'objects' => models})
       end
     end
   end

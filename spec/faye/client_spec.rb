@@ -32,15 +32,17 @@ describe ServerSideClient do
   describe '#on_server_message' do
     context 'when the model in the message is a valid constant' do
       context 'and it responds to find_by_id' do
-        let(:message) { {'model' => 'Post', 'object_ids' => ['some_id']} }
+        let(:message) { {'client_id' => 'some_unique_id',
+                         'model' => 'Post',
+                         'object_ids' => ['some_id']} }
 
         it 'collects the most recent version of the objects in the message' do
           Post.should_receive(:find_by_id).with('some_id')
           subject.on_server_message(message)
         end
 
-        it 'publishes on the channel declared in the message' do
-          client.should_receive(:publish).with('/sync/Post', an_instance_of(Hash))
+        it 'publishes to the sending client only' do
+          client.should_receive(:publish).with('/sync/Post/some_unique_id', an_instance_of(Hash))
           subject.on_server_message(message)
         end
 
