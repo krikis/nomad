@@ -33,6 +33,10 @@ group :assets do
   gem 'uglifier', '>= 1.0.3'
 end
 
+group :development do
+  gem 'pry'
+end
+
 group :test, :development do
   gem 'jasminerice'
 end
@@ -48,7 +52,7 @@ group :test do
   gem 'guard-rspec'
   gem 'fuubar'
   gem 'database_cleaner'
-  gem 'guard-jasmine', :git => 'git://github.com/esposito/guard-jasmine.git'
+  gem 'guard-jasmine'
   gem 'poltergeist'
   # gem 'launchy'
   gem 'guard-livereload'
