@@ -26,8 +26,9 @@ guard 'shell' do
 end
 
 guard 'jasmine', :console => :always, :errors => :always do
+  watch(%r{spec/javascripts/helpers/.*(js\.coffee|js|coffee)$})    { 'spec/javascripts' }
   watch(%r{spec/javascripts/spec\.(js\.coffee|js|coffee)$})        { 'spec/javascripts' }
-  watch(%r{^spec/javascripts/(.*)_factory\..*})                    { 'spec/javascripts' }
+  watch(%r{^spec/javascripts/.*_factory\..*})                      { 'spec/javascripts' }
   watch(%r{spec/javascripts/.+_spec\.(js\.coffee|js|coffee)$})
   watch(%r{app/assets/javascripts/(.+?)\.(js\.coffee|js|coffee)$}) { |m| "spec/javascripts/#{m[1]}_spec.#{m[2]}" }
   watch(%r{app/assets/javascripts/templates/(.+?)\.hamlc$})        { |m| "spec/javascripts/views/#{m[1]}_view_spec.coffee" }
