@@ -1,6 +1,7 @@
 @Sync =
   prepareSync: ->
     @fayeClient.publish
+      client_id: Nomad.clientId
       model: @channel
       object_ids: @changedObjects()
 

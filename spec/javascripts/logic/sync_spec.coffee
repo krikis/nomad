@@ -21,7 +21,10 @@ describe 'Sync', ->
 
   describe 'prepareSync', ->
     beforeEach ->
-      @publishStub = sinon.stub(BackboneSync.FayeClient::, "publish")
+      @message = undefined
+      @publishStub = sinon.stub(BackboneSync.FayeClient::, "publish", (message) =>
+        @message = message
+      )
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], channel: 'testChannel')
       model =
@@ -32,8 +35,15 @@ describe 'Sync', ->
     afterEach ->
       @publishStub.restore()
 
-    it 'publishes the channel and a list of changed objects to the server', ->
+    it 'publishes the channel to the server', ->
       @collection.prepareSync()
-      expect(@publishStub).toHaveBeenCalledWith
-        model: 'testChannel'
-        object_ids: ['some_id']
+      expect(@message.model).toEqual @collection.channel
+
+    it 'publishes Nomad.clientId to the server', ->
+      @collection.prepareSync()
+      expect(@message.client_id).toEqual Nomad.clientId
+
+    it 'publishes a list of changed objects to the server', ->
+      @collection.prepareSync()
+      expect(@message.object_ids).toEqual ['some_id']
+      
