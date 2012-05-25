@@ -16,9 +16,9 @@ describe 'Versioning', ->
       @model.initVersioning()
       expect(@model._versioning).toBeDefined()
     
-    it 'sets the oldVersion property to a hash of the object', ->
+    it 'sets the oldVersion property to a hash of the object', ->  
+      hash = CryptoJS.SHA256(JSON.stringify @model.previousAttributes()).toString()
       @model.initVersioning()
-      hash = CryptoJS.SHA256(JSON.stringify @model).toString()
       expect(@model._versioning.oldVersion).toEqual(hash)
 
   describe '#hasPatches', ->
@@ -26,16 +26,58 @@ describe 'Versioning', ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build("answer")
 
+    context 'when the model has no versioning', ->
+      it 'returns false', ->
+        expect(@model.hasPatches()).toBeFalsy()
+
     context 'when the model has no patches', ->
+      beforeEach ->
+        @model._versioning = {patches: _([])}
+        
       it 'returns false', ->
         expect(@model.hasPatches()).toBeFalsy()
 
     context 'when the model has patches', ->
       beforeEach ->
-        @model._patches = _([{}])
+        @model._versioning = {patches: _([{}])}
 
       it 'returns true', ->
         expect(@model.hasPatches()).toBeTruthy()
+
+  describe '#addPatch', ->
+    beforeEach ->
+      @initVersioningSpy = sinon.spy(Backbone.Model::, 'initVersioning')
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build("answer")
+      @model.collection =
+        url: "/collection" # stub the model's collection url
+      @createPatchSpy = sinon.spy(@model, 'createPatch')
+
+    afterEach ->
+      @createPatchSpy.restore()
+      @initVersioningSpy.restore()
+
+    it 'initializes _versioning', ->
+      @model.save(synced: true)
+      expect(@initVersioningSpy).toHaveBeenCalled()
+
+    context 'once the object is synced to the server', ->
+      it 'initializes _versioning.patches as an empty array', ->
+        expect(@model._versioning?.patches).toBeUndefined()
+        @model.save(synced: true)
+        expect(@model._versioning?.patches).toBeDefined()
+        expect(@model._versioning?.patches._wrapped).toBeDefined()
+        expect(@model._versioning?.patches._wrapped.constructor.name).toEqual("Array")
+
+      it 'saves a patch for the update to _versioning.patches', ->
+        @model.set(
+          synced: true
+          values:
+            v_1: "other_value_1"
+            v_2: "value_2"
+        )
+        @model.save()
+        expect(@model._versioning.patches.first()).toEqual @createPatchSpy.returnValues[0]
 
   describe '#createPatch', ->
     beforeEach ->
@@ -57,37 +99,6 @@ describe 'Versioning', ->
       patch = @createPatchSpy.returnValues[0]
       expect(patch).toContain 'other_'
       expect(patch).not.toContain 'value_2'
-
-  describe '#addPatch', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel Factory.build("answer")
-      @model.collection =
-        url: "/collection" # stub the model's collection url
-      @createPatchSpy = sinon.spy(@model, 'createPatch')
-
-    afterEach ->
-      @createPatchSpy.restore()
-
-    context 'when the object was synced to the server', ->
-      it 'initializes _patches', ->
-        expect(@model._patches).toBeUndefined()
-        @model.save(synced: true)
-        expect(@model._patches).toBeDefined()
         
-      it 'initializes _patches.list as an empty array', ->
-        expect(@model._patches?.list).toBeUndefined()
-        @model.save(synced: true)
-        expect(@model._patches?.list).toBeDefined()
-        expect(@model._patches?.list._wrapped).toBeDefined()
-        expect(@model._patches?.list._wrapped.constructor.name).toEqual("Array")
-
-      it 'saves a patch for the update to the _patches.list', ->
-        @model.set(
-          synced: true
-          values:
-            v_1: "other_value_1"
-            v_2: "value_2"
-        )
-        @model.save()
-        expect(@model._patches?.list.first()).toEqual @createPatchSpy.returnValues[0]
+        
+        

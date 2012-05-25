@@ -56,13 +56,14 @@
     # Update a model by replacing its copy in `@data`.
     update: (model) ->
       @localStorage().setItem @storageKeyFor(model), JSON.stringify(model)
-      @saveVersioning(model)
+      model.initVersioning()
+      @saveVersioningFor(model)
       unless _.include(@records, model.id.toString())
         @records.push model.id.toString()
       @save()
       model
       
-    saveVersioning: (model) ->  
+    saveVersioningFor: (model) ->  
       if model._versioning?
         @localStorage().setItem @versioningKeyFor(model),
                                 JSON.stringify(model._versioning)

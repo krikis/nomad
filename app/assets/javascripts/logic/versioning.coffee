@@ -1,16 +1,16 @@
 @Versioning = 
   initVersioning: ->
     @_versioning ||= {}
-    @_versioning.oldVersion ||= CryptoJS.SHA256(JSON.stringify @).toString()
+    @_versioning.oldVersion ||= CryptoJS.SHA256(JSON.stringify @previousAttributes()).toString()
     
   hasPatches: ->
-    @_patches?.size() > 0
+    @_versioning?.patches?.size() > 0
 
   addPatch: ->
     if @get('synced')
-      @_patches ||= {}
-      @_patches.list ||= _([])
-      @_patches.list.push @createPatch()
+      @initVersioning()
+      @_versioning.patches ||= _([])
+      @_versioning.patches.push @createPatch()
 
   createPatch: ->
     window.dmp ||= new diff_match_patch

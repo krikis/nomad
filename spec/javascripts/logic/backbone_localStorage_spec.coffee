@@ -144,6 +144,7 @@ describe 'Bacbone.LocalStorage', ->
 
   describe '#create', ->
     beforeEach ->
+      
       class TestCollection extends Backbone.Collection
       class OtherTestCollection extends Backbone.Collection
       TestCollection::localStorage = new Backbone.
@@ -153,7 +154,7 @@ describe 'Bacbone.LocalStorage', ->
       @collection = new TestCollection([], channel: 'testChannel')
       @other_collection = new OtherTestCollection([], channel: 'testChannel')
       @ids = undefined
-
+      
     it 'generates a unique object id within the scope of a collection', ->
       sinon.stub @collection.localStorage, 'guid', ->
         @ids ||= ['other_unique_id', 'unique_id', 'used_id']
@@ -165,25 +166,28 @@ describe 'Bacbone.LocalStorage', ->
       @collection.create Factory.build('answer', id: null)
       # last model has a unique id within collection scope
       expect(@collection.last().get('id')).toEqual 'unique_id'
-
-    it 'initializes the _versioning object', ->
-
-
+      
   describe '#update', ->
     beforeEach ->
+      @initVersioningStub = sinon.stub(Backbone.Model::, 'initVersioning')
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('model')
       @localStorage = new Backbone.LocalStorage('TestModel')
-      @saveVersioningSpy = sinon.spy(@localStorage, 'saveVersioning')
+      @saveVersioningForStub = sinon.stub(@localStorage, 'saveVersioningFor')
 
     afterEach ->
-      @saveVersioningSpy.restore()
+      @initVersioningStub.restore()
+      @saveVersioningForStub.restore()
 
-    it 'calls #saveVersioning with the model', ->
+    it 'initializes the object versioning', ->
       @localStorage.update(@model)
-      expect(@saveVersioningSpy).toHaveBeenCalledWith(@model)
+      expect(@initVersioningStub).toHaveBeenCalled()
 
-  describe '#saveVersioning', ->
+    it 'saves the initial versioning of an object', ->
+      @localStorage.update(@model)
+      expect(@saveVersioningForStub).toHaveBeenCalledWith(@model)
+
+  describe '#saveVersioningFor', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
@@ -192,8 +196,8 @@ describe 'Bacbone.LocalStorage', ->
       @model.collection =
         url: '/collection' # stub the model's collection url
 
-    it 'saves the _versioning object to localStorage', ->
-      @model.localStorage.saveVersioning(@model)
+    it 'saves the model\'s _versioning object to localStorage', ->
+      @model.localStorage.saveVersioningFor(@model)
       expect(window.localStorage.
                getItem('TestModel-' + @model.id + '-versioning')).
         toEqual JSON.stringify(@model._versioning)
