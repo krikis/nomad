@@ -47,7 +47,7 @@ describe 'Versioning', ->
   describe '#addPatch', ->
     beforeEach ->
       class TestModel extends Backbone.Model
-      @model = new TestModel Factory.build("model")
+      @model = new TestModel
       @initVersioningSpy = sinon.spy(@model, 'initVersioning')
       @patch = sinon.stub()
       @createPatchStub = sinon.stub(@model, 'createPatch', =>
@@ -57,34 +57,34 @@ describe 'Versioning', ->
     afterEach ->  
       @initVersioningSpy.restore()
       @createPatchStub.restore()
-
+      
     it 'initializes _versioning', ->
       @model.addPatch()
       expect(@initVersioningSpy).toHaveBeenCalled()
-
-    context 'once the object is synced to the server', ->
+        
+    context 'when the model has changed', ->
       beforeEach ->
-        @model._versioning = 
-          synced: true
-
-      it 'does not add a patch if no attributes changed', ->
+        @changedStub = sinon.stub(@model, 'hasChanged', -> true)
+    
+      afterEach ->
+        @changedStub.restore()
+  
+      it 'does not add a patch if the model was never synced before', ->
         @model.addPatch()
         expect(@model.hasPatches()).toBeFalsy()
-      
-      context 'and the object has changed', ->
+        
+      context 'after it was synced to the server', ->
         beforeEach ->
-          @changedStub = sinon.stub(@model, 'hasChanged', -> true)
-          
-        afterEach ->
-          @changedStub.restore()
-          
+          @model._versioning = 
+            synced: true
+        
         it 'initializes _versioning.patches as an empty array', ->
           expect(@model._versioning?.patches).toBeUndefined()
           @model.addPatch()
           expect(@model._versioning?.patches).toBeDefined()
           expect(@model._versioning?.patches._wrapped).toBeDefined()
           expect(@model._versioning?.patches._wrapped.constructor.name).toEqual("Array")
-
+  
         it 'saves a patch for the update to _versioning.patches', ->
           @model.addPatch()
           expect(@model._versioning.patches.first()).toEqual @patch

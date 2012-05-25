@@ -6,9 +6,9 @@
   hasPatches: ->
     @_versioning?.patches?.size() > 0
 
-  addPatch: ->  
+  addPatch: ->
     @initVersioning()
-    if @_versioning.synced and @hasChanged()
+    if @hasChanged() and @_versioning.synced
       @_versioning.patches ||= _([])
       @_versioning.patches.push @createPatch()
 
