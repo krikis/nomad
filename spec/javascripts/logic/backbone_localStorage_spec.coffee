@@ -169,19 +169,13 @@ describe 'Bacbone.LocalStorage', ->
       
   describe '#update', ->
     beforeEach ->
-      @addPatchStub = sinon.stub(Backbone.Model::, 'addPatch')
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('model')
       @localStorage = new Backbone.LocalStorage('TestModel')
       @saveVersioningForStub = sinon.stub(@localStorage, 'saveVersioningFor')
 
     afterEach ->
-      @addPatchStub.restore()
       @saveVersioningForStub.restore()
-      
-    it 'adds a patch to the model for the update', ->
-      @localStorage.update(@model)
-      expect(@addPatchStub).toHaveBeenCalled()
 
     it 'saves the versioning of the model', ->
       @localStorage.update(@model)
