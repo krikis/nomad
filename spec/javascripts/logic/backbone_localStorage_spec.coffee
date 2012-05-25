@@ -179,10 +179,6 @@ describe 'Bacbone.LocalStorage', ->
       @initVersioningStub.restore()
       @saveVersioningForStub.restore()
 
-    it 'initializes the object versioning', ->
-      @localStorage.update(@model)
-      expect(@initVersioningStub).toHaveBeenCalled()
-
     it 'saves the initial versioning of an object', ->
       @localStorage.update(@model)
       expect(@saveVersioningForStub).toHaveBeenCalledWith(@model)
