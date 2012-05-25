@@ -32,13 +32,13 @@
     guid: ->
       S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4()
       
-    # Generates the key a model is stored with in the localStorage
+    # Generates the key a model is stored with in localStorage
     storageKeyFor: (model) ->
       "#{@name}-#{if _.isObject(model) then model.id else model}"
       
-    # Generates the key a model's patches are stored with in the localStorage
-    patchesKeyFor: (model) ->
-      "#{@storageKeyFor(model)}-patches"
+    # Generates the key a model's versioning is stored with in localStorage
+    versioningKeyFor: (model) ->
+      "#{@storageKeyFor(model)}-versioning"
 
     # Add a model, giving it a (hopefully)-unique GUID, if it doesn't already
     # have an id of it's own.
@@ -56,9 +56,9 @@
     # Update a model by replacing its copy in `@data`.
     update: (model) ->
       @localStorage().setItem @storageKeyFor(model), JSON.stringify(model)
-      if model._patches?
-        @localStorage().setItem @patchesKeyFor(model),
-                                JSON.stringify(model._patches)
+      if model._versioning?
+        @localStorage().setItem @versioningKeyFor(model),
+                                JSON.stringify(model._versioning)
       unless _.include(@records, model.id.toString())
         @records.push model.id.toString()
       @save()
@@ -66,32 +66,32 @@
 
     # Retrieve a model from `@data` by id.
     find: (model) ->
-      patches = JSON.parse @localStorage().
-                  getItem(@patchesKeyFor model)
-      model._patches = patches if patches?
+      versioning = JSON.parse @localStorage().
+                  getItem(@versioningKeyFor model)
+      model._versioning = versioning if versioning?
       JSON.parse @localStorage().getItem(@storageKeyFor model)
 
     # Return the array of all models currently in storage.
     findAll: (collection) ->
-      collection?.on 'reset', @setAllPatches, @
-      collection?.on 'add', @setPatches, @
+      collection?.on 'reset', @setAllVersioning, @
+      collection?.on 'add', @setVersioning, @
       _(@records).chain().map((id) ->
         JSON.parse @localStorage().getItem(@storageKeyFor id)
       , @).compact().value()
 
-    setAllPatches: (collection, options) ->
+    setAllVersioning: (collection, options) ->
       _.each(collection.models, (model) =>
-        @setPatches model, collection, options
+        @setVersioning model, collection, options
       )
 
-    setPatches: (model, collection, options) ->
-      patches = JSON.parse @localStorage().
-                  getItem(@patchesKeyFor model)
-      model._patches = patches if patches?
+    setVersioning: (model, collection, options) ->
+      versioning = JSON.parse @localStorage().
+                  getItem(@versioningKeyFor model)
+      model._versioning = versioning if versioning?
 
     # Delete a model from `@data`, returning it.
     destroy: (model) ->
-      @localStorage().removeItem @patchesKeyFor(model)
+      @localStorage().removeItem @versioningKeyFor(model)
       @localStorage().removeItem @storageKeyFor(model)
       @records = _.reject(@records, (record_id) ->
         record_id is model.id.toString()

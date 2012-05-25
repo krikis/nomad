@@ -128,7 +128,7 @@ describe 'Bacbone.LocalStorage', ->
       method = Backbone.getSyncMethod(remoteModel)
       expect(method).toEqual Backbone.ajaxSync #
       
-  describe '#patchesKeyFor', ->
+  describe '#versioningKeyFor', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       class TestCollection extends Backbone.Collection
@@ -138,9 +138,9 @@ describe 'Bacbone.LocalStorage', ->
       @collection = new TestCollection
       @model = @collection.create Factory.build('answer', id: null)
       
-    it 'returns the storage key for the model appended with -patches', ->
-      expect(@collection.localStorage.patchesKeyFor(@model)).
-        toEqual "#{@collection.localStorage.storageKeyFor(@model)}-patches"
+    it 'returns the storage key for the model appended with -versioning', ->
+      expect(@collection.localStorage.versioningKeyFor(@model)).
+        toEqual "#{@collection.localStorage.storageKeyFor(@model)}-versioning"
 
   describe '#create', ->
     beforeEach ->
@@ -154,8 +154,7 @@ describe 'Bacbone.LocalStorage', ->
       @other_collection = new OtherTestCollection([], channel: 'testChannel')
       @ids = undefined
 
-    it 'should generate a unique object id
-        within the scope of a collection', ->
+    it 'generates a unique object id within the scope of a collection', ->
       sinon.stub @collection.localStorage, 'guid', ->
         @ids ||= ['other_unique_id', 'unique_id', 'used_id']
         id = @ids.pop()
@@ -166,6 +165,9 @@ describe 'Bacbone.LocalStorage', ->
       @collection.create Factory.build('answer', id: null)
       # last model has a unique id within collection scope
       expect(@collection.last().get('id')).toEqual 'unique_id'
+      
+    it 'initializes the versioning object', ->
+      
 
   describe '#update', ->
     beforeEach ->
@@ -175,15 +177,15 @@ describe 'Bacbone.LocalStorage', ->
       @model.collection =
         url: '/collection' # stub the model's collection url
 
-    it 'saves _patches to the localStorage', ->  
+    it 'saves _versioning to localStorage', ->  
       @model.save(
         values:
           v_1: 'other_value_1'
           v_2: 'value_2'
       )
       expect(window.localStorage.
-               getItem('TestModel-' + @model.id + '-patches')).
-        toEqual JSON.stringify(@model._patches)
+               getItem('TestModel-' + @model.id + '-versioning')).
+        toEqual JSON.stringify(@model._versioning)
 
   describe '#find', ->
     beforeEach ->
@@ -194,54 +196,54 @@ describe 'Bacbone.LocalStorage', ->
         url: '/collection' # stub the model's collection url
       @model.save()
 
-    it 'fetches _patches from the localStorage', ->
-      patches = ['some', 'patches']
+    it 'fetches _versioning from localStorage', ->
+      versioning = {patches: ['some', 'patches']}
       window.localStorage.
-        setItem 'TestModel-test_id-patches',
-                JSON.stringify(patches)
+        setItem 'TestModel-test_id-versioning',
+                JSON.stringify(versioning)
       @model.fetch()
-      expect(@model._patches).toEqual patches
+      expect(@model._versioning).toEqual versioning
       
   describe '#findAll', ->    
     beforeEach ->
       class TestCollection extends Backbone.Collection
-      @setAllPatchesStub = sinon.stub Backbone.LocalStorage::, 'setAllPatches'
-      @setPatchesStub = sinon.stub Backbone.LocalStorage::, 'setPatches'
+      @setAllVersioningStub = sinon.stub Backbone.LocalStorage::, 'setAllVersioning'
+      @setVersioningStub = sinon.stub Backbone.LocalStorage::, 'setVersioning'
       TestCollection::localStorage = new Backbone.
                                        LocalStorage('TestCollection')
       @collection = new TestCollection([], channel: 'testChannel')
       @collection.create Factory.build('answer')
       
     afterEach ->
-      @setAllPatchesStub.restore()
-      @setPatchesStub.restore()
+      @setAllVersioningStub.restore()
+      @setVersioningStub.restore()
     
-    it 'binds setAllPatches to the collection reset event', ->
+    it 'binds setAllVersioning to the collection reset event', ->
       @collection.fetch()
-      expect(@setAllPatchesStub).toHaveBeenCalled()
+      expect(@setAllVersioningStub).toHaveBeenCalled()
     
-    it 'binds setPatches to the collection add event', ->
+    it 'binds setVersioning to the collection add event', ->
       @collection.reset()
       @collection.fetch(add: true)
-      expect(@setPatchesStub).toHaveBeenCalled()
+      expect(@setVersioningStub).toHaveBeenCalled()
       
-  describe '#setAllPatches', ->
+  describe '#setAllVersioning', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
-      @setPatchesStub = sinon.stub Backbone.LocalStorage::, 'setPatches'
+      @setVersioningStub = sinon.stub Backbone.LocalStorage::, 'setVersioning'
       TestCollection::localStorage = new Backbone.
                                        LocalStorage('TestCollection')
       @collection = new TestCollection([], channel: 'testChannel')
       @collection.create Factory.build('answer')
       
     afterEach ->
-      @setPatchesStub.restore()
+      @setVersioningStub.restore()
       
-    it 'calls setPatches for all models in a collection', ->
+    it 'calls setVersioning for all models in a collection', ->
       @collection.fetch()
-      expect(@setPatchesStub).toHaveBeenCalled()
+      expect(@setVersioningStub).toHaveBeenCalled()
       
-  describe '#setPatches', ->
+  describe '#setVersioning', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       TestCollection::localStorage = new Backbone.
@@ -249,14 +251,14 @@ describe 'Bacbone.LocalStorage', ->
       @collection = new TestCollection([], channel: 'testChannel')
       @collection.create Factory.build('answer', id: 'test_id')
       
-    it 'fetches _patches for a model being added to a collection', ->
-      patches = ['some', 'patches']
+    it 'fetches _versioning for a model being added to a collection', ->
+      versioning = {patches: ['some', 'patches']}
       window.localStorage.
-        setItem 'TestCollection-test_id-patches',
-                JSON.stringify(patches)
+        setItem 'TestCollection-test_id-versioning',
+                JSON.stringify(versioning)
       @collection.reset()
       @collection.fetch(add: true)
-      expect(@collection.models[0]._patches).toEqual patches
+      expect(@collection.models[0]._versioning).toEqual versioning
       
   describe '#destroy', ->
     beforeEach ->
@@ -266,15 +268,15 @@ describe 'Bacbone.LocalStorage', ->
       @model.collection =
         url: '/collection' # stub the model's collection url
     
-    it 'cleans up the paches in de localStorage after destroing', ->
-      @model._patches = ['some', 'patches']
+    it 'cleans up the versioning in localStorage after destroing', ->
+      @model._versioning = {patches: ['some', 'patches']}
       @model.save()
       expect(window.localStorage.
-               getItem('TestModel-' + @model.id + '-patches')).
-        toEqual JSON.stringify(@model._patches)
+               getItem('TestModel-' + @model.id + '-versioning')).
+        toEqual JSON.stringify(@model._versioning)
       @model.destroy()
       expect(window.localStorage.
-               getItem('TestModel-' + @model.id + '-patches')).
+               getItem('TestModel-' + @model.id + '-versioning')).
         toBeNull()
     
       
