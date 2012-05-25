@@ -56,6 +56,7 @@
     # Update a model by replacing its copy in `@data`.
     update: (model) ->
       @localStorage().setItem @storageKeyFor(model), JSON.stringify(model)
+      model.addPatch()
       @saveVersioningFor(model)
       unless _.include(@records, model.id.toString())
         @records.push model.id.toString()
