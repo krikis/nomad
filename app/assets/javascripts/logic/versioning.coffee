@@ -1,4 +1,8 @@
-@Versioning =     
+@Versioning = 
+  initVersioning: ->
+    @_versioning ||= {}
+    @_versioning.oldVersion ||= CryptoJS.SHA256(JSON.stringify @).toString()
+    
   hasPatches: ->
     @_patches?.size() > 0
 

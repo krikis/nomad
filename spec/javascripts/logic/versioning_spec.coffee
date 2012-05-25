@@ -5,6 +5,21 @@ describe 'Versioning', ->
 
   afterEach ->
     @server.restore()
+    
+  describe '#initVersioning', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build("model")
+    
+    it 'initializes the _versioning object if undefined', ->
+      expect(@model._versioning).toBeUndefined()
+      @model.initVersioning()
+      expect(@model._versioning).toBeDefined()
+    
+    it 'sets the oldVersion property to a hash of the object', ->
+      @model.initVersioning()
+      hash = CryptoJS.SHA256(JSON.stringify @model).toString()
+      expect(@model._versioning.oldVersion).toEqual(hash)
 
   describe '#hasPatches', ->
     beforeEach ->
