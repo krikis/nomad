@@ -14,7 +14,8 @@ describe 'prepareSync', ->
   afterEach ->
     @fayeClientStub.restore()
 
-  it 'publishes the channel and a list of changed objects to the server', ->
+  it 'publishes a list of changed objects to the server
+      and receives a list of concurrently changed objects back', ->
     runs ->
       @collection.prepareSync()
     waitsFor (->

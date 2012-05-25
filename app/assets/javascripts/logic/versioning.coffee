@@ -8,7 +8,7 @@
 
   addPatch: ->  
     @initVersioning()
-    if @_versioning.synced
+    if @_versioning.synced and @hasChanged()
       @_versioning.patches ||= _([])
       @_versioning.patches.push @createPatch()
 

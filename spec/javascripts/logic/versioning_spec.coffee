@@ -66,17 +66,28 @@ describe 'Versioning', ->
       beforeEach ->
         @model._versioning = 
           synced: true
-      
-      it 'initializes _versioning.patches as an empty array', ->
-        expect(@model._versioning?.patches).toBeUndefined()
-        @model.addPatch()
-        expect(@model._versioning?.patches).toBeDefined()
-        expect(@model._versioning?.patches._wrapped).toBeDefined()
-        expect(@model._versioning?.patches._wrapped.constructor.name).toEqual("Array")
 
-      it 'saves a patch for the update to _versioning.patches', ->
+      it 'does not add a patch if no attributes changed', ->
         @model.addPatch()
-        expect(@model._versioning.patches.first()).toEqual @patch
+        expect(@model.hasPatches()).toBeFalsy()
+      
+      context 'and the object has changed', ->
+        beforeEach ->
+          @changedStub = sinon.stub(@model, 'hasChanged', -> true)
+          
+        afterEach ->
+          @changedStub.restore()
+          
+        it 'initializes _versioning.patches as an empty array', ->
+          expect(@model._versioning?.patches).toBeUndefined()
+          @model.addPatch()
+          expect(@model._versioning?.patches).toBeDefined()
+          expect(@model._versioning?.patches._wrapped).toBeDefined()
+          expect(@model._versioning?.patches._wrapped.constructor.name).toEqual("Array")
+
+        it 'saves a patch for the update to _versioning.patches', ->
+          @model.addPatch()
+          expect(@model._versioning.patches.first()).toEqual @patch
 
   describe '#createPatch', ->
     beforeEach ->
