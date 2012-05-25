@@ -183,7 +183,7 @@ describe 'Bacbone.LocalStorage', ->
       @localStorage.update(@model)
       expect(@addPatchStub).toHaveBeenCalled()
 
-    it 'saves the initial versioning of an object', ->
+    it 'saves the versioning of the model', ->
       @localStorage.update(@model)
       expect(@saveVersioningForStub).toHaveBeenCalledWith(@model)
 
