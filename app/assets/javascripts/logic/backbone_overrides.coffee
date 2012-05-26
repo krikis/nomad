@@ -29,6 +29,7 @@ Backbone.Collection = ((Collection) ->
   # Define the new constructor
   Backbone.Collection = (models, options = {}) ->
     Collection.apply @, arguments
+    @url ||= "/#{@constructor.name.underscore()}"
     @channel ||= options.channel
     @channel ||= @model::constructor.name
     unless @channel? and @channel.length > 0

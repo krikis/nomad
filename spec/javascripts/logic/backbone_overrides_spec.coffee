@@ -39,6 +39,17 @@ describe 'Overrides', ->
       afterEach ->
         @fayeClientStub.restore()
         @localStorageStub.restore()
+        
+      it 'sets the url to the collection\'s constructor name', ->
+        expect(@collection.url).toEqual('/test_collection')
+        
+      it 'preservers the url if it is already set', ->        
+        class TestModel extends Backbone.Model
+        class TestCollection extends Backbone.Collection
+          model: TestModel
+          url: 'preset_url'
+        @collection = new TestCollection
+        expect(@collection.url).toEqual('preset_url')
 
       it 'sets the channel to the associated model\'s constructor name', ->
         expect(@collection.channel).toEqual 'TestModel'
