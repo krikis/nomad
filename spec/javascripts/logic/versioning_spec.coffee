@@ -65,9 +65,11 @@ describe 'Versioning', ->
     context 'when the model has changed', ->
       beforeEach ->
         @changedStub = sinon.stub(@model, 'hasChanged', -> true)
+        @setVersionStub = sinon.stub(@model, 'setVersion')
     
       afterEach ->
         @changedStub.restore()
+        @setVersionStub.restore()
   
       it 'does not add a patch if the model was never synced before', ->
         @model.addPatch()
@@ -88,6 +90,11 @@ describe 'Versioning', ->
         it 'saves a patch for the update to _versioning.patches', ->
           @model.addPatch()
           expect(@model._versioning.patches.first()).toEqual @patch
+          
+          
+        it 'calls setVersion on the model', ->
+          @model.addPatch()
+          expect(@setVersionStub).toHaveBeenCalled()
 
   describe '#createPatch', ->
     beforeEach ->
@@ -101,6 +108,27 @@ describe 'Versioning', ->
       patch = @model.createPatch()
       expect(patch).toContain 'other_'
       expect(patch).not.toContain 'value_2'
+      
+  describe '#setVersion', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('answer')
+      @model._versioning = {}
+    
+    it 'sets the version for the current model', ->
+      @model.setVersion()
+      hash = CryptoJS.SHA256(JSON.stringify @model).toString()
+      expect(@model._versioning.version).toEqual(hash)
+      
+    context 'when the version already exists', ->
+      beforeEach ->
+        @model._versioning = {version: 'some_version'}
+        
+      it 'overwrites the existing version', ->
+        @model.setVersion()
+        hash = CryptoJS.SHA256(JSON.stringify @model).toString()
+        expect(@model._versioning.version).toEqual(hash)
+        
         
         
         
