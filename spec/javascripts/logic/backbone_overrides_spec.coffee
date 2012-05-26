@@ -51,36 +51,36 @@ describe 'Overrides', ->
         @collection = new TestCollection
         expect(@collection.url).toEqual('preset_url')
 
-      it 'sets the channel to the associated model\'s constructor name', ->
-        expect(@collection.channel).toEqual 'TestModel'
+      it 'sets the model name to the associated model\'s constructor name', ->
+        expect(@collection.modelName).toEqual 'TestModel'
 
-      it 'sets the channel to the channel option if provided', ->
+      it 'sets the model name to the modelName option if provided', ->
         class TestModel extends Backbone.Model
         class TestCollection extends Backbone.Collection
           model: TestModel
-        @collection = new TestCollection([], channel: 'testChannel')
-        expect(@collection.channel).toEqual 'testChannel'
+        @collection = new TestCollection([], modelName: 'TestModel')
+        expect(@collection.modelName).toEqual 'TestModel'
 
-      it 'retains the channel if it was defined in the collection class', ->
+      it 'retains the model name if it was defined in the collection class', ->
         class TestModel extends Backbone.Model
         class TestCollection extends Backbone.Collection
           model: TestModel
-          channel: 'predefined'
-        @collection = new TestCollection([], channel: 'testChannel')
-        expect(@collection.channel).toEqual 'predefined'
+          modelName: 'predefined'
+        @collection = new TestCollection([], modelName: 'TestModel')
+        expect(@collection.modelName).toEqual 'predefined'
 
 
-      it 'throws an error if no channel could be set', ->
+      it 'throws an error if no model name could be set', ->
         class TestModel extends Backbone.Model
         class TestCollection extends Backbone.Collection
         expect(-> @collection = new TestCollection()).
-          toThrow 'Channel undefined: either set a valid Backbone.Model ' +
-                  'or pass a channel option!'
+          toThrow 'Model name undefined: either set a valid Backbone.Model ' +
+                  'or pass a modelName option!'
 
 
-      it 'initializes a new fayeclient for the channel', ->
+      it 'initializes a new fayeclient for the model name', ->
         expect(@fayeClientStub).toHaveBeenCalledWith(@collection, {
-          channel: @collection.channel
+          channel: @collection.modelName
         })
         expect(@collection.fayeClient).toEqual @fayeClient
         
@@ -92,8 +92,8 @@ describe 'Overrides', ->
         @collection = new TestCollection
         expect(@collection.fayeClient).toEqual({faye: 'client'})
 
-      it 'enables localStorage for the channel', ->
-        expect(@localStorageStub).toHaveBeenCalledWith(@collection.channel)
+      it 'enables localStorage for the model name', ->
+        expect(@localStorageStub).toHaveBeenCalledWith(@collection.modelName)
         expect(@collection.localStorage).toEqual(@localStorage)
 
       it 'preserves localStorage when it is already set', ->

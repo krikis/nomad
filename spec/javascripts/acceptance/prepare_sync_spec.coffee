@@ -5,7 +5,7 @@ describe 'prepareSync', ->
       window.receive_called = true
     )
     class TestCollection extends Backbone.Collection
-    @collection = new TestCollection([], channel: 'Post')
+    @collection = new TestCollection([], modelName: 'Post')
     model =
       id: 'some_id'
       hasPatches: -> true

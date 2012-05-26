@@ -2,7 +2,7 @@
   prepareSync: ->
     @fayeClient.publish
       client_id: Nomad.clientId
-      model: @channel
+      model_name: @modelName
       object_ids: @changedObjects()
 
   changedObjects: ->

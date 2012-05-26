@@ -10,7 +10,7 @@ describe 'Bacbone.LocalStorage', ->
     beforeEach ->
       window.localStorage.clear()
       TestCollection::localStorage = new Backbone.LocalStorage('TestCollection')
-      collection = new TestCollection([], channel: 'testChannel')
+      collection = new TestCollection([], modelName: 'TestModel')
 
     it 'should be empty initially', ->
       expect(collection.length).toEqual 0 # 'empty initially'
@@ -70,7 +70,7 @@ describe 'Bacbone.LocalStorage', ->
 
     it 'should load from session store without server request', ->
       collection.create Factory.build('post')
-      secondTestCollection = new TestCollection([], channel: 'testChannel')
+      secondTestCollection = new TestCollection([], modelName: 'TestModel')
       secondTestCollection.fetch()
       expect(1).toEqual secondTestCollection.length #
 
@@ -80,7 +80,7 @@ describe 'Bacbone.LocalStorage', ->
         model: Model
         localStorage: new Store('strangeID')
       )
-      collection = new Collection([], channel: 'testChannel')
+      collection = new Collection([], modelName: 'TestModel')
       collection.create {}
       expect(collection.first().id).toEqual collection.first().get('_id') #
 
@@ -151,8 +151,8 @@ describe 'Bacbone.LocalStorage', ->
                                        LocalStorage('TestCollection')
       OtherTestCollection::localStorage = new Backbone.
                                             LocalStorage('OtherTestCollection')
-      @collection = new TestCollection([], channel: 'testChannel')
-      @other_collection = new OtherTestCollection([], channel: 'testChannel')
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @other_collection = new OtherTestCollection([], modelName: 'TestModel')
       @ids = undefined
       
     it 'generates a unique object id within the scope of a collection', ->
@@ -220,7 +220,7 @@ describe 'Bacbone.LocalStorage', ->
       @setVersioningStub = sinon.stub Backbone.LocalStorage::, 'setVersioning'
       TestCollection::localStorage = new Backbone.
                                        LocalStorage('TestCollection')
-      @collection = new TestCollection([], channel: 'testChannel')
+      @collection = new TestCollection([], modelName: 'TestModel')
       @collection.create Factory.build('answer')
 
     afterEach ->
@@ -242,7 +242,7 @@ describe 'Bacbone.LocalStorage', ->
       @setVersioningStub = sinon.stub Backbone.LocalStorage::, 'setVersioning'
       TestCollection::localStorage = new Backbone.
                                        LocalStorage('TestCollection')
-      @collection = new TestCollection([], channel: 'testChannel')
+      @collection = new TestCollection([], modelName: 'TestModel')
       @collection.create Factory.build('answer')
 
     afterEach ->
@@ -257,7 +257,7 @@ describe 'Bacbone.LocalStorage', ->
       class TestCollection extends Backbone.Collection
       TestCollection::localStorage = new Backbone.
                                        LocalStorage('TestCollection')
-      @collection = new TestCollection([], channel: 'testChannel')
+      @collection = new TestCollection([], modelName: 'TestModel')
       @collection.create Factory.build('answer', id: 'test_id')
 
     it 'fetches _versioning for a model being added to a collection', ->

@@ -30,15 +30,15 @@ Backbone.Collection = ((Collection) ->
   Backbone.Collection = (models, options = {}) ->
     Collection.apply @, arguments
     @url ||= "/#{@constructor.name.underscore()}"
-    @channel ||= options.channel
-    @channel ||= @model::constructor.name
-    unless @channel? and @channel.length > 0
-      throw new Error('Channel undefined: either set a valid Backbone.Model ' +
-                      'or pass a channel option!')
+    @modelName ||= options.modelName
+    @modelName ||= @model::constructor.name
+    unless @modelName? and @modelName.length > 0
+      throw new Error('Model name undefined: either set a valid Backbone.Model ' +
+                      'or pass a modelName option!')
     @fayeClient ||= new BackboneSync.FayeClient(@,
-      channel: @channel
+      channel: @modelName
     )
-    @localStorage ||= new Backbone.LocalStorage(@channel)
+    @localStorage ||= new Backbone.LocalStorage(@modelName)
     return
   # Clone static properties
   _.extend(Backbone.Collection, Collection)

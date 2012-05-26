@@ -2,7 +2,7 @@ describe 'Sync', ->
   describe 'changedObjects', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
-      @collection = new TestCollection([], channel: 'testChannel')
+      @collection = new TestCollection([], modelName: 'TestModel')
       model =
         id: 'some_id'
         hasPatches: -> true
@@ -26,7 +26,7 @@ describe 'Sync', ->
         @message = message
       )
       class TestCollection extends Backbone.Collection
-      @collection = new TestCollection([], channel: 'testChannel')
+      @collection = new TestCollection([], modelName: 'TestModel')
       model =
         id: 'some_id'
         hasPatches: -> true
@@ -35,9 +35,9 @@ describe 'Sync', ->
     afterEach ->
       @publishStub.restore()
 
-    it 'publishes the channel to the server', ->
+    it 'publishes the model name to the server', ->
       @collection.prepareSync()
-      expect(@message.model).toEqual @collection.channel
+      expect(@message.model_name).toEqual @collection.modelName
 
     it 'publishes Nomad.clientId to the server', ->
       @collection.prepareSync()
