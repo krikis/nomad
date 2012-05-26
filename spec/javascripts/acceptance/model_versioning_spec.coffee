@@ -4,7 +4,6 @@ describe 'modelVersioning', ->
       class TestModel extends Backbone.Model
       class TestCollection extends Backbone.Collection
         model: TestModel
-        url: '/test_collection'
       @collection = new TestCollection
       @model = @collection.create()
 
@@ -19,7 +18,6 @@ describe 'modelVersioning', ->
       class TestModel extends Backbone.Model
       class TestCollection extends Backbone.Collection
         model: TestModel
-        url: '/test_collection'
       @model = new TestModel
       @collection = new TestCollection
       @collection.add @model
@@ -52,7 +50,6 @@ describe 'modelVersioning', ->
       class TestModel extends Backbone.Model
       class TestCollection extends Backbone.Collection
         model: TestModel
-        url: '/test_collection'
       @collection = new TestCollection
       @model = @collection.create(Factory.build('answer'))
 
@@ -98,7 +95,6 @@ describe 'modelVersioning', ->
       class TestModel extends Backbone.Model
       class TestCollection extends Backbone.Collection
         model: TestModel
-        url: '/test_collection'
       @model = new TestModel Factory.build('answer')
       @collection = new TestCollection
       @collection.add @model
