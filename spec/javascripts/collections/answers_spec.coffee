@@ -1,13 +1,13 @@
 describe "AnswersSpec", ->
   beforeEach ->
-    @Answers = Nomad.Collections.Answers
-    @answers = new @Answers
+    Answers = Nomad.Collections.Answers
+    @answers = new Answers
 
   it "has the Answer model for model", ->
-    expect(@Answers::model).toEqual Nomad.Models.Answer
+    expect(@answers.model).toEqual Nomad.Models.Answer
 
   it "lives in the '/answers' url", ->
-    expect(@Answers::url).toEqual '/answers'
+    expect(@answers.url).toEqual '/answers'
     
   it "orders answers by created_at", ->
     answer1 = new Backbone.Model
@@ -34,5 +34,5 @@ describe "AnswersSpec", ->
 
   describe "localStorage", ->
     it "has a localStorage defined using the 'Answers' namespace", ->
-      expect(@Answers::localStorage.name).toEqual 'Answers'
+      expect(@answers.localStorage.name).toEqual 'Answer'
       

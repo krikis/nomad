@@ -5,7 +5,6 @@ describe 'modelVersioning', ->
       class TestCollection extends Backbone.Collection
         model: TestModel
         url: '/test_collection'
-        localStorage: new Backbone.LocalStorage('TestModel')
       @collection = new TestCollection
       @model = @collection.create()
 
@@ -21,7 +20,6 @@ describe 'modelVersioning', ->
       class TestCollection extends Backbone.Collection
         model: TestModel
         url: '/test_collection'
-        localStorage: new Backbone.LocalStorage('TestModel')
       @model = new TestModel
       @collection = new TestCollection
       @collection.add @model
@@ -55,7 +53,6 @@ describe 'modelVersioning', ->
       class TestCollection extends Backbone.Collection
         model: TestModel
         url: '/test_collection'
-        localStorage: new Backbone.LocalStorage('TestModel')
       @collection = new TestCollection
       @model = @collection.create(Factory.build('answer'))
 
@@ -102,7 +99,6 @@ describe 'modelVersioning', ->
       class TestCollection extends Backbone.Collection
         model: TestModel
         url: '/test_collection'
-        localStorage: new Backbone.LocalStorage('TestModel')
       @model = new TestModel Factory.build('answer')
       @collection = new TestCollection
       @collection.add @model

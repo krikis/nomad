@@ -3,4 +3,3 @@ class Nomad.Collections.Answers extends Backbone.Collection
   comparator: (answer)->
     answer.get('created_at')
   url: '/answers'
-  localStorage: new Backbone.LocalStorage("Answers")
