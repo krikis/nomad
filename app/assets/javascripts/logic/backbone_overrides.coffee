@@ -34,9 +34,10 @@ Backbone.Collection = ((Collection) ->
     unless @channel? and @channel.length > 0
       throw new Error('Channel undefined: either set a valid Backbone.Model ' +
                       'or pass a channel option!')
-    @fayeClient = new BackboneSync.FayeClient(@,
+    @fayeClient ||= new BackboneSync.FayeClient(@,
       channel: @channel
     )
+    @localStorage ||= new Backbone.LocalStorage(@channel)
     return
   # Clone static properties
   _.extend(Backbone.Collection, Collection)
