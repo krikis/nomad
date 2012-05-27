@@ -1,8 +1,10 @@
 describe 'prepareSync', ->
   
   beforeEach ->
-    # delete old faye client if it exists
-    delete window.client
+    # delete faye client created during isolated tests
+    unless window.acceptance_client?
+      delete window.client
+      window.acceptance_client = true
     window.receive_called = false
     @fayeClientStub = sinon.stub(BackboneSync.FayeClient::, 'receive', (message)->
       window.receive_called = true

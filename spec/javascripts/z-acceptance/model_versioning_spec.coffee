@@ -1,8 +1,10 @@
 describe 'modelVersioning', ->
   
   beforeEach ->
-    # delete old faye client if it exists
-    delete window.client
+    # delete faye client created during isolated tests
+    unless window.acceptance_client?
+      delete window.client
+      window.acceptance_client = true
   
   context 'when a model is created without an id', ->
     beforeEach ->
