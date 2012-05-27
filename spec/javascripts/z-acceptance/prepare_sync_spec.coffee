@@ -9,6 +9,7 @@ describe 'prepareSync', ->
     model =
       id: 'some_id'
       hasPatches: -> true
+    model._versioning = {oldVersion: 'some_hash'}
     @collection.models = [model]
 
   afterEach ->
