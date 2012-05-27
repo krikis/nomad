@@ -1,4 +1,7 @@
 describe 'modelVersioning', ->
+  beforeEach ->
+    delete window.client
+  
   context 'when a model is created without an id', ->
     beforeEach ->
       class TestModel extends Backbone.Model
