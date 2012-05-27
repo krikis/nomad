@@ -1,5 +1,7 @@
 describe 'modelVersioning', ->
+  
   beforeEach ->
+    # delete old faye client if it exists
     delete window.client
   
   context 'when a model is created without an id', ->

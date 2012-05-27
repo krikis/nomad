@@ -64,8 +64,9 @@ describe "AnswersRouterSpec", ->
         returns @collection
       
     afterEach ->
-      Nomad.Views.Answers.IndexView.restore()
-      Nomad.Collections.Answers.restore()
+      @fetchStub.restore()
+      @answerListViewStub.restore()
+      @answersCollectionStub.restore()
       
     describe "index handler", ->
       describe "when no list exists", ->

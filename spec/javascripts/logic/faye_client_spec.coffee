@@ -1,6 +1,5 @@
 describe "FayeClient", ->
   beforeEach ->
-    delete window.client
     @fayeClientStub = {}
     @fayeClientStub.subscribe = sinon.stub()
     @fayeClientStub.publish = sinon.stub()
