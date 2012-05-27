@@ -1,9 +1,9 @@
-describe "FayeClient", ->
+describe 'FayeClient', ->
   beforeEach ->
     @fayeClientStub = {}
     @fayeClientStub.subscribe = sinon.stub()
     @fayeClientStub.publish = sinon.stub()
-    @clientConstructorStub = sinon.stub(Faye, "Client")
+    @clientConstructorStub = sinon.stub(Faye, 'Client')
     @clientConstructorStub.returns @fayeClientStub
     @collection = new Backbone.Collection([], modelName: 'TestModel')
     @modelName = 'TestModel'
@@ -13,53 +13,53 @@ describe "FayeClient", ->
     # remove stub from window.client
     delete window.client
 
-  it "exists", ->
+  it 'exists', ->
     expect(BackboneSync).toBeDefined()
 
-  describe "new", ->
+  describe 'new', ->
     beforeEach ->
       # stub before creation because of callback binding
-      @subscribeStub = sinon.stub(BackboneSync.FayeClient::, "subscribe")
+      @subscribeStub = sinon.stub(BackboneSync.FayeClient::, 'subscribe')
       @subscriber = new BackboneSync.FayeClient @collection,
                                                 channel: @modelName
 
     afterEach ->
       @subscribeStub.restore()
 
-    it "fires up the Faye client", ->
+    it 'fires up the Faye client', ->
       expect(@clientConstructorStub).toHaveBeenCalled()
 
-    it "sets the collection and channel property", ->
+    it 'sets the collection and channel property', ->
       expect(@subscriber.collection).toEqual @collection
       expect(@subscriber.channel).toEqual @modelName
 
-    it "calls the subscribe method", ->
+    it 'calls the subscribe method', ->
       expect(@subscribeStub).toHaveBeenCalled()
 
-    it "does not fire up a new Faye client if one is already running", ->
+    it 'does not fire up a new Faye client if one is already running', ->
       @otherSubscriber = new BackboneSync.FayeClient @collection,
                                                      channel: @modelName
       expect(@clientConstructorStub).toHaveBeenCalledOnce()
 
-  describe "#publish", ->
+  describe '#publish', ->
     beforeEach ->
       @subscriber = new BackboneSync.FayeClient @collection,
                                                 channel: @modelName
 
-    it "calls the publish method on the faye client object", ->
+    it 'calls the publish method on the faye client object', ->
       data = sinon.stub()
       @subscriber.publish data
       expect(@fayeClientStub.publish).
-        toHaveBeenCalledWith("/server/" + @modelName, data)
+        toHaveBeenCalledWith('/server/' + @modelName, data)
 
-  describe "#subscribe", ->
+  describe '#subscribe', ->
     beforeEach ->
       @subscriber = new BackboneSync.FayeClient @collection,
                                                 channel: @modelName
 
-    it "subscribes the wrapped client to the channel", ->
+    it 'subscribes the wrapped client to the channel', ->
       expect(@fayeClientStub.subscribe).
-        toHaveBeenCalledWith("/sync/" + @modelName,
+        toHaveBeenCalledWith('/sync/' + @modelName,
                              @subscriber.receive,
                              @subscriber)
 
@@ -69,21 +69,45 @@ describe "FayeClient", ->
                                @subscriber.receive,
                                @subscriber)
 
-  describe "#receive", ->
+  describe '#receive', ->
     beforeEach ->
       @subscriber = new BackboneSync.FayeClient @collection,
                                                 channel: @modelName
       @subscriber.method_1 = sinon.stub()
       @subscriber.method_2 = sinon.stub()
 
-    it "calls a method for each entry in the message", ->
+    it 'calls a method for each entry in the message', ->
       @subscriber.receive
         method_1:
-          id: {attribute_1: "test"}
+          id: {attribute_1: 'test'}
         method_2:
-          id: {attribute_2: "receive"}
-      expect(@subscriber.method_1).toHaveBeenCalledWith(id: {attribute_1: "test"})
-      expect(@subscriber.method_2).toHaveBeenCalledWith(id: {attribute_2: "receive"})
+          id: {attribute_2: 'receive'}
+      expect(@subscriber.method_1).
+        toHaveBeenCalledWith(id: {attribute_1: 'test'})    
+      expect(@subscriber.method_2).
+        toHaveBeenCalledWith(id: {attribute_2: 'receive'})
+      
+  describe '#update', ->
+    beforeEach ->
+      @rebaseStub = sinon.stub(Backbone.Model::, 'rebase')
+      @subscriber = new BackboneSync.FayeClient @collection,
+                                                channel: @modelName
+      @getStub = sinon.stub(@collection, 'get', (id) ->
+        new Backbone.Model if id == 'id' 
+      )
+      
+    afterEach ->
+      @rebaseStub.restore()
+      @getStub.restore()
+    
+    it 'rebases each model that is found in the collection', ->
+      @subscriber.update(
+        id: {attribute: 'value'}
+        other_id: {attribute: 'other_value'}
+      )
+      expect(@rebaseStub).toHaveBeenCalledWith(attribute: 'value')
+      expect(@rebaseStub).not.
+        toHaveBeenCalledWith(attribute: 'other_value')
 
 
 

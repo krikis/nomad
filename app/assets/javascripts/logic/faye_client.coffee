@@ -27,7 +27,7 @@ class @BackboneSync.FayeClient
   update: (params) ->
     _.each params, (attributes, id) =>
       model = @collection.get(id)
-      model.set attributes
+      model?.rebase attributes
 
   create: (params) ->
     _.each params, (attributes, id) =>
