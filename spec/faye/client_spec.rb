@@ -56,7 +56,7 @@ describe ServerSideClient do
 
         it 'publishes the JSON for the collected objects' do
           json_object = stub
-          Post.stub(:find_by_id).and_return(stub(:id => 'some_id', :as_json => json_object))
+          Post.stub(:find_by_id).and_return(stub(:id => 'some_id', :to_json => json_object))
           client.should_receive(:publish).with(an_instance_of(String), {'update' => {'some_id' => json_object}})
           subject.on_server_message(message)
         end
