@@ -23,17 +23,17 @@ describe 'Sync', ->
   describe 'prepareSync', ->
     beforeEach ->
       @message = undefined
-      @publishStub = sinon.stub(BackboneSync.FayeClient::, "publish", (message) =>
-        @message = message
-      )
       @changedObject = sinon.stub()
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
+      @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
+        @message = message
+      )
       @changedObjectsStub = sinon.stub(@collection, 'changedObjects', => [@changedObject])
 
     afterEach ->
       @publishStub.restore()
-      @changedObjectsStub.restore()
+      @changedObjectsStub.restore()      
 
     it 'publishes the model name to the server', ->
       @collection.prepareSync()

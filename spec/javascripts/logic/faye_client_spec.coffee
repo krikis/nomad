@@ -8,8 +8,11 @@ describe "FayeClient", ->
     @clientConstructorStub.returns @fayeClientStub
     @collection = new Backbone.Collection([], modelName: 'TestModel')
     @modelName = 'TestModel'
+
   afterEach ->
     @clientConstructorStub.restore()
+    # remove stub from window.client
+    delete window.client
 
   it "exists", ->
     expect(BackboneSync).toBeDefined()
@@ -38,12 +41,12 @@ describe "FayeClient", ->
       @otherSubscriber = new BackboneSync.FayeClient @collection,
                                                      channel: @modelName
       expect(@clientConstructorStub).toHaveBeenCalledOnce()
-      
+
   describe "#publish", ->
     beforeEach ->
       @subscriber = new BackboneSync.FayeClient @collection,
                                                 channel: @modelName
-                                                    
+
     it "calls the publish method on the faye client object", ->
       data = sinon.stub()
       @subscriber.publish data
@@ -60,7 +63,7 @@ describe "FayeClient", ->
         toHaveBeenCalledWith("/sync/" + @modelName,
                              @subscriber.receive,
                              @subscriber)
-                             
+
     it 'subscribes the wrapped client to a personal channel', ->
       expect(@fayeClientStub.subscribe).
           toHaveBeenCalledWith("/sync/#{@modelName}/#{Nomad.clientId}",
