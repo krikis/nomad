@@ -12,10 +12,11 @@ class ServerSideClient
   end
 
   def on_server_message(message)
+    error message.inspect
     if model = message['model_name'].safe_constantize
       if model.respond_to? :find_by_id
-        models = message['object_ids'].map do |object_id|
-          object = model.find_by_id object_id
+        models = message['objects'].map do |object|
+          object = model.find_by_id object['id']
           object.to_json if object
         end.compact
         channel = "/sync/#{message['model_name']}"

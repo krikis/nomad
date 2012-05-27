@@ -3,7 +3,7 @@
     @fayeClient.publish
       client_id: Nomad.clientId
       model_name: @modelName
-      object_ids: @changedObjects()
+      objects: @changedObjects()
 
   changedObjects: ->
     _(@models).chain().map((model) ->

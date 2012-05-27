@@ -45,5 +45,5 @@ describe 'Sync', ->
 
     it 'publishes a list of changed objects to the server', ->
       @collection.prepareSync()
-      expect(@message.object_ids).toEqual [@changedObject]
+      expect(@message.objects).toEqual [@changedObject]
       
