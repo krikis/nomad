@@ -129,6 +129,32 @@ describe 'Versioning', ->
         hash = CryptoJS.SHA256(JSON.stringify @model).toString()
         expect(@model._versioning.version).toEqual(hash)
         
+  describe '#rebase', ->
+        
+    it 'creates a dummy model', ->
+      
+    it 'sets the new attributes on this dummy model', ->
+      
+    it 'applies all patches to the dummy model', ->
+      
+    context 'when successfully patched', ->
+      
+      it 'sets the new attributes to the original model', ->
+        
+      it 'clears the patches of the original model', ->
+        
+      it 'sets the original model\'s oldVersion to its version', ->
+      
+      it 'calls setVersion on the original model', ->
+        
+      it 'publishes the updated model to the server', ->
+        
+    context 'when patching fails', ->
+      
+      it 'filters out the attributes that differ', ->
+        
+      it 'creates a diff for each attribute', ->
+        
         
         
         
