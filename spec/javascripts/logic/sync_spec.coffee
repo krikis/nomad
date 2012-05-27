@@ -6,11 +6,12 @@ describe 'Sync', ->
       model =
         id: 'some_id'
         hasPatches: -> true
+      model._versioning = {oldVersion: 'some_hash'}
       @collection.models = [model]
 
     it 'collects the ids of all models with patches', ->
       objects = @collection.changedObjects()
-      expect(objects).toEqual ["some_id"]
+      expect(objects).toEqual [{id: 'some_id', old_version: 'some_hash'}]
 
     it 'does not collect ids of models with no patches', ->
       model =
@@ -25,15 +26,14 @@ describe 'Sync', ->
       @publishStub = sinon.stub(BackboneSync.FayeClient::, "publish", (message) =>
         @message = message
       )
+      @changedObject = sinon.stub()
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
-      model =
-        id: 'some_id'
-        hasPatches: -> true
-      @collection.models = [model]
+      @changedObjectsStub = sinon.stub(@collection, 'changedObjects', => [@changedObject])
 
     afterEach ->
       @publishStub.restore()
+      @changedObjectsStub.restore()
 
     it 'publishes the model name to the server', ->
       @collection.prepareSync()
@@ -45,5 +45,5 @@ describe 'Sync', ->
 
     it 'publishes a list of changed objects to the server', ->
       @collection.prepareSync()
-      expect(@message.object_ids).toEqual ['some_id']
+      expect(@message.object_ids).toEqual [@changedObject]
       

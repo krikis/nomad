@@ -7,7 +7,9 @@
 
   changedObjects: ->
     _(@models).chain().map((model) ->
-      model.id if model.hasPatches()
+      if model.hasPatches()
+        id: model.id
+        old_version: model._versioning?.oldVersion
     ).compact().value()
 
 # extend Backbone.Collection
