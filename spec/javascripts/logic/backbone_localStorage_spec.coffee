@@ -143,8 +143,7 @@ describe 'Bacbone.LocalStorage', ->
         toEqual "#{@collection.localStorage.storageKeyFor(@model)}-versioning"
 
   describe '#create', ->
-    beforeEach ->
-      
+    beforeEach ->      
       class TestCollection extends Backbone.Collection
       class OtherTestCollection extends Backbone.Collection
       TestCollection::localStorage = new Backbone.
@@ -153,12 +152,11 @@ describe 'Bacbone.LocalStorage', ->
                                             LocalStorage('OtherTestCollection')
       @collection = new TestCollection([], modelName: 'TestModel')
       @other_collection = new OtherTestCollection([], modelName: 'TestModel')
-      @ids = undefined
       
     it 'generates a unique object id within the scope of a collection', ->
       sinon.stub @collection.localStorage, 'guid', ->
         @ids ||= ['other_unique_id', 'unique_id', 'used_id']
-        id = @ids.pop()
+        @ids.pop()
       # this id is in use in the same collection
       @collection.create id: 'used_id'
       # this id is in use in another collection
