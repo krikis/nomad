@@ -138,7 +138,8 @@ describe 'Versioning', ->
       @dummy = new TestModel
       @newModelStub = sinon.stub(TestModel::, 'constructor', => @dummy)
       @dummySetStub = sinon.stub(@dummy, 'set')
-      @processPatchesStub = sinon.stub(@dummy, 'processPatches')
+      @processPatchesStub = sinon.stub(@dummy, 'processPatches', -> true)
+      @modelSetStub = sinon.stub(@model, 'set')
 
     afterEach ->
       @newModelStub.restore()
@@ -155,6 +156,10 @@ describe 'Versioning', ->
     it 'applies all patches to the dummy model', ->
       @model.rebase()
       expect(@processPatchesStub).toHaveBeenCalledWith(@model._versioning.patches)
+      
+    it 'sets the dummy\'s attributes on the model on success', ->
+      @model.rebase()
+      expect(@modelSetStub).toHaveBeenCalledWith(@dummy)
       
   describe '#processPatches', ->
     beforeEach ->

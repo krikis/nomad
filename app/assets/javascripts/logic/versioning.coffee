@@ -29,7 +29,8 @@
   rebase: (attributes) ->
     dummy = new @constructor
     dummy.set attributes
-    dummy.processPatches(@_versioning.patches)
+    if dummy.processPatches(@_versioning.patches)
+      @set dummy
 
   processPatches: (patches) ->
     patches.all (patch_text) =>
@@ -50,4 +51,4 @@
 
 
 # extend Backbone.Model
-_.extend Backbone.Model::,  @Versioning
+_.extend Backbone.Model::, @Versioning
