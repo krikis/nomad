@@ -31,6 +31,9 @@
     dummy.set attributes
     if dummy.processPatches(@_versioning.patches)
       @set dummy
+      @resetVersioning()
+      return true
+    false
 
   processPatches: (patches) ->
     patches.all (patch_text) =>
@@ -47,6 +50,9 @@
       true
     else
       false
+      
+  resetVersioning: ->
+    
 
 
 

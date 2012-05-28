@@ -140,6 +140,7 @@ describe 'Versioning', ->
       @dummySetStub = sinon.stub(@dummy, 'set')
       @processPatchesStub = sinon.stub(@dummy, 'processPatches', -> true)
       @modelSetStub = sinon.stub(@model, 'set')
+      @resetVersioningStub = sinon.stub(@model, 'resetVersioning')
 
     afterEach ->
       @newModelStub.restore()
@@ -156,10 +157,30 @@ describe 'Versioning', ->
     it 'applies all patches to the dummy model', ->
       @model.rebase()
       expect(@processPatchesStub).toHaveBeenCalledWith(@model._versioning.patches)
+    
+    context 'when all patches are successfully applied', ->
+      it 'sets the dummy\'s attributes on the model', ->
+        @model.rebase()
+        expect(@modelSetStub).toHaveBeenCalledWith(@dummy)
+        
+      it 'resets the versioning of the model', ->
+        @model.rebase()
+        expect(@resetVersioningStub).toHaveBeenCalled()
+        
+      it 'returns true', ->
+        expect(@model.rebase()).toBeTruthy()
+        
+    context 'when not all patches were applied successfully', ->
+      beforeEach ->
+        @processPatchesStub.restore()
+        @processPatchesStub = sinon.stub(@dummy, 'processPatches', -> false)
       
-    it 'sets the dummy\'s attributes on the model on success', ->
-      @model.rebase()
-      expect(@modelSetStub).toHaveBeenCalledWith(@dummy)
+      it 'returns false', ->
+        expect(@model.rebase()).toBeFalsy()
+            
+      it 'filters out the attributes that differ'
+
+      it 'creates a diff for each attribute'
       
   describe '#processPatches', ->
     beforeEach ->
@@ -247,26 +268,16 @@ describe 'Versioning', ->
 
       it 'returns false', ->
         expect(@model.applyPatch()).toBeFalsy()
+        
+  describe '#resetVersioning', ->
+    
+    
 
+    it 'clears the patches of the original model', ->
 
+    it 'sets the original model\'s oldVersion to its version', ->
 
-    context 'when successfully patched', ->
-
-      it 'sets the new attributes to the original model', ->
-
-      it 'clears the patches of the original model', ->
-
-      it 'sets the original model\'s oldVersion to its version', ->
-
-      it 'calls setVersion on the original model', ->
-
-      it 'publishes the updated model to the server', ->
-
-    context 'when patching fails', ->
-
-      it 'filters out the attributes that differ', ->
-
-      it 'creates a diff for each attribute', ->
+    it 'calls setVersion on the original model', ->
 
 
 

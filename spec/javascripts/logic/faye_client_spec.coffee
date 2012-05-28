@@ -108,6 +108,8 @@ describe 'FayeClient', ->
       expect(@rebaseStub).toHaveBeenCalledWith(attribute: 'value')
       expect(@rebaseStub).not.
         toHaveBeenCalledWith(attribute: 'other_value')
+        
+    it 'publishes each successfully updated model to the server', ->
 
 
 
