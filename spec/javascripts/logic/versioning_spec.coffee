@@ -134,7 +134,8 @@ describe 'Versioning', ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('answer')
       @dummy = new TestModel
-      @newModelStub = sinon.stub(TestModel::, 'constructor', -> @dummy)
+      @newModelStub = sinon.stub(TestModel::, 'constructor', => @dummy)
+      @dummySetStub = sinon.stub(@dummy, 'set')
       
     afterEach ->
       @newModelStub.restore()
@@ -144,6 +145,9 @@ describe 'Versioning', ->
       expect(@newModelStub).toHaveBeenCalled()
       
     it 'sets the new attributes on this dummy model', ->
+      attributes = sinon.stub()
+      @model.rebase(attributes)
+      expect(@dummySetStub).toHaveBeenCalledWith(attributes)
       
     it 'applies all patches to the dummy model', ->
       

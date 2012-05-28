@@ -29,6 +29,7 @@
 
   rebase: (attributes) ->
     dummy = new @constructor
+    dummy.set attributes
 
 # extend Backbone.Model
 _.extend Backbone.Model::,  @Versioning
