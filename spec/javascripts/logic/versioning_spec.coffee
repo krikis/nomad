@@ -158,14 +158,31 @@ describe 'Versioning', ->
       
   describe '#applyPatch', ->
     beforeEach ->
+      class TestModel extends Backbone.Model
+      @dummy = new TestModel
       @dmp = new diff_match_patch
       @dmpStub = sinon.stub(window, 'diff_match_patch', => @dmp)
       @patch = sinon.stub()
       @patchFromTextStub = sinon.stub(@dmp, 'patch_fromText', => @patch)
+      @dummy_json = sinon.stub()
+      @stringifyStub = sinon.stub(JSON, 'stringify', => @dummy_json)
     
     afterEach -> 
       @dmpStub.restore()
       @patchFromTextStub.restore()
+      @stringifyStub.restore()
+      
+    it 'converts the patch_text to a patch', ->
+      patch_text = sinon.stub()
+      @dummy.applyPatch(patch_text)
+      expect(@patchFromTextStub).toHaveBeenCalledWith(patch_text)
+      
+    it 'converts the dummy object to json', ->
+      @dummy.applyPatch()
+      expect(@stringifyStub).toHaveBeenCalledWith(@dummy)
+      
+      
+      
       
     context 'when successfully patched', ->
       

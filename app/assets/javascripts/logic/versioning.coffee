@@ -33,9 +33,9 @@
       dummy.applyPatch(patch_text)
       
   applyPatch: (patch_text) ->    
-    # @dmp = new diff_match_patch
-    # patch = @dmp.patch_fromText(patch_text)
-    # dummy_json = JSON.stringify(dummy)
+    @dmp = new diff_match_patch
+    patch = @dmp.patch_fromText(patch_text)
+    dummy_json = JSON.stringify(@)
 
       
 
