@@ -166,11 +166,14 @@ describe 'Versioning', ->
       @patchFromTextStub = sinon.stub(@dmp, 'patch_fromText', => @patch)
       @dummy_json = sinon.stub()
       @stringifyStub = sinon.stub(JSON, 'stringify', => @dummy_json)
+      @new_dummy_json = sinon.stub()
+      @patchApplyStub = sinon.stub(@dmp, 'patch_apply', => @new_dummy_json)
     
     afterEach -> 
       @dmpStub.restore()
       @patchFromTextStub.restore()
       @stringifyStub.restore()
+      @patchApplyStub.restore()
       
     it 'converts the patch_text to a patch', ->
       patch_text = sinon.stub()
@@ -181,6 +184,9 @@ describe 'Versioning', ->
       @dummy.applyPatch()
       expect(@stringifyStub).toHaveBeenCalledWith(@dummy)
       
+    it 'applies the patch to the json', ->
+      @dummy.applyPatch()
+      expect(@patchApplyStub).toHaveBeenCalledWith(@patch, @dummy_json)
       
       
       

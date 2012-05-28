@@ -36,6 +36,7 @@
     @dmp = new diff_match_patch
     patch = @dmp.patch_fromText(patch_text)
     dummy_json = JSON.stringify(@)
+    new_dummy_json = @dmp.patch_apply(patch, dummy_json)
 
       
 
