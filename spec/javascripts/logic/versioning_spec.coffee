@@ -200,6 +200,21 @@ describe 'Versioning', ->
       it 'updates the model with the patched attributes', ->
         @model.applyPatch()
         expect(@modelSetStub).toHaveBeenCalledWith(@patched_attributes)
+        
+      it 'returns true', ->
+        expect(@model.applyPatch()).toBeTruthy()
+        
+    context 'when patching fails', ->
+      beforeEach ->
+        @patchApplyStub.restore()
+        @patchApplyStub = sinon.stub(@dmp, 'patch_apply', => [@new_json, [false]])
+        
+      afterEach ->
+        @patchApplyStub.restore()
+      
+      it 'returns false', ->
+        expect(@model.applyPatch()).toBeFalsy()
+        
       
       
     context 'when successfully patched', ->

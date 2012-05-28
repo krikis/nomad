@@ -37,10 +37,12 @@
     patch = @dmp.patch_fromText(patch_text)
     json = JSON.stringify(@)
     [new_json, results] = @dmp.patch_apply(patch, json)
-    unless false in results
+    if not false in results
       patched_attributes = JSON.parse(new_json)
       @set patched_attributes
-    
+      true
+    else
+      false
 
       
 
