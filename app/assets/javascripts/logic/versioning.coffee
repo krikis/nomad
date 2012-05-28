@@ -29,8 +29,12 @@
   rebase: (attributes) ->
     dummy = new @constructor
     dummy.set attributes
-    @_versioning.patches.each (patch_text) =>
-      dummy.applyPatch(patch_text)
+    dummy.processPatches(@_versioning.patches)
+      
+  processPatches: (patches) ->  
+   patches.each (patch_text) =>
+     @applyPatch(patch_text)
+    
       
   applyPatch: (patch_text) ->    
     @dmp = new diff_match_patch
