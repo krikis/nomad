@@ -16,8 +16,7 @@
       @setVersion()
 
   createPatch: ->
-    window.dmp ||= new diff_match_patch
-    @dmp = window.dmp
+    @dmp = new diff_match_patch
     diff = @dmp.diff_main JSON.stringify(@previousAttributes()),
                           JSON.stringify(@)
     patch = @dmp.patch_make JSON.stringify(@previousAttributes()),
@@ -28,6 +27,35 @@
     @_versioning.version = CryptoJS.SHA256(JSON.stringify @).toString()
 
   rebase: (attributes) ->
+    dummy = new @constructor
+    dummy.set attributes
+    if dummy.processPatches(@_versioning.patches)
+      @set dummy
+      return true
+    false
+
+  processPatches: (patches) ->
+    patches.all (patch_text) =>
+      @applyPatch(patch_text)
+
+  applyPatch: (patch_text) ->
+    @dmp = new diff_match_patch
+    patch = @dmp.patch_fromText(patch_text)
+    json = JSON.stringify(@)
+    [new_json, results] = @dmp.patch_apply(patch, json)
+    if not false in results
+      patched_attributes = JSON.parse(new_json)
+      @set patched_attributes
+      true
+    else
+      false
+      
+  resetVersioning: ->
+    @_versioning.patches = _([])
+    @_versioning.oldVersion = @_versioning.version
+    @setVersion()
 
 # extend Backbone.Model
-_.extend Backbone.Model::,  @Versioning
+_.extend Backbone.Model::, @Versioning
+
+
