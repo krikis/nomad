@@ -16,8 +16,7 @@
       @setVersion()
 
   createPatch: ->
-    window.dmp ||= new diff_match_patch
-    @dmp = window.dmp
+    @dmp = new diff_match_patch
     diff = @dmp.diff_main JSON.stringify(@previousAttributes()),
                           JSON.stringify(@)
     patch = @dmp.patch_make JSON.stringify(@previousAttributes()),
@@ -30,6 +29,15 @@
   rebase: (attributes) ->
     dummy = new @constructor
     dummy.set attributes
+    @_versioning.patches.each (patch_text) =>
+      dummy.applyPatch(patch_text)
+      
+  applyPatch: (patch_text) ->    
+    # @dmp = new diff_match_patch
+    # patch = @dmp.patch_fromText(patch_text)
+    # dummy_json = JSON.stringify(dummy)
+
+      
 
 # extend Backbone.Model
 _.extend Backbone.Model::,  @Versioning

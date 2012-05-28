@@ -133,9 +133,12 @@ describe 'Versioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('answer')
+      @patch_text = sinon.stub
+      @model._versioning = {patches: _([@patch_text])}
       @dummy = new TestModel
       @newModelStub = sinon.stub(TestModel::, 'constructor', => @dummy)
       @dummySetStub = sinon.stub(@dummy, 'set')
+      @applyPatchStub = sinon.stub(@dummy, 'applyPatch')
       
     afterEach ->
       @newModelStub.restore()
@@ -150,6 +153,19 @@ describe 'Versioning', ->
       expect(@dummySetStub).toHaveBeenCalledWith(attributes)
       
     it 'applies all patches to the dummy model', ->
+      @model.rebase()
+      expect(@applyPatchStub).toHaveBeenCalledWith(@patch_text)
+      
+  describe '#applyPatch', ->
+    beforeEach ->
+      @dmp = new diff_match_patch
+      @dmpStub = sinon.stub(window, 'diff_match_patch', => @dmp)
+      @patch = sinon.stub()
+      @patchFromTextStub = sinon.stub(@dmp, 'patch_fromText', => @patch)
+    
+    afterEach -> 
+      @dmpStub.restore()
+      @patchFromTextStub.restore()
       
     context 'when successfully patched', ->
       
