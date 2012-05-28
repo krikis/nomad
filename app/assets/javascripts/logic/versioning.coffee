@@ -31,7 +31,6 @@
     dummy.set attributes
     if dummy.processPatches(@_versioning.patches)
       @set dummy
-      @resetVersioning()
       return true
     false
 
@@ -52,6 +51,9 @@
       false
       
   resetVersioning: ->
+    @_versioning.patches = _([])
+    @_versioning.oldVersion = @_versioning.version
+    @setVersion()
     
 
 

@@ -163,10 +163,6 @@ describe 'Versioning', ->
         @model.rebase()
         expect(@modelSetStub).toHaveBeenCalledWith(@dummy)
         
-      it 'resets the versioning of the model', ->
-        @model.rebase()
-        expect(@resetVersioningStub).toHaveBeenCalled()
-        
       it 'returns true', ->
         expect(@model.rebase()).toBeTruthy()
         
@@ -270,14 +266,25 @@ describe 'Versioning', ->
         expect(@model.applyPatch()).toBeFalsy()
         
   describe '#resetVersioning', ->
-    
-    
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      @model._versioning = 
+        oldVersion: 'old_version'
+        version: 'version'
+        patches: _(['some', 'patches'])
+      @setVersionStub = sinon.stub(@model, 'setVersion')
 
     it 'clears the patches of the original model', ->
+      @model.resetVersioning()
+      expect(@model._versioning.patches).toEqual _([])
 
     it 'sets the original model\'s oldVersion to its version', ->
+      @model.resetVersioning()
+      expect(@model._versioning.oldVersion).toEqual('version')
 
     it 'calls setVersion on the original model', ->
-
+      @model.resetVersioning()
+      expect(@setVersionStub).toHaveBeenCalled()
 
 
