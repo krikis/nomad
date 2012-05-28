@@ -14,10 +14,10 @@ class ServerSideClient
   def on_server_message(message)
     error message.inspect
     if model = message['model_name'].safe_constantize
-      if model.respond_to? :find_by_id
+      if model.respond_to? :where
         models = {}
         message['objects'].each do |object|
-          object = model.find_by_id object['id']
+          object = model.where(['id is ? and version is not ?', object['id'], object['old_version']]).first
           models[object.id] = object.to_json(:except => [:id, :version]) if object
         end.compact
         channel = "/sync/#{message['model_name']}"
