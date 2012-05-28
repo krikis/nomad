@@ -60,6 +60,13 @@ describe ServerSideClient do
           client.should_receive(:publish).with(an_instance_of(String), {'update' => {'some_id' => json_object}})
           subject.on_server_message(message)
         end
+
+        it 'filters out the id and version attribute in the JSON' do
+          object = stub(:id => 'some_id')
+          Post.stub(:find_by_id).and_return(object)
+          object.should_receive(:to_json).with(:except => [:id, :version])
+          subject.on_server_message(message)
+        end
       end
 
       context 'and it does not respond to find_by_id' do

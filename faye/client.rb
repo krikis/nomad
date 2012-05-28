@@ -18,7 +18,7 @@ class ServerSideClient
         models = {}
         message['objects'].each do |object|
           object = model.find_by_id object['id']
-          models[object.id] = object.to_json(:except => :version) if object
+          models[object.id] = object.to_json(:except => [:id, :version]) if object
         end.compact
         channel = "/sync/#{message['model_name']}"
         channel += "/#{message['client_id']}" if message['client_id'].present?
