@@ -160,13 +160,29 @@ describe 'Versioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
-      @applyPatchStub = sinon.stub(@model, 'applyPatch', -> true)
+      @applyPatchStub = sinon.stub(@model, 'applyPatch', -> 
+        @results ||= [true, true]
+        @results.pop()
+      )
       
     it 'applies each patch to the model', ->
       @model.processPatches(_(['some', 'patches']))
       expect(@applyPatchStub).toHaveBeenCalledWith('some')
       expect(@applyPatchStub).toHaveBeenCalledWith('patches')
       
+    it 'returns true when all patches apply successfully', ->
+      expect(@model.processPatches(_(['some', 'patches']))).toBeTruthy()
+      
+    context 'when at least one patch did not apply successfully', ->
+      beforeEach -> 
+        @applyPatchStub.restore()
+        @applyPatchStub = sinon.stub(@model, 'applyPatch', -> 
+          @results ||= [true, false, true]
+          @results.pop()
+        )
+      
+      it 'returns false when at least one patch was unsuccessful', ->
+        expect(@model.processPatches(_(['some', 'more', 'patches']))).toBeFalsy()
 
   describe '#applyPatch', ->
     beforeEach ->

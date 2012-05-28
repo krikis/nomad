@@ -30,13 +30,12 @@
     dummy = new @constructor
     dummy.set attributes
     dummy.processPatches(@_versioning.patches)
-      
-  processPatches: (patches) ->  
-   patches.each (patch_text) =>
-     @applyPatch(patch_text)
-    
-      
-  applyPatch: (patch_text) ->    
+
+  processPatches: (patches) ->
+    patches.all (patch_text) =>
+      @applyPatch(patch_text)
+
+  applyPatch: (patch_text) ->
     @dmp = new diff_match_patch
     patch = @dmp.patch_fromText(patch_text)
     json = JSON.stringify(@)
@@ -48,7 +47,7 @@
     else
       false
 
-      
+
 
 # extend Backbone.Model
 _.extend Backbone.Model::,  @Versioning
