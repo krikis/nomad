@@ -130,8 +130,18 @@ describe 'Versioning', ->
         expect(@model._versioning.version).toEqual(hash)
         
   describe '#rebase', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('answer')
+      @dummy = new TestModel
+      @newModelStub = sinon.stub(TestModel::, 'constructor', -> @dummy)
+      
+    afterEach ->
+      @newModelStub.restore()
         
     it 'creates a dummy model', ->
+      @model.rebase()
+      expect(@newModelStub).toHaveBeenCalled()
       
     it 'sets the new attributes on this dummy model', ->
       

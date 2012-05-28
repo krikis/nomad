@@ -28,6 +28,7 @@
     @_versioning.version = CryptoJS.SHA256(JSON.stringify @).toString()
 
   rebase: (attributes) ->
+    dummy = new @constructor
 
 # extend Backbone.Model
 _.extend Backbone.Model::,  @Versioning
