@@ -35,8 +35,12 @@
   applyPatch: (patch_text) ->    
     @dmp = new diff_match_patch
     patch = @dmp.patch_fromText(patch_text)
-    dummy_json = JSON.stringify(@)
-    new_dummy_json = @dmp.patch_apply(patch, dummy_json)
+    json = JSON.stringify(@)
+    [new_json, results] = @dmp.patch_apply(patch, json)
+    unless false in results
+      patched_attributes = JSON.parse(new_json)
+      @set patched_attributes
+    
 
       
 

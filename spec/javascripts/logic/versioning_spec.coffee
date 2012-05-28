@@ -159,35 +159,47 @@ describe 'Versioning', ->
   describe '#applyPatch', ->
     beforeEach ->
       class TestModel extends Backbone.Model
-      @dummy = new TestModel
+      @model = new TestModel
       @dmp = new diff_match_patch
       @dmpStub = sinon.stub(window, 'diff_match_patch', => @dmp)
       @patch = sinon.stub()
       @patchFromTextStub = sinon.stub(@dmp, 'patch_fromText', => @patch)
-      @dummy_json = sinon.stub()
-      @stringifyStub = sinon.stub(JSON, 'stringify', => @dummy_json)
-      @new_dummy_json = sinon.stub()
-      @patchApplyStub = sinon.stub(@dmp, 'patch_apply', => @new_dummy_json)
+      @json = sinon.stub()
+      @stringifyStub = sinon.stub(JSON, 'stringify', => @json)
+      @new_json = sinon.stub()
+      @patchApplyStub = sinon.stub(@dmp, 'patch_apply', => [@new_json, [true]])
+      @patched_attributes = sinon.stub()
+      @parseStub = sinon.stub(JSON, 'parse', => @patched_attributes)
+      @modelSetStub = sinon.stub(@model, 'set')
     
     afterEach -> 
       @dmpStub.restore()
       @patchFromTextStub.restore()
       @stringifyStub.restore()
       @patchApplyStub.restore()
+      @parseStub.restore()
       
     it 'converts the patch_text to a patch', ->
       patch_text = sinon.stub()
-      @dummy.applyPatch(patch_text)
+      @model.applyPatch(patch_text)
       expect(@patchFromTextStub).toHaveBeenCalledWith(patch_text)
       
-    it 'converts the dummy object to json', ->
-      @dummy.applyPatch()
-      expect(@stringifyStub).toHaveBeenCalledWith(@dummy)
+    it 'converts the model object to json', ->
+      @model.applyPatch()
+      expect(@stringifyStub).toHaveBeenCalledWith(@model)
       
     it 'applies the patch to the json', ->
-      @dummy.applyPatch()
-      expect(@patchApplyStub).toHaveBeenCalledWith(@patch, @dummy_json)
+      @model.applyPatch()
+      expect(@patchApplyStub).toHaveBeenCalledWith(@patch, @json)
       
+    context 'when patching was successfull', ->
+      it 'parses new attributes from the new model json', ->
+        @model.applyPatch()
+        expect(@parseStub).toHaveBeenCalledWith(@new_json)
+      
+      it 'updates the model with the patched attributes', ->
+        @model.applyPatch()
+        expect(@modelSetStub).toHaveBeenCalledWith(@patched_attributes)
       
       
     context 'when successfully patched', ->
