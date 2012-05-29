@@ -1,4 +1,5 @@
 describe 'Sync', ->
+  
   describe '#changedModels', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
@@ -6,7 +7,7 @@ describe 'Sync', ->
       model =
         id: 'some_id'
         hasPatches: -> true
-      model._versioning = {oldVersion: 'some_hash'}
+        oldVersion: -> 'some_hash'
       @collection.models = [model]
 
     it 'collects the ids of all models with patches', ->
@@ -57,6 +58,8 @@ describe 'Sync', ->
       it 'does not publish to the server', ->
         @collection.prepareSync()
         expect(@publishStub).not.toHaveBeenCalled()
+        
+      it 'sends all fresh models to the server'
 
   describe '#processUpdates', ->
     beforeEach ->
@@ -78,7 +81,7 @@ describe 'Sync', ->
       expect(@rebaseStub).not.
         toHaveBeenCalledWith(attribute: 'other_value')
               
-    it 'publishes each successfully updated model to the server', ->
+    it 'publishes all successfully updated models to the server', ->
       @model = new Backbone.Model
       @rebaseStub = sinon.stub(@model, 'rebase', -> 
         @out ||= [false, @]
@@ -102,6 +105,26 @@ describe 'Sync', ->
     
     
     it 'publishes all updated and fresh models to the server'
+    
+  describe '#freshModels', ->
+    beforeEach ->
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @fresh_model = 
+        id: 'some_id' 
+        isFresh: -> true
+        version: -> 'some_hash'
+      @synced_model = 
+        id: 'some_other_id'
+        isFresh: -> false
+      @collection.models = [@fresh_model, @synced_model]       
+    
+    it 'collects JSON and version of all models that were never synced', ->
+      entry = 
+        model: JSON.stringify(@fresh_model)
+        version: @fresh_model.version()
+      expect(@collection.freshModels()).toEqual([@fresh_model])
+    
       
        
        

@@ -10,7 +10,7 @@
     _(@models).chain().map((model) ->
       if model.hasPatches()
         id: model.id
-        old_version: model._versioning?.oldVersion
+        old_version: model.oldVersion()
     ).compact().value()
     
   processUpdates: (models) ->
@@ -22,6 +22,10 @@
   syncModels: (models) ->
     
   freshModels: () ->
+    _(@models).chain().map((model) ->
+      if model.isFresh()
+        model
+    ).compact().value()
 
 # extend Backbone.Collection
 _.extend Backbone.Collection::, Sync
