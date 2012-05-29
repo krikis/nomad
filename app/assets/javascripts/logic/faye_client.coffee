@@ -13,8 +13,9 @@ class @BackboneSync.FayeClient
     @channel = options.channel
     @subscribe()
 
-  publish: (data)->
-    @client.publish "/server/" + @channel, data
+  publish: (message)->
+    message.client_id ||= Nomad.clientId
+    @client.publish "/server/" + @channel, message
 
   subscribe: ->
     @client.subscribe "/sync/#{@channel}", @receive, @

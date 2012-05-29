@@ -2,7 +2,6 @@
   prepareSync: ->
     if not _.isEmpty(changed = @changedModels())
       @fayeClient.publish
-        client_id: Nomad.clientId
         model_name: @modelName
         changed: changed      
 
@@ -23,7 +22,6 @@
     fresh = @freshModels()
     # if not (_.isEmpty(updated) and _.isEmpty(fresh))
     @fayeClient.publish
-      client_id: Nomad.clientId
       model_name: @modelName
       updates: updated
       creates: fresh
