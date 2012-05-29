@@ -11,6 +11,12 @@
 
   hasPatches: ->
     @_versioning?.patches?.size() > 0
+    
+  oldVersion: ->
+    @_versioning?.oldVersion
+    
+  version: ->
+    @_versioning?.version
 
   addPatch: ->
     @initVersioning()

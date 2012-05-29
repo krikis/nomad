@@ -62,6 +62,24 @@ describe 'Versioning', ->
 
       it 'returns true', ->
         expect(@model.hasPatches()).toBeTruthy()
+        
+  describe '#oldVersion', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('model')
+      @model._versioning = {oldVersion: 'some_hash'}
+      
+    it 'fetches the oldVersion property of the versioning object', ->
+      expect(@model.oldVersion()).toEqual('some_hash')
+      
+  describe '#version', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('model')
+      @model._versioning = {version: 'some_hash'}
+    
+    it 'fetches the version property of the versioning object', ->
+      expect(@model.version()).toEqual('some_hash')
 
   describe '#addPatch', ->
     beforeEach ->
