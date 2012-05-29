@@ -4,7 +4,6 @@
     changed = @changedModels()
     if not (_.isEmpty(fresh) and _.isEmpty(changed))
       @fayeClient.publish
-        model_name: @modelName
         creates: fresh
         changes: changed
 
@@ -30,7 +29,6 @@
     
   syncUpdates: (updated) ->
     @fayeClient.publish
-      model_name: @modelName
       updates: updated
     
 # extend Backbone.Collection

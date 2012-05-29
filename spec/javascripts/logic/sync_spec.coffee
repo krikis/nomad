@@ -27,10 +27,6 @@ describe 'Sync', ->
         @changedModelsStub = sinon.
           stub(@collection, 'changedModels', => ['changed', 'models'])
 
-      it 'publishes the model name to the server', ->
-        @collection.preSync()
-        expect(@message.model_name).toEqual @collection.modelName
-
       it 'collects all changed models', ->
         @collection.preSync()
         expect(@changedModelsStub).toHaveBeenCalled()
