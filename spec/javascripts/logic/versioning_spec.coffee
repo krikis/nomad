@@ -9,7 +9,8 @@ describe 'Versioning', ->
   describe '#initVersioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
-      @model = new TestModel Factory.build('model')
+      @model = new TestModel Factory.build('model')  
+      @setVersionStub = sinon.stub(@model, 'setVersion')
 
     it 'initializes the _versioning object if undefined', ->
       expect(@model._versioning).toBeUndefined()
@@ -20,6 +21,15 @@ describe 'Versioning', ->
       hash = CryptoJS.SHA256(JSON.stringify @model.previousAttributes()).toString()
       @model.initVersioning()
       expect(@model._versioning.oldVersion).toEqual(hash)
+      
+    it 'retains the oldVersion property once is has been set', ->
+      @model._versioning = {oldVersion: 'some_hash'}
+      @model.initVersioning()
+      expect(@model._versioning.oldVersion).toEqual('some_hash')
+      
+    it 'sets the current version on the model', ->
+      @model.initVersioning()
+      expect(@setVersionStub).toHaveBeenCalled()
       
   describe '#isFresh', ->
     beforeEach ->
@@ -292,7 +302,7 @@ describe 'Versioning', ->
       @model.resetVersioning()
       expect(@model._versioning.oldVersion).toEqual('version')
 
-    it 'calls setVersion on the original model', ->
+    it 'sets the current version on the original model', ->
       @model.resetVersioning()
       expect(@setVersionStub).toHaveBeenCalled()
 
