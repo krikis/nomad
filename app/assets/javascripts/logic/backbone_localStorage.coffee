@@ -69,9 +69,7 @@
 
     # Retrieve a model from `@data` by id.
     find: (model) ->
-      versioning = JSON.parse @localStorage().
-                  getItem(@versioningKeyFor model)
-      model._versioning = versioning if versioning?
+      @setVersioning(model)
       JSON.parse @localStorage().getItem(@storageKeyFor model)
 
     # Return the array of all models currently in storage.
@@ -84,10 +82,10 @@
 
     setAllVersioning: (collection, options) ->
       _.each(collection.models, (model) =>
-        @setVersioning model, collection, options
+        @setVersioning model
       )
 
-    setVersioning: (model, collection, options) ->
+    setVersioning: (model) ->
       versioning = JSON.parse @localStorage().
                   getItem(@versioningKeyFor model)
       model._versioning = versioning if versioning?
