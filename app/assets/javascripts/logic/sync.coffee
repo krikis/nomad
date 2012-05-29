@@ -1,9 +1,19 @@
 @Sync =
-  prepareSync: ->
-    if not _.isEmpty(changed = @changedModels())
+  preSync: ->
+    fresh = @freshModels()
+    changed = @changedModels()
+    if not (_.isEmpty(fresh) and _.isEmpty(changed))
       @fayeClient.publish
         model_name: @modelName
-        changed: changed      
+        creates: fresh
+        changed: changed
+
+  freshModels: () ->
+    _(@models).chain().map((model) ->
+      if model.isFresh()
+        model: JSON.stringify(model)
+        version: model.version()
+    ).compact().value()
 
   changedModels: ->
     _(@models).chain().map((model) ->
@@ -16,22 +26,12 @@
     updated = _.map models, (attributes, id) =>
       model = @get(id)
       model?.rebase attributes
-    @syncModels _(updated).compact()
+    @syncUpdates _(updated).compact()
     
-  syncModels: (updated) ->
-    fresh = @freshModels()
-    # if not (_.isEmpty(updated) and _.isEmpty(fresh))
+  syncUpdates: (updated) ->
     @fayeClient.publish
       model_name: @modelName
       updates: updated
-      creates: fresh
     
-  freshModels: () ->
-    _(@models).chain().map((model) ->
-      if model.isFresh()
-        model: JSON.stringify(model)
-        version: model.version()
-    ).compact().value()
-
 # extend Backbone.Collection
 _.extend Backbone.Collection::, Sync

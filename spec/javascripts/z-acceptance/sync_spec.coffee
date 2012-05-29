@@ -6,7 +6,7 @@ describe 'sync', ->
       delete window.client
       window.acceptance_client = true
 
-  describe 'prepareSync', ->  
+  describe 'preSync', ->  
     beforeEach ->
       window.receive_called = false
       @fayeClientStub = sinon.stub(BackboneSync.FayeClient::, 'receive', (message) ->
@@ -26,7 +26,7 @@ describe 'sync', ->
     it 'publishes a list of changed objects to the server
         and receives a list of concurrently changed objects back', ->
       runs ->
-        @collection.prepareSync()
+        @collection.preSync()
       waitsFor (->
         window.receive_called
       ), 'receive to get called', 5000
