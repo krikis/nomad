@@ -31,7 +31,7 @@
     dummy.set attributes
     if dummy.processPatches(@_versioning.patches)
       @set dummy
-      return true
+      return @
     false
 
   processPatches: (patches) ->

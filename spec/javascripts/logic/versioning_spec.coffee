@@ -163,8 +163,8 @@ describe 'Versioning', ->
         @model.rebase()
         expect(@modelSetStub).toHaveBeenCalledWith(@dummy)
         
-      it 'returns true', ->
-        expect(@model.rebase()).toBeTruthy()
+      it 'returns the updated model', ->
+        expect(@model.rebase()).toEqual(@model)
         
     context 'when not all patches were applied successfully', ->
       beforeEach ->
