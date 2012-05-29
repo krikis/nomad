@@ -20,6 +20,15 @@ describe 'Versioning', ->
       hash = CryptoJS.SHA256(JSON.stringify @model.previousAttributes()).toString()
       @model.initVersioning()
       expect(@model._versioning.oldVersion).toEqual(hash)
+      
+  describe '#isFresh', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('model')
+    
+    it 'returns whether the model has not been synced yet', ->
+      @model._versioning = {synced: false}
+      expect(@model.isFresh()).toBeTruthy()
 
   describe '#hasPatches', ->
     beforeEach ->

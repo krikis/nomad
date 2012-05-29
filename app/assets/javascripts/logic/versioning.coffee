@@ -4,6 +4,9 @@
     unless @_versioning.oldVersion?
       previous = CryptoJS.SHA256(JSON.stringify @previousAttributes()).toString()
       @_versioning.oldVersion = previous
+      
+  isFresh: ->
+    not @_versioning?.synced
 
   hasPatches: ->
     @_versioning?.patches?.size() > 0
