@@ -6,7 +6,7 @@
       @fayeClient.publish
         model_name: @modelName
         creates: fresh
-        changed: changed
+        changes: changed
 
   freshModels: () ->
     _(@models).chain().map((model) ->

@@ -37,7 +37,7 @@ describe 'Sync', ->
 
       it 'publishes a list of changed models to the server', ->
         @collection.preSync()
-        expect(@message.changed).toEqual(['changed', 'models'])
+        expect(@message.changes).toEqual(['changed', 'models'])
       
     context 'when there are no fresh or changed models', ->
       beforeEach ->
