@@ -10,16 +10,17 @@ class @BackboneSync.FayeClient
     # client.disable('callback-polling');
     @client = window.client
     @collection = collection
-    @channel = options.channel
+    @modelName = options.modelName
     @subscribe()
 
   publish: (message)->
     message.client_id ||= Nomad.clientId
-    @client.publish "/server/" + @channel, message
+    message.model_name ||= @modelName
+    @client.publish "/server/" + @modelName, message
 
   subscribe: ->
-    @client.subscribe "/sync/#{@channel}", @receive, @
-    @client.subscribe "/sync/#{@channel}/#{Nomad.clientId}", @receive, @
+    @client.subscribe "/sync/#{@modelName}", @receive, @
+    @client.subscribe "/sync/#{@modelName}/#{Nomad.clientId}", @receive, @
 
   receive: (message) ->
     _.each message, (eventArguments, event) =>

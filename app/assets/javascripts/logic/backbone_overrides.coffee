@@ -36,7 +36,7 @@ Backbone.Collection = ((Collection) ->
       throw new Error('Model name undefined: either set a valid Backbone.Model ' +
                       'or pass a modelName option!')
     @fayeClient ||= new BackboneSync.FayeClient(@,
-      channel: @modelName
+      modelName: @modelName
     )
     @localStorage ||= new Backbone.LocalStorage(@modelName)
     return

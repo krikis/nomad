@@ -80,7 +80,7 @@ describe 'Overrides', ->
 
       it 'initializes a new fayeclient for the model name', ->
         expect(@fayeClientStub).toHaveBeenCalledWith(@collection, {
-          channel: @collection.modelName
+          modelName: @collection.modelName
         })
         expect(@collection.fayeClient).toEqual @fayeClient
         
