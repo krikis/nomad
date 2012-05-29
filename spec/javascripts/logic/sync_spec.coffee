@@ -121,9 +121,9 @@ describe 'Sync', ->
     
     it 'collects JSON and version of all models that were never synced', ->
       entry = 
-        model: JSON.stringify(@fresh_model)
-        version: @fresh_model.version()
-      expect(@collection.freshModels()).toEqual([@fresh_model])
+        model: '{"id":"some_id"}'
+        version: 'some_hash'
+      expect(@collection.freshModels()).toEqual([entry])
     
       
        

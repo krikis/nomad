@@ -24,7 +24,8 @@
   freshModels: () ->
     _(@models).chain().map((model) ->
       if model.isFresh()
-        model
+        model: JSON.stringify(model)
+        version: model.version()
     ).compact().value()
 
 # extend Backbone.Collection
