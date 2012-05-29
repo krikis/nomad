@@ -9,7 +9,8 @@ describe 'Versioning', ->
   describe '#initVersioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
-      @model = new TestModel Factory.build('model')
+      @model = new TestModel Factory.build('model')  
+      @setVersionStub = sinon.stub(@model, 'setVersion')
 
     it 'initializes the _versioning object if undefined', ->
       expect(@model._versioning).toBeUndefined()
@@ -20,6 +21,20 @@ describe 'Versioning', ->
       hash = CryptoJS.SHA256(JSON.stringify @model.previousAttributes()).toString()
       @model.initVersioning()
       expect(@model._versioning.oldVersion).toEqual(hash)
+      
+    it 'retains the oldVersion property once is has been set', ->
+      @model._versioning = {oldVersion: 'some_hash'}
+      @model.initVersioning()
+      expect(@model._versioning.oldVersion).toEqual('some_hash')
+      
+  describe '#isFresh', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('model')
+    
+    it 'returns whether the model has not been synced yet', ->
+      @model._versioning = {synced: false}
+      expect(@model.isFresh()).toBeTruthy()
 
   describe '#hasPatches', ->
     beforeEach ->
@@ -43,29 +58,53 @@ describe 'Versioning', ->
 
       it 'returns true', ->
         expect(@model.hasPatches()).toBeTruthy()
+        
+  describe '#oldVersion', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('model')
+      @model._versioning = {oldVersion: 'some_hash'}
+      
+    it 'fetches the oldVersion property of the versioning object', ->
+      expect(@model.oldVersion()).toEqual('some_hash')
+      
+  describe '#version', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('model')
+      @model._versioning = {version: 'some_hash'}
+    
+    it 'fetches the version property of the versioning object', ->
+      expect(@model.version()).toEqual('some_hash')
+      
+    it 'returns the oldVersion property should version be undefined', ->
+      @model._versioning = {oldVersion: 'some_old_hash'}
+      expect(@model.version()).toEqual('some_old_hash')
 
   describe '#addPatch', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
-      @initVersioningSpy = sinon.spy(@model, 'initVersioning')
+      @model._versioning = 
+        oldVersion: 'some_hash'
+      @initVersioningStub = sinon.stub(@model, 'initVersioning')
+      @setVersionStub = sinon.stub(@model, 'setVersion')
       @patch = sinon.stub()
       @createPatchStub = sinon.stub(@model, 'createPatch', =>
         @patch
       )
 
-    afterEach ->
-      @initVersioningSpy.restore()
-      @createPatchStub.restore()
-
     it 'initializes _versioning', ->
       @model.addPatch()
-      expect(@initVersioningSpy).toHaveBeenCalled()
+      expect(@initVersioningStub).toHaveBeenCalled()
+
+    it 'sets the model\'s current version', ->
+      @model.addPatch()
+      expect(@setVersionStub).toHaveBeenCalled()
 
     context 'when the model has changed', ->
       beforeEach ->
         @changedStub = sinon.stub(@model, 'hasChanged', -> true)
-        @setVersionStub = sinon.stub(@model, 'setVersion')
 
       afterEach ->
         @changedStub.restore()
@@ -90,11 +129,6 @@ describe 'Versioning', ->
         it 'saves a patch for the update to _versioning.patches', ->
           @model.addPatch()
           expect(@model._versioning.patches.first()).toEqual @patch
-
-
-        it 'calls setVersion on the model', ->
-          @model.addPatch()
-          expect(@setVersionStub).toHaveBeenCalled()
 
   describe '#createPatch', ->
     beforeEach ->
@@ -163,8 +197,8 @@ describe 'Versioning', ->
         @model.rebase()
         expect(@modelSetStub).toHaveBeenCalledWith(@dummy)
         
-      it 'returns true', ->
-        expect(@model.rebase()).toBeTruthy()
+      it 'returns the updated model', ->
+        expect(@model.rebase()).toEqual(@model)
         
     context 'when not all patches were applied successfully', ->
       beforeEach ->
@@ -283,7 +317,7 @@ describe 'Versioning', ->
       @model.resetVersioning()
       expect(@model._versioning.oldVersion).toEqual('version')
 
-    it 'calls setVersion on the original model', ->
+    it 'sets the current version on the original model', ->
       @model.resetVersioning()
       expect(@setVersionStub).toHaveBeenCalled()
 
