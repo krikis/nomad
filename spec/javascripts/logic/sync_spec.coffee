@@ -23,29 +23,40 @@ describe 'Sync', ->
   describe '#prepareSync', ->
     beforeEach ->
       @message = undefined
-      @changedObject = sinon.stub()
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
       )
-      @changedModelsStub = sinon.stub(@collection, 'changedModels', => [@changedObject])
 
     afterEach ->
       @publishStub.restore()
-      @changedModelsStub.restore()      
+      @changedModelsStub.restore()   
+      
+    context 'when there are changed models', ->
+      beforeEach ->
+        @changedModel = sinon.stub()
+        @changedModelsStub = sinon.stub(@collection, 'changedModels', => [@changedModel])
 
-    it 'publishes the model name to the server', ->
-      @collection.prepareSync()
-      expect(@message.model_name).toEqual @collection.modelName
+      it 'publishes the model name to the server', ->
+        @collection.prepareSync()
+        expect(@message.model_name).toEqual @collection.modelName
 
-    it 'publishes Nomad.clientId to the server', ->
-      @collection.prepareSync()
-      expect(@message.client_id).toEqual Nomad.clientId
+      it 'publishes Nomad.clientId to the server', ->
+        @collection.prepareSync()
+        expect(@message.client_id).toEqual Nomad.clientId
 
-    it 'publishes a list of changed objects to the server', ->
-      @collection.prepareSync()
-      expect(@message.objects).toEqual [@changedObject]
+      it 'publishes a list of changed models to the server', ->
+        @collection.prepareSync()
+        expect(@message.objects).toEqual [@changedModel]
+      
+    context 'when there are no changed models', ->
+      beforeEach ->
+        @changedModelsStub = sinon.stub(@collection, 'changedModels', => [])
+        
+      it 'does not publish to the server', ->
+        @collection.prepareSync()
+        expect(@publishStub).not.toHaveBeenCalled()
 
   describe '#processUpdates', ->
     beforeEach ->
@@ -79,6 +90,18 @@ describe 'Sync', ->
         other_id: {attribute: 'other_value'}
       )
       expect(@syncModelsStub).toHaveBeenCalledWith([@model])
+      
+  describe '#syncModels', ->
+    beforeEach ->
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @freshModelsStub = sinon.stub(@collection, 'freshModels')    
+    
+    it 'collects all models that were never synced', ->
+      @collection.syncModels()
+    
+    
+    it 'publishes all updated and fresh models to the server'
       
        
        
