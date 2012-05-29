@@ -20,6 +20,9 @@ describe 'modelVersioning', ->
     it 'adds an oldVersion hash to it', ->
       expect(@model._versioning?.oldVersion).toBeDefined()
 
+    it 'adds a version hash to it', ->
+      expect(@model._versioning?.version).toBeDefined()
+
   context 'when a model is saved without an id', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -36,21 +39,32 @@ describe 'modelVersioning', ->
     it 'adds an oldVersion hash to it', ->
       expect(@model._versioning?.oldVersion).toBeDefined()
 
+    it 'adds a version hash to it', ->
+      expect(@model._versioning?.version).toBeDefined()
+
     context 'and it changed but was never synced', ->
       beforeEach ->
+        @setVersionStub = sinon.stub(@model, 'setVersion')
         @model.set Factory.build('answer')
 
       it 'does not add a patch', ->
         expect(@model.hasPatches()).toBeFalsy()
+        
+      it 'updates the version hash', ->
+        expect(@setVersionStub).toHaveBeenCalled()
 
     context 'and it changed after it has been synced', ->
       beforeEach ->
         @model._versioning =
           synced: true
+        @setVersionStub = sinon.stub(@model, 'setVersion')
         @model.set Factory.build('answer')
 
       it 'adds a patch', ->
         expect(@model.hasPatches()).toBeTruthy()
+        
+      it 'updates the version hash', ->
+        expect(@setVersionStub).toHaveBeenCalled()
         
   context 'when a model is created with an id', ->
     beforeEach ->
