@@ -11,8 +11,8 @@ describe 'Sync', ->
       @collection.models = [model]
 
     it 'collects the ids of all models with patches', ->
-      objects = @collection.changedModels()
-      expect(objects).toEqual [{id: 'some_id', old_version: 'some_hash'}]
+      models = @collection.changedModels()
+      expect(models).toEqual [{id: 'some_id', old_version: 'some_hash'}]
 
     it 'does not collect ids of models with no patches', ->
       model =
@@ -28,16 +28,13 @@ describe 'Sync', ->
       @collection = new TestCollection([], modelName: 'TestModel')
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
-      )
-
-    afterEach ->
-      @publishStub.restore()
-      @changedModelsStub.restore()   
+      )  
       
     context 'when there are changed models', ->
       beforeEach ->
         @changedModel = sinon.stub()
-        @changedModelsStub = sinon.stub(@collection, 'changedModels', => [@changedModel])
+        @changedModelsStub = sinon.
+          stub(@collection, 'changedModels', => [@changedModel])
 
       it 'publishes the model name to the server', ->
         @collection.prepareSync()
@@ -49,7 +46,7 @@ describe 'Sync', ->
 
       it 'publishes a list of changed models to the server', ->
         @collection.prepareSync()
-        expect(@message.objects).toEqual [@changedModel]
+        expect(@message.changed).toEqual [@changedModel]
       
     context 'when there are no changed models', ->
       beforeEach ->
@@ -98,14 +95,26 @@ describe 'Sync', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
-      @freshModelsStub = sinon.stub(@collection, 'freshModels')    
+      @freshModelsStub = sinon.stub(@collection, 
+                                    'freshModels', 
+                                    -> ['new', 'models'])  
+      @message = undefined  
+      @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
+        @message = message
+      )
     
     it 'collects all models that were never synced', ->
       @collection.syncModels()
-      expect(@freshModelsStub).toHaveBeenCalled()
+      expect(@freshModelsStub).toHaveBeenCalled()    
     
+    it 'publishes all fresh models to the server', ->
+      @collection.syncModels()
+      expect(@message.creates).toEqual(['new', 'models'])
     
-    it 'publishes all updated and fresh models to the server'
+    it 'publishes all updated models to the server', ->
+      @collection.syncModels(['updated', 'models'])
+      expect(@message.updates).toEqual(['updated', 'models'])
+      
     
   describe '#freshModels', ->
     beforeEach ->

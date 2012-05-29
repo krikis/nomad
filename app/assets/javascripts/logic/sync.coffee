@@ -4,7 +4,7 @@
       @fayeClient.publish
         client_id: Nomad.clientId
         model_name: @modelName
-        objects: changed      
+        changed: changed      
 
   changedModels: ->
     _(@models).chain().map((model) ->
@@ -19,8 +19,14 @@
       model?.rebase attributes
     @syncModels _(updated).compact()
     
-  syncModels: (models) ->
+  syncModels: (updated) ->
     fresh = @freshModels()
+    # if not (_.isEmpty(updated) and _.isEmpty(fresh))
+    @fayeClient.publish
+      client_id: Nomad.clientId
+      model_name: @modelName
+      updates: updated
+      creates: fresh
     
   freshModels: () ->
     _(@models).chain().map((model) ->

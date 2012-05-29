@@ -34,7 +34,7 @@ describe ServerSideClient do
       context 'and it responds to find_by_id' do
         let(:message) { {'client_id' => 'some_unique_id',
                          'model_name' => 'Post',
-                         'objects' => [{'id' => 'some_id',
+                         'changed' => [{'id' => 'some_id',
                                         'old_version' => 'some_version'}]} }
         before { Post.stub(:where).and_return([]) }
 
@@ -51,7 +51,7 @@ describe ServerSideClient do
         it 'publishes to the provided channel if there is no client_id' do
           client.should_receive(:publish).with('/sync/Post', an_instance_of(Hash))
           subject.on_server_message({'model_name' => 'Post',
-                                     'objects' => [{'id' => 'some_id',
+                                     'changed' => [{'id' => 'some_id',
                                                     'old_version' => 'some_version'}]})
         end
 
@@ -73,7 +73,7 @@ describe ServerSideClient do
 
       context 'and it does not respond to find_by_id' do
         let(:message) { {'model_name' => 'Rails',
-                         'objects' => [{'id' => 'some_id',
+                         'changed' => [{'id' => 'some_id',
                                         'old_version' => 'some_version'}]} }
         it 'does not try to collect objects' do
           Test.should_not_receive(:find_by_id)
@@ -85,7 +85,7 @@ describe ServerSideClient do
     context 'when the model in the message is no valid constant' do
       let(:model) { 'NotAnExistingConstant' }
       let(:message) { {'model_name' => model,
-                       'objects' => [{'id' => 'some_id',
+                       'changed' => [{'id' => 'some_id',
                                       'old_version' => 'some_version'}]} }
       it 'does not try to constantize it' do
         model.should_not_receive(:constantize)
