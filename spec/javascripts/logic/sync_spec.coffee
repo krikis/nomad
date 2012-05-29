@@ -1,5 +1,5 @@
 describe 'Sync', ->
-  describe '#changedObjects', ->
+  describe '#changedModels', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
@@ -10,7 +10,7 @@ describe 'Sync', ->
       @collection.models = [model]
 
     it 'collects the ids of all models with patches', ->
-      objects = @collection.changedObjects()
+      objects = @collection.changedModels()
       expect(objects).toEqual [{id: 'some_id', old_version: 'some_hash'}]
 
     it 'does not collect ids of models with no patches', ->
@@ -18,7 +18,7 @@ describe 'Sync', ->
         id: 'some_other_id'
         hasPatches: -> false
       @collection.models = [model]
-      expect(@collection.changedObjects()).not.toContain "some_other_id"
+      expect(@collection.changedModels()).not.toContain "some_other_id"
 
   describe '#prepareSync', ->
     beforeEach ->
@@ -29,11 +29,11 @@ describe 'Sync', ->
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
       )
-      @changedObjectsStub = sinon.stub(@collection, 'changedObjects', => [@changedObject])
+      @changedModelsStub = sinon.stub(@collection, 'changedModels', => [@changedObject])
 
     afterEach ->
       @publishStub.restore()
-      @changedObjectsStub.restore()      
+      @changedModelsStub.restore()      
 
     it 'publishes the model name to the server', ->
       @collection.prepareSync()
@@ -49,18 +49,16 @@ describe 'Sync', ->
 
   describe '#processUpdates', ->
     beforeEach ->
-      @rebaseStub = sinon.stub(Backbone.Model::, 'rebase')
+      @model = new Backbone.Model
+      @rebaseStub = sinon.stub(@model, 'rebase', -> @)
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
-      @getStub = sinon.stub(@collection, 'get', (id) ->
-        new Backbone.Model if id == 'id' 
+      @syncModelsStub = sinon.stub(@collection, 'syncModels')
+
+    it 'rebases each model that is found in the collection', ->  
+      @getStub = sinon.stub(@collection, 'get', (id) =>
+        @model if id == 'id' 
       )
-
-    afterEach ->
-      @rebaseStub.restore()
-      @getStub.restore()
-
-    it 'rebases each model that is found in the collection', ->
       @collection.processUpdates(
         id: {attribute: 'value'}
         other_id: {attribute: 'other_value'}
@@ -70,3 +68,25 @@ describe 'Sync', ->
         toHaveBeenCalledWith(attribute: 'other_value')
               
     it 'publishes each successfully updated model to the server', ->
+      @model = new Backbone.Model
+      @rebaseStub = sinon.stub(@model, 'rebase', -> 
+        @out ||= [false, @]
+        @out.pop()
+      )
+      @getStub = sinon.stub(@collection, 'get', => @model)
+      @collection.processUpdates(
+        id: {attribute: 'value'}
+        other_id: {attribute: 'other_value'}
+      )
+      expect(@syncModelsStub).toHaveBeenCalledWith([@model])
+      
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
