@@ -4,16 +4,25 @@
     unless @_versioning.oldVersion?
       previous = CryptoJS.SHA256(JSON.stringify @previousAttributes()).toString()
       @_versioning.oldVersion = previous
+      
+  isFresh: ->
+    not @_versioning?.synced
 
   hasPatches: ->
     @_versioning?.patches?.size() > 0
+    
+  oldVersion: ->
+    @_versioning?.oldVersion
+    
+  version: ->
+    @_versioning?.version || @_versioning?.oldVersion
 
   addPatch: ->
     @initVersioning()
     if @hasChanged() and @_versioning.synced
       @_versioning.patches ||= _([])
       @_versioning.patches.push @createPatch()
-      @setVersion()
+    @setVersion()
 
   createPatch: ->
     @dmp = new diff_match_patch
@@ -31,7 +40,7 @@
     dummy.set attributes
     if dummy.processPatches(@_versioning.patches)
       @set dummy
-      return true
+      return @
     false
 
   processPatches: (patches) ->
