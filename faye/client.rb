@@ -12,19 +12,40 @@ class ServerSideClient
   end
 
   def on_server_message(message)
-    error message.inspect
     if model = message['model_name'].safe_constantize
       if model.respond_to? :where
-        models = {}
-        message['changes'].each do |object|
-          object = model.where(['id is ? and version is not ?', object['id'], object['old_version']]).first
-          models[object.id] = object.to_json(:except => [:id, :version]) if object
-        end.compact
-        channel = "/sync/#{message['model_name']}"
-        channel += "/#{message['client_id']}" if message['client_id'].present?
-        @client.publish(channel, {'update' => models})
+        process_message(model, message)
       end
     end
+  end
+
+  def process_message(model, message)
+    error message.inspect
+    results = {}
+    results['update'] = handle_changes(model, message['changes'])
+    publish_results(message, results)
+  end
+
+  def handle_changes(model, changes)
+    objects = {}
+    changes.each do |change|
+      object = model.where(['id is ? and version is not ?',
+                           change['id'],
+                           change['old_version']]
+                          ).first
+      objects[object.id] = jsonify(object) if object
+    end
+    objects
+  end
+
+  def jsonify(object)
+    object.to_json(:except => [:id, :version])
+  end
+
+  def publish_results(message, results)
+    channel = "/sync/#{message['model_name']}"
+    channel += "/#{message['client_id']}" if message['client_id'].present?
+    @client.publish(channel, results)
   end
 
   def publish
