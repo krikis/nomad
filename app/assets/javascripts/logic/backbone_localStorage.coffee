@@ -62,10 +62,10 @@
       @save()
       model
       
-    saveVersioningFor: (model) ->  
-      if model._versioning?
-        @localStorage().setItem @versioningKeyFor(model),
-                                JSON.stringify(model._versioning)
+    saveVersioningFor: (model) -> 
+      model.initVersioning() 
+      @localStorage().setItem @versioningKeyFor(model),
+                              JSON.stringify(model._versioning)
 
     # Retrieve a model from `@data` by id.
     find: (model) ->
