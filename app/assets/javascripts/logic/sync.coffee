@@ -20,6 +20,7 @@
     @syncModels _(updated).compact()
     
   syncModels: (models) ->
+    fresh = @freshModels()
     
   freshModels: () ->
     _(@models).chain().map((model) ->

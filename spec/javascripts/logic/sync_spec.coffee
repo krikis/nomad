@@ -102,6 +102,7 @@ describe 'Sync', ->
     
     it 'collects all models that were never synced', ->
       @collection.syncModels()
+      expect(@freshModelsStub).toHaveBeenCalled()
     
     
     it 'publishes all updated and fresh models to the server'

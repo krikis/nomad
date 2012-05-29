@@ -99,6 +99,9 @@ describe 'FayeClient', ->
     it 'has the collection process the updates', ->      
       @subscriber.update(id: {attribute: 'value'})
       expect(@processUpdatesStub).toHaveBeenCalledWith(id: {attribute: 'value'})
+      
+  describe '#create', ->
+    it 'marks the created models as synced'
         
 
 
