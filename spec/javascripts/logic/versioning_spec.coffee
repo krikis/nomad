@@ -27,10 +27,6 @@ describe 'Versioning', ->
       @model.initVersioning()
       expect(@model._versioning.oldVersion).toEqual('some_hash')
       
-    it 'sets the current version on the model', ->
-      @model.initVersioning()
-      expect(@setVersionStub).toHaveBeenCalled()
-      
   describe '#isFresh', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -80,29 +76,35 @@ describe 'Versioning', ->
     
     it 'fetches the version property of the versioning object', ->
       expect(@model.version()).toEqual('some_hash')
+      
+    it 'returns the oldVersion property should version be undefined', ->
+      @model._versioning = {oldVersion: 'some_old_hash'}
+      expect(@model.version()).toEqual('some_old_hash')
 
   describe '#addPatch', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
-      @initVersioningSpy = sinon.spy(@model, 'initVersioning')
+      @model._versioning = 
+        oldVersion: 'some_hash'
+      @initVersioningStub = sinon.stub(@model, 'initVersioning')
+      @setVersionStub = sinon.stub(@model, 'setVersion')
       @patch = sinon.stub()
       @createPatchStub = sinon.stub(@model, 'createPatch', =>
         @patch
       )
 
-    afterEach ->
-      @initVersioningSpy.restore()
-      @createPatchStub.restore()
-
     it 'initializes _versioning', ->
       @model.addPatch()
-      expect(@initVersioningSpy).toHaveBeenCalled()
+      expect(@initVersioningStub).toHaveBeenCalled()
+
+    it 'sets the model\'s current version', ->
+      @model.addPatch()
+      expect(@setVersionStub).toHaveBeenCalled()
 
     context 'when the model has changed', ->
       beforeEach ->
         @changedStub = sinon.stub(@model, 'hasChanged', -> true)
-        @setVersionStub = sinon.stub(@model, 'setVersion')
 
       afterEach ->
         @changedStub.restore()
@@ -127,11 +129,6 @@ describe 'Versioning', ->
         it 'saves a patch for the update to _versioning.patches', ->
           @model.addPatch()
           expect(@model._versioning.patches.first()).toEqual @patch
-
-
-        it 'calls setVersion on the model', ->
-          @model.addPatch()
-          expect(@setVersionStub).toHaveBeenCalled()
 
   describe '#createPatch', ->
     beforeEach ->
