@@ -89,27 +89,17 @@ describe 'FayeClient', ->
       
   describe '#update', ->
     beforeEach ->
-      @rebaseStub = sinon.stub(Backbone.Model::, 'rebase')
+      @processUpdatesStub = sinon.stub(@collection, 'processUpdates')
       @subscriber = new BackboneSync.FayeClient @collection,
                                                 channel: @modelName
-      @getStub = sinon.stub(@collection, 'get', (id) ->
-        new Backbone.Model if id == 'id' 
-      )
       
     afterEach ->
-      @rebaseStub.restore()
-      @getStub.restore()
-    
-    it 'rebases each model that is found in the collection', ->
-      @subscriber.update(
-        id: {attribute: 'value'}
-        other_id: {attribute: 'other_value'}
-      )
-      expect(@rebaseStub).toHaveBeenCalledWith(attribute: 'value')
-      expect(@rebaseStub).not.
-        toHaveBeenCalledWith(attribute: 'other_value')
+      @processUpdatesStub.restore()
+      
+    it 'has the collection process the updates', ->      
+      @subscriber.update(id: {attribute: 'value'})
+      expect(@processUpdatesStub).toHaveBeenCalledWith(id: {attribute: 'value'})
         
-    it 'publishes each successfully updated model to the server', ->
 
 
 

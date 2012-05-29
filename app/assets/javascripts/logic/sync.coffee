@@ -11,6 +11,11 @@
         id: model.id
         old_version: model._versioning?.oldVersion
     ).compact().value()
+    
+  processUpdates: (models)->
+    _.each models, (attributes, id) =>
+      model = @get(id)
+      model?.rebase attributes
 
 # extend Backbone.Collection
 _.extend Backbone.Collection::, Sync

@@ -25,9 +25,7 @@ class @BackboneSync.FayeClient
       @[event] eventArguments
 
   update: (params) ->
-    _.each params, (attributes, id) =>
-      model = @collection.get(id)
-      model?.rebase attributes
+    @collection.processUpdates(params)
 
   create: (params) ->
     _.each params, (attributes, id) =>

@@ -1,5 +1,5 @@
 describe 'Sync', ->
-  describe 'changedObjects', ->
+  describe '#changedObjects', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
@@ -20,7 +20,7 @@ describe 'Sync', ->
       @collection.models = [model]
       expect(@collection.changedObjects()).not.toContain "some_other_id"
 
-  describe 'prepareSync', ->
+  describe '#prepareSync', ->
     beforeEach ->
       @message = undefined
       @changedObject = sinon.stub()
@@ -46,4 +46,27 @@ describe 'Sync', ->
     it 'publishes a list of changed objects to the server', ->
       @collection.prepareSync()
       expect(@message.objects).toEqual [@changedObject]
-      
+
+  describe '#processUpdates', ->
+    beforeEach ->
+      @rebaseStub = sinon.stub(Backbone.Model::, 'rebase')
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @getStub = sinon.stub(@collection, 'get', (id) ->
+        new Backbone.Model if id == 'id' 
+      )
+
+    afterEach ->
+      @rebaseStub.restore()
+      @getStub.restore()
+
+    it 'rebases each model that is found in the collection', ->
+      @collection.processUpdates(
+        id: {attribute: 'value'}
+        other_id: {attribute: 'other_value'}
+      )
+      expect(@rebaseStub).toHaveBeenCalledWith(attribute: 'value')
+      expect(@rebaseStub).not.
+        toHaveBeenCalledWith(attribute: 'other_value')
+              
+    it 'publishes each successfully updated model to the server', ->
