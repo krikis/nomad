@@ -14,11 +14,17 @@ describe 'sync', ->
       )
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'Post')
-      model =
+      fresh_model =
         id: 'some_id'
+        isFresh: -> true
+        hasPatches: -> false
+        version: -> 'some_hash'
+      synced_model =
+        id: 'some_id'
+        isFresh: -> false
         hasPatches: -> true
         oldVersion: -> 'some_hash'
-      @collection.models = [model]
+      @collection.models = [fresh_model, synced_model]
 
     afterEach ->
       @fayeClientStub.restore()
