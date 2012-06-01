@@ -51,7 +51,6 @@ describe 'Sync', ->
       @fresh_model = new Backbone.Model
         id: 'some_id'
         attribute: 'some_value'
-      @fresh_model.isSynced = -> false
       @fresh_model.version = -> 'some_hash'
       @synced_model =
         id: 'some_other_id'
@@ -65,6 +64,11 @@ describe 'Sync', ->
           attribute: 'some_value'
         version: 'some_hash'
       expect(@collection.freshModels()).toEqual([entry])
+      
+    it 'marks the models as synced if the markAsSynced option is set', ->  
+      expect(@fresh_model.isSynced()).toBeFalsy()
+      @collection.freshModels(markAsSynced: true)
+      expect(@fresh_model.isSynced()).toBeTruthy()
 
   describe '#changedModels', ->
     beforeEach ->

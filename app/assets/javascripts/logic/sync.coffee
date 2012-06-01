@@ -7,10 +7,10 @@
         creates: fresh
         changes: changed
 
-  freshModels: () ->
+  freshModels: (options = {}) ->
     _(@models).chain().map((model) ->
       if not model.isSynced()
-        window.m = model
+        model.markAsSynced() if options.markAsSynced
         json = model.toJSON()
         delete json.id
         id: model.id
