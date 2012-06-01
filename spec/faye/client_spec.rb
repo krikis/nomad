@@ -112,8 +112,8 @@ describe ServerSideClient do
     end
 
     it 'collects for each object an updated version if any' do
-      model.should_receive(:where).with(['id is ? and version is not ?', 'some_id', 'some_version'])
-      model.should_receive(:where).with(['id is ? and version is not ?', 'other_id', 'other_version'])
+      model.should_receive(:where).with(['remote_id is ? and remote_version is not ?', 'some_id', 'some_version'])
+      model.should_receive(:where).with(['remote_id is ? and remote_version is not ?', 'other_id', 'other_version'])
       subject.handle_changes(model, changes)
     end
 
@@ -143,13 +143,13 @@ describe ServerSideClient do
     end
 
     it 'checks if an object with the provided id already exists' do
-      model.should_receive(:where).with(:id => 'some_id')
+      model.should_receive(:where).with(:remote_id => 'some_id')
       subject.handle_creates(model, creates)
     end
 
     context 'when no such object exists' do
       it 'creates an object for each entry' do
-        model.should_receive(:create).with(:id => 'some_id')
+        model.should_receive(:create).with(:remote_id => 'some_id')
         subject.handle_creates(model, creates)
       end
 
@@ -189,7 +189,7 @@ describe ServerSideClient do
   describe '#jsonify' do
     it 'filters out the id and version attribute in the JSON' do
       object = stub(:id => 'some_id')
-      object.should_receive(:to_json).with(:except => [:id, :version])
+      object.should_receive(:to_json).with(:except => [:remote_id, :remote_version])
       subject.jsonify(object)
     end
   end

@@ -29,7 +29,7 @@ class ServerSideClient
   def handle_changes(model, changes)
     objects = {}
     changes.each do |change|
-      object = model.where(['id is ? and version is not ?',
+      object = model.where(['remote_id is ? and remote_version is not ?',
                            change['id'],
                            change['old_version']]
                           ).first
@@ -41,8 +41,8 @@ class ServerSideClient
   def handle_creates(model, creates)
     conflicts = acks = []
     creates.each do |create|
-      if model.where(:id => create['id']).blank?
-        object = model.create(:id => create['id'])
+      if model.where(:remote_id => create['id']).blank?
+        object = model.create(:remote_id => create['id'])
         object.update_attributes(create['attributes'])
         object.update_attribute(:remote_version, create['version'])
         acks << create['id']
@@ -54,7 +54,7 @@ class ServerSideClient
   end
 
   def jsonify(object)
-    object.to_json(:except => [:id, :version])
+    object.to_json(:except => [:remote_id, :remote_version])
   end
 
   def publish_results(message, results)
