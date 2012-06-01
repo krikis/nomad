@@ -45,13 +45,13 @@ class ServerSideClient
 
   def handle_creates(model, creates)
     conflicts = []
-    acks = []
+    acks = {}
     creates.each do |create|
       if model.where(:remote_id => create['id']).blank?
         object = model.create(:remote_id => create['id'])
         object.update_attributes(create['attributes'])
         object.update_attribute(:remote_version, create['version'])
-        acks << create['id']
+        acks[create['id']] = create['version']
       else
         conflicts << create['id']
       end

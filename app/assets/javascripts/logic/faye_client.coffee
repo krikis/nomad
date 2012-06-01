@@ -32,6 +32,11 @@ class @BackboneSync.FayeClient
   conflict: (params) ->
     
   ack: (params) -> 
+    _.each params, (version, id) =>
+      console.log version
+      console.log id
+      model = @collection.get(id)
+      model?.forwardTo(version)
 
   create: (params) ->
     _.each params, (attributes, id) =>

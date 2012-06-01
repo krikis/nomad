@@ -119,6 +119,19 @@ describe 'FayeClient', ->
     it 'has the collection process the updates', ->
       @backboneClient.update(id: {attribute: 'value'})
       expect(@processUpdatesStub).toHaveBeenCalledWith(id: {attribute: 'value'})
+      
+  describe '#ack', ->
+    beforeEach ->
+      @model = new Backbone.Model
+      @forwardToStub = sinon.stub(@model, 'forwardTo')
+      @getStub = sinon.stub(@collection, 'get', => @model)
+      @backboneClient = new BackboneSync.FayeClient @collection,
+                                                    modelName: @modelName
+    
+    it 'forwards the model to the version provided', ->
+      @backboneClient.ack(some_id: 'some_version')
+      expect(@forwardToStub).toHaveBeenCalledWith('some_version')
+      
 
 
 
