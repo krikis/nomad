@@ -25,6 +25,13 @@ guard 'shell' do
   # watch(%r{file/path}) { `command(s)` }
 end
 
+class DbCleaner
+  def call(guard_class, event, *args)
+    puts 'Resetting sqlite3 test db...'
+    `cp db/test.sqlite3.clean db/test.sqlite3`
+  end
+end
+
 guard 'jasmine', :console => :always, :errors => :always do
   watch(%r{spec/javascripts/helpers/.*(js\.coffee|js|coffee)$})    { 'spec/javascripts' }
   watch(%r{spec/javascripts/spec\.(js\.coffee|js|coffee)$})        { 'spec/javascripts' }
@@ -32,6 +39,8 @@ guard 'jasmine', :console => :always, :errors => :always do
   watch(%r{spec/javascripts/.+_spec\.(js\.coffee|js|coffee)$})
   watch(%r{app/assets/javascripts/(.+?)\.(js\.coffee|js|coffee)$}) { |m| "spec/javascripts/#{m[1]}_spec.#{m[2]}" }
   watch(%r{app/assets/javascripts/templates/(.+?)\.hamlc$})        { |m| "spec/javascripts/views/#{m[1]}_view_spec.coffee" }
+  Hook.reset_callbacks!
+  callback(DbCleaner.new, [:start_begin, :run_all_begin, :reload_begin, :run_on_change_begin])
 end
 
 guard 'rspec', :version => 2, :cli => "--drb -f Fuubar --colour" do
