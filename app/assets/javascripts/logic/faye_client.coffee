@@ -31,7 +31,7 @@ class @BackboneSync.FayeClient
     
   conflict: (params) ->
     
-  ack: (params) ->
+  ack: (params) -> 
 
   create: (params) ->
     _.each params, (attributes, id) =>

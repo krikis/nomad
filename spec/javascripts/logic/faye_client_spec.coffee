@@ -45,24 +45,24 @@ describe 'FayeClient', ->
     beforeEach ->
       @backboneClient = new BackboneSync.FayeClient @collection,
                                                     modelName: @modelName
-                                                
-    it 'adds the Nomad client id to the message', ->                                                
-      message = {}       
+
+    it 'adds the Nomad client id to the message', ->
+      message = {}
       @backboneClient.publish(message)
       expect(message.client_id).toEqual(Nomad.clientId)
-      
-    it 'adds the model name to the message', ->                                                
-      message = {}       
+
+    it 'adds the model name to the message', ->
+      message = {}
       @backboneClient.publish(message)
       expect(message.model_name).toEqual(@backboneClient.modelName)
 
     it 'preserves client_id if it is already set', ->
-      message = {client_id: 'preset_id'}       
+      message = {client_id: 'preset_id'}
       @backboneClient.publish(message)
       expect(message.client_id).toEqual('preset_id')
 
     it 'preserves model_name if it is already set', ->
-      message = {model_name: 'preset_name'}       
+      message = {model_name: 'preset_name'}
       @backboneClient.publish(message)
       expect(message.model_name).toEqual('preset_name')
 
@@ -103,26 +103,23 @@ describe 'FayeClient', ->
         method_2:
           id: {attribute_2: 'receive'}
       expect(@backboneClient.method_1).
-        toHaveBeenCalledWith(id: {attribute_1: 'test'})    
+        toHaveBeenCalledWith(id: {attribute_1: 'test'})
       expect(@backboneClient.method_2).
         toHaveBeenCalledWith(id: {attribute_2: 'receive'})
-      
+
   describe '#update', ->
     beforeEach ->
       @processUpdatesStub = sinon.stub(@collection, 'processUpdates')
       @backboneClient = new BackboneSync.FayeClient @collection,
                                                     modelName: @modelName
-      
+
     afterEach ->
       @processUpdatesStub.restore()
-      
-    it 'has the collection process the updates', ->      
+
+    it 'has the collection process the updates', ->
       @backboneClient.update(id: {attribute: 'value'})
       expect(@processUpdatesStub).toHaveBeenCalledWith(id: {attribute: 'value'})
-      
-  describe '#create', ->
-    it 'marks the created models as synced'
-        
+
 
 
 
