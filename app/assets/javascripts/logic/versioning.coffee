@@ -63,6 +63,8 @@
     else
       false
       
+  forwardTo: ->
+      
   resetVersioning: ->
     @_versioning.patches = _([])
     @_versioning.oldVersion = @_versioning.version
