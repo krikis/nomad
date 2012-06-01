@@ -39,12 +39,18 @@ class ServerSideClient
   end
 
   def handle_creates(model, creates)
-    conflicts = {}
+    conflicts = acks = []
     creates.each do |create|
-      if model.where(:id => create['id'])
-
+      if model.where(:id => create['id']).blank?
+        object = model.create(:id => create['id'])
+        object.update_attributes(create['attributes'])
+        object.update_attribute(:remote_version, create['version'])
+        acks << create['id']
+      else
+        conflicts << create['id']
       end
     end
+    [conflicts, acks]
   end
 
   def jsonify(object)
