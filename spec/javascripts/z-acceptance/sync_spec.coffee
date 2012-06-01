@@ -9,8 +9,9 @@ describe 'sync', ->
   describe 'preSync', ->
     beforeEach ->
       window.receive_called = false
+      originalReceive = BackboneSync.FayeClient::receive
       @fayeReceiveStub = sinon.stub(BackboneSync.FayeClient::, 'receive', (message) ->
-        console.log message
+        originalReceive.apply(@, arguments)
         window.receive_called = true
       )
       class Post extends Backbone.Model
@@ -18,19 +19,10 @@ describe 'sync', ->
         model: Post
       @collection = new TestCollection
       @fayePublishSpy = sinon.spy(@collection.fayeClient, 'publish')
-      fresh_model = new Post
-        id: 'some_id'
+      @fresh_model = new Post
         title: 'some_title'
         content: 'some_content'
-      fresh_model.isFresh = -> true
-      fresh_model.hasPatches = -> false
-      fresh_model.version = -> 'some_hash'
-      synced_model = new Post
-        id: 'some_id'
-      synced_model.isFresh = -> false
-      synced_model.hasPatches = -> true
-      synced_model.version = -> 'some_hash'
-      @collection.models = [fresh_model, synced_model]
+      @collection.create @fresh_model
 
     afterEach ->
       @fayePublishSpy.restore()
@@ -44,4 +36,4 @@ describe 'sync', ->
         window.receive_called
       ), 'receive to get called', 5000
       runs ->
-        expect(@fayeReceiveStub).toHaveBeenCalledWith({ update: {}, conflict: [], ack: ['some_id'] })
+        expect(@fayeReceiveStub).toHaveBeenCalledWith({ conflict: [], ack: [@fresh_model.id] })

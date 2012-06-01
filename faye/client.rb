@@ -12,7 +12,6 @@ class ServerSideClient
   end
 
   def on_server_message(message)
-    error message.inspect
     if model = message['model_name'].safe_constantize
       if model.respond_to? :where
         process_message(model, message)
