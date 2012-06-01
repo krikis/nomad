@@ -27,14 +27,14 @@ describe 'Versioning', ->
       @model.initVersioning()
       expect(@model._versioning.oldVersion).toEqual('some_hash')
       
-  describe '#isFresh', ->
+  describe '#isSynced', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('model')
     
-    it 'returns whether the model has not been synced yet', ->
-      @model._versioning = {synced: false}
-      expect(@model.isFresh()).toBeTruthy()
+    it 'returns whether the model has been synced yet', ->
+      @model._versioning = {synced: true}
+      expect(@model.isSynced()).toBeTruthy()
 
   describe '#hasPatches', ->
     beforeEach ->

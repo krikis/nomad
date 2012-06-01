@@ -51,11 +51,11 @@ describe 'Sync', ->
       @fresh_model = new Backbone.Model
         id: 'some_id'
         attribute: 'some_value'
-      @fresh_model.isFresh = -> true
+      @fresh_model.isSynced = -> false
       @fresh_model.version = -> 'some_hash'
       @synced_model =
         id: 'some_other_id'
-        isFresh: -> false
+        isSynced: -> true
       @collection.models = [@fresh_model, @synced_model]
 
     it 'collects id, JSON and version of all models that were never synced', ->

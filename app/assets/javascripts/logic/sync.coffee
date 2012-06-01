@@ -9,7 +9,7 @@
 
   freshModels: () ->
     _(@models).chain().map((model) ->
-      if model.isFresh()
+      if not model.isSynced()
         window.m = model
         json = model.toJSON()
         delete json.id
