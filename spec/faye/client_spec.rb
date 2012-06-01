@@ -108,10 +108,11 @@ describe ServerSideClient do
                      {'id' => 'other_id',
                       'old_version' => 'other_version'}] }
     let(:model)   { TestModel }
-    let(:object)  { stub(:remote_id => 'some_id') }
+    let(:object)  { stub(:attributes => {},
+                         :remote_id => 'some_id') }
     before do
       TestModel.stub(:where).and_return([object], [])
-      subject.stub(:jsonify => 'some_json')
+      subject.stub(:json_for => 'some_json')
     end
 
     it 'collects for each object an updated version if any' do
@@ -121,7 +122,7 @@ describe ServerSideClient do
     end
 
     it 'collects the JSON of all found objects' do
-      subject.should_receive(:jsonify).with(object).once()
+      subject.should_receive(:json_for).with(object).once()
       subject.handle_changes(model, changes)
     end
 
@@ -191,11 +192,14 @@ describe ServerSideClient do
     end
   end
 
-  describe '#jsonify' do
+  describe '#json_for' do
     it 'filters out the id, remote_id and remote_version attribute in the JSON' do
-      object = stub
-      object.should_receive(:to_json).with(:except => [:id, :remote_id, :remote_version])
-      subject.jsonify(object)
+      object = stub(:attributes => {:attribute => 'value',
+                                    :id => 1,
+                                    :remote_id => 'some_id',
+                                    :remote_version => 'some_hash'})
+      json = subject.json_for(object)
+      json.should eq({:attribute => 'value'})
     end
   end
 
