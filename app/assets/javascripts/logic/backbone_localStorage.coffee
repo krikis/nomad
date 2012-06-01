@@ -31,11 +31,11 @@
     # Generate a pseudo-GUID by concatenating random hexadecimal.
     guid: ->
       S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4()
-      
+
     # Generates the key a model is stored with in localStorage
     storageKeyFor: (model) ->
       "#{@name}-#{if _.isObject(model) then model.id else model}"
-      
+
     # Generates the key a model's versioning is stored with in localStorage
     versioningKeyFor: (model) ->
       "#{@storageKeyFor(model)}-versioning"
@@ -61,9 +61,9 @@
         @records.push model.id.toString()
       @save()
       model
-      
-    saveVersioningFor: (model) -> 
-      model.initVersioning() 
+
+    saveVersioningFor: (model) ->
+      model.initVersioning()
       @localStorage().setItem @versioningKeyFor(model),
                               JSON.stringify(model._versioning)
 
@@ -141,7 +141,7 @@
   # Override 'Backbone.sync' to default to localSync,
   # the original 'Backbone.sync' is still available in 'Backbone.ajaxSync'
   Backbone.sync = (method, model, options, error) ->
-    Backbone.getSyncMethod(model).apply @, [ method, model, options, error ]
-    return
+    return Backbone.getSyncMethod(model).apply @, [ method, model, options, error ]
+
   return
 )()
