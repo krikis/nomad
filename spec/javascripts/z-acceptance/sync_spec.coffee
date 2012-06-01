@@ -36,7 +36,9 @@ describe 'sync', ->
         window.receive_called
       ), 'receive to get called', 5000
       runs ->
-        expect(@fayeReceiveStub).toHaveBeenCalledWith(conflict: [], ack: [@model.id])
+        acks = {}
+        acks[@model.id] = @model.version()
+        expect(@fayeReceiveStub).toHaveBeenCalledWith(conflict: [], ack: acks)
 
   describe 'syncing a changed object to the server', ->
     beforeEach ->
@@ -58,7 +60,7 @@ describe 'sync', ->
 
     afterEach ->
       @fayeUpdateStub.restore()
-  
+
     it 'publishes a list of changed objects to the server
         and receives a list of concurrently changed objects back', ->
       runs ->
