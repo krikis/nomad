@@ -83,7 +83,6 @@ describe ServerSideClient do
     end
 
     it 'handles creates' do
-
     end
 
     it 'handles updates' do
@@ -113,8 +112,8 @@ describe ServerSideClient do
     end
 
     it 'collects for each object an updated version if any' do
-      TestModel.should_receive(:where).with(['id is ? and version is not ?', 'some_id', 'some_version'])
-      TestModel.should_receive(:where).with(['id is ? and version is not ?', 'other_id', 'other_version'])
+      model.should_receive(:where).with(['id is ? and version is not ?', 'some_id', 'some_version'])
+      model.should_receive(:where).with(['id is ? and version is not ?', 'other_id', 'other_version'])
       subject.handle_changes(model, changes)
     end
 
@@ -126,6 +125,44 @@ describe ServerSideClient do
     it 'returns a hash with ids for keys and json for values' do
       subject.handle_changes(model, changes).
         should eq({'some_id' => 'some_json'})
+    end
+  end
+
+  describe '#handle_creates' do
+    let(:creates) { [{'id' => 'some_id',
+                      'old_version' => 'some_version'}] }
+    let(:model)   { TestModel }
+    let(:object)  { stub(:update_attributes) }
+    before do
+      model.stub(:where).and_return([])
+      model.stub(:create).and_return(object)
+    end
+
+    it 'checks if an object with the provided id already exists' do
+      model.should_receive(:where).with(:id => 'some_id')
+      subject.handle_creates(model, creates)
+    end
+
+    context 'when no such object exists' do
+      it 'creates an object for each entry' do
+        # subject.should_receive(:create).with(:id => 'some_id')
+      end
+
+      it 'updates the obect with the attributes provided' do
+
+      end
+    end
+
+    context 'when such object exists' do
+      before { TestModel.stub(:where).and_return([]) }
+
+      it 'does not create the object' do
+
+      end
+
+      it 'returns the conflicting id' do
+
+      end
     end
   end
 

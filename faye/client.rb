@@ -38,6 +38,15 @@ class ServerSideClient
     objects
   end
 
+  def handle_creates(model, creates)
+    conflicts = {}
+    creates.each do |create|
+      if model.where(:id => create['id'])
+
+      end
+    end
+  end
+
   def jsonify(object)
     object.to_json(:except => [:id, :version])
   end
