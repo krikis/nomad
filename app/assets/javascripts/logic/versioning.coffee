@@ -4,6 +4,10 @@
     unless @_versioning.oldVersion?
       previous = CryptoJS.SHA256(JSON.stringify @previousAttributes()).toString()
       @_versioning.oldVersion = previous
+
+  markAsSynced: ->
+    @initVersioning() unless @_versioning
+    @_versioning.synced = true
       
   isSynced: ->
     @_versioning?.synced

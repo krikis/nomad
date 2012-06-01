@@ -27,6 +27,20 @@ describe 'Versioning', ->
       @model.initVersioning()
       expect(@model._versioning.oldVersion).toEqual('some_hash')
       
+  describe '#markAsSynced', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('model')
+      
+    it 'initializes versioning if not already', ->  
+      expect(@model._versioning).toBeUndefined()
+      @model.markAsSynced()
+      expect(@model._versioning).toBeDefined()
+      
+    it 'sets the synced property on the versioning object to true', ->
+      @model.markAsSynced()
+      expect(@model._versioning.synced).toBeTruthy()
+      
   describe '#isSynced', ->
     beforeEach ->
       class TestModel extends Backbone.Model
