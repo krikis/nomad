@@ -69,31 +69,34 @@ describe ServerSideClient do
   end
 
   describe '#process_message' do
-    let(:message) { {'changes' => [{'id' => 'some_id',
-                                    'old_version' => 'some_version'}]} }
     let(:model)   { TestModel }
     before do
       subject.stub(:handle_changes)
       subject.stub(:publish_results)
     end
 
-    it 'handles changes' do
+    it 'handles changes if present' do
+      message = {'changes' => [{}]}
       subject.should_receive(:handle_changes).with(model, message['changes'])
       subject.process_message(model, message)
     end
 
-    it 'handles creates' do
+    it 'handles creates if present' do
+      message = {'creates' => [{}]}
+      subject.should_receive(:handle_creates).with(model, message['creates'])
+      subject.process_message(model, message)
     end
 
-    it 'handles updates' do
+    it 'handles updates if present' do
 
     end
 
-    it 'handles destroys' do
+    it 'handles destroys if present' do
 
     end
 
     it 'publishes the results' do
+      message = {}
       subject.should_receive(:publish_results).with(message, an_instance_of(Hash))
       subject.process_message(model, message)
     end
@@ -102,8 +105,8 @@ describe ServerSideClient do
   describe '#handle_changes' do
     let(:changes) { [{'id' => 'some_id',
                       'old_version' => 'some_version'},
-                      {'id' => 'other_id',
-                       'old_version' => 'other_version'}] }
+                     {'id' => 'other_id',
+                      'old_version' => 'other_version'}] }
     let(:model)   { TestModel }
     let(:object)  { stub(:id => 'some_id') }
     before do

@@ -14,7 +14,7 @@
         json = model.toJSON()
         delete json.id
         id: model.id
-        attributes: JSON.stringify(json)
+        attributes: json
         version: model.version()
     ).compact().value()
 

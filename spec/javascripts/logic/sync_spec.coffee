@@ -7,21 +7,21 @@ describe 'Sync', ->
       @collection = new TestCollection([], modelName: 'TestModel')
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
-      ) 
-    
-    context 'when there are fresh models', ->  
+      )
+
+    context 'when there are fresh models', ->
       beforeEach ->
         @freshModelsStub = sinon.
           stub(@collection, 'freshModels', -> ['new', 'models'])
 
       it 'collects all models that were never synced', ->
         @collection.preSync()
-        expect(@freshModelsStub).toHaveBeenCalled()    
+        expect(@freshModelsStub).toHaveBeenCalled()
 
       it 'publishes all fresh models to the server', ->
         @collection.preSync()
         expect(@message.creates).toEqual(['new', 'models'])
-      
+
     context 'when there are changed models', ->
       beforeEach ->
         @changedModelsStub = sinon.
@@ -34,12 +34,12 @@ describe 'Sync', ->
       it 'publishes a list of changed models to the server', ->
         @collection.preSync()
         expect(@message.changes).toEqual(['changed', 'models'])
-      
+
     context 'when there are no fresh or changed models', ->
       beforeEach ->
         @freshModelsStub = sinon.stub(@collection, 'freshModels', -> [])
         @changedModelsStub = sinon.stub(@collection, 'changedModels', => [])
-        
+
       it 'does not publish to the server', ->
         @collection.preSync()
         expect(@publishStub).not.toHaveBeenCalled()
@@ -49,22 +49,23 @@ describe 'Sync', ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @fresh_model = new Backbone.Model
-        id: 'some_id' 
+        id: 'some_id'
         attribute: 'some_value'
       @fresh_model.isFresh = -> true
       @fresh_model.version = -> 'some_hash'
-      @synced_model = 
+      @synced_model =
         id: 'some_other_id'
         isFresh: -> false
-      @collection.models = [@fresh_model, @synced_model]       
+      @collection.models = [@fresh_model, @synced_model]
 
     it 'collects id, JSON and version of all models that were never synced', ->
-      entry = 
+      entry =
         id: 'some_id'
-        attributes: '{"attribute":"some_value"}'
+        attributes:
+          attribute: 'some_value'
         version: 'some_hash'
       expect(@collection.freshModels()).toEqual([entry])
-  
+
   describe '#changedModels', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
@@ -94,9 +95,9 @@ describe 'Sync', ->
       @collection = new TestCollection([], modelName: 'TestModel')
       @syncUpdatesStub = sinon.stub(@collection, 'syncUpdates')
 
-    it 'rebases each model that is found in the collection', ->  
+    it 'rebases each model that is found in the collection', ->
       @getStub = sinon.stub(@collection, 'get', (id) =>
-        @model if id == 'id' 
+        @model if id == 'id'
       )
       @collection.processUpdates(
         id: {attribute: 'value'}
@@ -105,10 +106,10 @@ describe 'Sync', ->
       expect(@rebaseStub).toHaveBeenCalledWith(attribute: 'value')
       expect(@rebaseStub).not.
         toHaveBeenCalledWith(attribute: 'other_value')
-              
+
     it 'publishes all successfully updated models to the server', ->
       @model = new Backbone.Model
-      @rebaseStub = sinon.stub(@model, 'rebase', -> 
+      @rebaseStub = sinon.stub(@model, 'rebase', ->
         @out ||= [false, @]
         @out.pop()
       )
@@ -118,27 +119,27 @@ describe 'Sync', ->
         other_id: {attribute: 'other_value'}
       )
       expect(@syncUpdatesStub).toHaveBeenCalledWith([@model])
-      
+
   describe '#syncUpdates', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
-      @message = undefined  
+      @message = undefined
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
       )
-    
+
     it 'publishes all updated models to the server', ->
       @collection.syncUpdates(['updated', 'models'])
       expect(@message.updates).toEqual(['updated', 'models'])
-      
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
+
+
+
+
+
+
+
+
+
+
+

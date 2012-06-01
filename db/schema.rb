@@ -16,9 +16,10 @@ ActiveRecord::Schema.define(:version => 20120420085920) do
   create_table "posts", :force => true do |t|
     t.string   "title"
     t.string   "content"
-    t.string   "version"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.string   "remote_id"
+    t.string   "remote_version"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
   end
 
   create_table "tasks", :force => true do |t|

@@ -12,6 +12,7 @@ class ServerSideClient
   end
 
   def on_server_message(message)
+    error message.inspect
     if model = message['model_name'].safe_constantize
       if model.respond_to? :where
         process_message(model, message)
@@ -20,9 +21,14 @@ class ServerSideClient
   end
 
   def process_message(model, message)
-    error message.inspect
     results = {}
-    results['update'] = handle_changes(model, message['changes'])
+    if message['changes'].present?
+      results['update'] = handle_changes(model, message['changes'])
+    end
+    if message['creates'].present?
+      results['conflict'], results['ack'] =
+        handle_creates(model, message['creates'])
+    end
     publish_results(message, results)
   end
 
@@ -65,7 +71,7 @@ class ServerSideClient
 
   def publish
     EM.add_periodic_timer(30) {
-      @client.publish('/sync/Post', 'hello' => 'world')
+      @client.publish('/sync/some_channel', 'hello' => 'world')
     }
   end
 end

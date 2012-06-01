@@ -3,7 +3,8 @@ class CreatePosts < ActiveRecord::Migration
     create_table :posts do |t|
       t.string :title
       t.string :content
-      t.string :version
+      t.string :remote_id
+      t.string :remote_version
 
       t.timestamps
     end

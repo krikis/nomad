@@ -28,6 +28,10 @@ class @BackboneSync.FayeClient
 
   update: (params) ->
     @collection.processUpdates(params)
+    
+  conflict: (params) ->
+    
+  ack: (params) ->
 
   create: (params) ->
     _.each params, (attributes, id) =>

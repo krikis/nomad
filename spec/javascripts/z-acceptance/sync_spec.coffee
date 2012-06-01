@@ -6,28 +6,35 @@ describe 'sync', ->
       delete window.client
       window.acceptance_client = true
 
-  describe 'preSync', ->  
+  describe 'preSync', ->
     beforeEach ->
       window.receive_called = false
-      @fayeClientStub = sinon.stub(BackboneSync.FayeClient::, 'receive', (message) ->
+      @fayeReceiveStub = sinon.stub(BackboneSync.FayeClient::, 'receive', (message) ->
+        console.log message
         window.receive_called = true
       )
+      class Post extends Backbone.Model
       class TestCollection extends Backbone.Collection
-      @collection = new TestCollection([], modelName: 'Post')
-      fresh_model =
+        model: Post
+      @collection = new TestCollection
+      @fayePublishSpy = sinon.spy(@collection.fayeClient, 'publish')
+      fresh_model = new Post
         id: 'some_id'
-        isFresh: -> true
-        hasPatches: -> false
-        version: -> 'some_hash'
-      synced_model =
+        title: 'some_title'
+        content: 'some_content'
+      fresh_model.isFresh = -> true
+      fresh_model.hasPatches = -> false
+      fresh_model.version = -> 'some_hash'
+      synced_model = new Post
         id: 'some_id'
-        isFresh: -> false
-        hasPatches: -> true
-        oldVersion: -> 'some_hash'
+      synced_model.isFresh = -> false
+      synced_model.hasPatches = -> true
+      synced_model.version = -> 'some_hash'
       @collection.models = [fresh_model, synced_model]
 
     afterEach ->
-      @fayeClientStub.restore()
+      @fayePublishSpy.restore()
+      @fayeReceiveStub.restore()
 
     it 'publishes a list of changed objects to the server
         and receives a list of concurrently changed objects back', ->
@@ -37,4 +44,4 @@ describe 'sync', ->
         window.receive_called
       ), 'receive to get called', 5000
       runs ->
-        expect(@fayeClientStub).toHaveBeenCalledWith({update: {}})
+        expect(@fayeReceiveStub).toHaveBeenCalledWith({update: {}})
