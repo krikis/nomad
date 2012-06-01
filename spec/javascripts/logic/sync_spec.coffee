@@ -48,18 +48,20 @@ describe 'Sync', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
-      @fresh_model = 
+      @fresh_model = new Backbone.Model
         id: 'some_id' 
-        isFresh: -> true
-        version: -> 'some_hash'
+        attribute: 'some_value'
+      @fresh_model.isFresh = -> true
+      @fresh_model.version = -> 'some_hash'
       @synced_model = 
         id: 'some_other_id'
         isFresh: -> false
       @collection.models = [@fresh_model, @synced_model]       
 
-    it 'collects JSON and version of all models that were never synced', ->
+    it 'collects id, JSON and version of all models that were never synced', ->
       entry = 
-        model: '{"id":"some_id"}'
+        id: 'some_id'
+        attributes: '{"attribute":"some_value"}'
         version: 'some_hash'
       expect(@collection.freshModels()).toEqual([entry])
   

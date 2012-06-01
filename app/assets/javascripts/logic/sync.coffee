@@ -10,7 +10,11 @@
   freshModels: () ->
     _(@models).chain().map((model) ->
       if model.isFresh()
-        model: JSON.stringify(model)
+        window.m = model
+        json = model.toJSON()
+        delete json.id
+        id: model.id
+        attributes: JSON.stringify(json)
         version: model.version()
     ).compact().value()
 
