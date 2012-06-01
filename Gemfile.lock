@@ -270,7 +270,7 @@ DEPENDENCIES
   libnotify
   poltergeist
   pry
-  rails
+  rails (= 3.2.5)
   rails-backbone
   rb-fsevent
   rb-inotify
