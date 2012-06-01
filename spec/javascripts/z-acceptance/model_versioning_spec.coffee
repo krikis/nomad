@@ -24,6 +24,9 @@ describe 'modelVersioning', ->
 
     it 'adds a version hash to it', ->
       expect(@model._versioning?.version).toBeDefined()
+      
+    it 'can be found within the model', ->
+      expect(@collection.get(@model)).toEqual(@model)
 
     context 'and it changed but was never synced', ->
       beforeEach ->
@@ -67,7 +70,6 @@ describe 'modelVersioning', ->
 
     it 'does not add a version hash to it', ->
       expect(@model._versioning?.version).toBeUndefined()
-
 
 
 

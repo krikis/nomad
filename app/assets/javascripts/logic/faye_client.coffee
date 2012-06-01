@@ -33,8 +33,6 @@ class @BackboneSync.FayeClient
     
   ack: (params) -> 
     _.each params, (version, id) =>
-      console.log version
-      console.log id
       model = @collection.get(id)
       model?.forwardTo(version)
 
