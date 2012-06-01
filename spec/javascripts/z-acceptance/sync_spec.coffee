@@ -6,7 +6,7 @@ describe 'sync', ->
       delete window.client
       window.acceptance_client = true
 
-  describe 'sync a newly created object to the server', ->
+  describe 'syncing a newly created object to the server', ->
     beforeEach ->
       # create a wrapper around the receive method so that it sets window.receive_called
       window.receive_called = false
@@ -36,31 +36,39 @@ describe 'sync', ->
         window.receive_called
       ), 'receive to get called', 5000
       runs ->
-        expect(@fayeReceiveStub).toHaveBeenCalledWith({ conflict: [], ack: [@model.id] })
+        expect(@fayeReceiveStub).toHaveBeenCalledWith(conflict: [], ack: [@model.id])
 
+  describe 'syncing a changed object to the server', ->
+    beforeEach ->
+      # create a wrapper around the update method so that it sets window.update_called
+      window.update_called = false
+      originalUpdate = BackboneSync.FayeClient::update
+      @fayeUpdateStub = sinon.stub(BackboneSync.FayeClient::, 'update', (params) ->
+        originalUpdate.apply(@, arguments)
+        window.update_called = true
+      )
+      class Post extends Backbone.Model
+      class TestCollection extends Backbone.Collection
+        model: Post
+      @collection = new TestCollection
+      @model = new Post
+        title: 'some_title'
+        content: 'some_content'
+      @collection.create @model
 
-
-  # describe 'sync a changed object to the server', ->
-  #   beforeEach ->
-  #     class Post extends Backbone.Model
-  #     class TestCollection extends Backbone.Collection
-  #       model: Post
-  #     @collection = new TestCollection
-  #     @model = new Post
-  #       title: 'some_title'
-  #       content: 'some_content'
-  #     @collection.create @fresh_model
-  #
-  #   afterEach ->
-  #     @fayePublishSpy.restore()
-  #     @fayeReceiveStub.restore()
-  #
-  #   it 'publishes a list of changed objects to the server
-  #       and receives a list of concurrently changed objects back', ->
-  #     runs ->
-  #       @collection.preSync()
-  #     waitsFor (->
-  #       window.receive_called
-  #     ), 'receive to get called', 5000
-  #     runs ->
-  #       expect(@fayeReceiveStub).toHaveBeenCalledWith({ conflict: [], ack: [@fresh_model.id] })
+    afterEach ->
+      @fayeUpdateStub.restore()
+  
+    it 'publishes a list of changed objects to the server
+        and receives a list of concurrently changed objects back', ->
+      runs ->
+        @collection.preSync()
+        @model.save
+          title: 'other_title'
+          content: 'other_content'
+        @collection.preSync()
+      waitsFor (->
+        window.update_called
+      ), 'update to get called', 5000
+      runs ->
+        expect(@fayeUpdateStub).toHaveBeenCalledWith({})
