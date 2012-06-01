@@ -18,6 +18,10 @@ describe 'Sync', ->
         @collection.preSync()
         expect(@freshModelsStub).toHaveBeenCalled()
 
+      it 'marks all unsynced models as synced', ->
+        @collection.preSync()
+        expect(@freshModelsStub).toHaveBeenCalledWith(markAsSynced: true)
+
       it 'publishes all fresh models to the server', ->
         @collection.preSync()
         expect(@message.creates).toEqual(['new', 'models'])

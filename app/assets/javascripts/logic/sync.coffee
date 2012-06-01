@@ -1,6 +1,6 @@
 @Sync =
   preSync: ->
-    fresh = @freshModels()
+    fresh = @freshModels(markAsSynced: true)
     changed = @changedModels()
     if not (_.isEmpty(fresh) and _.isEmpty(changed))
       @fayeClient.publish
