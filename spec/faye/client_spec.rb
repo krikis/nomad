@@ -108,7 +108,7 @@ describe ServerSideClient do
                      {'id' => 'other_id',
                       'old_version' => 'other_version'}] }
     let(:model)   { TestModel }
-    let(:object)  { stub(:id => 'some_id') }
+    let(:object)  { stub(:remote_id => 'some_id') }
     before do
       TestModel.stub(:where).and_return([object], [])
       subject.stub(:jsonify => 'some_json')
@@ -192,9 +192,9 @@ describe ServerSideClient do
   end
 
   describe '#jsonify' do
-    it 'filters out the id and version attribute in the JSON' do
-      object = stub(:id => 'some_id')
-      object.should_receive(:to_json).with(:except => [:remote_id, :remote_version])
+    it 'filters out the id, remote_id and remote_version attribute in the JSON' do
+      object = stub
+      object.should_receive(:to_json).with(:except => [:id, :remote_id, :remote_version])
       subject.jsonify(object)
     end
   end

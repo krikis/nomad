@@ -38,7 +38,7 @@ class ServerSideClient
                            change['id'],
                            change['old_version']]
                           ).first
-      objects[object.id] = jsonify(object) if object
+      objects[object.remote_id] = jsonify(object) if object
     end
     objects
   end
@@ -60,7 +60,7 @@ class ServerSideClient
   end
 
   def jsonify(object)
-    object.to_json(:except => [:remote_id, :remote_version])
+    object.to_json(:except => [:id, :remote_id, :remote_version])
   end
 
   def publish_results(message, results)
