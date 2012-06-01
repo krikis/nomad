@@ -171,6 +171,7 @@ describe ServerSideClient do
       it 'returns an acknowledgement for the created object' do
         conflicts, acks = subject.handle_creates(model, creates)
         acks.should include('some_id')
+        conflicts.should be_blank
       end
     end
 
@@ -185,6 +186,7 @@ describe ServerSideClient do
       it 'returns the conflicting id' do
         conflicts, acks = subject.handle_creates(model, creates)
         conflicts.should include('some_id')
+        acks.should be_blank
       end
     end
   end

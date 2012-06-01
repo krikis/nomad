@@ -44,4 +44,4 @@ describe 'sync', ->
         window.receive_called
       ), 'receive to get called', 5000
       runs ->
-        expect(@fayeReceiveStub).toHaveBeenCalledWith({update: {}})
+        expect(@fayeReceiveStub).toHaveBeenCalledWith({ update: {}, conflict: [], ack: ['some_id'] })

@@ -45,7 +45,8 @@ class ServerSideClient
   end
 
   def handle_creates(model, creates)
-    conflicts = acks = []
+    conflicts = []
+    acks = []
     creates.each do |create|
       if model.where(:remote_id => create['id']).blank?
         object = model.create(:remote_id => create['id'])
