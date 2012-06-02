@@ -101,7 +101,7 @@ describe 'Versioning', ->
       @model = new TestModel
       @model._versioning = 
         oldVersion: 'some_hash'
-      @initVersioningStub = sinon.stub(@model, 'initVersioning')  
+      @initVersioningSpy = sinon.spy(@model, 'initVersioning')  
       @setVersionStub = sinon.stub(@model, 'setVersion')
       @patch = sinon.stub()
       @createPatchStub = sinon.stub(@model, 'createPatch', =>
@@ -109,11 +109,13 @@ describe 'Versioning', ->
       )
     
     afterEach ->  
+      @initVersioningSpy.restore()
       @setVersionStub.restore()
+      @createPatchStub.restore()
 
     it 'initializes _versioning', ->
       @model.addPatch()
-      expect(@initVersioningStub).toHaveBeenCalled()
+      expect(@initVersioningSpy).toHaveBeenCalled()
 
     it 'does not set the model\'s current version if it did not change', ->
       @model.addPatch()
@@ -145,6 +147,10 @@ describe 'Versioning', ->
           expect(@model._versioning?.patches).toBeDefined()
           expect(@model._versioning?.patches._wrapped).toBeDefined()
           expect(@model._versioning?.patches._wrapped.constructor.name).toEqual("Array")
+          
+        it 'creates a patch providing it with the model\'s oldVersion', ->
+          @model.addPatch()
+          expect(@createPatchStub).toHaveBeenCalledWith(@model.oldVersion())
 
         it 'saves a patch for the update to _versioning.patches', ->
           @model.addPatch()
@@ -159,9 +165,16 @@ describe 'Versioning', ->
       @model.attributes.values =
         v_1: "other_value_1"
         v_2: "value_2"
-      patch = @model.createPatch()
-      expect(patch).toContain 'other_'
-      expect(patch).not.toContain 'value_2'
+      out = @model.createPatch()
+      expect(out.patch_text).toContain 'other_'
+      expect(out.patch_text).not.toContain 'value_2'
+
+    it 'sets the model\'s current oldVersion with the newly created patch', ->
+      @model.attributes.values =
+        v_1: "other_value_1"
+        v_2: "value_2"
+      out = @model.createPatch('old_version')
+      expect(out.base).toEqual('old_version')
 
   describe '#setVersion', ->
     beforeEach ->
@@ -187,8 +200,8 @@ describe 'Versioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('answer')
-      @patch_text = sinon.stub
-      @model._versioning = {patches: _([@patch_text])}
+      @patches = sinon.stub
+      @model._versioning = {patches: @patches}
       @dummy = new TestModel
       @newModelStub = sinon.stub(TestModel::, 'constructor', => @dummy)
       @dummySetStub = sinon.stub(@dummy, 'set')
@@ -209,7 +222,7 @@ describe 'Versioning', ->
 
     it 'applies all patches to the dummy model', ->
       @model.rebase()
-      expect(@processPatchesStub).toHaveBeenCalledWith(@model._versioning.patches)
+      expect(@processPatchesStub).toHaveBeenCalledWith(@patches)
     
     context 'when all patches are successfully applied', ->
       it 'sets the dummy\'s attributes on the model', ->
@@ -241,7 +254,8 @@ describe 'Versioning', ->
       )
       
     it 'applies each patch to the model', ->
-      @model.processPatches(_(['some', 'patches']))
+      @model.processPatches(_([{patch_text: 'some'},
+                               {patch_text: 'patches'}]))
       expect(@applyPatchStub).toHaveBeenCalledWith('some')
       expect(@applyPatchStub).toHaveBeenCalledWith('patches')
       
@@ -319,7 +333,9 @@ describe 'Versioning', ->
         expect(@model.applyPatch()).toBeFalsy()
         
   describe '#forwardTo', ->
-
+    beforeEach -> 
+      class TestModel extends Backbone.Model
+      @model = new TestModel
 
     it 'removes all patches older than the version provided'
     

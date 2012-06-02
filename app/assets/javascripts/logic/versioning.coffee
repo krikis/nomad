@@ -27,15 +27,17 @@
       @setVersion()
       if @_versioning.synced
         @_versioning.patches ||= _([])
-        @_versioning.patches.push @createPatch()
+        @_versioning.patches.push @createPatch(@oldVersion())
 
-  createPatch: ->
+  createPatch: (base) ->
     @dmp = new diff_match_patch
     diff = @dmp.diff_main JSON.stringify(@previousAttributes()),
                           JSON.stringify(@)
     patch = @dmp.patch_make JSON.stringify(@previousAttributes()),
                             diff
-    @dmp.patch_toText(patch)
+    patch_text: @dmp.patch_toText(patch)
+    base: base
+    
 
   setVersion: ->
     @_versioning.version = CryptoJS.SHA256(JSON.stringify @).toString()
@@ -49,8 +51,8 @@
     false
 
   processPatches: (patches) ->
-    patches.all (patch_text) =>
-      @applyPatch(patch_text)
+    patches.all (patch) =>
+      @applyPatch(patch.patch_text)
 
   applyPatch: (patch_text) ->
     @dmp = new diff_match_patch
