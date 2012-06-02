@@ -44,10 +44,10 @@
     # have an id of it's own.
     create: (model) ->
       unless model.id
-        new_id = @guid()
+        model.id = @guid()
         # make sure the id is unique within the model's collection
-        new_id = @guid() while @find(id: new_id)?
-        model.set(model.idAttribute, new_id)
+        model.id = @guid() while @find(model)?
+        model.set(model.idAttribute, model.id)
       @localStorage().setItem @storageKeyFor(model), JSON.stringify(model)
       @records.push model.id.toString()
       @save()
