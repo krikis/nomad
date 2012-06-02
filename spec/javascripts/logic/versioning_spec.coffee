@@ -101,20 +101,23 @@ describe 'Versioning', ->
       @model = new TestModel
       @model._versioning = 
         oldVersion: 'some_hash'
-      @initVersioningStub = sinon.stub(@model, 'initVersioning')
+      @initVersioningStub = sinon.stub(@model, 'initVersioning')  
       @setVersionStub = sinon.stub(@model, 'setVersion')
       @patch = sinon.stub()
       @createPatchStub = sinon.stub(@model, 'createPatch', =>
         @patch
       )
+    
+    afterEach ->  
+      @setVersionStub.restore()
 
     it 'initializes _versioning', ->
       @model.addPatch()
       expect(@initVersioningStub).toHaveBeenCalled()
 
-    it 'sets the model\'s current version', ->
+    it 'does not set the model\'s current version if it did not change', ->
       @model.addPatch()
-      expect(@setVersionStub).toHaveBeenCalled()
+      expect(@setVersionStub).not.toHaveBeenCalled()
 
     context 'when the model has changed', ->
       beforeEach ->
@@ -122,7 +125,10 @@ describe 'Versioning', ->
 
       afterEach ->
         @changedStub.restore()
-        @setVersionStub.restore()
+
+      it 'sets the model\'s current version', ->
+        @model.addPatch()
+        expect(@setVersionStub).toHaveBeenCalled()
 
       it 'does not add a patch if the model was never synced before', ->
         @model.addPatch()
@@ -314,4 +320,8 @@ describe 'Versioning', ->
         
   describe '#forwardTo', ->
 
+
+    it 'removes all patches older than the version provided'
+    
+    it 'sets oldVersion to the version provided'
 

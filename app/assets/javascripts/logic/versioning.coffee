@@ -23,10 +23,11 @@
 
   addPatch: ->
     @initVersioning()
-    if @hasChanged() and @_versioning.synced
-      @_versioning.patches ||= _([])
-      @_versioning.patches.push @createPatch()
-    @setVersion()
+    if @hasChanged()
+      @setVersion()
+      if @_versioning.synced
+        @_versioning.patches ||= _([])
+        @_versioning.patches.push @createPatch()
 
   createPatch: ->
     @dmp = new diff_match_patch
