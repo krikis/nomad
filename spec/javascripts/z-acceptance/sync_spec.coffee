@@ -5,62 +5,39 @@ describe 'sync', ->
     unless window.acceptance_client?
       delete window.client
       window.acceptance_client = true
+    # create a wrapper around the receive method so that it sets window.receive_called
+    @fayeReceiveSpy = sinon.spy(BackboneSync.FayeClient::, 'receive')
+    @fayeUpdateSpy  = sinon.spy(BackboneSync.FayeClient::, 'update')
+    class Post           extends Backbone.Model
+    class TestCollection extends Backbone.Collection
+      model: Post
+    @collection = new TestCollection
+    @model = new Post
+      title: 'some_title'
+      content: 'some_content'
+    @collection.create @model
 
-  describe 'syncing a newly created object to the server', ->
-    beforeEach ->
-      # create a wrapper around the receive method so that it sets window.receive_called
-      window.receive_called = false
-      originalReceive = BackboneSync.FayeClient::receive
-      @fayeReceiveStub = sinon.stub(BackboneSync.FayeClient::, 'receive', (message) ->
-        originalReceive.apply(@, arguments)
-        window.receive_called = true
-      )
-      class Post extends Backbone.Model
-      class TestCollection extends Backbone.Collection
-        model: Post
-      @collection = new TestCollection
-      @model = new Post
-        title: 'some_title'
-        content: 'some_content'
-      @collection.create @model
+  afterEach ->
+    window.client.unsubscribe('/sync/Post')
+    window.client.unsubscribe('/sync/Post/some_unique_id')
+    @fayeReceiveSpy.restore()
+    @fayeUpdateSpy.restore()
 
-    afterEach ->
-      @fayeReceiveStub.restore()
-
+  context 'when syncing a newly created object to the server', ->
     it 'marks a model as synced and receives an acknowledgement', ->
       runs ->
         expect(@model.isSynced()).toBeFalsy()
         @collection.preSync()
         expect(@model.isSynced()).toBeTruthy()
       waitsFor (->
-        window.receive_called
+        @fayeReceiveSpy.callCount > 0
       ), 'receive to get called', 5000
       runs ->
         acks = {}
         acks[@model.id] = @model.version()
-        expect(@fayeReceiveStub).toHaveBeenCalledWith(conflict: [], ack: acks)
+        expect(@fayeReceiveSpy).toHaveBeenCalledWith(conflict: [], ack: acks)
 
-  describe 'syncing a changed object to the server', ->
-    beforeEach ->
-      # create a wrapper around the update method so that it sets window.update_called
-      window.update_called = false
-      originalUpdate = BackboneSync.FayeClient::update
-      @fayeUpdateStub = sinon.stub(BackboneSync.FayeClient::, 'update', (params) ->
-        originalUpdate.apply(@, arguments)
-        window.update_called = true
-      )
-      class Post extends Backbone.Model
-      class TestCollection extends Backbone.Collection
-        model: Post
-      @collection = new TestCollection
-      @model = new Post
-        title: 'some_title'
-        content: 'some_content'
-      @collection.create @model
-
-    afterEach ->
-      @fayeUpdateStub.restore()
-
+  context 'when syncing a changed object to the server', ->
     it 'publishes a list of changed objects to the server
         and receives a list of concurrently changed objects back', ->
       runs ->
@@ -70,7 +47,7 @@ describe 'sync', ->
           content: 'other_content'
         @collection.preSync()
       waitsFor (->
-        window.update_called
+        @fayeUpdateSpy.callCount > 0
       ), 'update to get called', 5000
       runs ->
-        expect(@fayeUpdateStub).toHaveBeenCalledWith({})
+        expect(@fayeUpdateSpy).toHaveBeenCalledWith({})
