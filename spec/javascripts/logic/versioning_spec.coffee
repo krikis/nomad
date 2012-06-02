@@ -336,8 +336,19 @@ describe 'Versioning', ->
     beforeEach -> 
       class TestModel extends Backbone.Model
       @model = new TestModel
+      patches = [{patch_text: 'some_patch',  base: 'some_version'},
+                 {patch_text: 'other_patch', base: 'the_version'}]
+      @model._versioning = 
+        oldVersion: 'old_version'
+        patches: _(patches)
 
-    it 'removes all patches older than the version provided'
+    it 'removes all patches older than the version provided', ->
+      @model.forwardTo('the_version')
+      expect(@model._versioning.patches.first()).toEqual
+        patch_text: 'other_patch'
+        base: 'the_version'
     
-    it 'sets oldVersion to the version provided'
+    it 'sets oldVersion to the version provided', ->
+      @model.forwardTo('the_version')
+      expect(@model.oldVersion()).toEqual('the_version')
 
