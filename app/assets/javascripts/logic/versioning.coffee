@@ -68,8 +68,9 @@
       
   forwardTo: (version) ->
     @_versioning.oldVersion = version
-    if @hasPatches() and patches = @_versioning.patches
-      patches.shift() while patches.first().base != version
+    patches = @_versioning.patches
+    while @hasPatches() and patches.first().base != version
+      patches.shift() 
     
 # extend Backbone.Model
 _.extend Backbone.Model::, @Versioning
