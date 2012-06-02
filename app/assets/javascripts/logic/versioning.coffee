@@ -64,11 +64,6 @@
       false
       
   forwardTo: ->
-      
-  resetVersioning: ->
-    @_versioning.patches = _([])
-    @_versioning.oldVersion = @_versioning.version
-    @setVersion()
 
 # extend Backbone.Model
 _.extend Backbone.Model::, @Versioning

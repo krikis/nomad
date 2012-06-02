@@ -188,7 +188,6 @@ describe 'Versioning', ->
       @dummySetStub = sinon.stub(@dummy, 'set')
       @processPatchesStub = sinon.stub(@dummy, 'processPatches', -> true)
       @modelSetStub = sinon.stub(@model, 'set')
-      @resetVersioningStub = sinon.stub(@model, 'resetVersioning')
 
     afterEach ->
       @newModelStub.restore()
@@ -313,26 +312,6 @@ describe 'Versioning', ->
       it 'returns false', ->
         expect(@model.applyPatch()).toBeFalsy()
         
-  describe '#resetVersioning', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel
-      @model._versioning = 
-        oldVersion: 'old_version'
-        version: 'version'
-        patches: _(['some', 'patches'])
-      @setVersionStub = sinon.stub(@model, 'setVersion')
-
-    it 'clears the patches of the original model', ->
-      @model.resetVersioning()
-      expect(@model._versioning.patches).toEqual _([])
-
-    it 'sets the original model\'s oldVersion to its version', ->
-      @model.resetVersioning()
-      expect(@model._versioning.oldVersion).toEqual('version')
-
-    it 'sets the current version on the original model', ->
-      @model.resetVersioning()
-      expect(@setVersionStub).toHaveBeenCalled()
+  describe '#forwardTo', ->
 
 
