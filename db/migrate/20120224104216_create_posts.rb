@@ -4,7 +4,7 @@ class CreatePosts < ActiveRecord::Migration
       t.string :title
       t.string :content
       t.string :remote_id
-      t.string :remote_version
+      t.text :remote_version
 
       t.timestamps
     end

@@ -2,7 +2,11 @@ class Post < ActiveRecord::Base
 
   # before_validation :sanitize_attributes
 
-  validates_presence_of :title
+  attr_protected :id, :remote_id, :remote_version
+
+  validates_uniqueness_of :remote_id
+
+  serialize :remote_version
 
   private
 
