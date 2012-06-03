@@ -9,46 +9,127 @@ describe 'Versioning', ->
   describe '#initVersioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
-      @model = new TestModel Factory.build('model')  
-      @setVersionStub = sinon.stub(@model, 'setVersion')
+      @model = new TestModel Factory.build('model')
 
     it 'initializes the _versioning object if undefined', ->
       expect(@model._versioning).toBeUndefined()
       @model.initVersioning()
       expect(@model._versioning).toBeDefined()
-
-    it 'sets the oldVersion property to a hash of the object', ->
-      hash = CryptoJS.SHA256(JSON.stringify @model.previousAttributes()).toString()
+      
+    it 'initializes the vector clock if undefined', ->
+      expect(@model._versioning?.vector).toBeUndefined()
       @model.initVersioning()
-      expect(@model._versioning.oldVersion).toEqual(hash)
+      expect(@model._versioning?.vector).toBeDefined()
       
-    it 'retains the oldVersion property once is has been set', ->
-      @model._versioning = {oldVersion: 'some_hash'}
+    it 'initializes the local clock to zero if undefined', ->
+      expect(@model._versioning?.vector[Nomad.clientId]).toBeUndefined()
       @model.initVersioning()
-      expect(@model._versioning.oldVersion).toEqual('some_hash')
+      expect(@model._versioning?.vector[Nomad.clientId]).toBeDefined()
       
-  describe '#markAsSynced', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel Factory.build('model')
-      
-    it 'initializes versioning if not already', ->  
-      expect(@model._versioning).toBeUndefined()
-      @model.markAsSynced()
-      expect(@model._versioning).toBeDefined()
-      
-    it 'sets the synced property on the versioning object to true', ->
-      @model.markAsSynced()
-      expect(@model._versioning.synced).toBeTruthy()
-      
-  describe '#isSynced', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel Factory.build('model')
+    it 'retains the local clock if it is already set', ->
+      vector = {}
+      vector[Nomad.clientId] = 1
+      @model._versioning = {vector: vector}
+      @model.initVersioning()
+      expect(@model._versioning?.vector[Nomad.clientId]).toEqual(1)
     
-    it 'returns whether the model has been synced yet', ->
-      @model._versioning = {synced: true}
-      expect(@model.isSynced()).toBeTruthy()
+  describe '#version', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('model')
+      @vector = sinon.stub()
+      @model._versioning = {vector: @vector}
+  
+    it 'fetches the vector clock of the versioning object', ->
+      expect(@model.version()).toEqual(@vector)    
+
+  describe '#tickVersion', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      vector = {}      
+      vector[Nomad.clientId] = 1
+      @model._versioning = {vector: vector}
+
+    it 'increments the version for the current model', ->  
+      @oldVersion = @model._versioning.vector[Nomad.clientId]
+      @model.tickVersion()
+      expect(@model._versioning.vector[Nomad.clientId]).toEqual(@oldVersion + 1)
+      
+  describe '#localClock', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      vector = {}      
+      vector[Nomad.clientId] = 1
+      @model._versioning = {vector: vector}
+      
+    it 'returns the local clock of the model\'s version', ->
+      expect(@model.localClock()).toEqual(1)
+
+  describe '#addPatch', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      @model.localClock = -> 2
+      @initVersioningSpy = sinon.spy(@model, 'initVersioning')  
+      @tickVersionStub = sinon.stub(@model, 'tickVersion')
+      @patch = sinon.stub()
+      @createPatchStub = sinon.stub(@model, 'createPatch', =>
+        @patch
+      )
+    
+    afterEach ->  
+      @initVersioningSpy.restore()
+      @tickVersionStub.restore()
+      @createPatchStub.restore()
+
+    it 'initializes _versioning', ->
+      @model.addPatch()
+      expect(@initVersioningSpy).toHaveBeenCalled()
+
+    it 'initializes _versioning.patches as an empty array', ->
+      expect(@model._versioning?.patches).toBeUndefined()
+      @model.addPatch()
+      expect(@model._versioning?.patches).toBeDefined()
+      expect(@model._versioning?.patches._wrapped).toBeDefined()
+      expect(@model._versioning?.patches._wrapped.constructor.name).toEqual("Array")
+      
+    it 'creates a patch providing it with the model\'s local clock', ->
+      @model.addPatch()
+      expect(@createPatchStub).toHaveBeenCalledWith(@model.localClock())
+
+    it 'saves a patch for the update to _versioning.patches', ->
+      @model.addPatch()
+      expect(@model._versioning.patches.first()).toEqual @patch
+
+    it 'updates the model\'s version', ->
+      @model.addPatch()
+      expect(@tickVersionStub).toHaveBeenCalled()
+      
+    it 'updates the model\'s version after the patch has been created', ->
+      @model.addPatch()
+      expect(@createPatchStub).toHaveBeenCalledBefore(@tickVersionStub)
+
+  describe '#createPatch', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('answer')
+
+    it 'creates a patch for the new model version', ->
+      @model.attributes.values =
+        v_1: "other_value_1"
+        v_2: "value_2"
+      out = @model.createPatch()
+      expect(out.patch_text).toContain 'other_'
+      expect(out.patch_text).not.toContain 'value_2'
+
+    it 'sets the model\'s current version on the newly created patch', ->
+      @model.attributes.values =
+        v_1: "other_value_1"
+        v_2: "value_2"
+      out = @model.createPatch('local_clock')
+      expect(out.base).toEqual('local_clock')
 
   describe '#hasPatches', ->
     beforeEach ->
@@ -72,129 +153,6 @@ describe 'Versioning', ->
 
       it 'returns true', ->
         expect(@model.hasPatches()).toBeTruthy()
-        
-  describe '#oldVersion', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel Factory.build('model')
-      @model._versioning = {oldVersion: 'some_hash'}
-      
-    it 'fetches the oldVersion property of the versioning object', ->
-      expect(@model.oldVersion()).toEqual('some_hash')
-      
-  describe '#version', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel Factory.build('model')
-      @model._versioning = {version: 'some_hash'}
-    
-    it 'fetches the version property of the versioning object', ->
-      expect(@model.version()).toEqual('some_hash')
-      
-    it 'returns the oldVersion property should version be undefined', ->
-      @model._versioning = {oldVersion: 'some_old_hash'}
-      expect(@model.version()).toEqual('some_old_hash')
-
-  describe '#addPatch', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel
-      @model._versioning = 
-        oldVersion: 'some_hash'
-      @initVersioningSpy = sinon.spy(@model, 'initVersioning')  
-      @setVersionStub = sinon.stub(@model, 'setVersion')
-      @patch = sinon.stub()
-      @createPatchStub = sinon.stub(@model, 'createPatch', =>
-        @patch
-      )
-    
-    afterEach ->  
-      @initVersioningSpy.restore()
-      @setVersionStub.restore()
-      @createPatchStub.restore()
-
-    it 'initializes _versioning', ->
-      @model.addPatch()
-      expect(@initVersioningSpy).toHaveBeenCalled()
-
-    it 'does not set the model\'s current version if it did not change', ->
-      @model.addPatch()
-      expect(@setVersionStub).not.toHaveBeenCalled()
-
-    context 'when the model has changed', ->
-      beforeEach ->
-        @changedStub = sinon.stub(@model, 'hasChanged', -> true)
-
-      afterEach ->
-        @changedStub.restore()
-
-      it 'sets the model\'s current version', ->
-        @model.addPatch()
-        expect(@setVersionStub).toHaveBeenCalled()
-
-      it 'does not add a patch if the model was never synced before', ->
-        @model.addPatch()
-        expect(@model.hasPatches()).toBeFalsy()
-
-      context 'after it was synced to the server', ->
-        beforeEach ->
-          @model._versioning =
-            synced: true
-
-        it 'initializes _versioning.patches as an empty array', ->
-          expect(@model._versioning?.patches).toBeUndefined()
-          @model.addPatch()
-          expect(@model._versioning?.patches).toBeDefined()
-          expect(@model._versioning?.patches._wrapped).toBeDefined()
-          expect(@model._versioning?.patches._wrapped.constructor.name).toEqual("Array")
-          
-        it 'creates a patch providing it with the model\'s oldVersion', ->
-          @model.addPatch()
-          expect(@createPatchStub).toHaveBeenCalledWith(@model.oldVersion())
-
-        it 'saves a patch for the update to _versioning.patches', ->
-          @model.addPatch()
-          expect(@model._versioning.patches.first()).toEqual @patch
-
-  describe '#createPatch', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel Factory.build('answer')
-
-    it 'creates a patch for the new model version', ->
-      @model.attributes.values =
-        v_1: "other_value_1"
-        v_2: "value_2"
-      out = @model.createPatch()
-      expect(out.patch_text).toContain 'other_'
-      expect(out.patch_text).not.toContain 'value_2'
-
-    it 'sets the model\'s current oldVersion with the newly created patch', ->
-      @model.attributes.values =
-        v_1: "other_value_1"
-        v_2: "value_2"
-      out = @model.createPatch('old_version')
-      expect(out.base).toEqual('old_version')
-
-  describe '#setVersion', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel Factory.build('answer')
-      @model._versioning = {}
-
-    it 'sets the version for the current model', ->
-      @model.setVersion()
-      hash = CryptoJS.SHA256(JSON.stringify @model).toString()
-      expect(@model._versioning.version).toEqual(hash)
-
-    context 'when the version already exists', ->
-      beforeEach ->
-        @model._versioning = {version: 'some_version'}
-
-      it 'overwrites the existing version', ->
-        @model.setVersion()
-        hash = CryptoJS.SHA256(JSON.stringify @model).toString()
-        expect(@model._versioning.version).toEqual(hash)
 
   describe '#rebase', ->
     beforeEach ->
@@ -336,19 +294,16 @@ describe 'Versioning', ->
     beforeEach -> 
       class TestModel extends Backbone.Model
       @model = new TestModel
-      patches = [{patch_text: 'some_patch',  base: 'some_version'},
-                 {patch_text: 'other_patch', base: 'the_version'}]
+      patches = [{patch_text: 'some_patch',  base: 0},
+                 {patch_text: 'other_patch', base: 1}]
       @model._versioning = 
-        oldVersion: 'old_version'
         patches: _(patches)
 
     it 'removes all patches older than the version provided', ->
-      @model.forwardTo('the_version')
+      vector = {}
+      vector[Nomad.clientId] = 1
+      @model.forwardTo(vector)
       expect(@model._versioning.patches.first()).toEqual
         patch_text: 'other_patch'
-        base: 'the_version'
-    
-    it 'sets oldVersion to the version provided', ->
-      @model.forwardTo('the_version')
-      expect(@model.oldVersion()).toEqual('the_version')
+        base: 1
 

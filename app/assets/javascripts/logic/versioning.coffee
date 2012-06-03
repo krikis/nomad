@@ -1,33 +1,23 @@
 @Versioning =
   initVersioning: ->
     @_versioning ||= {}
-    unless @_versioning.oldVersion?
-      previous = CryptoJS.SHA256(JSON.stringify @previousAttributes()).toString()
-      @_versioning.oldVersion = previous
-
-  markAsSynced: ->
-    @initVersioning() unless @_versioning
-    @_versioning.synced = true
-      
-  isSynced: ->
-    @_versioning?.synced
-
-  hasPatches: ->
-    @_versioning?.patches?.size() > 0
-    
-  oldVersion: ->
-    @_versioning?.oldVersion
+    @_versioning.vector ||= {}
+    @_versioning.vector[Nomad.clientId] ||= 0
     
   version: ->
-    @_versioning?.version || @_versioning?.oldVersion
+    @_versioning?.vector
+
+  tickVersion: ->
+    @_versioning.vector[Nomad.clientId] += 1
+    
+  localClock: ->
+    @_versioning.vector[Nomad.clientId]
 
   addPatch: ->
     @initVersioning()
-    if @hasChanged()
-      @setVersion()
-      if @_versioning.synced
-        @_versioning.patches ||= _([])
-        @_versioning.patches.push @createPatch(@oldVersion())
+    @_versioning.patches ||= _([])
+    @_versioning.patches.push @createPatch(@localClock())
+    @tickVersion()
 
   createPatch: (base) ->
     @dmp = new diff_match_patch
@@ -37,10 +27,9 @@
                             diff
     patch_text: @dmp.patch_toText(patch)
     base: base
-    
 
-  setVersion: ->
-    @_versioning.version = CryptoJS.SHA256(JSON.stringify @).toString()
+  hasPatches: ->
+    @_versioning?.patches?.size() > 0    
 
   rebase: (attributes) ->
     dummy = new @constructor
@@ -66,10 +55,9 @@
     else
       false
       
-  forwardTo: (version) ->
-    @_versioning.oldVersion = version
+  forwardTo: (vectorClock) ->
     patches = @_versioning.patches
-    while @hasPatches() and patches.first().base != version
+    while @hasPatches() and patches.first().base < vectorClock[Nomad.clientId]
       patches.shift() 
     
 # extend Backbone.Model
