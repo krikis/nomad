@@ -38,12 +38,21 @@
     @_versioning?.synced
 
   rebase: (attributes) ->
+    version = attributes.remote_version
+    delete attributes.remote_version
     dummy = new @constructor
     dummy.set attributes
     if dummy.processPatches(@_versioning.patches)
       @set dummy
+      @updateVersionTo(version)
       return @
     false
+    
+  updateVersionTo: (version) ->    
+    vector = @_versioning.vector
+    _.each version, (value, clock) ->
+      if not vector[clock]? or value > vector[clock]
+        vector[clock] = value 
 
   processPatches: (patches) ->
     patches.all (patch) =>

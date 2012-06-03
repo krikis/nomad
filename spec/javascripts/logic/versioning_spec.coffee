@@ -15,55 +15,55 @@ describe 'Versioning', ->
       expect(@model._versioning).toBeUndefined()
       @model.initVersioning()
       expect(@model._versioning).toBeDefined()
-      
+
     it 'initializes the vector clock if undefined', ->
       expect(@model._versioning?.vector).toBeUndefined()
       @model.initVersioning()
       expect(@model._versioning?.vector).toBeDefined()
-      
+
     it 'initializes the local clock to zero if undefined', ->
       expect(@model._versioning?.vector[Nomad.clientId]).toBeUndefined()
       @model.initVersioning()
       expect(@model._versioning?.vector[Nomad.clientId]).toBeDefined()
-      
+
     it 'retains the local clock if it is already set', ->
       vector = {}
       vector[Nomad.clientId] = 1
       @model._versioning = {vector: vector}
       @model.initVersioning()
       expect(@model._versioning?.vector[Nomad.clientId]).toEqual(1)
-    
+
   describe '#version', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('model')
       @vector = sinon.stub()
       @model._versioning = {vector: @vector}
-  
+
     it 'fetches the vector clock of the versioning object', ->
-      expect(@model.version()).toEqual(@vector)    
+      expect(@model.version()).toEqual(@vector)
 
   describe '#tickVersion', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
-      vector = {}      
+      vector = {}
       vector[Nomad.clientId] = 1
       @model._versioning = {vector: vector}
 
-    it 'increments the version for the current model', ->  
+    it 'increments the version for the current model', ->
       @oldVersion = @model._versioning.vector[Nomad.clientId]
       @model.tickVersion()
       expect(@model._versioning.vector[Nomad.clientId]).toEqual(@oldVersion + 1)
-      
+
   describe '#localClock', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
-      vector = {}      
+      vector = {}
       vector[Nomad.clientId] = 1
       @model._versioning = {vector: vector}
-      
+
     it 'returns the local clock of the model\'s version', ->
       expect(@model.localClock()).toEqual(1)
 
@@ -72,14 +72,14 @@ describe 'Versioning', ->
       class TestModel extends Backbone.Model
       @model = new TestModel
       @model.localClock = -> 2
-      @initVersioningSpy = sinon.spy(@model, 'initVersioning')  
+      @initVersioningSpy = sinon.spy(@model, 'initVersioning')
       @tickVersionStub = sinon.stub(@model, 'tickVersion')
       @patch = sinon.stub()
       @createPatchStub = sinon.stub(@model, 'createPatch', =>
         @patch
       )
-    
-    afterEach ->  
+
+    afterEach ->
       @initVersioningSpy.restore()
       @tickVersionStub.restore()
       @createPatchStub.restore()
@@ -94,7 +94,7 @@ describe 'Versioning', ->
       expect(@model._versioning?.patches).toBeDefined()
       expect(@model._versioning?.patches._wrapped).toBeDefined()
       expect(@model._versioning?.patches._wrapped.constructor.name).toEqual("Array")
-      
+
     it 'creates a patch providing it with the model\'s local clock', ->
       @model.addPatch()
       expect(@createPatchStub).toHaveBeenCalledWith(@model.localClock())
@@ -106,7 +106,7 @@ describe 'Versioning', ->
     it 'updates the model\'s version', ->
       @model.addPatch()
       expect(@tickVersionStub).toHaveBeenCalled()
-      
+
     it 'updates the model\'s version after the patch has been created', ->
       @model.addPatch()
       expect(@createPatchStub).toHaveBeenCalledBefore(@tickVersionStub)
@@ -153,26 +153,26 @@ describe 'Versioning', ->
 
       it 'returns true', ->
         expect(@model.hasPatches()).toBeTruthy()
-        
+
   describe '#markAsSynced', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
       @model._versioning = {}
-      
+
     it 'sets the synced property on the versioning object to true', ->
       @model.markAsSynced()
       expect(@model._versioning.synced).toBeTruthy()
-      
+
   describe '#isSynced', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('model')
-      
+
     it 'returns whether the model has been synced yet', ->
       @model._versioning = {synced: true}
       expect(@model.isSynced()).toBeTruthy()
-  
+
   describe '#rebase', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -184,12 +184,13 @@ describe 'Versioning', ->
       @dummySetStub = sinon.stub(@dummy, 'set')
       @processPatchesStub = sinon.stub(@dummy, 'processPatches', -> true)
       @modelSetStub = sinon.stub(@model, 'set')
+      @updateVersionToStub = sinon.stub(@model, 'updateVersionTo')
 
     afterEach ->
       @newModelStub.restore()
 
     it 'creates a dummy model', ->
-      @model.rebase()
+      @model.rebase({})
       expect(@newModelStub).toHaveBeenCalled()
 
     it 'sets the new attributes on this dummy model', ->
@@ -197,56 +198,89 @@ describe 'Versioning', ->
       @model.rebase(attributes)
       expect(@dummySetStub).toHaveBeenCalledWith(attributes)
 
+    it 'filters out the remote_version before doing so', ->
+      attributes =
+        attribute: 'value'
+        remote_version: 'version'
+      @model.rebase(attributes)
+      expect(@dummySetStub).toHaveBeenCalledWith(attribute: 'value')
+
     it 'applies all patches to the dummy model', ->
-      @model.rebase()
+      @model.rebase({})
       expect(@processPatchesStub).toHaveBeenCalledWith(@patches)
-    
+
     context 'when all patches are successfully applied', ->
       it 'sets the dummy\'s attributes on the model', ->
-        @model.rebase()
+        @model.rebase({})
         expect(@modelSetStub).toHaveBeenCalledWith(@dummy)
-        
+
+      it 'updates the model version to the remote_version', ->
+        attributes =
+          attribute: 'value'
+          remote_version: 'version'
+        @model.rebase(attributes)
+        expect(@updateVersionToStub).toHaveBeenCalledWith('version')
+
       it 'returns the updated model', ->
-        expect(@model.rebase()).toEqual(@model)
-        
+        expect(@model.rebase({})).toEqual(@model)
+
     context 'when not all patches were applied successfully', ->
       beforeEach ->
         @processPatchesStub.restore()
         @processPatchesStub = sinon.stub(@dummy, 'processPatches', -> false)
-      
+
       it 'returns false', ->
-        expect(@model.rebase()).toBeFalsy()
-            
+        expect(@model.rebase({})).toBeFalsy()
+
       it 'filters out the attributes that differ'
 
       it 'creates a diff for each attribute'
       
+  describe '#updateVersionTo', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      @model._versioning =
+        vector: 
+          some_unique_id: 3
+    
+    it 'updates each clock with a remote value if the local value is lower', ->
+      @model.updateVersionTo(some_unique_id: 4)
+      expect(@model._versioning.vector).toEqual(some_unique_id: 4)  
+      
+    it 'adds a remote clock if it did not exist locally', ->
+      @model.updateVersionTo(some_other_id: 4)
+      expect(@model._versioning.vector).toEqual
+        some_unique_id: 3
+        some_other_id: 4
+          
+
   describe '#processPatches', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
-      @applyPatchStub = sinon.stub(@model, 'applyPatch', -> 
+      @applyPatchStub = sinon.stub(@model, 'applyPatch', ->
         @results ||= [true, true]
         @results.pop()
       )
-      
+
     it 'applies each patch to the model', ->
       @model.processPatches(_([{patch_text: 'some'},
                                {patch_text: 'patches'}]))
       expect(@applyPatchStub).toHaveBeenCalledWith('some')
       expect(@applyPatchStub).toHaveBeenCalledWith('patches')
-      
+
     it 'returns true when all patches apply successfully', ->
       expect(@model.processPatches(_(['some', 'patches']))).toBeTruthy()
-      
+
     context 'when at least one patch did not apply successfully', ->
-      beforeEach -> 
+      beforeEach ->
         @applyPatchStub.restore()
-        @applyPatchStub = sinon.stub(@model, 'applyPatch', -> 
+        @applyPatchStub = sinon.stub(@model, 'applyPatch', ->
           @results ||= [true, false, true]
           @results.pop()
         )
-      
+
       it 'returns false when at least one patch was unsuccessful', ->
         expect(@model.processPatches(_(['some', 'more', 'patches']))).toBeFalsy()
 
@@ -308,14 +342,14 @@ describe 'Versioning', ->
 
       it 'returns false', ->
         expect(@model.applyPatch()).toBeFalsy()
-        
+
   describe '#forwardTo', ->
-    beforeEach -> 
+    beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
       patches = [{patch_text: 'some_patch',  base: 0},
                  {patch_text: 'other_patch', base: 1}]
-      @model._versioning = 
+      @model._versioning =
         patches: _(patches)
 
     it 'removes all patches older than the version provided', ->
