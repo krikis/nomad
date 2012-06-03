@@ -14,6 +14,10 @@ describe 'Sync', ->
       @collection.preSync()
       expect(@versionDetailsStub).toHaveBeenCalled()
       
+    it 'marks all models as synced', ->
+     @collection.preSync()
+     expect(@versionDetailsStub).toHaveBeenCalledWith(markSynced: true)
+      
     it 'publishes a list of version details to the server', ->
       @collection.preSync()
       expect(@message.versions).toEqual(['version', 'details'])
@@ -25,6 +29,7 @@ describe 'Sync', ->
       @model = new Backbone.Model
         id: 'some_id'
       @model.version = -> 'vector_clock'
+      @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
       @collection.models = [@model]
 
     it 'collects the ids and versions of all models', ->
@@ -35,6 +40,15 @@ describe 'Sync', ->
     it 'sets the is_new flag for objects that were not synced yet', ->  
       versions = @collection.versionDetails()
       expect(versions).toEqual [{id: 'some_id', version: 'vector_clock', is_new: true}]
+      
+    it 'marks the models as synced if the markSynced option is set', ->
+      versions = @collection.versionDetails(markSynced: true)
+      expect(@markAsSyncedStub).toHaveBeenCalled()
+      
+    it 'marks a model as synced after it sets the is_new flag', ->
+      isSyncedStub = sinon.stub(@model, 'isSynced')
+      versions = @collection.versionDetails(markSynced: true)
+      expect(isSyncedStub).toHaveBeenCalledBefore(@markAsSyncedStub)
 
   describe '#processUpdates', ->
     beforeEach ->
