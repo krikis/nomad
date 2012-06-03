@@ -4,7 +4,8 @@
       versions: @versionDetails(markSynced: true)
         
   versionDetails: (options = {}) ->
-    _(@models).chain().map((model) ->
+    models = @modelsForSync()
+    _(models).chain().map((model) ->
       details = 
         id: model.id
         version: model.version()
@@ -12,6 +13,10 @@
       model.markAsSynced() if options.markSynced
       details
     ).value()
+    
+  modelsForSync: ->
+    _(@models).filter (model) ->
+      model.hasPatches()
     
   processUpdates: (models) ->
     updated = _.map models, (attributes, id) =>
