@@ -1,28 +1,12 @@
 @Sync =
   preSync: ->
-    fresh = @freshModels(markAsSynced: true)
-    changed = @changedModels()
-    if not (_.isEmpty(fresh) and _.isEmpty(changed))
-      @fayeClient.publish
-        creates: fresh
-        changes: changed
-
-  freshModels: (options = {}) ->
+    @fayeClient.publish
+      versions: @versionDetails()
+        
+  versionDetails: () ->
     _(@models).chain().map((model) ->
-      if not model.isSynced()
-        model.markAsSynced() if options.markAsSynced
-        json = model.toJSON()
-        delete json.id
-        id: model.id
-        attributes: json
-        version: model.version()
-    ).compact().value()
-
-  changedModels: ->
-    _(@models).chain().map((model) ->
-      if model.hasPatches()
-        id: model.id
-        old_version: model.oldVersion()
+      id: model.id
+      version: model.version()
     ).compact().value()
     
   processUpdates: (models) ->
