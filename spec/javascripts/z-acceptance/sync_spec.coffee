@@ -38,12 +38,14 @@ describe 'sync', ->
         and receives a list of concurrently changed objects back', ->
       runs ->
         @collection.preSync()
+      waits(10)
+      runs ->
         @model.save
           title: 'other_title'
           content: 'other_content'
         @collection.preSync()
       waitsFor (->
-        @fayeUpdateSpy.callCount > 0
+        @fayeUpdateSpy.callCount > 1
       ), 'update to get called', 5000
       runs ->
         expect(@fayeUpdateSpy).toHaveBeenCalledWith({})
