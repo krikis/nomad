@@ -2,7 +2,7 @@ require_relative 'faye_helper'
 require 'client'
 
 class TestModel
-  def self.where
+  def self.find_by_remote_id
   end
 end
 
@@ -39,7 +39,7 @@ describe ServerSideClient do
       let(:model) { Faye }
       let(:message) { {'model_name' => "#{model}"} }
 
-      context 'and it responds to where' do
+      context 'and it responds to find_by_remote_id' do
         let(:model) { TestModel }
         let(:message) { {'model_name' => "#{model}"} }
 
@@ -49,7 +49,7 @@ describe ServerSideClient do
         end
       end
 
-      context 'and it does not respond to where' do
+      context 'and it does not respond to find_by_remote_id' do
         it 'does not process the message' do
           subject.should_not_receive(:process_message)
           subject.on_server_message(message)
@@ -71,13 +71,13 @@ describe ServerSideClient do
   describe '#process_message' do
     let(:model)   { TestModel }
     before do
-      subject.stub(:handle_changes)
+      subject.stub(:handle_versions)
       subject.stub(:publish_results)
     end
 
-    it 'handles changes if present' do
-      message = {'changes' => [{}]}
-      subject.should_receive(:handle_changes).with(model, message['changes'])
+    it 'handles versions if present' do
+      message = {'versions' => [{}]}
+      subject.should_receive(:handle_versions).with(model, message['versions'])
       subject.process_message(model, message)
     end
 
@@ -102,32 +102,40 @@ describe ServerSideClient do
     end
   end
 
-  describe '#handle_changes' do
-    let(:changes) { [{'id' => 'some_id',
-                      'old_version' => 'some_version'},
-                     {'id' => 'other_id',
-                      'old_version' => 'other_version'}] }
-    let(:model)   { TestModel }
-    let(:object)  { stub(:attributes => {},
-                         :remote_id => 'some_id') }
+  describe '#handle_versions' do
+    let(:versions)       { [{'id' => 'some_id',
+                             'version' => 'some_version'},
+                            {'id' => 'other_id',
+                             'version' => 'other_version'}] }
+    let(:model)          { TestModel }
+    let(:remote_version) { stub(:supersedes? => true) }
+    let(:object)         { stub(:attributes => {},
+                                :remote_id => 'some_id',
+                                :remote_version => remote_version) }
     before do
-      TestModel.stub(:where).and_return([object], [])
+      TestModel.stub(:find_by_remote_id).and_return(object, nil)
       subject.stub(:json_for => 'some_json')
     end
 
-    it 'collects for each object an updated version if any' do
-      model.should_receive(:where).with(['remote_id is ? and remote_version is not ?', 'some_id', 'some_version'])
-      model.should_receive(:where).with(['remote_id is ? and remote_version is not ?', 'other_id', 'other_version'])
-      subject.handle_changes(model, changes)
+    it 'collects for each object an updated version if any exists' do
+      model.should_receive(:find_by_remote_id).with('some_id')
+      model.should_receive(:find_by_remote_id).with('other_id')
+      subject.handle_versions(model, versions)
     end
 
-    it 'collects the JSON of all found objects' do
+    it 'checks for each found object whether its version
+        supersedes the client\'s version' do
+      remote_version.should_receive(:supersedes?).with('some_version')
+      subject.handle_versions(model, versions)
+    end
+
+    it 'collects the JSON of all superseding objects' do
       subject.should_receive(:json_for).with(object).once()
-      subject.handle_changes(model, changes)
+      subject.handle_versions(model, versions)
     end
 
     it 'returns a hash with ids for keys and json for values' do
-      subject.handle_changes(model, changes).
+      subject.handle_versions(model, versions).
         should eq({'some_id' => 'some_json'})
     end
   end

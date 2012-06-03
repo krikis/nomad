@@ -13,7 +13,7 @@ class ServerSideClient
 
   def on_server_message(message)
     if model = message['model_name'].safe_constantize
-      if model.respond_to? :where
+      if model.respond_to? :find_by_remote_id
         process_message(model, message)
       end
     end
@@ -21,8 +21,8 @@ class ServerSideClient
 
   def process_message(model, message)
     results = {}
-    if message['changes'].present?
-      results['update'] = handle_changes(model, message['changes'])
+    if message['versions'].present?
+      results['update'] = handle_versions(model, message['versions'])
     end
     if message['creates'].present?
       results['conflict'], results['ack'] =
@@ -31,14 +31,15 @@ class ServerSideClient
     publish_results(message, results)
   end
 
-  def handle_changes(model, changes)
+  def handle_versions(model, versions)
     objects = {}
-    changes.each do |change|
-      object = model.where(['remote_id is ? and remote_version is not ?',
-                           change['id'],
-                           change['old_version']]
-                          ).first
-      objects[object.remote_id] = json_for(object) if object
+    versions.each do |version|
+      object = model.find_by_remote_id(version['id'])
+      # compare the client version to the server version 
+      # to see if the server supersedes the client
+      if object and object.remote_version.supersedes? version['version']
+        objects[object.remote_id] = json_for(object)
+      end
     end
     objects
   end
