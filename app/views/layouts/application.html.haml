@@ -6,6 +6,10 @@
     -# set some environment variables
     :coffeescript
       @development = #{Rails.env.development?.inspect}
+      # In future work the unicity of this client id could be guaranteed
+      # by keeping track of all ids ever used in the database. However 
+      # the odds of collisions when using the session id is presumably 
+      # very small already.
       @clientId = '#{request.session_options[:id]}'
     = javascript_include_tag "application"
     = csrf_meta_tags

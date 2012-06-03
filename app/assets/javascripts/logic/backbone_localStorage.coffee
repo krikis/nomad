@@ -45,7 +45,15 @@
     create: (model) ->
       unless model.id
         model.id = @guid()
-        # make sure the id is unique within the model's collection
+        # Make sure the id is unique within the model's collection
+        # 
+        # Although the id is unique on the client, there is still a small 
+        # chance of colliding with an id generated on another client. 
+        # In future work this could be dealt with by keeping track of the
+        # model being synced yet. When there exists an object on the server
+        # with the same id as an unsynced model, a collision has been detected
+        # and a new id can be generated for the unsynced model.
+        #
         model.id = @guid() while @find(model)?
         model.set(model.idAttribute, model.id)
       @localStorage().setItem @storageKeyFor(model), JSON.stringify(model)
