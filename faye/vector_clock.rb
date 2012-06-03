@@ -16,7 +16,9 @@ class Hash
   # ahead on the path with shortest distance supersedes the other values.
   # This approach is justified by the rationale that the path with shortest
   # distance is most likely the correct path from the old clock value
-  # to the new clock value.
+  # to the new clock value. This prevents overflowed clock values to be 
+  # treated as old clock values, thus blocking all updates on a once 
+  # overflowed object.
   #
   def supersedes?(vector)
     out = false
