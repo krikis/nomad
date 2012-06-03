@@ -110,6 +110,7 @@ describe 'FayeClient', ->
   describe '#update', ->
     beforeEach ->
       @processUpdatesStub = sinon.stub(@collection, 'processUpdates')
+      @syncModelsStub = sinon.stub(@collection, 'syncModels')
       @backboneClient = new BackboneSync.FayeClient @collection,
                                                     modelName: @modelName
 
@@ -120,17 +121,26 @@ describe 'FayeClient', ->
       @backboneClient.update(id: {attribute: 'value'})
       expect(@processUpdatesStub).toHaveBeenCalledWith(id: {attribute: 'value'})
       
+    it 'has the collection sync models to the server after that', ->
+      @backboneClient.update()
+      expect(@syncModelsStub).toHaveBeenCalledAfter(@processUpdatesStub)
+      
   describe '#ack', ->
     beforeEach ->
       @model = new Backbone.Model
       @forwardToStub = sinon.stub(@model, 'forwardTo')
-      @getStub = sinon.stub(@collection, 'get', => @model)
       @backboneClient = new BackboneSync.FayeClient @collection,
                                                     modelName: @modelName
     
     it 'forwards the model to the version provided', ->
+      @getStub = sinon.stub(@collection, 'get', => @model)
       @backboneClient.ack(some_id: 'some_version')
       expect(@forwardToStub).toHaveBeenCalledWith('some_version')
+      
+    it 'does not attempt to forward if no model was found', ->
+      @getStub = sinon.stub(@collection, 'get')
+      @backboneClient.ack(some_id: 'some_version')
+      expect(@forwardToStub).not.toHaveBeenCalledWith('some_version')
       
 
 

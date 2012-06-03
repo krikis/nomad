@@ -19,14 +19,13 @@
       model.hasPatches()
     
   processUpdates: (models) ->
-    updated = _.map models, (attributes, id) =>
+    _.map models, (attributes, id) =>
       model = @get(id)
       model?.rebase attributes
-    @syncUpdates _(updated).compact()
     
-  syncUpdates: (updated) ->
+  syncModels: (updated) ->
     @fayeClient.publish
-      updates: updated
+      updates: @modelsForSync()
     
 # extend Backbone.Collection
 _.extend Backbone.Collection::, Sync

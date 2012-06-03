@@ -28,13 +28,14 @@ class @BackboneSync.FayeClient
 
   update: (params) ->
     @collection.processUpdates(params)
+    @collection.syncModels()
     
   resolve: (params) ->
     
   ack: (params) -> 
     _.each params, (version, id) =>
       model = @collection.get(id)
-      model.forwardTo(version)
+      model?.forwardTo(version)
 
   create: (params) ->
     _.each params, (attributes, id) =>

@@ -109,7 +109,7 @@ describe 'Versioning', ->
 
     it 'updates the model\'s version after the patch has been created', ->
       @model.addPatch()
-      expect(@createPatchStub).toHaveBeenCalledBefore(@tickVersionStub)
+      expect(@tickVersionStub).toHaveBeenCalledAfter(@createPatchStub)
 
   describe '#createPatch', ->
     beforeEach ->

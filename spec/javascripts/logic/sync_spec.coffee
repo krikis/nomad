@@ -52,7 +52,7 @@ describe 'Sync', ->
     it 'marks a model as synced after it sets the is_new flag', ->
       isSyncedStub = sinon.stub(@model, 'isSynced')
       versions = @collection.versionDetails(markSynced: true)
-      expect(isSyncedStub).toHaveBeenCalledBefore(@markAsSyncedStub)
+      expect(@markAsSyncedStub).toHaveBeenCalledAfter(isSyncedStub)
 
   describe '#modelsForSync', ->
     beforeEach ->
@@ -75,34 +75,18 @@ describe 'Sync', ->
       @rebaseStub = sinon.stub(@model, 'rebase', -> @)
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
-      @syncUpdatesStub = sinon.stub(@collection, 'syncUpdates')
 
     it 'rebases each model that is found in the collection', ->
-      @getStub = sinon.stub(@collection, 'get', (id) =>
+      @getStub = sinon.stub @collection, 'get', (id) =>
         @model if id == 'id'
-      )
-      @collection.processUpdates(
+      @collection.processUpdates
         id: {attribute: 'value'}
         other_id: {attribute: 'other_value'}
-      )
       expect(@rebaseStub).toHaveBeenCalledWith(attribute: 'value')
       expect(@rebaseStub).not.
         toHaveBeenCalledWith(attribute: 'other_value')
 
-    it 'publishes all successfully updated models to the server', ->
-      @model = new Backbone.Model
-      @rebaseStub = sinon.stub(@model, 'rebase', ->
-        @out ||= [false, @]
-        @out.pop()
-      )
-      @getStub = sinon.stub(@collection, 'get', => @model)
-      @collection.processUpdates(
-        id: {attribute: 'value'}
-        other_id: {attribute: 'other_value'}
-      )
-      expect(@syncUpdatesStub).toHaveBeenCalledWith([@model])
-
-  describe '#syncUpdates', ->
+  describe '#syncModels', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
@@ -110,10 +94,12 @@ describe 'Sync', ->
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
       )
+      @modelsForSyncStub = sinon.
+        stub(@collection, 'modelsForSync', -> ['dirty', 'models'])
 
-    it 'publishes all updated models to the server', ->
-      @collection.syncUpdates(['updated', 'models'])
-      expect(@message.updates).toEqual(['updated', 'models'])
+    it 'publishes all dirty models to the server', ->
+      @collection.syncModels()
+      expect(@message.updates).toEqual(['dirty', 'models'])
 
 
 
