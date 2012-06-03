@@ -22,7 +22,8 @@ class ServerSideClient
   def process_message(model, message)
     results = {}
     if message['versions'].present?
-      results['update'] = handle_versions(model, message['versions'])
+      results['update'], results['resolve'] =
+        handle_versions(model, message['versions'])
     end
     if message['creates'].present?
       results['conflict'], results['ack'] =
@@ -32,16 +33,23 @@ class ServerSideClient
   end
 
   def handle_versions(model, versions)
-    objects = {}
+    updates = {}
+    conflicts = []
     versions.each do |version|
       object = model.find_by_remote_id(version['id'])
-      # compare the client version to the server version 
-      # to see if the server supersedes the client
-      if object and object.remote_version.supersedes? version['version']
-        objects[object.remote_id] = json_for(object)
+      if object
+        # Detect id conflict caused by haphazardly generating
+        # random id on client
+        if version['is_new']
+          conflicts << version['id']
+        # Compare the client version to the server version
+        # to see if the server supersedes the client
+        elsif object.remote_version.supersedes? version['version']
+          updates[object.remote_id] = json_for(object)
+        end
       end
     end
-    objects
+    [updates, conflicts]
   end
 
   def handle_creates(model, creates)

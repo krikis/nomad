@@ -71,13 +71,19 @@ describe ServerSideClient do
   describe '#process_message' do
     let(:model)   { TestModel }
     before do
-      subject.stub(:handle_versions)
+      subject.stub(:handle_versions => ['updates', 'conflicts'])
       subject.stub(:publish_results)
     end
 
     it 'handles versions if present' do
       message = {'versions' => [{}]}
       subject.should_receive(:handle_versions).with(model, message['versions'])
+      subject.process_message(model, message)
+    end
+
+    it 'passes through the generated updates and conflicts' do
+      message = {'versions' => [{}]}
+      subject.should_receive(:publish_results).with(message, {'update' => 'updates', 'resolve' => 'conflicts'})
       subject.process_message(model, message)
     end
 
@@ -117,7 +123,7 @@ describe ServerSideClient do
       subject.stub(:json_for => 'some_json')
     end
 
-    it 'collects for each object an updated version if any exists' do
+    it 'collects for each version an updated version if any exists' do
       model.should_receive(:find_by_remote_id).with('some_id')
       model.should_receive(:find_by_remote_id).with('other_id')
       subject.handle_versions(model, versions)
@@ -134,9 +140,27 @@ describe ServerSideClient do
       subject.handle_versions(model, versions)
     end
 
-    it 'returns a hash with ids for keys and json for values' do
-      subject.handle_versions(model, versions).
-        should eq({'some_id' => 'some_json'})
+    it 'returns an updates hash with ids for keys and json for values' do
+      updates, conflicts = subject.handle_versions(model, versions)
+      updates.should eq({'some_id' => 'some_json'})
+      conflicts.should be_blank
+    end
+
+    context 'when a new model preexists on the server' do
+      let(:versions) { [{'id' => 'some_id',
+                         'version' => 'some_version',
+                         'is_new' => true}] }
+
+      it 'does not collect the JSON of the object' do
+        subject.should_not_receive(:json_for)
+        subject.handle_versions(model, versions)
+      end
+
+      it 'returns a conflict' do
+        updates, conflicts = subject.handle_versions(model, versions)
+        conflicts.should eq(['some_id'])
+        updates.should be_blank
+      end
     end
   end
 
