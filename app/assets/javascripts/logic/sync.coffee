@@ -5,9 +5,12 @@
         
   versionDetails: () ->
     _(@models).chain().map((model) ->
-      id: model.id
-      version: model.version()
-    ).compact().value()
+      details = 
+        id: model.id
+        version: model.version()
+      details['is_new'] = true unless model.isSynced()
+      details
+    ).value()
     
   processUpdates: (models) ->
     updated = _.map models, (attributes, id) =>

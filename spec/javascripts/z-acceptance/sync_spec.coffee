@@ -31,9 +31,7 @@ describe 'sync', ->
         @fayeReceiveSpy.callCount > 0
       ), 'receive to get called', 5000
       runs ->
-        acks = {}
-        acks[@model.id] = @model.version()
-        expect(@fayeReceiveSpy).toHaveBeenCalledWith(conflict: [], ack: acks)
+        expect(@fayeReceiveSpy).toHaveBeenCalledWith(update: {})
 
   context 'when syncing a changed object to the server', ->
     it 'publishes a list of changed objects to the server

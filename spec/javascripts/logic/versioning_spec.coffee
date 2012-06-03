@@ -153,7 +153,26 @@ describe 'Versioning', ->
 
       it 'returns true', ->
         expect(@model.hasPatches()).toBeTruthy()
-
+        
+  describe '#markAsSynced', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      @model._versioning = {}
+      
+    it 'sets the synced property on the versioning object to true', ->
+      @model.markAsSynced()
+      expect(@model._versioning.synced).toBeTruthy()
+      
+  describe '#isSynced', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('model')
+      
+    it 'returns whether the model has been synced yet', ->
+      @model._versioning = {synced: true}
+      expect(@model.isSynced()).toBeTruthy()
+  
   describe '#rebase', ->
     beforeEach ->
       class TestModel extends Backbone.Model

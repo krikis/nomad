@@ -29,7 +29,13 @@
     base: base
 
   hasPatches: ->
-    @_versioning?.patches?.size() > 0    
+    @_versioning?.patches?.size() > 0  
+    
+  markAsSynced: ->
+    @_versioning.synced = true  
+    
+  isSynced: ->
+    @_versioning?.synced
 
   rebase: (attributes) ->
     dummy = new @constructor

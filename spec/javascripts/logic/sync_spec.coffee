@@ -22,15 +22,19 @@ describe 'Sync', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
-      model =
+      @model = new Backbone.Model
         id: 'some_id'
-        version: -> 'vector_clock'
-      @collection.models = [model]
+      @model.version = -> 'vector_clock'
+      @collection.models = [@model]
 
     it 'collects the ids and versions of all models', ->
-      models = @collection.versionDetails()
-      expect(models).toEqual [{id: 'some_id', version: 'vector_clock'}]
-
+      @model.isSynced = -> true
+      versions = @collection.versionDetails()
+      expect(versions).toEqual [{id: 'some_id', version: 'vector_clock'}]
+      
+    it 'sets the is_new flag for objects that were not synced yet', ->  
+      versions = @collection.versionDetails()
+      expect(versions).toEqual [{id: 'some_id', version: 'vector_clock', is_new: true}]
 
   describe '#processUpdates', ->
     beforeEach ->
