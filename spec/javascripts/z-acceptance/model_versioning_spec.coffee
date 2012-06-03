@@ -11,65 +11,56 @@ describe 'modelVersioning', ->
       class TestModel extends Backbone.Model
       class TestCollection extends Backbone.Collection
         model: TestModel
+      @collection = new TestCollection  
       @model = new TestModel
-      @collection = new TestCollection
+      @initVersioningSpy = sinon.spy(@model, 'initVersioning')
+      @tickVersionSpy = sinon.spy(@model, 'tickVersion')
       @collection.add @model
       @model.save()
 
     it 'adds versioning to it', ->
-      expect(@model._versioning).toBeDefined()
-
-    it 'adds an oldVersion hash to it', ->
-      expect(@model._versioning?.oldVersion).toBeDefined()
-
-    it 'adds a version hash to it', ->
-      expect(@model._versioning?.version).toBeDefined()
+      expect(@initVersioningSpy).toHaveBeenCalled()
       
     it 'can be found within the model', ->
       expect(@collection.get(@model)).toEqual(@model)
 
-    context 'and it changed but was never synced', ->
-      beforeEach ->
-        @setVersionStub = sinon.stub(@model, 'setVersion')
-        @model.set Factory.build('answer')
+    it 'adds a patch', ->
+      expect(@model.hasPatches()).toBeTruthy()
+      
+    it 'updates the model\'s version', ->
+      expect(@tickVersionSpy).toHaveBeenCalled()
 
-      it 'does not add a patch', ->
-        expect(@model.hasPatches()).toBeFalsy()
-        
-      it 'updates the version hash', ->
-        expect(@setVersionStub).toHaveBeenCalled()
-
-    context 'and it changed after it has been synced', ->
+    context 'and it changes', ->
       beforeEach ->
-        @model._versioning =
-          synced: true
-        @setVersionStub = sinon.stub(@model, 'setVersion')
+        @tickVersionSpy.reset()
         @model.set Factory.build('answer')
 
       it 'adds a patch', ->
-        expect(@model.hasPatches()).toBeTruthy()
+        expect(@model._versioning.patches.size()).toEqual(2)
         
       it 'updates the version hash', ->
-        expect(@setVersionStub).toHaveBeenCalled()
+        expect(@tickVersionSpy).toHaveBeenCalled()
 
   context 'when a model is saved with an id', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       class TestCollection extends Backbone.Collection
         model: TestModel
+      @collection = new TestCollection  
       @model = new TestModel Factory.build('answer')
-      @collection = new TestCollection
+      @initVersioningSpy = sinon.spy(@model, 'initVersioning')
+      @tickVersionSpy = sinon.spy(@model, 'tickVersion')
       @collection.add @model
       @model.save()
 
     it 'adds versioning to it', ->
-      expect(@model._versioning).toBeDefined()
+      expect(@initVersioningSpy).toHaveBeenCalled()
 
-    it 'adds an oldVersion hash to it', ->
-      expect(@model._versioning?.oldVersion).toBeDefined()
-
-    it 'does not add a version hash to it', ->
-      expect(@model._versioning?.version).toBeUndefined()
+    it 'does not add a patch', ->
+      expect(@model.hasPatches()).toBeFalsy()
+      
+    it 'does not update the model\'s version', ->
+      expect(@tickVersionSpy).not.toHaveBeenCalled()
 
 
 

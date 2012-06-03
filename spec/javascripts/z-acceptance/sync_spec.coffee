@@ -24,11 +24,9 @@ describe 'sync', ->
     @fayeUpdateSpy.restore()
 
   context 'when syncing a newly created object to the server', ->
-    it 'marks a model as synced and receives an acknowledgement', ->
+    it 'receives an acknowledgement', ->
       runs ->
-        expect(@model.isSynced()).toBeFalsy()
         @collection.preSync()
-        expect(@model.isSynced()).toBeTruthy()
       waitsFor (->
         @fayeReceiveSpy.callCount > 0
       ), 'receive to get called', 5000
