@@ -38,7 +38,7 @@ describe 'sync', ->
         and receives a list of concurrently changed objects back', ->
       runs ->
         @collection.preSync()
-      waits(50)
+      waits(10)
       runs ->
         @model.save
           title: 'other_title'

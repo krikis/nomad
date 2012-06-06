@@ -100,10 +100,17 @@ describe ServerSideClient do
   describe '#handle_versions' do
     let(:version) { stub }
     let(:model)   { TestModel }
+    before { subject.stub(:check_version) }
 
     it 'checks the version of each entry' do
-      subject.should_receive(:check_version).with(model, version, 'client_id', {})
+      subject.should_receive(:check_version).with(model, version, 'client_id', an_instance_of(Hash))
       subject.handle_versions(model, [version], 'client_id', {})
+    end
+
+    it 'flags the results as preSync results' do
+      results = {}
+      subject.handle_versions(model, [version], 'client_id', results)
+      results['preSync'].should be_true
     end
   end
 
