@@ -64,10 +64,17 @@ class ServerSideClient
   end
 
   def handle_updates(model, updates, results)
-    results['ack'] ||= {}
     updates.each do |update|
-      check_version(model, update, results)
+      success, object = check_version(model, update, results)
+      if success
+        process_update(model, object, update, results)
+      end
     end
+  end
+
+  def process_update(model, object, update, results)
+    results['ack'] ||= {}
+    object ||= model.create :remote_id => update['id']
   end
 
   def handle_creates(model, creates)

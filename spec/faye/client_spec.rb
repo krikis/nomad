@@ -194,25 +194,44 @@ describe ServerSideClient do
   end
 
   describe '#handle_updates' do
-    let(:updates) { [{'id' => 'some_id',
+    let(:update) { stub }
+    let(:model)  { TestModel }
+    let(:object) { stub }
+    before { subject.stub(:check_version => [true, object]) }
+
+    it 'checks the version of each update' do
+      subject.should_receive(:check_version).with(model, update, an_instance_of(Hash))
+      subject.handle_updates(model, [update], {})
+    end
+
+    it 'issues an update if the version check is successful' do
+      subject.should_receive(:process_update).with(model, object, update, an_instance_of(Hash))
+      subject.handle_updates(model, [update], {})
+    end
+
+    it 'issues no update if the version check was unsuccessful' do
+      subject.stub(:check_version => [false, object])
+      subject.should_not_receive(:process_update).with(model, object, update, an_instance_of(Hash))
+      subject.handle_updates(model, [update], {})
+    end
+  end
+
+  describe '#process_update' do
+    let(:update) { {'id' => 'some_id',
                       'attributes' => {'attribute' => 'some_value'},
-                      'version' => 'some_version'}] }
-    let(:model)   { TestModel }
+                      'version' => 'some_version'} }
+    let(:model)  { TestModel }
     let(:object) do
       stub(:update_attributes => nil,
            :update_attribute => nil)
     end
-    before do
-      TestModel.stub(:find_by_remote_id)
+
+    context 'when no object is passed in' do
+      it 'creates an object with the given id for remote_id' do
+        model.should_receive(:create).with(:remote_id => 'some_id')
+        subject.process_update(model, nil, update, {})
+      end
     end
-
-    it 'checks the version of each update' do
-      subject.should_receive(:check_version).with(model, updates.first, an_instance_of(Hash))
-      subject.handle_updates(model, updates, {})
-    end
-
-    context ''
-
 
     # context 'when no such object exists' do
     #   it 'creates an object for each entry' do
