@@ -254,12 +254,6 @@ describe ServerSideClient do
         with(:remote_version, 'some_version')
       subject.process_update(model, object, update, {})
     end
-
-    it 'returns an acknowledgement for the created object' do
-      results = {}
-      subject.process_update(model, object, update, results)
-      results['ack']['some_id'].should eq('some_version')
-    end
   end
 
   describe '#json_for' do

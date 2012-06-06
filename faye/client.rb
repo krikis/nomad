@@ -68,14 +68,13 @@ class ServerSideClient
         process_update(model, object, update, results)
       end
     end
+    # TODO::collect successful updates and multicast to all clients
   end
 
   def process_update(model, object, update, results)
-    results['ack'] ||= {}
     object ||= model.create :remote_id => update['id']
     object.update_attributes(update['attributes'])
     object.update_attribute(:remote_version, update['version'])
-    results['ack'][update['id']] = update['version']
   end
 
   def json_for(object)
