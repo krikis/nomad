@@ -28,8 +28,6 @@
 #= require jquery-ui-editors.js
 #= require uploader.js
 #= require diff_match_patch.js
-#= require core.js
-#= require sha256.js
 #
 #= require nomad
 #
