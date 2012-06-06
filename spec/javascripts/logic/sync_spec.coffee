@@ -14,10 +14,6 @@ describe 'Sync', ->
       @collection.preSync()
       expect(@versionDetailsStub).toHaveBeenCalled()
 
-    it 'marks all models as synced', ->
-     @collection.preSync()
-     expect(@versionDetailsStub).toHaveBeenCalledWith(markSynced: true)
-
     it 'publishes a list of version details to the server', ->
       @collection.preSync()
       expect(@message.versions).toEqual(['version', 'details'])
@@ -29,7 +25,6 @@ describe 'Sync', ->
       @model = new Backbone.Model
         id: 'some_id'
       @model.version = -> 'vector_clock'
-      @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
       @modelsForSyncStub = sinon.stub(@collection, 'modelsForSync', => [@model])
 
     it 'fetches the models that have to be synced', ->
@@ -45,21 +40,13 @@ describe 'Sync', ->
       versions = @collection.versionDetails()
       expect(versions).toEqual [{id: 'some_id', version: 'vector_clock', is_new: true}]
 
-    it 'marks the models as synced if the markSynced option is set', ->
-      versions = @collection.versionDetails(markSynced: true)
-      expect(@markAsSyncedStub).toHaveBeenCalled()
-
-    it 'marks a model as synced after it sets the is_new flag', ->
-      isSyncedStub = sinon.stub(@model, 'isSynced')
-      versions = @collection.versionDetails(markSynced: true)
-      expect(@markAsSyncedStub).toHaveBeenCalledAfter(isSyncedStub)
-
   describe '#modelsForSync', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @model = new Backbone.Model
         id: 'some_id'
+      @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
       @collection.models = [@model]
 
     it 'includes all models that have patches', ->
@@ -68,6 +55,10 @@ describe 'Sync', ->
 
     it 'does not include models that have no patches', ->
       expect(@collection.modelsForSync()).toEqual([])
+
+    it 'marks the models as synced if the markSynced option is set', ->
+      versions = @collection.modelsForSync(markSynced: true)
+      expect(@markAsSyncedStub).toHaveBeenCalled()
 
   describe '#processUpdates', ->
     beforeEach ->
@@ -100,6 +91,10 @@ describe 'Sync', ->
     it 'publishes all dirty models to the server', ->
       @collection.syncModels()
       expect(@message.updates).toEqual(['dirty', 'models'])
+
+    it 'marks all models as synced', ->
+     @collection.syncModels()
+     expect(@modelsForSyncStub).toHaveBeenCalledWith(markSynced: true)
 
 
 

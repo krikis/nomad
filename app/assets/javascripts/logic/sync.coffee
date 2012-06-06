@@ -1,21 +1,21 @@
 @Sync =
   preSync: ->
     @fayeClient.publish
-      versions: @versionDetails(markSynced: true)
+      versions: @versionDetails()
         
-  versionDetails: (options = {}) ->
+  versionDetails: () ->
     models = @modelsForSync()
     _(models).chain().map((model) ->
       details = 
         id: model.id
         version: model.version()
       details['is_new'] = true unless model.isSynced()
-      model.markAsSynced() if options.markSynced
       details
     ).value()
     
-  modelsForSync: ->
+  modelsForSync: (options = {}) ->
     _(@models).filter (model) ->
+      model.markAsSynced() if options.markSynced
       model.hasPatches()
     
   processUpdates: (models) ->
@@ -25,7 +25,7 @@
     
   syncModels: (updated) ->
     @fayeClient.publish
-      updates: @modelsForSync()
+      updates: @modelsForSync(markSynced: true)
     
 # extend Backbone.Collection
 _.extend Backbone.Collection::, Sync
