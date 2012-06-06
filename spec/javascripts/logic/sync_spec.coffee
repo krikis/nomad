@@ -48,7 +48,7 @@ describe 'Sync', ->
         id: 'some_id'
       @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
       @collection.models = [@model]
-
+      
     it 'includes all models that have patches', ->
       @model.hasPatches = -> true
       expect(@collection.modelsForSync()).toEqual([@model])
@@ -59,6 +59,34 @@ describe 'Sync', ->
     it 'marks the models as synced if the markSynced option is set', ->
       versions = @collection.modelsForSync(markSynced: true)
       expect(@markAsSyncedStub).toHaveBeenCalled()
+      
+  describe '#dataForSync', ->
+    beforeEach ->
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @model = new Backbone.Model
+        id: 'some_id'
+        attribute: 'some_value'
+      @model.version = -> 'some_version'
+      @collection.models = [@model]  
+      @modelsForSyncStub = sinon.stub(@collection, 'modelsForSync', => [@model])
+
+    it 'fetches the models that have to be synced', ->
+      @collection.dataForSync()
+      expect(@modelsForSyncStub).toHaveBeenCalled() 
+
+    it 'marks all models as synced', ->
+      @collection.syncModels()
+      expect(@modelsForSyncStub).toHaveBeenCalledWith(markSynced: true)
+  
+    it 'collects id, attributes and version for models that have patches', ->
+      @model.hasPatches = -> true
+      expect(@collection.dataForSync()).toEqual([
+        id: 'some_id'
+        attributes: 
+          attribute: 'some_value'
+        version: 'some_version'
+      ])
 
   describe '#processUpdates', ->
     beforeEach ->
@@ -85,16 +113,16 @@ describe 'Sync', ->
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
       )
-      @modelsForSyncStub = sinon.
-        stub(@collection, 'modelsForSync', -> ['dirty', 'models'])
+      @dataForSyncStub = sinon.
+        stub(@collection, 'dataForSync', -> [some: 'data'])
 
     it 'publishes all dirty models to the server', ->
       @collection.syncModels()
-      expect(@message.updates).toEqual(['dirty', 'models'])
+      expect(@message.updates).toEqual([some: 'data'])
 
     it 'marks all models as synced', ->
      @collection.syncModels()
-     expect(@modelsForSyncStub).toHaveBeenCalledWith(markSynced: true)
+     expect(@dataForSyncStub).toHaveBeenCalledWith(markSynced: true)
 
 
 

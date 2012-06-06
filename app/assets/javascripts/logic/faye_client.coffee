@@ -13,7 +13,7 @@ class @BackboneSync.FayeClient
     @modelName = options.modelName
     @subscribe()
 
-  publish: (message)->
+  publish: (message)->  
     message.client_id ||= Nomad.clientId
     message.model_name ||= @modelName
     @client.publish "/server/" + @modelName, message
