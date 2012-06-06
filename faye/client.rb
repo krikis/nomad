@@ -31,10 +31,11 @@ class ServerSideClient
   end
 
   def handle_versions(model, versions, client_id, results)
-    results['preSync'] = true
+    results['update'] ||= {}
     versions.each do |version|
       check_version(model, version, client_id, results)
     end
+    results['update']['preSync'] = true
   end
 
   def check_version(model, version, client_id, results)

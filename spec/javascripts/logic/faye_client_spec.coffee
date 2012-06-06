@@ -121,9 +121,14 @@ describe 'FayeClient', ->
       @backboneClient.update(id: {attribute: 'value'})
       expect(@processUpdatesStub).toHaveBeenCalledWith(id: {attribute: 'value'})
       
-    it 'has the collection sync models to the server after that', ->
-      @backboneClient.update()
+    it 'has the collection sync models to the server after that 
+        when it concerns presync feedback', ->
+      @backboneClient.update(preSync: true)
       expect(@syncModelsStub).toHaveBeenCalledAfter(@processUpdatesStub)
+      
+    it 'does not sync models to the server when it is no presync feedback', ->
+      @backboneClient.update({})
+      expect(@syncModelsStub).not.toHaveBeenCalled()
       
   describe '#ack', ->
     beforeEach ->

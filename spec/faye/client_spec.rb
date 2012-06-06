@@ -107,10 +107,10 @@ describe ServerSideClient do
       subject.handle_versions(model, [version], 'client_id', {})
     end
 
-    it 'flags the results as preSync results' do
+    it 'flags the update results as preSync results' do
       results = {}
       subject.handle_versions(model, [version], 'client_id', results)
-      results['preSync'].should be_true
+      results['update']['preSync'].should be_true
     end
   end
 

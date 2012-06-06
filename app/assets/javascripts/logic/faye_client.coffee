@@ -28,7 +28,7 @@ class @BackboneSync.FayeClient
 
   update: (params) ->
     @collection.processUpdates(params)
-    @collection.syncModels()
+    @collection.syncModels() if params.preSync
     
   resolve: (params) ->
     
