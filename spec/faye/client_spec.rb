@@ -71,30 +71,25 @@ describe ServerSideClient do
   describe '#process_message' do
     let(:model)   { TestModel }
     before do
-      subject.stub(:handle_versions => ['updates', 'conflicts'])
       subject.stub(:publish_results)
     end
 
     it 'handles versions if present' do
-      message = {'versions' => [{}]}
-      subject.should_receive(:handle_versions).with(model, message['versions'])
-      subject.process_message(model, message)
-    end
-
-    it 'passes through the generated updates and conflicts' do
-      message = {'versions' => [{}]}
-      subject.should_receive(:publish_results).with(message, {'update' => 'updates', 'resolve' => 'conflicts'})
-      subject.process_message(model, message)
-    end
-
-    it 'handles creates if present' do
-      message = {'creates' => [{}]}
-      subject.should_receive(:handle_creates).with(model, message['creates'])
+      message = {'versions' => stub}
+      subject.should_receive(:handle_versions).with(model, message['versions'], {})
       subject.process_message(model, message)
     end
 
     it 'handles updates if present' do
+      message = {'updates' => stub}
+      subject.should_receive(:handle_updates).with(model, message['updates'], {})
+      subject.process_message(model, message)
+    end
 
+    it 'handles creates if present' do
+      message = {'creates' => stub}
+      subject.should_receive(:handle_creates).with(model, message['creates'])
+      subject.process_message(model, message)
     end
 
     it 'handles destroys if present' do
@@ -126,24 +121,25 @@ describe ServerSideClient do
     it 'collects for each version an updated version if any exists' do
       model.should_receive(:find_by_remote_id).with('some_id')
       model.should_receive(:find_by_remote_id).with('other_id')
-      subject.handle_versions(model, versions)
+      subject.handle_versions(model, versions, {})
     end
 
     it 'checks for each found object whether its version
         supersedes the client\'s version' do
       remote_version.should_receive(:supersedes?).with('some_version')
-      subject.handle_versions(model, versions)
+      subject.handle_versions(model, versions, {})
     end
 
     it 'collects the JSON of all superseding objects' do
       subject.should_receive(:json_for).with(object).once()
-      subject.handle_versions(model, versions)
+      subject.handle_versions(model, versions, {})
     end
 
-    it 'returns an updates hash with ids for keys and json for values' do
-      updates, conflicts = subject.handle_versions(model, versions)
-      updates.should eq({'some_id' => 'some_json'})
-      conflicts.should be_blank
+    it 'fills the udpates hash with ids for keys and json for values' do
+      results = {}
+      subject.handle_versions(model, versions, results)
+      results['update'].should eq({'some_id' => 'some_json'})
+      results['resolve'].should be_blank
     end
 
     context 'when a new model preexists on the server' do
@@ -153,13 +149,74 @@ describe ServerSideClient do
 
       it 'does not collect the JSON of the object' do
         subject.should_not_receive(:json_for)
-        subject.handle_versions(model, versions)
+        subject.handle_versions(model, versions, {})
       end
 
       it 'returns a conflict' do
-        updates, conflicts = subject.handle_versions(model, versions)
-        conflicts.should eq(['some_id'])
-        updates.should be_blank
+        results = {}
+        subject.handle_versions(model, versions, results)
+        results['resolve'].should eq(['some_id'])
+        results['update'].should be_blank
+      end
+    end
+  end
+
+  describe '#handle_updates' do
+    let(:creates) { [{'id' => 'some_id',
+                      'attributes' => {'attribute' => 'some_value'},
+                      'version' => 'some_version'}] }
+    let(:model)   { TestModel }
+    let(:object) do
+      stub(:update_attributes => nil,
+           :update_attribute => nil)
+    end
+    before do
+      model.stub(:where).and_return([])
+      model.stub(:create).and_return(object)
+    end
+
+    it 'checks if an object with the provided id already exists' do
+      model.should_receive(:where).with(:remote_id => 'some_id')
+      subject.handle_creates(model, creates)
+    end
+
+    context 'when no such object exists' do
+      it 'creates an object for each entry' do
+        model.should_receive(:create).with(:remote_id => 'some_id')
+        subject.handle_creates(model, creates)
+      end
+
+      it 'updates the obect with the attributes provided' do
+        object.should_receive(:update_attributes).
+          with('attribute' => 'some_value')
+        subject.handle_creates(model, creates)
+      end
+
+      it 'sets the object version' do
+        object.should_receive(:update_attribute).
+          with(:remote_version, 'some_version')
+        subject.handle_creates(model, creates)
+      end
+
+      it 'returns an acknowledgement for the created object' do
+        conflicts, acks = subject.handle_creates(model, creates)
+        acks['some_id'].should eq('some_version')
+        conflicts.should be_blank
+      end
+    end
+
+    context 'when such object exists' do
+      before { TestModel.stub(:where).and_return([object]) }
+
+      it 'does not create the object' do
+        model.should_not_receive(:create)
+        subject.handle_creates(model, creates)
+      end
+
+      it 'returns the conflicting id' do
+        conflicts, acks = subject.handle_creates(model, creates)
+        conflicts.should include('some_id')
+        acks.should be_blank
       end
     end
   end
