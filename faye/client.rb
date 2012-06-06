@@ -72,7 +72,8 @@ class ServerSideClient
   end
 
   def process_update(model, object, update, results)
-    object ||= model.create :remote_id => update['id']
+    object ||= model.create
+    object.update_attribute(:remote_id, update['id']) unless object.remote_id.present?
     object.update_attributes(update['attributes'])
     object.update_attribute(:remote_version, update['version'])
   end

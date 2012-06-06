@@ -231,14 +231,24 @@ describe ServerSideClient do
     let(:model)  { TestModel }
     let(:object) do
       stub(:update_attributes => nil,
-           :update_attribute => nil)
+           :update_attribute => nil,
+           :remote_id => 'some_id')
     end
 
     context 'when no object is passed in' do
-      before { model.stub(:create => object) }
+      before do
+        object.stub(:remote_id => nil)
+        model.stub(:create => object)
+      end
 
-      it 'creates an object with the given id for remote_id' do
-        model.should_receive(:create).with(:remote_id => 'some_id')
+      it 'creates an object' do
+        model.should_receive(:create).with()
+        subject.process_update(model, nil, update, {})
+      end
+
+      it 'sets the object remote_id' do
+        object.should_receive(:update_attribute).
+          with(:remote_id, 'some_id')
         subject.process_update(model, nil, update, {})
       end
     end
