@@ -6,26 +6,27 @@
   versionDetails: () ->
     models = @modelsForSync()
     _(models).chain().map((model) ->
-      details =
-        id: model.id
-        version: model.version()
-      details['is_new'] = true unless model.isSynced()
-      details
+      id: model.id
+      version: model.version()
+      is_new: !model.isSynced()
     ).value()
 
-  modelsForSync: (options = {}) ->
+  modelsForSync: () ->
     _(@models).filter (model) ->
-      model.markAsSynced() if options.markSynced
       model.hasPatches()
 
   dataForSync: (options = {}) ->
-    models = @modelsForSync(options)
+    models = @modelsForSync()
     _(models).chain().map((model) ->
       json = model.toJSON()
       delete json.id
-      id: model.id
-      attributes: json
-      version: model.version()
+      details = 
+        id: model.id
+        attributes: json
+        version: model.version()
+        is_new: !model.isSynced()
+      model.markAsSynced() if options.markSynced
+      details
     ).value()
 
   processUpdates: (models) ->
