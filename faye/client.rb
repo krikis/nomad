@@ -75,6 +75,9 @@ class ServerSideClient
   def process_update(model, object, update, results)
     results['ack'] ||= {}
     object ||= model.create :remote_id => update['id']
+    object.update_attributes(update['attributes'])
+    object.update_attribute(:remote_version, update['version'])
+    results['ack'][update['id']] = update['version']
   end
 
   def handle_creates(model, creates)

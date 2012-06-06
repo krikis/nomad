@@ -197,7 +197,10 @@ describe ServerSideClient do
     let(:update) { stub }
     let(:model)  { TestModel }
     let(:object) { stub }
-    before { subject.stub(:check_version => [true, object]) }
+    before do
+      subject.stub(:check_version => [true, object],
+                   :process_update => nil)
+    end
 
     it 'checks the version of each update' do
       subject.should_receive(:check_version).with(model, update, an_instance_of(Hash))
@@ -218,8 +221,8 @@ describe ServerSideClient do
 
   describe '#process_update' do
     let(:update) { {'id' => 'some_id',
-                      'attributes' => {'attribute' => 'some_value'},
-                      'version' => 'some_version'} }
+                    'attributes' => {'attribute' => 'some_value'},
+                    'version' => 'some_version'} }
     let(:model)  { TestModel }
     let(:object) do
       stub(:update_attributes => nil,
@@ -227,51 +230,31 @@ describe ServerSideClient do
     end
 
     context 'when no object is passed in' do
+      before { model.stub(:create => object) }
+
       it 'creates an object with the given id for remote_id' do
         model.should_receive(:create).with(:remote_id => 'some_id')
         subject.process_update(model, nil, update, {})
       end
     end
 
-    # context 'when no such object exists' do
-    #   it 'creates an object for each entry' do
-    #     model.should_receive(:create).with(:remote_id => 'some_id')
-    #     subject.handle_creates(model, creates)
-    #   end
-    #
-    #   it 'updates the obect with the attributes provided' do
-    #     object.should_receive(:update_attributes).
-    #       with('attribute' => 'some_value')
-    #     subject.handle_creates(model, creates)
-    #   end
-    #
-    #   it 'sets the object version' do
-    #     object.should_receive(:update_attribute).
-    #       with(:remote_version, 'some_version')
-    #     subject.handle_creates(model, creates)
-    #   end
-    #
-    #   it 'returns an acknowledgement for the created object' do
-    #     conflicts, acks = subject.handle_creates(model, creates)
-    #     acks['some_id'].should eq('some_version')
-    #     conflicts.should be_blank
-    #   end
-    # end
-    #
-    # context 'when such object exists' do
-    #   before { TestModel.stub(:where).and_return([object]) }
-    #
-    #   it 'does not create the object' do
-    #     model.should_not_receive(:create)
-    #     subject.handle_creates(model, creates)
-    #   end
-    #
-    #   it 'returns the conflicting id' do
-    #     conflicts, acks = subject.handle_creates(model, creates)
-    #     conflicts.should include('some_id')
-    #     acks.should be_blank
-    #   end
-    # end
+    it 'updates the object with the attributes provided' do
+      object.should_receive(:update_attributes).
+        with('attribute' => 'some_value')
+      subject.process_update(model, object, update, {})
+    end
+
+    it 'sets the object version' do
+      object.should_receive(:update_attribute).
+        with(:remote_version, 'some_version')
+      subject.process_update(model, object, update, {})
+    end
+
+    it 'returns an acknowledgement for the created object' do
+      results = {}
+      subject.process_update(model, object, update, results)
+      results['ack']['some_id'].should eq('some_version')
+    end
   end
 
   describe '#handle_creates' do
