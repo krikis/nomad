@@ -35,27 +35,38 @@ class ServerSideClient
   end
 
   def handle_versions(model, versions, results)
+    versions.each do |version|
+      check_version(model, version, results)
+    end
+  end
+
+  def check_version(model, version, results)
     results['update'] ||= {}
     results['resolve'] ||= []
-    versions.each do |version|
-      object = model.find_by_remote_id(version['id'])
-      if object
-        # Detect id conflict caused by haphazardly generating
-        # random id on client
-        if version['is_new']
-          results['resolve'] << version['id']
-        # Compare the client version to the server version
-        # to see if the server supersedes the client
-        elsif object.remote_version.supersedes? version['version']
-          results['update'][object.remote_id] = json_for(object)
-        end
+    object = model.find_by_remote_id(version['id'])
+    if object
+      # Detect id conflict caused by haphazardly generating
+      # random id on client
+      if version['is_new']
+        results['resolve'] << version['id']
+        false
+      # Compare the client version to the server version
+      # to see if the server supersedes the client
+      elsif object.remote_version.supersedes? version['version']
+        results['update'][object.remote_id] = json_for(object)
+        false
+      else
+        [true, object]
       end
+    else
+      true
     end
   end
 
   def handle_updates(model, updates, results)
+    results['ack'] ||= {}
     updates.each do |update|
-      object = model.find_by_remote_id(update['id'])
+      check_version(model, update, results)
     end
   end
 

@@ -104,59 +104,91 @@ describe ServerSideClient do
   end
 
   describe '#handle_versions' do
-    let(:versions)       { [{'id' => 'some_id',
-                             'version' => 'some_version'},
-                            {'id' => 'other_id',
-                             'version' => 'other_version'}] }
-    let(:model)          { TestModel }
-    let(:remote_version) { stub(:supersedes? => true) }
-    let(:object)         { stub(:attributes => {},
-                                :remote_id => 'some_id',
-                                :remote_version => remote_version) }
+    let(:version) { stub }
+    let(:model)   { TestModel }
+
+    it 'checks the version of each entry' do
+      subject.should_receive(:check_version).with(model, version, {})
+      subject.handle_versions(model, [version], {})
+    end
+  end
+
+  describe '#check_version' do
+    let(:version) { {'id' => 'some_id',
+                     'version' => 'some_version'} }
+    let(:model)   { TestModel }
     before do
-      TestModel.stub(:find_by_remote_id).and_return(object, nil)
+      TestModel.stub(:find_by_remote_id)
       subject.stub(:json_for => 'some_json')
     end
 
-    it 'collects for each version an updated version if any exists' do
+    it 'tries to find an updated version' do
       model.should_receive(:find_by_remote_id).with('some_id')
-      model.should_receive(:find_by_remote_id).with('other_id')
-      subject.handle_versions(model, versions, {})
+      subject.check_version(model, version, {})
     end
 
-    it 'checks for each found object whether its version
-        supersedes the client\'s version' do
-      remote_version.should_receive(:supersedes?).with('some_version')
-      subject.handle_versions(model, versions, {})
+    it 'returns true if no object is found' do
+      subject.check_version(model, version, {}).should be_true
     end
 
-    it 'collects the JSON of all superseding objects' do
-      subject.should_receive(:json_for).with(object).once()
-      subject.handle_versions(model, versions, {})
-    end
+    context 'when an object is found' do
+      let(:remote_version) { stub(:supersedes? => false) }
+      let(:object) { stub(:attributes => {},
+                          :remote_id => 'some_id',
+                          :remote_version => remote_version) }
+      before { TestModel.stub(:find_by_remote_id).and_return(object) }
 
-    it 'fills the udpates hash with ids for keys and json for values' do
-      results = {}
-      subject.handle_versions(model, versions, results)
-      results['update'].should eq({'some_id' => 'some_json'})
-      results['resolve'].should be_blank
-    end
-
-    context 'when a new model preexists on the server' do
-      let(:versions) { [{'id' => 'some_id',
-                         'version' => 'some_version',
-                         'is_new' => true}] }
-
-      it 'does not collect the JSON of the object' do
-        subject.should_not_receive(:json_for)
-        subject.handle_versions(model, versions, {})
+      it 'checks whether its version supersedes the client\'s version' do
+        remote_version.should_receive(:supersedes?).with('some_version')
+        subject.check_version(model, version, {})
       end
 
-      it 'returns a conflict' do
-        results = {}
-        subject.handle_versions(model, versions, results)
-        results['resolve'].should eq(['some_id'])
-        results['update'].should be_blank
+      context 'and the version was expected to be new' do
+        let(:version) { {'id' => 'some_id',
+                         'version' => 'some_version',
+                         'is_new' => true} }
+
+        it 'does not collect the JSON of the object' do
+          subject.should_not_receive(:json_for)
+          subject.check_version(model, version, {})
+        end
+
+        it 'files the version for conflict resolution' do
+          results = {}
+          subject.check_version(model, version, results)
+          results['resolve'].should eq(['some_id'])
+          results['update'].should be_blank
+        end
+
+        it 'returns false' do
+          subject.check_version(model, version, {}).should be_false
+        end
+      end
+
+      context 'and the object supersedes the client version' do
+        let(:remote_version) { stub(:supersedes? => true) }
+
+        it 'collects the JSON of the object' do
+          subject.should_receive(:json_for).with(object).once()
+          subject.check_version(model, version, {})
+        end
+
+        it 'fills the udpate hash with id and json' do
+          results = {}
+          subject.check_version(model, version, results)
+          results['update'].should eq({'some_id' => 'some_json'})
+          results['resolve'].should be_blank
+        end
+
+        it 'returns false' do
+          subject.check_version(model, version, {}).should be_false
+        end
+      end
+
+      context 'and the object does not supersede the client version' do
+        it 'returns true and the object' do
+          subject.check_version(model, version, {}).should eq([true, object])
+        end
       end
     end
   end
@@ -174,44 +206,47 @@ describe ServerSideClient do
       TestModel.stub(:find_by_remote_id)
     end
 
-    it 'tries to find the object with the given id' do
-      model.should_receive(:find_by_remote_id).with('some_id')
+    it 'checks the version of each update' do
+      subject.should_receive(:check_version).with(model, updates.first, an_instance_of(Hash))
       subject.handle_updates(model, updates, {})
     end
+
+    context ''
+
 
     # context 'when no such object exists' do
     #   it 'creates an object for each entry' do
     #     model.should_receive(:create).with(:remote_id => 'some_id')
     #     subject.handle_creates(model, creates)
     #   end
-    # 
+    #
     #   it 'updates the obect with the attributes provided' do
     #     object.should_receive(:update_attributes).
     #       with('attribute' => 'some_value')
     #     subject.handle_creates(model, creates)
     #   end
-    # 
+    #
     #   it 'sets the object version' do
     #     object.should_receive(:update_attribute).
     #       with(:remote_version, 'some_version')
     #     subject.handle_creates(model, creates)
     #   end
-    # 
+    #
     #   it 'returns an acknowledgement for the created object' do
     #     conflicts, acks = subject.handle_creates(model, creates)
     #     acks['some_id'].should eq('some_version')
     #     conflicts.should be_blank
     #   end
     # end
-    # 
+    #
     # context 'when such object exists' do
     #   before { TestModel.stub(:where).and_return([object]) }
-    # 
+    #
     #   it 'does not create the object' do
     #     model.should_not_receive(:create)
     #     subject.handle_creates(model, creates)
     #   end
-    # 
+    #
     #   it 'returns the conflicting id' do
     #     conflicts, acks = subject.handle_creates(model, creates)
     #     conflicts.should include('some_id')
