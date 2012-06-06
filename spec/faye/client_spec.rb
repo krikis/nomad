@@ -86,12 +86,6 @@ describe ServerSideClient do
       subject.process_message(model, message)
     end
 
-    it 'handles creates if present' do
-      message = {'creates' => stub}
-      subject.should_receive(:handle_creates).with(model, message['creates'])
-      subject.process_message(model, message)
-    end
-
     it 'handles destroys if present' do
 
     end
@@ -254,66 +248,6 @@ describe ServerSideClient do
       results = {}
       subject.process_update(model, object, update, results)
       results['ack']['some_id'].should eq('some_version')
-    end
-  end
-
-  describe '#handle_creates' do
-    let(:creates) { [{'id' => 'some_id',
-                      'attributes' => {'attribute' => 'some_value'},
-                      'version' => 'some_version'}] }
-    let(:model)   { TestModel }
-    let(:object) do
-      stub(:update_attributes => nil,
-           :update_attribute => nil)
-    end
-    before do
-      model.stub(:where).and_return([])
-      model.stub(:create).and_return(object)
-    end
-
-    it 'checks if an object with the provided id already exists' do
-      model.should_receive(:where).with(:remote_id => 'some_id')
-      subject.handle_creates(model, creates)
-    end
-
-    context 'when no such object exists' do
-      it 'creates an object for each entry' do
-        model.should_receive(:create).with(:remote_id => 'some_id')
-        subject.handle_creates(model, creates)
-      end
-
-      it 'updates the obect with the attributes provided' do
-        object.should_receive(:update_attributes).
-          with('attribute' => 'some_value')
-        subject.handle_creates(model, creates)
-      end
-
-      it 'sets the object version' do
-        object.should_receive(:update_attribute).
-          with(:remote_version, 'some_version')
-        subject.handle_creates(model, creates)
-      end
-
-      it 'returns an acknowledgement for the created object' do
-        conflicts, acks = subject.handle_creates(model, creates)
-        acks['some_id'].should eq('some_version')
-        conflicts.should be_blank
-      end
-    end
-
-    context 'when such object exists' do
-      before { TestModel.stub(:where).and_return([object]) }
-
-      it 'does not create the object' do
-        model.should_not_receive(:create)
-        subject.handle_creates(model, creates)
-      end
-
-      it 'returns the conflicting id' do
-        conflicts, acks = subject.handle_creates(model, creates)
-        conflicts.should include('some_id')
-        acks.should be_blank
-      end
     end
   end
 

@@ -27,10 +27,6 @@ class ServerSideClient
     if message['updates'].present?
       handle_updates(model, message['updates'], results)
     end
-    if message['creates'].present?
-      results['conflict'], results['ack'] =
-        handle_creates(model, message['creates'])
-    end
     publish_results(message, results)
   end
 
@@ -78,22 +74,6 @@ class ServerSideClient
     object.update_attributes(update['attributes'])
     object.update_attribute(:remote_version, update['version'])
     results['ack'][update['id']] = update['version']
-  end
-
-  def handle_creates(model, creates)
-    conflicts = []
-    acks = {}
-    creates.each do |create|
-      if model.where(:remote_id => create['id']).blank?
-        object = model.create(:remote_id => create['id'])
-        object.update_attributes(create['attributes'])
-        object.update_attribute(:remote_version, create['version'])
-        acks[create['id']] = create['version']
-      else
-        conflicts << create['id']
-      end
-    end
-    [conflicts, acks]
   end
 
   def json_for(object)
