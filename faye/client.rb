@@ -53,6 +53,12 @@ class ServerSideClient
     end
   end
 
+  def handle_updates(model, updates, results)
+    updates.each do |update|
+      object = model.find_by_remote_id(update['id'])
+    end
+  end
+
   def handle_creates(model, creates)
     conflicts = []
     acks = {}
