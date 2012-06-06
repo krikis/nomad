@@ -11,7 +11,7 @@ class Hash
   # the opportunity to synchonize all writes. In future work transactions
   # may be used to guarantee synchronicity of vector writes.
   #
-  # In future work numerical overflows in clock values should be tackled 
+  # In future work numerical overflows in clock values should be dealt with 
   # by considering the shortest distance in a circular range. The value
   # ahead on the path with shortest distance supersedes the other values.
   # This approach is justified by the rationale that the path with shortest
