@@ -1,5 +1,6 @@
 require File.expand_path('../app',    __FILE__)
 require File.expand_path('../client', __FILE__)
+require File.expand_path('../vector_clock', __FILE__)
 
 class SyncServer
   include Faye::Logging
