@@ -22,21 +22,21 @@ class ServerSideClient
   def process_message(model, message)
     results = {}
     if message['versions'].present?
-      handle_versions(model, message['versions'], results)
+      handle_versions(model, message['versions'], message['client_id'], results)
     end
     if message['updates'].present?
-      handle_updates(model, message['updates'], results)
+      handle_updates(model, message['updates'], message['client_id'], results)
     end
     publish_results(message, results)
   end
 
-  def handle_versions(model, versions, results)
+  def handle_versions(model, versions, client_id, results)
     versions.each do |version|
-      check_version(model, version, results)
+      check_version(model, version, client_id, results)
     end
   end
 
-  def check_version(model, version, results)
+  def check_version(model, version, client_id, results)
     results['update'] ||= {}
     results['resolve'] ||= []
     object = model.find_by_remote_id(version['id'])
@@ -45,6 +45,8 @@ class ServerSideClient
       # random id on client
       if version['is_new']
         results['resolve'] << version['id']
+        false
+      elsif object.remote_version.obsoletes? version['version'], client_id
         false
       # Compare the client version to the server version
       # to see if the server supersedes the client
@@ -59,9 +61,9 @@ class ServerSideClient
     end
   end
 
-  def handle_updates(model, updates, results)
+  def handle_updates(model, updates, client_id, results)
     updates.each do |update|
-      success, object = check_version(model, update, results)
+      success, object = check_version(model, update, client_id, results)
       if success
         process_update(model, object, update, results)
       end

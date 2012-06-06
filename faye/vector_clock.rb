@@ -1,5 +1,11 @@
 class Hash
 
+  # Check whether the provided version is obsolete 
+  # with respect to the server state
+  def obsoletes?(vector, client_id)
+    self[client_id] >= vector[client_id]
+  end
+
   # Check whether +self+ supersedes +vector+ in a vector clock way.
   #
   # We say that +self+ supersedes +vector+ when at least one value
@@ -11,13 +17,13 @@ class Hash
   # the opportunity to synchonize all writes. In future work transactions
   # may be used to guarantee synchronicity of vector writes.
   #
-  # In future work numerical overflows in clock values should be dealt with 
+  # In future work numerical overflows in clock values should be dealt with
   # by considering the shortest distance in a circular range. The value
   # ahead on the path with shortest distance supersedes the other values.
   # This approach is justified by the rationale that the path with shortest
   # distance is most likely the correct path from the old clock value
-  # to the new clock value. This prevents overflowed clock values to be 
-  # treated as old clock values, thus blocking all updates on a once 
+  # to the new clock value. This prevents overflowed clock values to be
+  # treated as old clock values, thus blocking all updates on a once
   # overflowed object.
   #
   def supersedes?(vector)
