@@ -37,7 +37,12 @@
   isSynced: ->
     @_versioning?.synced
     
-  handleUpdate: ->
+  handleUpdate: (attributes) ->
+    handler = @checkVersion(attributes['remote_version'])
+    @[handler] attributes
+    
+  checkVersion: (remote_version) ->
+    
 
   rebase: (attributes) ->
     version = attributes.remote_version

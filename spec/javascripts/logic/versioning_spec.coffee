@@ -172,6 +172,29 @@ describe 'Versioning', ->
     it 'returns whether the model has been synced yet', ->
       @model._versioning = {synced: true}
       expect(@model.isSynced()).toBeTruthy()
+      
+  describe '#handleUpdate', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+        handler: ->
+      @model = new TestModel
+      @checkVersionStub = sinon.stub(@model, 'checkVersion', -> 'handler')
+      @handlerStub = sinon.stub(@model, 'handler')
+    
+    it 'checks the version of the update', ->
+      @model.handleUpdate
+        attribute: 'value'
+        remote_version: 'version'
+      expect(@checkVersionStub).toHaveBeenCalledWith('version')
+      
+    it 'calls the handler returned by checkVersion', ->
+      @model.handleUpdate
+        attribute: 'value'
+        remote_version: 'version'
+      expect(@handlerStub).toHaveBeenCalledWith
+        attribute: 'value'
+        remote_version: 'version'
+        
 
   describe '#rebase', ->
     beforeEach ->
