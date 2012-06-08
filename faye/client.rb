@@ -50,18 +50,18 @@ class ServerSideClient
     results['resolve'] ||= []
     object = model.find_by_remote_id(version['id'])
     if object
-      # Detect id conflict caused by haphazardly generating
-      # random id on client
+      # File update for id resolution if random generated id is already taken
       if version['is_new']
         results['resolve'] << version['id']
         false
+      # Discard update if obsolete
       elsif object.remote_version.obsoletes? version['version'], client_id
         false
-      # Compare the client version to the server version
-      # to see if the server supersedes the client
+      # File update for rebase if server version supersedes client version
       elsif object.remote_version.supersedes? version['version']
         add_update_for(object, results)
         false
+      # Process the update
       else
         [true, object]
       end
