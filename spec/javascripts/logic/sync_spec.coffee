@@ -86,16 +86,18 @@ describe 'Sync', ->
       @rebaseStub = sinon.stub(@model, 'rebase', -> @)
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
-
-    it 'rebases each model that is found in the collection', ->
-      @getStub = sinon.stub @collection, 'get', (id) =>
-        @model if id == 'id'
+      @getStub = sinon.stub(@collection, 'get', => @model)
+      @handleUpdateStub = sinon.stub(@model, 'handleUpdate')
+      
+    it 'fetches the model with the provided id from the collection', ->
       @collection.processUpdates
         id: {attribute: 'value'}
-        other_id: {attribute: 'other_value'}
-      expect(@rebaseStub).toHaveBeenCalledWith(attribute: 'value')
-      expect(@rebaseStub).not.
-        toHaveBeenCalledWith(attribute: 'other_value')
+      expect(@getStub).toHaveBeenCalledWith('id')
+      
+    it 'lets the model handle the update', ->
+      @collection.processUpdates
+        id: {attribute: 'value'}
+      expect(@handleUpdateStub).toHaveBeenCalledWith(attribute: 'value')
 
   describe '#syncModels', ->
     beforeEach ->

@@ -36,6 +36,8 @@
     
   isSynced: ->
     @_versioning?.synced
+    
+  handleUpdate: ->
 
   rebase: (attributes) ->
     version = attributes.remote_version

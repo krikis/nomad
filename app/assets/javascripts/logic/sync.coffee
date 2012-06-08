@@ -32,7 +32,7 @@
   processUpdates: (models) ->
     _.map models, (attributes, id) =>
       model = @get(id)
-      model?.rebase attributes
+      model?.handleUpdate attributes
 
   syncModels: (updated) ->
     @fayeClient.publish
