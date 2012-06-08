@@ -75,14 +75,18 @@ describe ServerSideClient do
     end
 
     it 'handles versions if present' do
-      message = {'versions' => stub, 'client_id' => 'some_unique_id'}
-      subject.should_receive(:handle_versions).with(model, message['versions'], message['client_id'], {})
+      message = {'versions' => stub, 'client_id' => 'some_id'}
+      subject.should_receive(:handle_versions).
+        with(model, message['versions'], 'some_id', {})
       subject.process_message(model, message)
     end
 
     it 'handles updates if present' do
-      message = {'updates' => stub, 'client_id' => 'some_unique_id'}
-      subject.should_receive(:handle_updates).with(model, message['updates'], message['client_id'], {})
+      message = {'updates' => stub,
+                 'client_id' => 'some_id',
+                 'model_name' => 'some_model'}
+      subject.should_receive(:handle_updates).
+        with(model, message['updates'], 'some_id', 'some_model', {})
       subject.process_message(model, message)
     end
 
@@ -211,23 +215,31 @@ describe ServerSideClient do
     let(:object) { stub }
     before do
       subject.stub(:check_version => [true, object],
-                   :process_update => nil)
+                   :process_update => nil,
+                   :mcast_updates => nil)
     end
 
     it 'checks the version of each update' do
       subject.should_receive(:check_version).with(model, update, 'client_id', an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', {})
+      subject.handle_updates(model, [update], 'client_id', 'model_name', {})
     end
 
     it 'issues an update if the version check is successful' do
       subject.should_receive(:process_update).with(model, object, update, an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', {})
+      subject.handle_updates(model, [update], 'client_id', 'model_name', {})
     end
 
     it 'issues no update if the version check was unsuccessful' do
       subject.stub(:check_version => [false, object])
       subject.should_not_receive(:process_update).with(model, object, update, an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', {})
+      subject.handle_updates(model, [update], 'client_id', 'model_name', {})
+    end
+
+    it 'multicasts all successful updates' do
+      other_update = stub
+      subject.stub(:process_update).and_return(true, nil)
+      subject.should_receive(:mcast_updates).with('model_name', [update])
+      subject.handle_updates(model, [update, other_update], 'client_id', 'model_name', {})
     end
   end
 
@@ -239,7 +251,8 @@ describe ServerSideClient do
     let(:object) do
       stub(:update_attributes => nil,
            :update_attribute => nil,
-           :remote_id => 'some_id')
+           :remote_id => 'some_id',
+           :valid? => true)
     end
 
     context 'when no object is passed in' do
@@ -270,6 +283,21 @@ describe ServerSideClient do
       object.should_receive(:update_attribute).
         with(:remote_version, 'some_version')
       subject.process_update(model, object, update, {})
+    end
+
+    it 'returns whether the object was successfully updated' do
+      subject.process_update(model, object, update, {}).should be_true
+    end
+  end
+
+  describe '#mcast_updates' do
+    let(:update) { {'id' => 'some_id',
+                    'attributes' => {'attribute' => 'some_value'},
+                    'version' => 'some_version'} }
+
+    it 'multicasts a list of updates' do
+      client.should_receive(:publish).with('/sync/TestModel', [update])
+      subject.mcast_updates('TestModel', [update])
     end
   end
 

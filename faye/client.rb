@@ -22,10 +22,17 @@ class ServerSideClient
   def process_message(model, message)
     results = {}
     if message['versions'].present?
-      handle_versions(model, message['versions'], message['client_id'], results)
+      handle_versions(model,
+                      message['versions'],
+                      message['client_id'],
+                      results)
     end
     if message['updates'].present?
-      handle_updates(model, message['updates'], message['client_id'], results)
+      handle_updates(model,
+                     message['updates'],
+                     message['client_id'],
+                     message['model_name'],
+                     results)
     end
     publish_results(message, results)
   end
@@ -63,14 +70,14 @@ class ServerSideClient
     end
   end
 
-  def handle_updates(model, updates, client_id, results)
-    updates.each do |update|
+  def handle_updates(model, updates, client_id, model_name, results)
+    successful_updates = updates.select do |update|
       success, object = check_version(model, update, client_id, results)
       if success
         process_update(model, object, update, results)
       end
     end
-    # TODO::collect successful updates and multicast to all clients
+    mcast_updates model_name, successful_updates
   end
 
   def process_update(model, object, update, results)
@@ -78,6 +85,12 @@ class ServerSideClient
     object.update_attribute(:remote_id, update['id']) unless object.remote_id.present?
     object.update_attributes(update['attributes'])
     object.update_attribute(:remote_version, update['version'])
+    object.valid?
+  end
+
+  def mcast_updates(model_name, updates)
+    channel = "/sync/#{model_name}"
+    @client.publish(channel, updates)
   end
 
   def json_for(object)
@@ -93,7 +106,7 @@ class ServerSideClient
   end
 
   def publish
-    EM.add_periodic_timer(30) {
+    EM.add_periodic_timer(360) {
       @client.publish('/sync/some_channel', 'hello' => 'world')
     }
   end
