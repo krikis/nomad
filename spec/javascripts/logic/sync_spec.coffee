@@ -18,7 +18,7 @@ describe 'Sync', ->
       @collection.preSync()
       expect(@message.versions).toEqual(['version', 'details'])
 
-  describe '#versionDetails', ->
+  describe '#_versionDetails', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
@@ -36,7 +36,7 @@ describe 'Sync', ->
       versions = @collection._versionDetails()
       expect(versions).toEqual [{id: 'some_id', version: 'vector_clock', is_new: false}]
 
-  describe '#modelsForSync', ->
+  describe '#_modelsForSync', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
@@ -89,7 +89,7 @@ describe 'Sync', ->
      @collection.syncModels()
      expect(@dataForSyncStub).toHaveBeenCalledWith(markSynced: true)
      
- describe '#dataForSync', ->
+ describe '#_dataForSync', ->
    beforeEach ->
      class TestCollection extends Backbone.Collection
      @collection = new TestCollection([], modelName: 'TestModel')

@@ -43,17 +43,6 @@ describe 'Versioning', ->
     it 'fetches the vector clock of the versioning object', ->
       expect(@model.version()).toEqual(@vector)
 
-  describe '#localClock', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel
-      vector = {}
-      vector[Nomad.clientId] = 1
-      @model._versioning = {vector: vector}
-
-    it 'returns the local clock of the model\'s version', ->
-      expect(@model._localClock()).toEqual(1)
-
   describe '#addPatch', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -98,7 +87,18 @@ describe 'Versioning', ->
       @model.addPatch()
       expect(@tickVersionStub).toHaveBeenCalledAfter(@createPatchStub)
 
-  describe '#createPatch', ->
+  describe '#_localClock', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      vector = {}
+      vector[Nomad.clientId] = 1
+      @model._versioning = {vector: vector}
+
+    it 'returns the local clock of the model\'s version', ->
+      expect(@model._localClock()).toEqual(1)
+
+  describe '#_createPatch', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('answer')
@@ -118,7 +118,7 @@ describe 'Versioning', ->
       out = @model._createPatch('local_clock')
       expect(out.base).toEqual('local_clock')
 
-  describe '#tickVersion', ->
+  describe '#_tickVersion', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
@@ -195,7 +195,7 @@ describe 'Versioning', ->
         attribute: 'value'
         remote_version: 'version'
         
-  describe '#checkVersion', ->
+  describe '#_checkVersion', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
@@ -235,7 +235,7 @@ describe 'Versioning', ->
       it 'returns the update handler', ->
         expect(@model._checkVersion({})).toEqual('_update')
 
-  describe '#forwardTo', ->
+  describe '#_forwardTo', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
@@ -262,7 +262,7 @@ describe 'Versioning', ->
       @model._forwardTo(remote_version: {})
       expect(@patchesShiftSpy).not.toHaveBeenCalledAfter(@modelSaveStub)
 
-  describe '#rebase', ->
+  describe '#_rebase', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('answer')
@@ -330,7 +330,7 @@ describe 'Versioning', ->
 
       it 'creates a diff for each attribute'
 
-  describe '#processPatches', ->
+  describe '#_processPatches', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
@@ -359,7 +359,7 @@ describe 'Versioning', ->
       it 'returns false when at least one patch was unsuccessful', ->
         expect(@model._processPatches(_(['some', 'more', 'patches']))).toBeFalsy()
 
-  describe '#applyPatch', ->
+  describe '#_applyPatch', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
@@ -418,7 +418,7 @@ describe 'Versioning', ->
       it 'returns false', ->
         expect(@model._applyPatch()).toBeFalsy()
 
-  describe '#updateVersionTo', ->
+  describe '#_updateVersionTo', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
@@ -436,7 +436,7 @@ describe 'Versioning', ->
         some_unique_id: 3
         some_other_id: 4
 
-  describe '#update', ->
+  describe '#_update', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
