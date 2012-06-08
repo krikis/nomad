@@ -23,12 +23,14 @@ class @BackboneSync.FayeClient
     @client.subscribe "/sync/#{@modelName}/#{Nomad.clientId}", @receive, @
 
   receive: (message) ->
+    meta = message.meta
+    delete message.meta
     _.each message, (eventArguments, event) =>
       @[event] eventArguments
+    @collection.syncModels() if meta?.preSync
 
   update: (params) ->
     @collection.processUpdates(params)
-    @collection.syncModels() if params.preSync
     
   resolve: (params) ->
 

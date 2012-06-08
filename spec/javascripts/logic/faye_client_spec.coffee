@@ -91,26 +91,46 @@ describe 'FayeClient', ->
 
   describe '#receive', ->
     beforeEach ->
+      @syncModelsStub = sinon.stub(@collection, 'syncModels')
       @backboneClient = new BackboneSync.FayeClient @collection,
                                                 modelName: @modelName
+      @backboneClient.meta = sinon.stub()
       @backboneClient.method_1 = sinon.stub()
       @backboneClient.method_2 = sinon.stub()
-
-    it 'calls a method for each entry in the message', ->
+      
+    it 'calls a method for each actual entry in the message', ->
       @backboneClient.receive
+        meta:
+          meta: 'information'
         method_1:
           id: {attribute_1: 'test'}
         method_2:
           id: {attribute_2: 'receive'}
+      expect(@backboneClient.meta).not.toHaveBeenCalled()
       expect(@backboneClient.method_1).
         toHaveBeenCalledWith(id: {attribute_1: 'test'})
       expect(@backboneClient.method_2).
         toHaveBeenCalledWith(id: {attribute_2: 'receive'})
 
+    it 'has the collection sync models to the server after that 
+        when it concerns presync feedback', ->
+      @backboneClient.receive
+        meta:
+          preSync: true
+        method_1:
+          id: {attribute_1: 'test'}
+      expect(@syncModelsStub).toHaveBeenCalled()
+      expect(@syncModelsStub).toHaveBeenCalledAfter(@backboneClient.method_1)
+
+    it 'does not sync models to the server when it is no presync feedback', ->
+      @backboneClient.receive({})
+      expect(@syncModelsStub).not.toHaveBeenCalled()
+        
+    
+
   describe '#update', ->
     beforeEach ->
       @processUpdatesStub = sinon.stub(@collection, 'processUpdates')
-      @syncModelsStub = sinon.stub(@collection, 'syncModels')
       @backboneClient = new BackboneSync.FayeClient @collection,
                                                     modelName: @modelName
 
@@ -120,15 +140,6 @@ describe 'FayeClient', ->
     it 'has the collection process the updates', ->
       @backboneClient.update(id: {attribute: 'value'})
       expect(@processUpdatesStub).toHaveBeenCalledWith(id: {attribute: 'value'})
-      
-    it 'has the collection sync models to the server after that 
-        when it concerns presync feedback', ->
-      @backboneClient.update(preSync: true)
-      expect(@syncModelsStub).toHaveBeenCalledAfter(@processUpdatesStub)
-      
-    it 'does not sync models to the server when it is no presync feedback', ->
-      @backboneClient.update({})
-      expect(@syncModelsStub).not.toHaveBeenCalled()
       
 
 
