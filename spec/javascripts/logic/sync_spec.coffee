@@ -30,7 +30,7 @@ describe 'Sync', ->
 
     it 'publishes a list of new version details to the server', ->
       @collection.preSync()
-      expect(@message.newVersions).toEqual(['version', 'details'])
+      expect(@message.new_versions).toEqual(['version', 'details'])
 
     it 'publishes a list of version details to the server', ->
       @collection.preSync()
@@ -90,7 +90,7 @@ describe 'Sync', ->
     it 'collects the ids and versions of the models', ->
       @model.isSynced = -> true
       versions = @collection._versionDetails([@model])
-      expect(versions).toEqual [{id: 'some_id', version: 'vector_clock', is_new: false}]
+      expect(versions).toEqual [{id: 'some_id', version: 'vector_clock'}]
 
   describe '#processUpdates', ->
     beforeEach ->
@@ -146,13 +146,12 @@ describe 'Sync', ->
      @collection._dataForSync()
      expect(@modelsForSyncStub).toHaveBeenCalled()
 
-   it 'collects id, attributes, version and sync state', ->
+   it 'collects id, attributes and version', ->
      expect(@collection._dataForSync()).toEqual([
        id: 'some_id'
        attributes:
          attribute: 'some_value'
        version: 'some_version'
-       is_new: true
      ])
 
    it 'marks the models as synced if the markSynced option is set', ->

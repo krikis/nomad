@@ -1,14 +1,13 @@
 @Sync =
   preSync: ->
     @fayeClient.publish
-      newVersions: @_versionDetails(@_newModelsForSync())
+      new_versions: @_versionDetails(@_newModelsForSync())
       versions: @_versionDetails(@_modelsForSync())
 
   _versionDetails: (models) ->
     _(models).chain().map((model) ->
       id: model.id
       version: model.version()
-      is_new: !model.isSynced()
     ).value()
     
   _newModelsForSync: () ->
@@ -37,7 +36,6 @@
         id: model.id
         attributes: json
         version: model.version()
-        is_new: !model.isSynced()
       model.markAsSynced() if options.markSynced
       details
     ).value()
