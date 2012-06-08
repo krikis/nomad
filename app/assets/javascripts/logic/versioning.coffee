@@ -70,12 +70,6 @@
       @save()
       return @
     false
-    
-  updateVersionTo: (version) ->    
-    vector = @_versioning.vector
-    _.each version, (value, clock) ->
-      if not vector[clock]? or value > vector[clock]
-        vector[clock] = value 
 
   processPatches: (patches) ->
     patches.all (patch) =>
@@ -92,6 +86,19 @@
       true
     else
       false
+
+  updateVersionTo: (version) ->    
+    vector = @_versioning.vector
+    _.each version, (value, clock) ->
+      if not vector[clock]? or value > vector[clock]
+        vector[clock] = value
+        
+  update: (attributes) ->
+    version = attributes.remote_version
+    delete attributes.remote_version
+    @set attributes
+    @updateVersionTo(version)
+    @save()
     
 # extend Backbone.Model
 _.extend Backbone.Model::, @Versioning

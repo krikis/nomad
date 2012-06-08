@@ -329,25 +329,6 @@ describe 'Versioning', ->
       it 'filters out the attributes that differ'
 
       it 'creates a diff for each attribute'
-      
-  describe '#updateVersionTo', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel
-      @model._versioning =
-        vector: 
-          some_unique_id: 3
-    
-    it 'updates each clock with a remote value if the local value is lower', ->
-      @model.updateVersionTo(some_unique_id: 4)
-      expect(@model._versioning.vector).toEqual(some_unique_id: 4)  
-      
-    it 'adds a remote clock if it did not exist locally', ->
-      @model.updateVersionTo(some_other_id: 4)
-      expect(@model._versioning.vector).toEqual
-        some_unique_id: 3
-        some_other_id: 4
-          
 
   describe '#processPatches', ->
     beforeEach ->
@@ -437,3 +418,45 @@ describe 'Versioning', ->
       it 'returns false', ->
         expect(@model.applyPatch()).toBeFalsy()
 
+  describe '#updateVersionTo', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      @model._versioning =
+        vector: 
+          some_unique_id: 3
+
+    it 'updates each clock with a remote value if the local value is lower', ->
+      @model.updateVersionTo(some_unique_id: 4)
+      expect(@model._versioning.vector).toEqual(some_unique_id: 4)  
+
+    it 'adds a remote clock if it did not exist locally', ->
+      @model.updateVersionTo(some_other_id: 4)
+      expect(@model._versioning.vector).toEqual
+        some_unique_id: 3
+        some_other_id: 4
+
+  describe '#update', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      @modelSetStub = sinon.stub(@model, 'set')
+      @updateVersionToStub = sinon.stub(@model, 'updateVersionTo')
+      @modelSaveStub = sinon.stub(@model, 'save')
+      
+    it 'sets the updated attributes on the model, except for the remote_version', ->
+      @model.update
+        attribute: 'value'
+        remote_version: 'version'
+      expect(@modelSetStub).toHaveBeenCalledWith(attribute: 'value')  
+
+    it 'updates the model version to the remote_version', ->
+      @model.update
+        attribute: 'value'
+        remote_version: 'version'
+      expect(@updateVersionToStub).toHaveBeenCalledWith('version')  
+        
+    it 'saves the rebased model to the localStorage after that', ->
+      @model.update({})
+      expect(@modelSaveStub).toHaveBeenCalledAfter(@updateVersionToStub)
+    
