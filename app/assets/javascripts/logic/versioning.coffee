@@ -1,7 +1,7 @@
 @Versioning =
   initVersioning: ->
     @_versioning ||= {}
-    @_versioning.vector ||= {}
+    @_versioning.vector ||= new VectorClock
     @_versioning.vector[Nomad.clientId] ||= 0
     
   version: ->
@@ -41,7 +41,9 @@
     handler = @checkVersion(attributes['remote_version'])
     @[handler] attributes
     
-  checkVersion: (remote_version) ->
+  checkVersion: (remoteVersion) ->
+    if @version().equals(remoteVersion) or @version().supersedes(remoteVersion)
+      'forwardTo'
     
 
   rebase: (attributes) ->

@@ -7,7 +7,7 @@
 #= require_tree ./routers
 
 # Create the Backbone application
-window.Nomad =
+@Nomad =
   Models: {}
   Collections: {}
   Routers: {}

@@ -195,6 +195,28 @@ describe 'Versioning', ->
         attribute: 'value'
         remote_version: 'version'
         
+  describe '#checkVersion', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      @version = new VectorClock
+      @model.version = => @version
+      
+    context 'when the versions equal', ->  
+      beforeEach ->
+        @equalsStub = sinon.stub(@version, 'equals', -> true)
+    
+      it 'returns the forwardTo handler', ->
+        expect(@model.checkVersion({})).toEqual('forwardTo')
+
+    context 'when the model version supersedes the server version', ->  
+      beforeEach ->
+        @equalsStub = sinon.stub(@version, 'equals', -> false)
+        @supersedesStub = sinon.stub(@version, 'supersedes', -> true)
+    
+      it 'returns the forwardTo handler', ->
+        expect(@model.checkVersion({})).toEqual('forwardTo')
+    
 
   describe '#rebase', ->
     beforeEach ->
