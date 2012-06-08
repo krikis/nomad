@@ -125,8 +125,6 @@ describe 'FayeClient', ->
     it 'does not sync models to the server when it is no presync feedback', ->
       @backboneClient.receive({})
       expect(@syncModelsStub).not.toHaveBeenCalled()
-        
-    
 
   describe '#update', ->
     beforeEach ->
