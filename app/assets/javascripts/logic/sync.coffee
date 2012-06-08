@@ -1,10 +1,10 @@
 @Sync =
   preSync: ->
     @fayeClient.publish
-      versions: @_versionDetails()
+      newVersions: @_versionDetails(@_newModelsForSync())
+      versions: @_versionDetails(@_modelsForSync())
 
-  _versionDetails: () ->
-    models = @_modelsForSync()
+  _versionDetails: (models) ->
     _(models).chain().map((model) ->
       id: model.id
       version: model.version()

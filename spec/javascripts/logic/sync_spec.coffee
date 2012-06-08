@@ -5,36 +5,36 @@ describe 'Sync', ->
       @message = undefined
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
+      @newModelsForSyncStub = sinon.stub(@collection, '_newModelsForSync', -> ['new', 'models'])
+      @modelsForSyncStub = sinon.stub(@collection, '_modelsForSync', -> ['other', 'models'])
       @versionDetailsStub = sinon.stub(@collection, '_versionDetails', -> ['version', 'details'])
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
       )
-
-    it 'collects version details of all models in the collection', ->
+      
+    it 'collects all new models that have to be synced', ->
       @collection.preSync()
-      expect(@versionDetailsStub).toHaveBeenCalled()
+      expect(@newModelsForSyncStub).toHaveBeenCalled()
+
+    it 'collects version details of all new models', ->
+      @collection.preSync()
+      expect(@versionDetailsStub).toHaveBeenCalledWith(['new', 'models'])
+      
+    it 'collects all other models that have to be synced', ->
+      @collection.preSync()
+      expect(@modelsForSyncStub).toHaveBeenCalled()
+
+    it 'collects version details of all other models', ->
+      @collection.preSync()
+      expect(@versionDetailsStub).toHaveBeenCalledWith(['other', 'models'])
+
+    it 'publishes a list of new version details to the server', ->
+      @collection.preSync()
+      expect(@message.newVersions).toEqual(['version', 'details'])
 
     it 'publishes a list of version details to the server', ->
       @collection.preSync()
       expect(@message.versions).toEqual(['version', 'details'])
-
-  describe '#_versionDetails', ->
-    beforeEach ->
-      class TestCollection extends Backbone.Collection
-      @collection = new TestCollection([], modelName: 'TestModel')
-      @model = new Backbone.Model
-        id: 'some_id'
-      @model.version = -> 'vector_clock'
-      @modelsForSyncStub = sinon.stub(@collection, '_modelsForSync', => [@model])
-
-    it 'fetches the models that have to be synced', ->
-      @collection._versionDetails()
-      expect(@modelsForSyncStub).toHaveBeenCalled()
-
-    it 'collects the ids, versions and sync state of all models', ->
-      @model.isSynced = -> true
-      versions = @collection._versionDetails()
-      expect(versions).toEqual [{id: 'some_id', version: 'vector_clock', is_new: false}]
 
   describe '#_newModelsForSync', ->
     beforeEach ->
@@ -78,6 +78,19 @@ describe 'Sync', ->
     it 'does not include models that were never synced', ->
       @model.hasPatches = -> true
       expect(@collection._modelsForSync()).toEqual([])
+
+  describe '#_versionDetails', ->
+    beforeEach ->
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @model = new Backbone.Model
+        id: 'some_id'
+      @model.version = -> 'vector_clock'
+
+    it 'collects the ids and versions of the models', ->
+      @model.isSynced = -> true
+      versions = @collection._versionDetails([@model])
+      expect(versions).toEqual [{id: 'some_id', version: 'vector_clock', is_new: false}]
 
   describe '#processUpdates', ->
     beforeEach ->
