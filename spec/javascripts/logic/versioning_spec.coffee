@@ -225,6 +225,15 @@ describe 'Versioning', ->
     
       it 'returns the rebase handler', ->
         expect(@model.checkVersion({})).toEqual('rebase')
+
+    context 'when the server version supersedes the client version', ->  
+      beforeEach ->
+        @equalsStub = sinon.stub(@version, 'equals', -> false)
+        @supersedesStub = sinon.stub(@version, 'supersedes', -> false)
+        @conflictsWithStub = sinon.stub(@version, 'conflictsWith', -> false)
+    
+      it 'returns the rebase handler', ->
+        expect(@model.checkVersion({})).toEqual('update')
     
 
   describe '#rebase', ->

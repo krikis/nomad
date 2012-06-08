@@ -48,6 +48,9 @@
     # if the client receives a conflicting update from the server
     else if @version().conflictsWith(remoteVersion)
       'rebase'
+    # if the server version supersedes the client version
+    else
+      'update'
 
   rebase: (attributes) ->
     version = attributes.remote_version
