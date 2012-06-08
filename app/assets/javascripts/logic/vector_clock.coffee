@@ -2,16 +2,16 @@ class @VectorClock
   constructor: (clocks) ->
     @[clock] = value for clock, value of clocks
     
-  defineClocksOf: (otherVector) ->
+  _defineClocksOf: (otherVector) ->
     @[clock] ||= 0 for clock of otherVector
     
   equals: (otherVector) ->
-    @defineClocksOf(otherVector)
+    @_defineClocksOf(otherVector)
     _.all _.keys(@), (clock) =>
       @[clock] == (otherVector[clock] || 0)
   
   supersedes: (otherVector) ->
-    @defineClocksOf(otherVector)
+    @_defineClocksOf(otherVector)
     some_greater = _.some _.keys(@), (clock) =>
       @[clock] > (otherVector[clock] || 0)
     all_greater_equal = _.all _.keys(@), (clock) =>
@@ -19,7 +19,7 @@ class @VectorClock
     some_greater and all_greater_equal
     
   conflictsWith: (otherVector) ->
-    @defineClocksOf(otherVector)
+    @_defineClocksOf(otherVector)
     some_greater = _.some _.keys(@), (clock) =>
       @[clock] > (otherVector[clock] || 0)
     some_less = _.some _.keys(@), (clock) =>

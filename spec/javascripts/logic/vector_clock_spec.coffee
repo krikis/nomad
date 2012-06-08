@@ -9,7 +9,7 @@ describe 'VectorClock', ->
       expect(@vector.some_clock).toEqual(1)
       expect(@vector.other_clock).toEqual(2)
       
-  describe '#defineClocksOf', ->    
+  describe '#_defineClocksOf', ->    
     beforeEach ->
       @otherVector = new VectorClock
         some_clock: 1
@@ -18,7 +18,7 @@ describe 'VectorClock', ->
     
     it 'initializes clocks to 0 for all clocks
         in otherVector that are undefined in vector', ->
-      @vector.defineClocksOf(@otherVector)
+      @vector._defineClocksOf(@otherVector)
       expect(@vector.undefined_clock).toEqual(0)
       
   describe '#equals', ->
