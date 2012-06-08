@@ -51,6 +51,13 @@
     # if the server version supersedes the client version
     else
       'update'
+      
+  forwardTo: (attributes) ->
+    vectorClock = attributes['remote_version']
+    patches = @_versioning.patches
+    while @hasPatches() and patches.first().base < vectorClock[Nomad.clientId]
+      patches.shift()
+    @save()
 
   rebase: (attributes) ->
     version = attributes.remote_version
@@ -60,6 +67,7 @@
     if dummy.processPatches(@_versioning.patches)
       @set dummy
       @updateVersionTo(version)
+      @save()
       return @
     false
     
@@ -84,11 +92,6 @@
       true
     else
       false
-      
-  forwardTo: (vectorClock) ->
-    patches = @_versioning.patches
-    while @hasPatches() and patches.first().base < vectorClock[Nomad.clientId]
-      patches.shift() 
     
 # extend Backbone.Model
 _.extend Backbone.Model::, @Versioning

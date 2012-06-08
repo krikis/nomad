@@ -234,7 +234,33 @@ describe 'Versioning', ->
     
       it 'returns the rebase handler', ->
         expect(@model.checkVersion({})).toEqual('update')
+
+  describe '#forwardTo', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      patches = [{patch_text: 'some_patch',  base: 0},
+                 {patch_text: 'other_patch', base: 1}]
+      @model._versioning =
+        patches: _(patches)
+      @patchesShiftSpy = sinon.spy(@model._versioning.patches, 'shift')
+      @modelSaveStub = sinon.stub(@model, 'save')
+
+    it 'removes all patches older than the version provided', ->
+      vector = {}
+      vector[Nomad.clientId] = 1
+      @model.forwardTo(remote_version: vector)
+      expect(@model._versioning.patches.first()).toEqual
+        patch_text: 'other_patch'
+        base: 1
     
+    it 'saves the model', -> 
+      @model.forwardTo(remote_version: {})
+      expect(@modelSaveStub).toHaveBeenCalled()
+    
+    it 'saves the model after forwarding it', ->  
+      @model.forwardTo(remote_version: {})
+      expect(@patchesShiftSpy).not.toHaveBeenCalledAfter(@modelSaveStub)
 
   describe '#rebase', ->
     beforeEach ->
@@ -248,6 +274,7 @@ describe 'Versioning', ->
       @processPatchesStub = sinon.stub(@dummy, 'processPatches', -> true)
       @modelSetStub = sinon.stub(@model, 'set')
       @updateVersionToStub = sinon.stub(@model, 'updateVersionTo')
+      @modelSaveStub = sinon.stub(@model, 'save')
 
     afterEach ->
       @newModelStub.restore()
@@ -283,6 +310,10 @@ describe 'Versioning', ->
           remote_version: 'version'
         @model.rebase(attributes)
         expect(@updateVersionToStub).toHaveBeenCalledWith('version')
+        
+      it 'saves the rebased model to the localStorage after that', ->
+        @model.rebase({})
+        expect(@modelSaveStub).toHaveBeenCalledAfter(@updateVersionToStub)
 
       it 'returns the updated model', ->
         expect(@model.rebase({})).toEqual(@model)
@@ -405,21 +436,4 @@ describe 'Versioning', ->
 
       it 'returns false', ->
         expect(@model.applyPatch()).toBeFalsy()
-
-  describe '#forwardTo', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel
-      patches = [{patch_text: 'some_patch',  base: 0},
-                 {patch_text: 'other_patch', base: 1}]
-      @model._versioning =
-        patches: _(patches)
-
-    it 'removes all patches older than the version provided', ->
-      vector = {}
-      vector[Nomad.clientId] = 1
-      @model.forwardTo(vector)
-      expect(@model._versioning.patches.first()).toEqual
-        patch_text: 'other_patch'
-        base: 1
 
