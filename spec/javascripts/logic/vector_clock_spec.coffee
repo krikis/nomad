@@ -100,7 +100,7 @@ describe 'VectorClock', ->
       it 'returns false', ->
         expect(@vector.supersedes(@otherVector)).toBeFalsy()
         
-  describe '#conflicts', ->
+  describe '#conflictsWith', ->
     context 'when at least one clock in vector supersedes 
              a clock in otherVector and viceVersa', ->
       beforeEach ->
@@ -109,7 +109,7 @@ describe 'VectorClock', ->
           other_id: 1
       
       it 'returns true', ->
-        expect(@vector.conflicts(@otherVector)).toBeTruthy()
+        expect(@vector.conflictsWith(@otherVector)).toBeTruthy()
       
     context 'when at least one clock in vector supersedes 
              a clock in otherVector and viceVersa', ->
@@ -119,7 +119,7 @@ describe 'VectorClock', ->
           undefined_id: 1
     
       it 'returns true', ->
-        expect(@vector.conflicts(@otherVector)).toBeTruthy()
+        expect(@vector.conflictsWith(@otherVector)).toBeTruthy()
         
     context 'when the vectors equal', ->    
       beforeEach ->
@@ -128,7 +128,7 @@ describe 'VectorClock', ->
           other_id: 2
 
       it 'returns false', ->
-        expect(@vector.conflicts(@otherVector)).toBeFalsy()
+        expect(@vector.conflictsWith(@otherVector)).toBeFalsy()
         
     context 'when vector supersedes otherVector', ->    
       beforeEach ->
@@ -137,7 +137,7 @@ describe 'VectorClock', ->
           other_id: 1
 
       it 'returns false', ->
-        expect(@vector.conflicts(@otherVector)).toBeFalsy()
+        expect(@vector.conflictsWith(@otherVector)).toBeFalsy()
         
     context 'when otherVector supersedes vector', ->    
       beforeEach ->
@@ -146,7 +146,7 @@ describe 'VectorClock', ->
           other_id: 2
 
       it 'returns false', ->
-        expect(@vector.conflicts(@otherVector)).toBeFalsy()
+        expect(@vector.conflictsWith(@otherVector)).toBeFalsy()
       
       
       

@@ -18,7 +18,7 @@ class @VectorClock
       @[clock] >= (otherVector[clock] || 0)
     some_greater and all_greater_equal
     
-  conflicts: (otherVector) ->
+  conflictsWith: (otherVector) ->
     @defineClocksOf(otherVector)
     some_greater = _.some _.keys(@), (clock) =>
       @[clock] > (otherVector[clock] || 0)
