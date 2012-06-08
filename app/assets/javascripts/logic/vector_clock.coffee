@@ -1,6 +1,6 @@
 class @VectorClock
   constructor: (clocks) ->
-    @[id] = clock for id, clock of clocks
+    @[clock] = value for clock, value of clocks
     
   defineClocksOf: (otherVector) ->
     @[clock] ||= 0 for clock of otherVector

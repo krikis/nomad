@@ -1,32 +1,32 @@
 describe 'VectorClock', ->
   beforeEach -> 
     @vector = new VectorClock
-      some_id: 1
-      other_id: 2
+      some_clock: 1
+      other_clock: 2
       
   describe '#new', ->
     it 'initializes the vector with the clocks provided', ->
-      expect(@vector.some_id).toEqual(1)
-      expect(@vector.other_id).toEqual(2)
+      expect(@vector.some_clock).toEqual(1)
+      expect(@vector.other_clock).toEqual(2)
       
   describe '#defineClocksOf', ->    
     beforeEach ->
       @otherVector = new VectorClock
-        some_id: 1
-        other_id: 2
-        undefined_id: 1
+        some_clock: 1
+        other_clock: 2
+        undefined_clock: 1
     
     it 'initializes clocks to 0 for all clocks
         in otherVector that are undefined in vector', ->
       @vector.defineClocksOf(@otherVector)
-      expect(@vector.undefined_id).toEqual(0)
+      expect(@vector.undefined_clock).toEqual(0)
       
   describe '#equals', ->
     context 'when all clocks in vector and otherVector are equal', ->
       beforeEach ->
         @otherVector = new VectorClock
-          some_id: 1
-          other_id: 2
+          some_clock: 1
+          other_clock: 2
       
       it 'returns true', ->
         expect(@vector.equals(@otherVector)).toBeTruthy()
@@ -34,8 +34,8 @@ describe 'VectorClock', ->
     context 'when at least one clock is different', ->
       beforeEach ->
         @otherVector = new VectorClock
-          some_id: 1
-          other_id: 3
+          some_clock: 1
+          other_clock: 3
       
       it 'returns false', ->
         expect(@vector.equals(@otherVector)).toBeFalsy()
@@ -43,9 +43,9 @@ describe 'VectorClock', ->
     context 'when at least one clock is undefined in a vector', ->
       beforeEach ->
         @otherVector = new VectorClock
-          some_id: 1
-          other_id: 2
-          undefined_id: 1
+          some_clock: 1
+          other_clock: 2
+          undefined_clock: 1
       
       it 'returns false', ->
         expect(@vector.equals(@otherVector)).toBeFalsy()
@@ -56,8 +56,8 @@ describe 'VectorClock', ->
              the corresponding clock in otherVector', ->
       beforeEach ->
         @otherVector = new VectorClock
-          some_id: 1
-          other_id: 1
+          some_clock: 1
+          other_clock: 1
               
       it 'returns true', ->
         expect(@vector.supersedes(@otherVector)).toBeTruthy()
@@ -66,7 +66,7 @@ describe 'VectorClock', ->
              in otherVector', ->
       beforeEach ->
         @otherVector = new VectorClock
-          some_id: 1
+          some_clock: 1
       
       it 'returns true', ->
         expect(@vector.supersedes(@otherVector)).toBeTruthy()
@@ -75,8 +75,8 @@ describe 'VectorClock', ->
              the corresponding clock in otherVector', ->
       beforeEach ->
         @otherVector = new VectorClock
-          some_id: 2
-          other_id: 2
+          some_clock: 2
+          other_clock: 2
           
       it 'returns false', ->
         expect(@vector.supersedes(@otherVector)).toBeFalsy()
@@ -85,8 +85,8 @@ describe 'VectorClock', ->
              in vector', ->
       beforeEach ->
         @otherVector = new VectorClock
-          some_id: 1
-          undefined_id: 1
+          some_clock: 1
+          undefined_clock: 1
       
       it 'returns false', ->
         expect(@vector.supersedes(@otherVector)).toBeFalsy()
@@ -94,8 +94,8 @@ describe 'VectorClock', ->
     context 'when the vectors conflict', ->    
       beforeEach ->
         @otherVector = new VectorClock
-          some_id: 2
-          other_id: 1
+          some_clock: 2
+          other_clock: 1
           
       it 'returns false', ->
         expect(@vector.supersedes(@otherVector)).toBeFalsy()
@@ -105,8 +105,8 @@ describe 'VectorClock', ->
              a clock in otherVector and viceVersa', ->
       beforeEach ->
         @otherVector = new VectorClock
-          some_id: 2
-          other_id: 1
+          some_clock: 2
+          other_clock: 1
       
       it 'returns true', ->
         expect(@vector.conflictsWith(@otherVector)).toBeTruthy()
@@ -115,8 +115,8 @@ describe 'VectorClock', ->
              a clock in otherVector and viceVersa', ->
       beforeEach ->
         @otherVector = new VectorClock
-          some_id: 1
-          undefined_id: 1
+          some_clock: 1
+          undefined_clock: 1
     
       it 'returns true', ->
         expect(@vector.conflictsWith(@otherVector)).toBeTruthy()
@@ -124,8 +124,8 @@ describe 'VectorClock', ->
     context 'when the vectors equal', ->    
       beforeEach ->
         @otherVector = new VectorClock
-          some_id: 1
-          other_id: 2
+          some_clock: 1
+          other_clock: 2
 
       it 'returns false', ->
         expect(@vector.conflictsWith(@otherVector)).toBeFalsy()
@@ -133,8 +133,8 @@ describe 'VectorClock', ->
     context 'when vector supersedes otherVector', ->    
       beforeEach ->
         @otherVector = new VectorClock
-          some_id: 1
-          other_id: 1
+          some_clock: 1
+          other_clock: 1
 
       it 'returns false', ->
         expect(@vector.conflictsWith(@otherVector)).toBeFalsy()
@@ -142,8 +142,8 @@ describe 'VectorClock', ->
     context 'when otherVector supersedes vector', ->    
       beforeEach ->
         @otherVector = new VectorClock
-          some_id: 2
-          other_id: 2
+          some_clock: 2
+          other_clock: 2
 
       it 'returns false', ->
         expect(@vector.conflictsWith(@otherVector)).toBeFalsy()
