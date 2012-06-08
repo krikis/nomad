@@ -42,9 +42,12 @@
     @[handler] attributes
     
   checkVersion: (remoteVersion) ->
+    # if the client receives an acknowledgement from the server
     if @version().equals(remoteVersion) or @version().supersedes(remoteVersion)
       'forwardTo'
-    
+    # if the client receives a conflicting update from the server
+    else if @version().conflictsWith(remoteVersion)
+      'rebase'
 
   rebase: (attributes) ->
     version = attributes.remote_version

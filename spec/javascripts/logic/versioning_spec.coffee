@@ -216,6 +216,15 @@ describe 'Versioning', ->
     
       it 'returns the forwardTo handler', ->
         expect(@model.checkVersion({})).toEqual('forwardTo')
+
+    context 'when the model version conflicts with the server version', ->  
+      beforeEach ->
+        @equalsStub = sinon.stub(@version, 'equals', -> false)
+        @supersedesStub = sinon.stub(@version, 'supersedes', -> false)
+        @conflictsWithStub = sinon.stub(@version, 'conflictsWith', -> true)
+    
+      it 'returns the rebase handler', ->
+        expect(@model.checkVersion({})).toEqual('rebase')
     
 
   describe '#rebase', ->
