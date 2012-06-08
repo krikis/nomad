@@ -83,7 +83,7 @@ describe 'Sync', ->
   describe '#processUpdates', ->
     beforeEach ->
       @model = new Backbone.Model
-      @rebaseStub = sinon.stub(@model, 'rebase', -> @)
+      @rebaseStub = sinon.stub(@model, '_rebase', -> @)
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @getStub = sinon.stub(@collection, 'get', => @model)

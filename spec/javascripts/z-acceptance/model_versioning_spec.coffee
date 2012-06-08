@@ -14,7 +14,7 @@ describe 'modelVersioning', ->
       @collection = new TestCollection  
       @model = new TestModel
       @initVersioningSpy = sinon.spy(@model, 'initVersioning')
-      @tickVersionSpy = sinon.spy(@model, 'tickVersion')
+      @tickVersionSpy = sinon.spy(@model, '_tickVersion')
       @collection.add @model
       @model.save()
 
@@ -49,7 +49,7 @@ describe 'modelVersioning', ->
       @collection = new TestCollection  
       @model = new TestModel Factory.build('answer')
       @initVersioningSpy = sinon.spy(@model, 'initVersioning')
-      @tickVersionSpy = sinon.spy(@model, 'tickVersion')
+      @tickVersionSpy = sinon.spy(@model, '_tickVersion')
       @collection.add @model
       @model.save()
 

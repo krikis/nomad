@@ -43,19 +43,6 @@ describe 'Versioning', ->
     it 'fetches the vector clock of the versioning object', ->
       expect(@model.version()).toEqual(@vector)
 
-  describe '#tickVersion', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel
-      vector = {}
-      vector[Nomad.clientId] = 1
-      @model._versioning = {vector: vector}
-
-    it 'increments the version for the current model', ->
-      @oldVersion = @model._versioning.vector[Nomad.clientId]
-      @model.tickVersion()
-      expect(@model._versioning.vector[Nomad.clientId]).toEqual(@oldVersion + 1)
-
   describe '#localClock', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -65,17 +52,17 @@ describe 'Versioning', ->
       @model._versioning = {vector: vector}
 
     it 'returns the local clock of the model\'s version', ->
-      expect(@model.localClock()).toEqual(1)
+      expect(@model._localClock()).toEqual(1)
 
   describe '#addPatch', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
-      @model.localClock = -> 2
+      @model._localClock = -> 2
       @initVersioningSpy = sinon.spy(@model, 'initVersioning')
-      @tickVersionStub = sinon.stub(@model, 'tickVersion')
+      @tickVersionStub = sinon.stub(@model, '_tickVersion')
       @patch = sinon.stub()
-      @createPatchStub = sinon.stub(@model, 'createPatch', =>
+      @createPatchStub = sinon.stub(@model, '_createPatch', =>
         @patch
       )
 
@@ -97,7 +84,7 @@ describe 'Versioning', ->
 
     it 'creates a patch providing it with the model\'s local clock', ->
       @model.addPatch()
-      expect(@createPatchStub).toHaveBeenCalledWith(@model.localClock())
+      expect(@createPatchStub).toHaveBeenCalledWith(@model._localClock())
 
     it 'saves a patch for the update to _versioning.patches', ->
       @model.addPatch()
@@ -120,7 +107,7 @@ describe 'Versioning', ->
       @model.attributes.values =
         v_1: "other_value_1"
         v_2: "value_2"
-      out = @model.createPatch()
+      out = @model._createPatch()
       expect(out.patch_text).toContain 'other_'
       expect(out.patch_text).not.toContain 'value_2'
 
@@ -128,8 +115,21 @@ describe 'Versioning', ->
       @model.attributes.values =
         v_1: "other_value_1"
         v_2: "value_2"
-      out = @model.createPatch('local_clock')
+      out = @model._createPatch('local_clock')
       expect(out.base).toEqual('local_clock')
+
+  describe '#tickVersion', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      vector = {}
+      vector[Nomad.clientId] = 1
+      @model._versioning = {vector: vector}
+
+    it 'increments the version for the current model', ->
+      @oldVersion = @model._versioning.vector[Nomad.clientId]
+      @model._tickVersion()
+      expect(@model._versioning.vector[Nomad.clientId]).toEqual(@oldVersion + 1)
 
   describe '#hasPatches', ->
     beforeEach ->
@@ -178,7 +178,7 @@ describe 'Versioning', ->
       class TestModel extends Backbone.Model
         handler: ->
       @model = new TestModel
-      @checkVersionStub = sinon.stub(@model, 'checkVersion', -> 'handler')
+      @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'handler')
       @handlerStub = sinon.stub(@model, 'handler')
     
     it 'checks the version of the update', ->
@@ -207,7 +207,7 @@ describe 'Versioning', ->
         @equalsStub = sinon.stub(@version, 'equals', -> true)
     
       it 'returns the forwardTo handler', ->
-        expect(@model.checkVersion({})).toEqual('forwardTo')
+        expect(@model._checkVersion({})).toEqual('_forwardTo')
 
     context 'when the model version supersedes the server version', ->  
       beforeEach ->
@@ -215,7 +215,7 @@ describe 'Versioning', ->
         @supersedesStub = sinon.stub(@version, 'supersedes', -> true)
     
       it 'returns the forwardTo handler', ->
-        expect(@model.checkVersion({})).toEqual('forwardTo')
+        expect(@model._checkVersion({})).toEqual('_forwardTo')
 
     context 'when the model version conflicts with the server version', ->  
       beforeEach ->
@@ -224,7 +224,7 @@ describe 'Versioning', ->
         @conflictsWithStub = sinon.stub(@version, 'conflictsWith', -> true)
     
       it 'returns the rebase handler', ->
-        expect(@model.checkVersion({})).toEqual('rebase')
+        expect(@model._checkVersion({})).toEqual('_rebase')
 
     context 'when the server version supersedes the client version', ->  
       beforeEach ->
@@ -232,8 +232,8 @@ describe 'Versioning', ->
         @supersedesStub = sinon.stub(@version, 'supersedes', -> false)
         @conflictsWithStub = sinon.stub(@version, 'conflictsWith', -> false)
     
-      it 'returns the rebase handler', ->
-        expect(@model.checkVersion({})).toEqual('update')
+      it 'returns the update handler', ->
+        expect(@model._checkVersion({})).toEqual('_update')
 
   describe '#forwardTo', ->
     beforeEach ->
@@ -249,17 +249,17 @@ describe 'Versioning', ->
     it 'removes all patches older than the version provided', ->
       vector = {}
       vector[Nomad.clientId] = 1
-      @model.forwardTo(remote_version: vector)
+      @model._forwardTo(remote_version: vector)
       expect(@model._versioning.patches.first()).toEqual
         patch_text: 'other_patch'
         base: 1
     
     it 'saves the model', -> 
-      @model.forwardTo(remote_version: {})
+      @model._forwardTo(remote_version: {})
       expect(@modelSaveStub).toHaveBeenCalled()
     
     it 'saves the model after forwarding it', ->  
-      @model.forwardTo(remote_version: {})
+      @model._forwardTo(remote_version: {})
       expect(@patchesShiftSpy).not.toHaveBeenCalledAfter(@modelSaveStub)
 
   describe '#rebase', ->
@@ -271,60 +271,60 @@ describe 'Versioning', ->
       @dummy = new TestModel
       @newModelStub = sinon.stub(TestModel::, 'constructor', => @dummy)
       @dummySetStub = sinon.stub(@dummy, 'set')
-      @processPatchesStub = sinon.stub(@dummy, 'processPatches', -> true)
+      @processPatchesStub = sinon.stub(@dummy, '_processPatches', -> true)
       @modelSetStub = sinon.stub(@model, 'set')
-      @updateVersionToStub = sinon.stub(@model, 'updateVersionTo')
+      @updateVersionToStub = sinon.stub(@model, '_updateVersionTo')
       @modelSaveStub = sinon.stub(@model, 'save')
 
     afterEach ->
       @newModelStub.restore()
 
     it 'creates a dummy model', ->
-      @model.rebase({})
+      @model._rebase({})
       expect(@newModelStub).toHaveBeenCalled()
 
     it 'sets the new attributes on this dummy model', ->
       attributes = sinon.stub()
-      @model.rebase(attributes)
+      @model._rebase(attributes)
       expect(@dummySetStub).toHaveBeenCalledWith(attributes)
 
     it 'filters out the remote_version before doing so', ->
       attributes =
         attribute: 'value'
         remote_version: 'version'
-      @model.rebase(attributes)
+      @model._rebase(attributes)
       expect(@dummySetStub).toHaveBeenCalledWith(attribute: 'value')
 
     it 'applies all patches to the dummy model', ->
-      @model.rebase({})
+      @model._rebase({})
       expect(@processPatchesStub).toHaveBeenCalledWith(@patches)
 
     context 'when all patches are successfully applied', ->
       it 'sets the dummy\'s attributes on the model', ->
-        @model.rebase({})
+        @model._rebase({})
         expect(@modelSetStub).toHaveBeenCalledWith(@dummy)
 
       it 'updates the model version to the remote_version', ->
         attributes =
           attribute: 'value'
           remote_version: 'version'
-        @model.rebase(attributes)
+        @model._rebase(attributes)
         expect(@updateVersionToStub).toHaveBeenCalledWith('version')
         
       it 'saves the rebased model to the localStorage after that', ->
-        @model.rebase({})
+        @model._rebase({})
         expect(@modelSaveStub).toHaveBeenCalledAfter(@updateVersionToStub)
 
       it 'returns the updated model', ->
-        expect(@model.rebase({})).toEqual(@model)
+        expect(@model._rebase({})).toEqual(@model)
 
     context 'when not all patches were applied successfully', ->
       beforeEach ->
         @processPatchesStub.restore()
-        @processPatchesStub = sinon.stub(@dummy, 'processPatches', -> false)
+        @processPatchesStub = sinon.stub(@dummy, '_processPatches', -> false)
 
       it 'returns false', ->
-        expect(@model.rebase({})).toBeFalsy()
+        expect(@model._rebase({})).toBeFalsy()
 
       it 'filters out the attributes that differ'
 
@@ -334,30 +334,30 @@ describe 'Versioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
-      @applyPatchStub = sinon.stub(@model, 'applyPatch', ->
+      @applyPatchStub = sinon.stub(@model, '_applyPatch', ->
         @results ||= [true, true]
         @results.pop()
       )
 
     it 'applies each patch to the model', ->
-      @model.processPatches(_([{patch_text: 'some'},
+      @model._processPatches(_([{patch_text: 'some'},
                                {patch_text: 'patches'}]))
       expect(@applyPatchStub).toHaveBeenCalledWith('some')
       expect(@applyPatchStub).toHaveBeenCalledWith('patches')
 
     it 'returns true when all patches apply successfully', ->
-      expect(@model.processPatches(_(['some', 'patches']))).toBeTruthy()
+      expect(@model._processPatches(_(['some', 'patches']))).toBeTruthy()
 
     context 'when at least one patch did not apply successfully', ->
       beforeEach ->
         @applyPatchStub.restore()
-        @applyPatchStub = sinon.stub(@model, 'applyPatch', ->
+        @applyPatchStub = sinon.stub(@model, '_applyPatch', ->
           @results ||= [true, false, true]
           @results.pop()
         )
 
       it 'returns false when at least one patch was unsuccessful', ->
-        expect(@model.processPatches(_(['some', 'more', 'patches']))).toBeFalsy()
+        expect(@model._processPatches(_(['some', 'more', 'patches']))).toBeFalsy()
 
   describe '#applyPatch', ->
     beforeEach ->
@@ -384,28 +384,28 @@ describe 'Versioning', ->
 
     it 'converts the patch_text to a patch', ->
       patch_text = sinon.stub()
-      @model.applyPatch(patch_text)
+      @model._applyPatch(patch_text)
       expect(@patchFromTextStub).toHaveBeenCalledWith(patch_text)
 
     it 'converts the model object to json', ->
-      @model.applyPatch()
+      @model._applyPatch()
       expect(@stringifyStub).toHaveBeenCalledWith(@model)
 
     it 'applies the patch to the json', ->
-      @model.applyPatch()
+      @model._applyPatch()
       expect(@patchApplyStub).toHaveBeenCalledWith(@patch, @json)
 
     context 'when patching was successfull', ->
       it 'parses new attributes from the new model json', ->
-        @model.applyPatch()
+        @model._applyPatch()
         expect(@parseStub).toHaveBeenCalledWith(@new_json)
 
       it 'updates the model with the patched attributes', ->
-        @model.applyPatch()
+        @model._applyPatch()
         expect(@modelSetStub).toHaveBeenCalledWith(@patched_attributes)
 
       it 'returns true', ->
-        expect(@model.applyPatch()).toBeTruthy()
+        expect(@model._applyPatch()).toBeTruthy()
 
     context 'when patching fails', ->
       beforeEach ->
@@ -416,7 +416,7 @@ describe 'Versioning', ->
         @patchApplyStub.restore()
 
       it 'returns false', ->
-        expect(@model.applyPatch()).toBeFalsy()
+        expect(@model._applyPatch()).toBeFalsy()
 
   describe '#updateVersionTo', ->
     beforeEach ->
@@ -427,11 +427,11 @@ describe 'Versioning', ->
           some_unique_id: 3
 
     it 'updates each clock with a remote value if the local value is lower', ->
-      @model.updateVersionTo(some_unique_id: 4)
+      @model._updateVersionTo(some_unique_id: 4)
       expect(@model._versioning.vector).toEqual(some_unique_id: 4)  
 
     it 'adds a remote clock if it did not exist locally', ->
-      @model.updateVersionTo(some_other_id: 4)
+      @model._updateVersionTo(some_other_id: 4)
       expect(@model._versioning.vector).toEqual
         some_unique_id: 3
         some_other_id: 4
@@ -441,22 +441,22 @@ describe 'Versioning', ->
       class TestModel extends Backbone.Model
       @model = new TestModel
       @modelSetStub = sinon.stub(@model, 'set')
-      @updateVersionToStub = sinon.stub(@model, 'updateVersionTo')
+      @updateVersionToStub = sinon.stub(@model, '_updateVersionTo')
       @modelSaveStub = sinon.stub(@model, 'save')
       
     it 'sets the updated attributes on the model, except for the remote_version', ->
-      @model.update
+      @model._update
         attribute: 'value'
         remote_version: 'version'
       expect(@modelSetStub).toHaveBeenCalledWith(attribute: 'value')  
 
     it 'updates the model version to the remote_version', ->
-      @model.update
+      @model._update
         attribute: 'value'
         remote_version: 'version'
       expect(@updateVersionToStub).toHaveBeenCalledWith('version')  
         
     it 'saves the rebased model to the localStorage after that', ->
-      @model.update({})
+      @model._update({})
       expect(@modelSaveStub).toHaveBeenCalledAfter(@updateVersionToStub)
     

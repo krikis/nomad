@@ -31,11 +31,6 @@ class @BackboneSync.FayeClient
     @collection.syncModels() if params.preSync
     
   resolve: (params) ->
-    
-  ack: (params) -> 
-    _.each params, (version, id) =>
-      model = @collection.get(id)
-      model?.forwardTo(version)
 
   create: (params) ->
     _.each params, (attributes, id) =>
