@@ -10,10 +10,14 @@
       version: model.version()
       is_new: !model.isSynced()
     ).value()
+    
+  _newModelsForSync: () ->
+    _(@models).filter (model) ->
+      model.hasPatches() and not model.isSynced()
 
   _modelsForSync: () ->
     _(@models).filter (model) ->
-      model.hasPatches()
+      model.hasPatches() and model.isSynced()
 
   processUpdates: (models) ->
     _.map models, (attributes, id) =>

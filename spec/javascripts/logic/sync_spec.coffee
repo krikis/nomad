@@ -36,6 +36,28 @@ describe 'Sync', ->
       versions = @collection._versionDetails()
       expect(versions).toEqual [{id: 'some_id', version: 'vector_clock', is_new: false}]
 
+  describe '#_newModelsForSync', ->
+    beforeEach ->
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @model = new Backbone.Model
+        id: 'some_id'
+      @collection.models = [@model]
+
+    it 'includes all models that have patches and have never been synced', ->
+      @model.hasPatches = -> true
+      @model.isSynced = -> false
+      expect(@collection._newModelsForSync()).toEqual([@model])
+
+    it 'does not include models that have no patches', ->
+      @model.isSynced = -> false
+      expect(@collection._newModelsForSync()).toEqual([])
+
+    it 'does not include models that have been synced before', ->
+      @model.hasPatches = -> true
+      @model.isSynced = -> true
+      expect(@collection._newModelsForSync()).toEqual([])
+
   describe '#_modelsForSync', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
@@ -43,12 +65,18 @@ describe 'Sync', ->
       @model = new Backbone.Model
         id: 'some_id'
       @collection.models = [@model]
-      
-    it 'includes all models that have patches', ->
+
+    it 'includes all models that have patches and have been synced before', ->
       @model.hasPatches = -> true
+      @model.isSynced = -> true
       expect(@collection._modelsForSync()).toEqual([@model])
 
     it 'does not include models that have no patches', ->
+      @model.isSynced = -> true
+      expect(@collection._modelsForSync()).toEqual([])
+
+    it 'does not include models that were never synced', ->
+      @model.hasPatches = -> true
       expect(@collection._modelsForSync()).toEqual([])
 
   describe '#processUpdates', ->
@@ -59,12 +87,12 @@ describe 'Sync', ->
       @collection = new TestCollection([], modelName: 'TestModel')
       @getStub = sinon.stub(@collection, 'get', => @model)
       @handleUpdateStub = sinon.stub(@model, 'handleUpdate')
-      
+
     it 'fetches the model with the provided id from the collection', ->
       @collection.processUpdates
         id: {attribute: 'value'}
       expect(@getStub).toHaveBeenCalledWith('id')
-      
+
     it 'lets the model handle the update', ->
       @collection.processUpdates
         id: {attribute: 'value'}
@@ -88,7 +116,7 @@ describe 'Sync', ->
     it 'marks all models as synced', ->
      @collection.syncModels()
      expect(@dataForSyncStub).toHaveBeenCalledWith(markSynced: true)
-     
+
  describe '#_dataForSync', ->
    beforeEach ->
      class TestCollection extends Backbone.Collection
@@ -97,18 +125,18 @@ describe 'Sync', ->
        id: 'some_id'
        attribute: 'some_value'
      @model.version = -> 'some_version'
-     @collection.models = [@model]  
+     @collection.models = [@model]
      @modelsForSyncStub = sinon.stub(@collection, '_modelsForSync', => [@model])
      @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
 
    it 'fetches the models that have to be synced', ->
      @collection._dataForSync()
-     expect(@modelsForSyncStub).toHaveBeenCalled() 
- 
+     expect(@modelsForSyncStub).toHaveBeenCalled()
+
    it 'collects id, attributes, version and sync state', ->
      expect(@collection._dataForSync()).toEqual([
        id: 'some_id'
-       attributes: 
+       attributes:
          attribute: 'some_value'
        version: 'some_version'
        is_new: true
