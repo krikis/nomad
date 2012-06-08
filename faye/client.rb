@@ -33,6 +33,7 @@ class ServerSideClient
                       message['client_id'],
                       results)
     end
+    #TODO::add handle creates
     if message['updates'].present?
       handle_updates(model,
                      message['updates'],
@@ -51,14 +52,6 @@ class ServerSideClient
     results['meta']['preSync'] = true
   end
 
-  def handle_versions(model, versions, client_id, results)
-    results['meta'] ||= {}
-    versions.each do |version|
-      check_version(model, version, client_id, results)
-    end
-    results['meta']['preSync'] = true
-  end
-
   def check_new_version(model, new_version, client_id, results)
     results['resolve'] ||= []
     object = model.find_by_remote_id(new_version['id'])
@@ -69,6 +62,14 @@ class ServerSideClient
     else
       true
     end
+  end
+
+  def handle_versions(model, versions, client_id, results)
+    results['meta'] ||= {}
+    versions.each do |version|
+      check_version(model, version, client_id, results)
+    end
+    results['meta']['preSync'] = true
   end
 
   def check_version(model, version, client_id, results)
@@ -112,11 +113,6 @@ class ServerSideClient
     end
   end
 
-  def mcast_updates(model_name, updates)
-    channel = "/sync/#{model_name}"
-    @client.publish(channel, updates)
-  end
-
   def add_update_for(object, results)
     results['update'] ||= {}
     results['update'][object.remote_id] = json_for(object)
@@ -126,6 +122,11 @@ class ServerSideClient
     object.attributes.reject do |key, value|
       ['id', 'remote_id'].include? key.to_s
     end
+  end
+
+  def mcast_updates(model_name, updates)
+    channel = "/sync/#{model_name}"
+    @client.publish(channel, updates)
   end
 
   def publish_results(message, results)

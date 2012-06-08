@@ -125,25 +125,6 @@ describe ServerSideClient do
     end
   end
 
-
-
-  describe '#handle_versions' do
-    let(:version) { stub }
-    let(:model)   { TestModel }
-    before { subject.stub(:check_version) }
-
-    it 'checks the version of each entry' do
-      subject.should_receive(:check_version).with(model, version, 'client_id', an_instance_of(Hash))
-      subject.handle_versions(model, [version], 'client_id', {})
-    end
-
-    it 'flags the results as preSync results' do
-      results = {}
-      subject.handle_versions(model, [version], 'client_id', results)
-      results['meta']['preSync'].should be_true
-    end
-  end
-
   describe '#check_new_version' do
     let(:new_version) { {'id' => 'some_id',
                          'version' => 'some_version'} }
@@ -176,6 +157,23 @@ describe ServerSideClient do
       it 'returns false' do
         subject.check_new_version(model, new_version, 'client_id', {}).should be_false
       end
+    end
+  end
+
+  describe '#handle_versions' do
+    let(:version) { stub }
+    let(:model)   { TestModel }
+    before { subject.stub(:check_version) }
+
+    it 'checks the version of each entry' do
+      subject.should_receive(:check_version).with(model, version, 'client_id', an_instance_of(Hash))
+      subject.handle_versions(model, [version], 'client_id', {})
+    end
+
+    it 'flags the results as preSync results' do
+      results = {}
+      subject.handle_versions(model, [version], 'client_id', results)
+      results['meta']['preSync'].should be_true
     end
   end
 
@@ -330,17 +328,6 @@ describe ServerSideClient do
     end
   end
 
-  describe '#mcast_updates' do
-    let(:update) { {'id' => 'some_id',
-                    'attributes' => {'attribute' => 'some_value'},
-                    'version' => 'some_version'} }
-
-    it 'multicasts a list of updates' do
-      client.should_receive(:publish).with('/sync/TestModel', [update])
-      subject.mcast_updates('TestModel', [update])
-    end
-  end
-
   describe '#add_update_for' do
     let(:object) { stub(:remote_id => 'some_id') }
     before { subject.stub(:json_for => 'some_json') }
@@ -360,6 +347,17 @@ describe ServerSideClient do
                                     :remote_version => 'some_hash'})
       json = subject.json_for(object)
       json.should eq({:attribute => 'value', :remote_version => 'some_hash'})
+    end
+  end
+
+  describe '#mcast_updates' do
+    let(:update) { {'id' => 'some_id',
+                    'attributes' => {'attribute' => 'some_value'},
+                    'version' => 'some_version'} }
+
+    it 'multicasts a list of updates' do
+      client.should_receive(:publish).with('/sync/TestModel', [update])
+      subject.mcast_updates('TestModel', [update])
     end
   end
 
