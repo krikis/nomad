@@ -60,7 +60,7 @@ class ServerSideClient
       # Compare the client version to the server version
       # to see if the server supersedes the client
       elsif object.remote_version.supersedes? version['version']
-        results['update'][object.remote_id] = json_for(object)
+        add_update_for(object, results)
         false
       else
         [true, object]
@@ -71,26 +71,34 @@ class ServerSideClient
   end
 
   def handle_updates(model, updates, client_id, model_name, results)
-    successful_updates = updates.select do |update|
+    successful_updates = {}
+    updates.select do |update|
       success, object = check_version(model, update, client_id, results)
       if success
-        process_update(model, object, update, results)
+        process_update(model, object, update, successful_updates)
       end
     end
     mcast_updates model_name, successful_updates
   end
 
-  def process_update(model, object, update, results)
+  def process_update(model, object, update, successful_updates)
     object ||= model.create
     object.update_attribute(:remote_id, update['id']) unless object.remote_id.present?
     object.update_attributes(update['attributes'])
     object.update_attribute(:remote_version, update['version'])
-    object.valid?
+    if object.valid?
+      add_update_for(object, successful_updates)
+    end
   end
 
   def mcast_updates(model_name, updates)
     channel = "/sync/#{model_name}"
     @client.publish(channel, updates)
+  end
+
+  def add_update_for(object, results)
+    results['update'] ||= {}
+    results['update'][object.remote_id] = json_for(object)
   end
 
   def json_for(object)

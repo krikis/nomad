@@ -183,17 +183,12 @@ describe ServerSideClient do
       context 'and the object supersedes the client version' do
         let(:remote_version) { stub(:obsoletes?  => false,
                                     :supersedes? => true) }
+        before { subject.stub(:add_update_for => nil) }
 
-        it 'collects the JSON of the object' do
-          subject.should_receive(:json_for).with(object).once()
-          subject.check_version(model, version, 'client_id', {})
-        end
-
-        it 'fills the udpate hash with id and json' do
+        it 'adds an update for the object when it successfully updated' do
           results = {}
+          subject.should_receive(:add_update_for).with(object, results)
           subject.check_version(model, version, 'client_id', results)
-          results['update'].should eq({'some_id' => 'some_json'})
-          results['resolve'].should be_blank
         end
 
         it 'returns false' do
@@ -236,10 +231,8 @@ describe ServerSideClient do
     end
 
     it 'multicasts all successful updates' do
-      other_update = stub
-      subject.stub(:process_update).and_return(true, nil)
-      subject.should_receive(:mcast_updates).with('model_name', [update])
-      subject.handle_updates(model, [update, other_update], 'client_id', 'model_name', {})
+      subject.should_receive(:mcast_updates).with('model_name', an_instance_of(Hash))
+      subject.handle_updates(model, [update], 'client_id', 'model_name', {})
     end
   end
 
@@ -254,6 +247,7 @@ describe ServerSideClient do
            :remote_id => 'some_id',
            :valid? => true)
     end
+    before { subject.stub(:add_update_for => nil) }
 
     context 'when no object is passed in' do
       before do
@@ -285,8 +279,10 @@ describe ServerSideClient do
       subject.process_update(model, object, update, {})
     end
 
-    it 'returns whether the object was successfully updated' do
-      subject.process_update(model, object, update, {}).should be_true
+    it 'adds an update for the object when it successfully updated' do
+      updates = {}
+      subject.should_receive(:add_update_for).with(object, updates)
+      subject.process_update(model, object, update, updates)
     end
   end
 
@@ -298,6 +294,17 @@ describe ServerSideClient do
     it 'multicasts a list of updates' do
       client.should_receive(:publish).with('/sync/TestModel', [update])
       subject.mcast_updates('TestModel', [update])
+    end
+  end
+
+  describe '#add_update_for' do
+    let(:object) { stub(:remote_id => 'some_id') }
+    before { subject.stub(:json_for => 'some_json') }
+
+    it 'adds an update for the object to the hash provided' do
+      results = {}
+      subject.add_update_for(object, results)
+      results['update']['some_id'].should eq('some_json')
     end
   end
 
