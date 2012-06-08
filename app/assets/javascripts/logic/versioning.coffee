@@ -53,7 +53,7 @@
       'update'
       
   forwardTo: (attributes) ->
-    vectorClock = attributes['remote_version']
+    vectorClock = attributes.remote_version
     patches = @_versioning.patches
     while @hasPatches() and patches.first().base < vectorClock[Nomad.clientId]
       patches.shift()
