@@ -21,6 +21,12 @@ class ServerSideClient
 
   def process_message(model, message)
     results = {}
+    if message['new_versions'].present?
+      handle_new_versions(model,
+                          message['new_versions'],
+                          message['client_id'],
+                          results)
+    end
     if message['versions'].present?
       handle_versions(model,
                       message['versions'],
@@ -37,6 +43,14 @@ class ServerSideClient
     publish_results(message, results)
   end
 
+  def handle_new_versions(model, new_versions, client_id, results)
+    results['meta'] ||= {}
+    new_versions.each do |version|
+      check_new_version(model, version, client_id, results)
+    end
+    results['meta']['preSync'] = true
+  end
+
   def handle_versions(model, versions, client_id, results)
     results['meta'] ||= {}
     versions.each do |version|
@@ -45,17 +59,24 @@ class ServerSideClient
     results['meta']['preSync'] = true
   end
 
-  def check_version(model, version, client_id, results)
-    results['update'] ||= {}
+  def check_new_version(model, new_version, client_id, results)
     results['resolve'] ||= []
-    object = model.find_by_remote_id(version['id'])
+    object = model.find_by_remote_id(new_version['id'])
     if object
       # File update for id resolution if random generated id is already taken
-      if version['is_new']
-        results['resolve'] << version['id']
-        false
+      results['resolve'] << new_version['id']
+      false
+    else
+      true
+    end
+  end
+
+  def check_version(model, version, client_id, results)
+    results['update'] ||= {}
+    object = model.find_by_remote_id(version['id'])
+    if object
       # Discard update if obsolete
-      elsif object.remote_version.obsoletes? version['version'], client_id
+      if object.remote_version.obsoletes? version['version'], client_id
         false
       # File update for rebase if server version supersedes client version
       elsif object.remote_version.supersedes? version['version']
@@ -82,7 +103,7 @@ class ServerSideClient
   end
 
   def process_update(model, object, update, successful_updates)
-    object ||= model.create
+    object ||= model.new
     object.update_attribute(:remote_id, update['id']) unless object.remote_id.present?
     object.update_attributes(update['attributes'])
     object.update_attribute(:remote_version, update['version'])

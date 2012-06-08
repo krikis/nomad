@@ -74,6 +74,13 @@ describe ServerSideClient do
       subject.stub(:publish_results)
     end
 
+    it 'handles new versions if present' do
+      message = {'new_versions' => stub, 'client_id' => 'some_id'}
+      subject.should_receive(:handle_new_versions).
+        with(model, message['new_versions'], 'some_id', {})
+      subject.process_message(model, message)
+    end
+
     it 'handles versions if present' do
       message = {'versions' => stub, 'client_id' => 'some_id'}
       subject.should_receive(:handle_versions).
@@ -101,6 +108,25 @@ describe ServerSideClient do
     end
   end
 
+  describe '#handle_new_versions' do
+    let(:new_version) { stub }
+    let(:model)   { TestModel }
+    before { subject.stub(:check_new_version) }
+
+    it 'checks the version of each entry' do
+      subject.should_receive(:check_new_version).with(model, new_version, 'client_id', an_instance_of(Hash))
+      subject.handle_new_versions(model, [new_version], 'client_id', {})
+    end
+
+    it 'flags the results as preSync results' do
+      results = {}
+      subject.handle_new_versions(model, [new_version], 'client_id', results)
+      results['meta']['preSync'].should be_true
+    end
+  end
+
+
+
   describe '#handle_versions' do
     let(:version) { stub }
     let(:model)   { TestModel }
@@ -115,6 +141,41 @@ describe ServerSideClient do
       results = {}
       subject.handle_versions(model, [version], 'client_id', results)
       results['meta']['preSync'].should be_true
+    end
+  end
+
+  describe '#check_new_version' do
+    let(:new_version) { {'id' => 'some_id',
+                         'version' => 'some_version'} }
+    let(:model)   { TestModel }
+    before do
+      TestModel.stub(:find_by_remote_id)
+      subject.stub(:json_for => 'some_json')
+    end
+
+    it 'tries to find an updated version' do
+      model.should_receive(:find_by_remote_id).with('some_id')
+      subject.check_new_version(model, new_version, 'client_id', {})
+    end
+
+    it 'returns true if no object is found' do
+      subject.check_new_version(model, new_version, 'client_id', {}).should be_true
+    end
+
+    context 'when an object is found' do
+      let(:object) { stub }
+      before { TestModel.stub(:find_by_remote_id).and_return(object) }
+
+      it 'files the version for conflict resolution' do
+        results = {}
+        subject.check_new_version(model, new_version, 'client_id', results)
+        results['resolve'].should eq(['some_id'])
+        results['update'].should be_blank
+      end
+
+      it 'returns false' do
+        subject.check_new_version(model, new_version, 'client_id', {}).should be_false
+      end
     end
   end
 
@@ -144,31 +205,9 @@ describe ServerSideClient do
                           :remote_version => remote_version) }
       before { TestModel.stub(:find_by_remote_id).and_return(object) }
 
-      it 'checks whether its version supersedes the client\'s version' do
-        remote_version.should_receive(:supersedes?).with('some_version')
+      it 'checks whether its version makes the client\'s version obsolete' do
+        remote_version.should_receive(:obsoletes?).with('some_version', 'client_id')
         subject.check_version(model, version, 'client_id', {})
-      end
-
-      context 'and the version was expected to be new' do
-        let(:version) { {'id' => 'some_id',
-                         'version' => 'some_version',
-                         'is_new' => true} }
-
-        it 'does not collect the JSON of the object' do
-          subject.should_not_receive(:json_for)
-          subject.check_version(model, version, 'client_id', {})
-        end
-
-        it 'files the version for conflict resolution' do
-          results = {}
-          subject.check_version(model, version, 'client_id', results)
-          results['resolve'].should eq(['some_id'])
-          results['update'].should be_blank
-        end
-
-        it 'returns false' do
-          subject.check_version(model, version, 'client_id', {}).should be_false
-        end
       end
 
       context 'and the version is obsolete' do
@@ -178,6 +217,11 @@ describe ServerSideClient do
         it 'returns false' do
           subject.check_version(model, version, 'client_id', {}).should be_false
         end
+      end
+
+      it 'checks whether its version supersedes the client\'s version' do
+        remote_version.should_receive(:supersedes?).with('some_version')
+        subject.check_version(model, version, 'client_id', {})
       end
 
       context 'and the object supersedes the client version' do
@@ -252,11 +296,11 @@ describe ServerSideClient do
     context 'when no object is passed in' do
       before do
         object.stub(:remote_id => nil)
-        model.stub(:create => object)
+        model.stub(:new => object)
       end
 
       it 'creates an object' do
-        model.should_receive(:create).with()
+        model.should_receive(:new).with()
         subject.process_update(model, nil, update, {})
       end
 
