@@ -42,6 +42,30 @@ describe 'Versioning', ->
 
     it 'fetches the vector clock of the versioning object', ->
       expect(@model.version()).toEqual(@vector)
+      
+  describe '#setVersion', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('model')
+      @version = sinon.stub()
+      @vector = sinon.stub()
+      @vectorClockStub = sinon.stub(window, 'VectorClock', => @vector)
+    
+    afterEach ->
+      @vectorClockStub.restore()
+      
+    it 'initializes a new vector clock for the version provided', ->
+      @model.setVersion(@version)
+      expect(@vectorClockStub).toHaveBeenCalledWith(@version)
+      
+    it 'initializes versioning if undefined', ->
+      expect(@model._versioning).toBeUndefined()
+      @model.setVersion(@version)
+      expect(@model._versioning).toBeDefined()
+      
+    it 'sets the model vector clock to the newly generated clock', ->
+      @model.setVersion(@version)
+      expect(@model._versioning.vector).toEqual(@vector)
 
   describe '#addPatch', ->
     beforeEach ->
@@ -176,24 +200,46 @@ describe 'Versioning', ->
   describe '#processUpdate', ->
     beforeEach ->
       class TestModel extends Backbone.Model
-        handler: ->
+        method: ->
       @model = new TestModel
-      @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'handler')
-      @handlerStub = sinon.stub(@model, 'handler')
+      @updateMethodStub = sinon.stub(@model, '_updateMethod', -> 'method')
+      @methodStub = sinon.stub(@model, 'method')
     
-    it 'checks the version of the update', ->
+    it 'queries the update method', ->
       @model.processUpdate
         attribute: 'value'
         remote_version: 'version'
+      expect(@updateMethodStub).toHaveBeenCalledWith('version')
+      
+    it 'calls the method returned', ->
+      @model.processUpdate
+        attribute: 'value'
+        remote_version: 'version'
+      expect(@methodStub).toHaveBeenCalledWith
+        attribute: 'value'
+        remote_version: 'version'
+        
+  describe '#_updateMethod', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      
+    it 'checks the version of the update', ->
+      @checkVersionStub = sinon.stub(@model, '_checkVersion')
+      @model._updateMethod 'version'
       expect(@checkVersionStub).toHaveBeenCalledWith('version')
       
-    it 'calls the handler returned by checkVersion', ->
-      @model.processUpdate
-        attribute: 'value'
-        remote_version: 'version'
-      expect(@handlerStub).toHaveBeenCalledWith
-        attribute: 'value'
-        remote_version: 'version'
+    it 'returns the _forwardTo method when client supersedes server', ->
+      @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'supersedes')
+      expect(@model._updateMethod()).toEqual('_forwardTo')
+      
+    it 'returns the _rebase method when client conflicts with server', ->
+      @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'conflictsWith')
+      expect(@model._updateMethod()).toEqual('_rebase')
+      
+    it 'returns the _update method when client precedes server', ->
+      @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'precedes')
+      expect(@model._updateMethod()).toEqual('_update')   
         
   describe '#_checkVersion', ->
     beforeEach ->
@@ -206,16 +252,16 @@ describe 'Versioning', ->
       beforeEach ->
         @equalsStub = sinon.stub(@version, 'equals', -> true)
     
-      it 'returns the forwardTo handler', ->
-        expect(@model._checkVersion({})).toEqual('_forwardTo')
+      it 'returns supersedes', ->
+        expect(@model._checkVersion({})).toEqual('supersedes')
 
     context 'when the model version supersedes the server version', ->  
       beforeEach ->
         @equalsStub = sinon.stub(@version, 'equals', -> false)
         @supersedesStub = sinon.stub(@version, 'supersedes', -> true)
     
-      it 'returns the forwardTo handler', ->
-        expect(@model._checkVersion({})).toEqual('_forwardTo')
+      it 'returns supersedes', ->
+        expect(@model._checkVersion({})).toEqual('supersedes')
 
     context 'when the model version conflicts with the server version', ->  
       beforeEach ->
@@ -223,17 +269,17 @@ describe 'Versioning', ->
         @supersedesStub = sinon.stub(@version, 'supersedes', -> false)
         @conflictsWithStub = sinon.stub(@version, 'conflictsWith', -> true)
     
-      it 'returns the rebase handler', ->
-        expect(@model._checkVersion({})).toEqual('_rebase')
+      it 'returns conflictsWith', ->
+        expect(@model._checkVersion({})).toEqual('conflictsWith')
 
-    context 'when the server version supersedes the client version', ->  
+    context 'when the client version precedes the server version', ->  
       beforeEach ->
         @equalsStub = sinon.stub(@version, 'equals', -> false)
         @supersedesStub = sinon.stub(@version, 'supersedes', -> false)
         @conflictsWithStub = sinon.stub(@version, 'conflictsWith', -> false)
     
-      it 'returns the update handler', ->
-        expect(@model._checkVersion({})).toEqual('_update')
+      it 'returns precedes', ->
+        expect(@model._checkVersion({})).toEqual('precedes')
 
   describe '#_forwardTo', ->
     beforeEach ->

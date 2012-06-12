@@ -8,6 +8,9 @@
     @_versioning?.vector
     
   setVersion: (version) ->
+    vector = new VectorClock version
+    @_versioning ||= {}
+    @_versioning.vector = vector
 
   addPatch: ->
     @initVersioning()
@@ -40,19 +43,25 @@
     @_versioning?.synced
     
   processUpdate: (attributes) ->
-    handler = @_checkVersion(attributes['remote_version'])
-    @[handler] attributes
+    method = @_updateMethod(attributes['remote_version'])
+    @[method] attributes
     
+  _updateMethod: (remoteVersion) ->
+    switch @_checkVersion(remoteVersion)
+      when 'supersedes' then '_forwardTo'
+      when 'conflictsWith' then '_rebase'
+      when 'precedes' then '_update'
+     
   _checkVersion: (remoteVersion) ->
     # if the client receives an acknowledgement from the server
     if @version().equals(remoteVersion) or @version().supersedes(remoteVersion)
-      '_forwardTo'
+      'supersedes'
     # if the client receives a conflicting update from the server
     else if @version().conflictsWith(remoteVersion)
-      '_rebase'
+      'conflictsWith'
     # if the server version supersedes the client version
     else
-      '_update'
+      'precedes'
       
   _forwardTo: (attributes) ->
     vectorClock = attributes.remote_version
