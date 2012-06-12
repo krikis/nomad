@@ -274,6 +274,17 @@ describe ServerSideClient do
     end
   end
 
+  describe '#add_update_for' do
+    let(:object) { stub(:remote_id => 'some_id') }
+    before { subject.stub(:json_for => 'some_json') }
+
+    it 'adds an update for the object to the hash provided' do
+      results = {}
+      subject.add_update_for(object, results)
+      results['update']['some_id'].should eq('some_json')
+    end
+  end
+
   describe '#handle_creates' do
     let(:create) { stub }
     let(:model)  { TestModel }
@@ -413,17 +424,6 @@ describe ServerSideClient do
       updates = {}
       subject.should_receive(:add_update_for).with(object, updates)
       subject.process_update(model, object, update, updates)
-    end
-  end
-
-  describe '#add_update_for' do
-    let(:object) { stub(:remote_id => 'some_id') }
-    before { subject.stub(:json_for => 'some_json') }
-
-    it 'adds an update for the object to the hash provided' do
-      results = {}
-      subject.add_update_for(object, results)
-      results['update']['some_id'].should eq('some_json')
     end
   end
 

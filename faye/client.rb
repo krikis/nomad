@@ -92,6 +92,11 @@ class ServerSideClient
     end
   end
 
+  def add_update_for(object, results)
+    results['update'] ||= {}
+    results['update'][object.remote_id] = json_for(object)
+  end
+
   def handle_creates(model, creates, results)
     results['unicast']   ||= {}
     results['multicast'] ||= {}
@@ -121,11 +126,6 @@ class ServerSideClient
     if object.valid?
       add_update_for(object, successful_updates)
     end
-  end
-
-  def add_update_for(object, results)
-    results['update'] ||= {}
-    results['update'][object.remote_id] = json_for(object)
   end
 
   def json_for(object)
