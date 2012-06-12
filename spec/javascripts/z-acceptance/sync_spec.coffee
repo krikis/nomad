@@ -42,7 +42,7 @@ describe 'sync', ->
       expect(@resolveSpy).toHaveBeenCalledWith([])
     waitsFor (->
       @createSpy.callCount > 0
-    ), 'create ackowledgement', 5000
+    ), 'create ackowledgement', 1000
     runs ->
       args = {}
       attributes = @model.attributes
@@ -125,7 +125,7 @@ describe 'sync', ->
       expect(@resolveSpy).toHaveBeenCalledWith([])
     waitsFor (->
       @createSpy.callCount > 0
-    ), 'create ackowledgement', 5000
+    ), 'create ackowledgement', 1000
     runs ->
       args = {}
       attributes = @model.attributes
