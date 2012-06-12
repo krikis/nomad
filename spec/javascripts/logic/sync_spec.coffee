@@ -1,4 +1,18 @@
 describe 'Sync', ->
+  beforeEach ->
+    window.localStorage.clear()
+    fayeClient = {}
+    fayeClient.subscribe = ->
+    fayeClient.publish = ->
+    @subscribeStub = sinon.stub(fayeClient, 'subscribe')
+    @publishStub = sinon.stub(fayeClient, 'publish')
+    @clientConstructorStub = sinon.stub(Faye, 'Client')
+    @clientConstructorStub.returns fayeClient
+
+  afterEach ->
+    @clientConstructorStub.restore()
+    # remove stub from window.client
+    delete window.client
 
   describe '#preSync', ->
     beforeEach ->
@@ -221,28 +235,28 @@ describe 'Sync', ->
       @collection.syncModels()
       expect(@message.creates).toEqual([new: 'data'])
 
- describe '#_dataForSync', ->
-   beforeEach ->
-     class TestCollection extends Backbone.Collection
-     @collection = new TestCollection([], modelName: 'TestModel')
-     @model = new Backbone.Model
-       id: 'some_id'
-       attribute: 'some_value'
-     @model.version = -> 'some_version'
-     @collection.models = [@model]
-     @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
-
-   it 'collects id, attributes and version of the models provided', ->
-     expect(@collection._dataForSync([@model])).toEqual([
-       id: 'some_id'
-       attributes:
-         attribute: 'some_value'
-       version: 'some_version'
-     ])
-
-   it 'marks the models as synced if the markSynced option is set', ->
-     versions = @collection._dataForSync([@model], markSynced: true)
-     expect(@markAsSyncedStub).toHaveBeenCalled()
+  describe '#_dataForSync', ->
+    beforeEach ->
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @model = new Backbone.Model
+        id: 'some_id'
+        attribute: 'some_value'
+      @model.version = -> 'some_version'
+      @collection.models = [@model]
+      @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
+ 
+    it 'collects id, attributes and version of the models provided', ->
+      expect(@collection._dataForSync([@model])).toEqual([
+        id: 'some_id'
+        attributes:
+          attribute: 'some_value'
+        version: 'some_version'
+      ])
+ 
+    it 'marks the models as synced if the markSynced option is set', ->
+      versions = @collection._dataForSync([@model], markSynced: true)
+      expect(@markAsSyncedStub).toHaveBeenCalled()
 
 
 
