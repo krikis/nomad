@@ -356,16 +356,28 @@ describe ServerSideClient do
       subject.process_create(model, create, {})
     end
 
+    it 'sets the object version' do
+      object.should_receive(:update_attribute).
+        with(:remote_version, 'some_version')
+      subject.process_create(model, create, {})
+    end
+
     it 'updates the object with the attributes provided' do
       object.should_receive(:update_attributes).
         with('attribute' => 'some_value')
       subject.process_create(model, create, {})
     end
 
-    it 'sets the object version' do
-      object.should_receive(:update_attribute).
-        with(:remote_version, 'some_version')
+    it 'preserves the updated_at attribute when set on the client' do
+      model = Post
+      object = Post.new
+      model.stub :new => object
+      time = DateTime.new(2012,4,12,14,30,32)
+      create = {'id' => 'some_id',
+                'attributes' => {'updated_at' => time.as_json},
+                'version' => 'some_version'}
       subject.process_create(model, create, {})
+      object.updated_at.should eq(time)
     end
 
     it 'adds a create for the object when it was successfully created' do
@@ -477,16 +489,28 @@ describe ServerSideClient do
       end
     end
 
+    it 'sets the object version' do
+      object.should_receive(:update_attribute).
+        with(:remote_version, 'some_version')
+      subject.process_update(model, object, update, {})
+    end
+
     it 'updates the object with the attributes provided' do
       object.should_receive(:update_attributes).
         with('attribute' => 'some_value')
       subject.process_update(model, object, update, {})
     end
 
-    it 'sets the object version' do
-      object.should_receive(:update_attribute).
-        with(:remote_version, 'some_version')
+    it 'preserves the updated_at attribute when set on the client' do
+      model = Post
+      object = Post.new
+      object.update_attribute :remote_id, 'some_id'
+      time = DateTime.new(2012,4,12,14,30,32)
+      update = {'id' => 'some_id',
+                'attributes' => {'updated_at' => time.as_json},
+                'version' => 'some_version'}
       subject.process_update(model, object, update, {})
+      object.updated_at.should eq(time)
     end
 
     it 'adds an update for the object when it successfully updated' do
@@ -523,7 +547,7 @@ describe ServerSideClient do
       let(:message) { {'client_id' => 'some_unique_id',
                        'model_name' => 'TestModel'} }
 
-      it 'publishes the unicast results to the sending client 
+      it 'publishes the unicast results to the sending client
           when such results are present' do
         client.should_receive(:publish).
           with('/sync/TestModel/some_unique_id', unicast)
