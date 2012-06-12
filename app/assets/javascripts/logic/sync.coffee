@@ -23,11 +23,14 @@
       if existing_model = @get(id)
         # TODO :: generate new id for conflicting model
         console.log existing_model
-      attributes.id = id
-      version = attributes.remote_version
-      delete attributes.remote_version
-      model = @create attributes
-      model.setVersion(version)
+      @_processCreate id, attributes
+      
+  _processCreate: (id, attributes) ->      
+    attributes.id = id
+    version = attributes.remote_version
+    delete attributes.remote_version
+    model = @create attributes
+    model.setVersion(version)
 
   handleUpdates: (models) ->
     _.map models, (attributes, id) =>

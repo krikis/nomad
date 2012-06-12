@@ -97,30 +97,39 @@ describe 'Sync', ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @getStub = sinon.stub(@collection, 'get')
-      @model = new Backbone.Model
-      @createStub = sinon.stub(@collection, 'create', => @model)
-      @setVersionStub = sinon.stub(@model, 'setVersion')      
+      @processCreateStub = sinon.stub(@collection, '_processCreate')     
       
     it 'checks for each id whether it conflicts with an existing model', ->
       @collection.handleCreates
         id: {attribute: 'value'}
       expect(@getStub).toHaveBeenCalledWith('id')
       
+    it 'creates a new model', ->
+      @collection.handleCreates
+        id: {attribute: 'value'}
+      expect(@processCreateStub).toHaveBeenCalledWith('id', attribute: 'value')
+      
+  describe '#_processCreate', ->
+    beforeEach ->
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @model = new Backbone.Model
+      @createStub = sinon.stub(@collection, 'create', => @model)
+      @setVersionStub = sinon.stub(@model, 'setVersion')
+      
     it 'creates a new model with the id and attributes provided 
         except remote_version', ->
-      @collection.handleCreates
-        id: 
-          attribute: 'value',
-          remote_version: 'version'
+      @collection._processCreate 'id',
+        attribute: 'value'
+        remote_version: 'version'
       expect(@createStub).toHaveBeenCalledWith
         id: 'id'
         attribute: 'value'
         
     it 'sets the model\'s version to the remote_version', ->
-      @collection.handleCreates
-        id: 
-          attribute: 'value',
-          remote_version: 'version'
+      @collection._processCreate 'id',
+        attribute: 'value'
+        remote_version: 'version'
       expect(@setVersionStub).toHaveBeenCalledWith('version')
 
   describe '#handleUpdates', ->
