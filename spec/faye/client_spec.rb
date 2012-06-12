@@ -330,6 +330,51 @@ describe ServerSideClient do
     end
   end
 
+  describe '#process_create' do
+    let(:create) { {'id' => 'some_id',
+                    'attributes' => {'attribute' => 'some_value'},
+                    'version' => 'some_version'} }
+    let(:model)  { TestModel }
+    let(:object) do
+      stub(:update_attributes => nil,
+           :update_attribute => nil,
+           :valid? => true)
+    end
+    before do
+      model.stub(:new => object)
+      subject.stub(:add_create_for => nil)
+    end
+
+    it 'creates a new object' do
+      model.should_receive(:new).with()
+      subject.process_create(model, create, {})
+    end
+
+    it 'sets the object remote_id' do
+      object.should_receive(:update_attribute).
+        with(:remote_id, 'some_id')
+      subject.process_create(model, create, {})
+    end
+
+    it 'updates the object with the attributes provided' do
+      object.should_receive(:update_attributes).
+        with('attribute' => 'some_value')
+      subject.process_create(model, create, {})
+    end
+
+    it 'sets the object version' do
+      object.should_receive(:update_attribute).
+        with(:remote_version, 'some_version')
+      subject.process_create(model, create, {})
+    end
+
+    it 'adds a create for the object when it was successfully created' do
+      creates = stub
+      subject.should_receive(:add_create_for).with(object, creates)
+      subject.process_create(model, create, creates)
+    end
+  end
+
   describe '#handle_updates' do
     let(:update) { stub }
     let(:model)  { TestModel }
@@ -408,6 +453,19 @@ describe ServerSideClient do
       end
     end
 
+    context 'when an object is passed in' do
+      it 'does not create a new object' do
+        model.should_not_receive(:new)
+        subject.process_update(model, object, update, {})
+      end
+
+      it 'does not set the object remote_id' do
+        object.should_not_receive(:update_attribute).
+          with(:remote_id, 'some_id')
+        subject.process_update(model, object, update, {})
+      end
+    end
+
     it 'updates the object with the attributes provided' do
       object.should_receive(:update_attributes).
         with('attribute' => 'some_value')
@@ -421,7 +479,7 @@ describe ServerSideClient do
     end
 
     it 'adds an update for the object when it successfully updated' do
-      updates = {}
+      updates = stub
       subject.should_receive(:add_update_for).with(object, updates)
       subject.process_update(model, object, update, updates)
     end

@@ -107,6 +107,16 @@ class ServerSideClient
     end
   end
 
+  def process_create(model, create, successful_creates)
+    object = model.new
+    object.update_attribute(:remote_id, create['id'])
+    object.update_attributes(create['attributes'])
+    object.update_attribute(:remote_version, create['version'])
+    if object.valid?
+      add_create_for(object, successful_creates)
+    end
+  end
+
   def handle_updates(model, updates, client_id, results)
     results['unicast']   ||= {}
     results['multicast'] ||= {}
