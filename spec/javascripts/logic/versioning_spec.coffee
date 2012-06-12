@@ -240,50 +240,6 @@ describe 'Versioning', ->
     it 'returns the _changeId method when client precedes server', ->
       @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'precedes')
       expect(@model._createMethod()).toEqual('_changeId')
-      
-  describe '#processUpdate', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-        method: ->
-      @model = new TestModel
-      @updateMethodStub = sinon.stub(@model, '_updateMethod', -> 'method')
-      @methodStub = sinon.stub(@model, 'method')
-    
-    it 'derives the update method', ->
-      @model.processUpdate
-        attribute: 'value'
-        remote_version: 'version'
-      expect(@updateMethodStub).toHaveBeenCalledWith('version')
-      
-    it 'calls the method returned', ->
-      @model.processUpdate
-        attribute: 'value'
-        remote_version: 'version'
-      expect(@methodStub).toHaveBeenCalledWith
-        attribute: 'value'
-        remote_version: 'version'
-        
-  describe '#_updateMethod', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel
-      
-    it 'checks the version of the update', ->
-      @checkVersionStub = sinon.stub(@model, '_checkVersion')
-      @model._updateMethod 'version'
-      expect(@checkVersionStub).toHaveBeenCalledWith('version')
-      
-    it 'returns the _forwardTo method when client supersedes server', ->
-      @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'supersedes')
-      expect(@model._updateMethod()).toEqual('_forwardTo')
-      
-    it 'returns the _rebase method when client conflicts with server', ->
-      @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'conflictsWith')
-      expect(@model._updateMethod()).toEqual('_rebase')
-      
-    it 'returns the _update method when client precedes server', ->
-      @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'precedes')
-      expect(@model._updateMethod()).toEqual('_update')   
         
   describe '#_checkVersion', ->
     beforeEach ->
@@ -351,6 +307,50 @@ describe 'Versioning', ->
     it 'saves the model after forwarding it', ->  
       @model._forwardTo(remote_version: {})
       expect(@patchesShiftSpy).not.toHaveBeenCalledAfter(@modelSaveStub)
+      
+  describe '#processUpdate', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+        method: ->
+      @model = new TestModel
+      @updateMethodStub = sinon.stub(@model, '_updateMethod', -> 'method')
+      @methodStub = sinon.stub(@model, 'method')
+    
+    it 'derives the update method', ->
+      @model.processUpdate
+        attribute: 'value'
+        remote_version: 'version'
+      expect(@updateMethodStub).toHaveBeenCalledWith('version')
+      
+    it 'calls the method returned', ->
+      @model.processUpdate
+        attribute: 'value'
+        remote_version: 'version'
+      expect(@methodStub).toHaveBeenCalledWith
+        attribute: 'value'
+        remote_version: 'version'
+        
+  describe '#_updateMethod', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      
+    it 'checks the version of the update', ->
+      @checkVersionStub = sinon.stub(@model, '_checkVersion')
+      @model._updateMethod 'version'
+      expect(@checkVersionStub).toHaveBeenCalledWith('version')
+      
+    it 'returns the _forwardTo method when client supersedes server', ->
+      @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'supersedes')
+      expect(@model._updateMethod()).toEqual('_forwardTo')
+      
+    it 'returns the _rebase method when client conflicts with server', ->
+      @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'conflictsWith')
+      expect(@model._updateMethod()).toEqual('_rebase')
+      
+    it 'returns the _update method when client precedes server', ->
+      @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'precedes')
+      expect(@model._updateMethod()).toEqual('_update')   
 
   describe '#_rebase', ->
     beforeEach ->

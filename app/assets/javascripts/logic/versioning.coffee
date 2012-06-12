@@ -50,21 +50,6 @@
     switch @_checkVersion(remoteVersion)
       when 'supersedes' then '_forwardTo'
       when 'conflictsWith', 'precedes' then '_changeId'
-      
-  _changeId: (attributes) ->
-    # TODO :: implement changing the model id when it conflicts 
-    # with a model created on another client
-    # think about what to do with the user interface when this happens
-    
-  processUpdate: (attributes) ->
-    method = @_updateMethod(attributes['remote_version'])
-    @[method] attributes
-    
-  _updateMethod: (remoteVersion) ->
-    switch @_checkVersion(remoteVersion)
-      when 'supersedes' then '_forwardTo'
-      when 'conflictsWith' then '_rebase'
-      when 'precedes' then '_update'
      
   _checkVersion: (remoteVersion) ->
     # if the client receives an acknowledgement from the server
@@ -83,6 +68,21 @@
     while @hasPatches() and patches.first().base < vectorClock[Nomad.clientId]
       patches.shift()
     @save()
+      
+  _changeId: (attributes) ->
+    # TODO :: implement changing the model id when it conflicts 
+    # with a model created on another client
+    # think about what to do with the user interface when this happens
+    
+  processUpdate: (attributes) ->
+    method = @_updateMethod(attributes['remote_version'])
+    @[method] attributes
+    
+  _updateMethod: (remoteVersion) ->
+    switch @_checkVersion(remoteVersion)
+      when 'supersedes' then '_forwardTo'
+      when 'conflictsWith' then '_rebase'
+      when 'precedes' then '_update'
 
   _rebase: (attributes) ->
     version = attributes.remote_version
