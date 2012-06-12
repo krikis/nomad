@@ -93,10 +93,12 @@ class ServerSideClient
   end
 
   def handle_creates(model, creates, results)
-    results['unicast'] ||= {}
+    results['unicast']   ||= {}
+    results['multicast'] ||= {}
     creates.each do |create|
-      check_new_version(model, create, results['unicast'])
-      process_create(model, create, results)
+      if check_new_version(model, create, results['unicast'])
+        process_create(model, create, results['multicast'])
+      end
     end
   end
 

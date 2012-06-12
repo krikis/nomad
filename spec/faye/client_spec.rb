@@ -302,6 +302,21 @@ describe ServerSideClient do
         with(model, create, an_instance_of(Hash))
       subject.handle_creates(model, [create], {})
     end
+
+    it 'issues no create when the version check is unsuccessful' do
+      subject.stub(:check_new_version => false)
+      subject.should_not_receive(:process_create)
+      subject.handle_creates(model, [create], {})
+    end
+
+    it 'files all successful creates for multicast' do
+      results = {}
+      subject.stub(:process_create) do |_, _, multicast|
+        multicast['successful'] = 'create'
+      end
+      subject.handle_creates(model, [create], results)
+      results['multicast']['successful'].should eq('create')
+    end
   end
 
   describe '#handle_updates' do
