@@ -197,6 +197,37 @@ describe 'Versioning', ->
       @model._versioning = {synced: true}
       expect(@model.isSynced()).toBeTruthy()
       
+  describe '#processCreate', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+        method: ->
+      @model = new TestModel
+      @createMethodStub = sinon.stub(@model, '_createMethod', -> 'method')
+      @methodStub = sinon.stub(@model, 'method')    
+      
+    it 'derives the create method', ->
+      @model.processCreate
+        attribute: 'value'
+        remote_version: 'version'
+      expect(@createMethodStub).toHaveBeenCalledWith('version')
+
+    it 'calls the method returned', ->
+      @model.processCreate
+        attribute: 'value'
+        remote_version: 'version'
+      expect(@methodStub).toHaveBeenCalledWith
+        attribute: 'value'
+        remote_version: 'version'
+
+    it 'does nothing when no method is returned', ->
+      @createMethodStub.restore()
+      @createMethodStub = sinon.stub(@model, '_createMethod')
+      expect(=>
+        @model.processCreate
+          attribute: 'value'
+          remote_version: 'version'
+      ).not.toThrow()
+      
   describe '#processUpdate', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -205,7 +236,7 @@ describe 'Versioning', ->
       @updateMethodStub = sinon.stub(@model, '_updateMethod', -> 'method')
       @methodStub = sinon.stub(@model, 'method')
     
-    it 'queries the update method', ->
+    it 'derives the update method', ->
       @model.processUpdate
         attribute: 'value'
         remote_version: 'version'
@@ -218,6 +249,15 @@ describe 'Versioning', ->
       expect(@methodStub).toHaveBeenCalledWith
         attribute: 'value'
         remote_version: 'version'
+        
+    it 'does nothing when no method is returned', ->
+      @updateMethodStub.restore()
+      @updateMethodStub = sinon.stub(@model, '_updateMethod')
+      expect(=>
+        @model.processUpdate
+          attribute: 'value'
+          remote_version: 'version'
+      ).not.toThrow()
         
   describe '#_updateMethod', ->
     beforeEach ->

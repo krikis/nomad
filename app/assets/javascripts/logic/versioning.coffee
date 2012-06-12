@@ -42,11 +42,15 @@
   isSynced: ->
     @_versioning?.synced
     
-  processCreate: (attribues) ->
+  processCreate: (attributes) ->
+    method = @_createMethod(attributes['remote_version'])
+    @[method] attributes if method?
+    
+  _createMethod: (remoteVersion) ->
     
   processUpdate: (attributes) ->
     method = @_updateMethod(attributes['remote_version'])
-    @[method] attributes
+    @[method] attributes if method?
     
   _updateMethod: (remoteVersion) ->
     switch @_checkVersion(remoteVersion)
