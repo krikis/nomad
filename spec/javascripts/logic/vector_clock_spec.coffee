@@ -21,7 +21,7 @@ describe 'VectorClock', ->
       @vector._defineClocksOf(@otherVector)
       expect(@vector.undefined_clock).toEqual(0)
       
-  describe '#equal_to', ->
+  describe '#equals', ->
     context 'when all clocks in vector and otherVector are equal', ->
       beforeEach ->
         @otherVector = new VectorClock
@@ -29,7 +29,7 @@ describe 'VectorClock', ->
           other_clock: 2
       
       it 'returns true', ->
-        expect(@vector.equal_to(@otherVector)).toBeTruthy()
+        expect(@vector.equals(@otherVector)).toBeTruthy()
         
     context 'when at least one clock is different', ->
       beforeEach ->
@@ -38,7 +38,7 @@ describe 'VectorClock', ->
           other_clock: 3
       
       it 'returns false', ->
-        expect(@vector.equal_to(@otherVector)).toBeFalsy()
+        expect(@vector.equals(@otherVector)).toBeFalsy()
         
     context 'when at least one clock is undefined in a vector', ->
       beforeEach ->
@@ -48,7 +48,7 @@ describe 'VectorClock', ->
           undefined_clock: 1
       
       it 'returns false', ->
-        expect(@vector.equal_to(@otherVector)).toBeFalsy()
+        expect(@vector.equals(@otherVector)).toBeFalsy()
         
   
   describe '#supersedes', ->    

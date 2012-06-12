@@ -5,7 +5,7 @@ class @VectorClock
   _defineClocksOf: (otherVector) ->
     @[clock] ||= 0 for clock of otherVector
     
-  equal_to: (otherVector) ->
+  equals: (otherVector) ->
     @_defineClocksOf(otherVector)
     _.all _.keys(@), (clock) =>
       @[clock] == (otherVector[clock] || 0)

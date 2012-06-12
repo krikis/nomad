@@ -250,14 +250,14 @@ describe 'Versioning', ->
       
     context 'when the versions equal', ->  
       beforeEach ->
-        @equalsStub = sinon.stub(@version, 'equal_to', -> true)
+        @equalsStub = sinon.stub(@version, 'equals', -> true)
     
       it 'returns supersedes', ->
         expect(@model._checkVersion({})).toEqual('supersedes')
 
     context 'when the model version supersedes the server version', ->  
       beforeEach ->
-        @equalsStub = sinon.stub(@version, 'equal_to', -> false)
+        @equalsStub = sinon.stub(@version, 'equals', -> false)
         @supersedesStub = sinon.stub(@version, 'supersedes', -> true)
     
       it 'returns supersedes', ->
@@ -265,7 +265,7 @@ describe 'Versioning', ->
 
     context 'when the model version conflicts with the server version', ->  
       beforeEach ->
-        @equalsStub = sinon.stub(@version, 'equal_to', -> false)
+        @equalsStub = sinon.stub(@version, 'equals', -> false)
         @supersedesStub = sinon.stub(@version, 'supersedes', -> false)
         @conflictsWithStub = sinon.stub(@version, 'conflictsWith', -> true)
     
@@ -274,7 +274,7 @@ describe 'Versioning', ->
 
     context 'when the client version precedes the server version', ->  
       beforeEach ->
-        @equalsStub = sinon.stub(@version, 'equal_to', -> false)
+        @equalsStub = sinon.stub(@version, 'equals', -> false)
         @supersedesStub = sinon.stub(@version, 'supersedes', -> false)
         @conflictsWithStub = sinon.stub(@version, 'conflictsWith', -> false)
     
