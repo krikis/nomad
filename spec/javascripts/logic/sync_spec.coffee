@@ -139,6 +139,7 @@ describe 'Sync', ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @getStub = sinon.stub(@collection, 'get', => @model)
+      @processCreateStub = sinon.stub(@collection, '_processCreate')
       @processUpdateStub = sinon.stub(@model, 'processUpdate')
 
     it 'fetches the model with the provided id from the collection', ->
@@ -146,10 +147,18 @@ describe 'Sync', ->
         id: {attribute: 'value'}
       expect(@getStub).toHaveBeenCalledWith('id')
 
-    it 'lets the model handle the update', ->
+    it 'lets the model handle the update when it could be found', ->
       @collection.handleUpdates
         id: {attribute: 'value'}
       expect(@processUpdateStub).toHaveBeenCalledWith(attribute: 'value')
+      
+    it 'creates a new model when it could not be found', ->
+      @getStub.restore()
+      @getStub = sinon.stub(@collection, 'get')
+      @collection.handleUpdates
+        id: {attribute: 'value'}
+      expect(@processCreateStub).toHaveBeenCalledWith('id', attribute: 'value')
+      
 
   describe '#syncModels', ->
     beforeEach ->

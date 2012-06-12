@@ -34,8 +34,10 @@
 
   handleUpdates: (models) ->
     _.map models, (attributes, id) =>
-      model = @get(id)
-      model?.processUpdate attributes
+      if model = @get(id)
+        model.processUpdate attributes
+      else
+        @_processCreate id, attributes
 
   syncModels: (updated) ->
     @fayeClient.publish
