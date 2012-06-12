@@ -97,12 +97,21 @@ describe 'Sync', ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @getStub = sinon.stub(@collection, 'get')
+      @model = new Backbone.Model
+      @modelCreateStub = sinon.stub(@model, 'processCreate')
       @processCreateStub = sinon.stub(@collection, '_processCreate')     
       
-    it 'checks for each id whether it conflicts with an existing model', ->
+    it 'fetches the model with the provided id from the collection', ->
       @collection.handleCreates
         id: {attribute: 'value'}
       expect(@getStub).toHaveBeenCalledWith('id')
+
+    it 'lets the model handle the create when it can be found', ->  
+      @getStub.restore()
+      @getStub = sinon.stub(@collection, 'get', => @model)
+      @collection.handleCreates
+        id: {attribute: 'value'}
+      expect(@modelCreateStub).toHaveBeenCalledWith(attribute: 'value')
       
     it 'creates a new model', ->
       @collection.handleCreates

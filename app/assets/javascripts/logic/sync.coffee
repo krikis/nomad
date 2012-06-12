@@ -20,10 +20,10 @@
       
   handleCreates: (models) ->
     _.map models, (attributes, id) =>
-      if existing_model = @get(id)
-        # TODO :: generate new id for conflicting model
-        console.log existing_model
-      @_processCreate id, attributes
+      if model = @get(id)
+        model.processCreate attributes
+      else
+        @_processCreate id, attributes
       
   _processCreate: (id, attributes) ->      
     attributes.id = id

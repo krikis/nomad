@@ -42,6 +42,8 @@
   isSynced: ->
     @_versioning?.synced
     
+  processCreate: (attribues) ->
+    
   processUpdate: (attributes) ->
     method = @_updateMethod(attributes['remote_version'])
     @[method] attributes
