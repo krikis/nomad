@@ -131,7 +131,9 @@ describe ServerSideClient do
 
     it 'files all id conflicts for unicast' do
       results = {}
-      subject.stub(:check_new_version) {|_, _, unicast| unicast['id'] = 'conflict'}
+      subject.stub(:check_new_version) do |_, _, unicast|
+        unicast['id'] = 'conflict'
+      end
       subject.handle_new_versions(model, [new_version], results)
       results['unicast']['id'].should eq('conflict')
     end
@@ -178,7 +180,8 @@ describe ServerSideClient do
     before { subject.stub(:check_version) }
 
     it 'checks the version of each entry' do
-      subject.should_receive(:check_version).with(model, version, 'client_id', an_instance_of(Hash))
+      subject.should_receive(:check_version).
+        with(model, version, 'client_id', an_instance_of(Hash))
       subject.handle_versions(model, [version], 'client_id', {})
     end
 
@@ -186,6 +189,15 @@ describe ServerSideClient do
       results = {}
       subject.handle_versions(model, [version], 'client_id', results)
       results['meta']['preSync'].should be_true
+    end
+
+    it 'files all update conflicts for unicast' do
+      results = {}
+      subject.stub(:check_version) do |_, _, _, unicast|
+        unicast['update'] = 'conflict'
+      end
+      subject.handle_versions(model, [version], 'client_id', results)
+      results['unicast']['update'].should eq('conflict')
     end
   end
 
@@ -216,7 +228,8 @@ describe ServerSideClient do
       before { TestModel.stub(:find_by_remote_id).and_return(object) }
 
       it 'checks whether its version makes the client\'s version obsolete' do
-        remote_version.should_receive(:obsoletes?).with('some_version', 'client_id')
+        remote_version.should_receive(:obsoletes?).
+          with('some_version', 'client_id')
         subject.check_version(model, version, 'client_id', {})
       end
 
@@ -225,7 +238,8 @@ describe ServerSideClient do
                                     :supersedes? => false) }
 
         it 'returns false' do
-          subject.check_version(model, version, 'client_id', {}).should be_false
+          subject.check_version(model, version, 'client_id', {}).
+            should be_false
         end
       end
 
@@ -246,13 +260,15 @@ describe ServerSideClient do
         end
 
         it 'returns false' do
-          subject.check_version(model, version, 'client_id', {}).should be_false
+          subject.check_version(model, version, 'client_id', {}).
+            should be_false
         end
       end
 
       context 'and the object does not supersede the client version' do
         it 'returns true and the object' do
-          subject.check_version(model, version, 'client_id', {}).should eq([true, object])
+          subject.check_version(model, version, 'client_id', {}).
+            should eq([true, object])
         end
       end
     end
@@ -278,24 +294,38 @@ describe ServerSideClient do
     end
 
     it 'checks the version of each update' do
-      subject.should_receive(:check_version).with(model, update, 'client_id', an_instance_of(Hash))
+      subject.should_receive(:check_version).
+        with(model, update, 'client_id', an_instance_of(Hash))
       subject.handle_updates(model, [update], 'client_id', {})
     end
 
     it 'issues an update if the version check is successful' do
-      subject.should_receive(:process_update).with(model, object, update, an_instance_of(Hash))
+      subject.should_receive(:process_update).
+        with(model, object, update, an_instance_of(Hash))
       subject.handle_updates(model, [update], 'client_id', {})
     end
 
     it 'issues no update if the version check was unsuccessful' do
       subject.stub(:check_version => [false, object])
-      subject.should_not_receive(:process_update).with(model, object, update, an_instance_of(Hash))
+      subject.should_not_receive(:process_update).
+        with(model, object, update, an_instance_of(Hash))
       subject.handle_updates(model, [update], 'client_id', {})
+    end
+
+    it 'files all update conflicts for unicast' do
+      results = {}
+      subject.stub(:check_version) do |_, _, _, unicast|
+        unicast['update'] = 'conflict'
+      end
+      subject.handle_updates(model, [update], 'client_id', results)
+      results['unicast']['update'].should eq('conflict')
     end
 
     it 'files all successful updates for multicast' do
       results = {}
-      subject.stub(:process_update) {|_, _, _, multicast| multicast['successful'] = 'update'}
+      subject.stub(:process_update) do |_, _, _, multicast|
+        multicast['successful'] = 'update'
+      end
       subject.handle_updates(model, [update], 'client_id', results)
       results['multicast']['successful'].should eq('update')
     end
@@ -390,7 +420,8 @@ describe ServerSideClient do
                        'model_name' => 'TestModel'} }
 
       it 'publishes the unicast results to the sending client' do
-        client.should_receive(:publish).with('/sync/TestModel/some_unique_id', unicast)
+        client.should_receive(:publish).
+          with('/sync/TestModel/some_unique_id', unicast)
         subject.publish_results(message, results)
       end
     end
@@ -398,7 +429,8 @@ describe ServerSideClient do
     context 'when no client id is provided' do
       let(:message) { {'model_name' => 'TestModel'} }
       it 'it does not publish the unicast results' do
-        client.should_not_receive(:publish).with(an_instance_of(String), unicast)
+        client.should_not_receive(:publish).
+          with(an_instance_of(String), unicast)
         subject.publish_results(message, results)
       end
     end
