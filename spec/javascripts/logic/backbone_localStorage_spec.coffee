@@ -1,6 +1,18 @@
 describe 'Bacbone.LocalStorage', ->
   beforeEach ->
     window.localStorage.clear()
+    fayeClient = {}
+    fayeClient.subscribe = ->
+    fayeClient.publish = ->
+    @subscribeStub = sinon.stub(fayeClient, 'subscribe')
+    @publishStub = sinon.stub(fayeClient, 'publish')
+    @clientConstructorStub = sinon.stub(Faye, 'Client')
+    @clientConstructorStub.returns fayeClient
+  
+  afterEach ->
+    @clientConstructorStub.restore()
+    # remove stub from window.client
+    delete window.client
 
   describe 'localStorage on collections', ->
 

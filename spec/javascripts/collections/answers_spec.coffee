@@ -1,7 +1,20 @@
 describe "AnswersSpec", ->
   beforeEach ->
+    window.localStorage.clear()
+    fayeClient = {}
+    fayeClient.subscribe = ->
+    fayeClient.publish = ->
+    @subscribeStub = sinon.stub(fayeClient, 'subscribe')
+    @publishStub = sinon.stub(fayeClient, 'publish')
+    @clientConstructorStub = sinon.stub(Faye, 'Client')
+    @clientConstructorStub.returns fayeClient
     Answers = Nomad.Collections.Answers
     @answers = new Answers
+
+  afterEach ->
+    @clientConstructorStub.restore()
+    # remove stub from window.client
+    delete window.client
 
   it "has the Answer model for model", ->
     expect(@answers.model).toEqual Nomad.Models.Answer

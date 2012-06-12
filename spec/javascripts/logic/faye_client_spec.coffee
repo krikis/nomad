@@ -1,10 +1,12 @@
 describe 'FayeClient', ->
   beforeEach ->
-    @fayeClientStub = {}
-    @fayeClientStub.subscribe = sinon.stub()
-    @fayeClientStub.publish = sinon.stub()
+    fayeClient = {}
+    fayeClient.subscribe = ->
+    fayeClient.publish = ->
+    @subscribeStub = sinon.stub(fayeClient, 'subscribe')
+    @publishStub = sinon.stub(fayeClient, 'publish')
     @clientConstructorStub = sinon.stub(Faye, 'Client')
-    @clientConstructorStub.returns @fayeClientStub
+    @clientConstructorStub.returns fayeClient
     @collection = new Backbone.Collection([], modelName: 'TestModel')
     @modelName = 'TestModel'
 
@@ -69,7 +71,7 @@ describe 'FayeClient', ->
     it 'calls the publish method on the faye client object', ->
       message = sinon.stub()
       @backboneClient.publish message
-      expect(@fayeClientStub.publish).
+      expect(@publishStub).
         toHaveBeenCalledWith('/server/' + @modelName, message)
 
   describe '#subscribe', ->
@@ -78,13 +80,13 @@ describe 'FayeClient', ->
                                                     modelName: @modelName
 
     it 'subscribes the wrapped client to the channel', ->
-      expect(@fayeClientStub.subscribe).
+      expect(@subscribeStub).
         toHaveBeenCalledWith('/sync/' + @modelName,
                              @backboneClient.receive,
                              @backboneClient)
 
     it 'subscribes the wrapped client to a personal channel', ->
-      expect(@fayeClientStub.subscribe).
+      expect(@subscribeStub).
           toHaveBeenCalledWith("/sync/#{@modelName}/#{Nomad.clientId}",
                                @backboneClient.receive,
                                @backboneClient)
