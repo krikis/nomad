@@ -93,13 +93,17 @@ class ServerSideClient
   end
 
   def handle_creates(model, creates, results)
-
+    results['unicast'] ||= {}
+    creates.each do |create|
+      check_new_version(model, create, results['unicast'])
+      process_create(model, create, results)
+    end
   end
 
   def handle_updates(model, updates, client_id, results)
     results['unicast']   ||= {}
     results['multicast'] ||= {}
-    updates.select do |update|
+    updates.each do |update|
       success, object = check_version(model, update, client_id, results['unicast'])
       if success
         process_update(model, object, update, results['multicast'])
