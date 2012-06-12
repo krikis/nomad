@@ -91,6 +91,19 @@ describe 'Sync', ->
       @model.isSynced = -> true
       versions = @collection._versionDetails([@model])
       expect(versions).toEqual [{id: 'some_id', version: 'vector_clock'}]
+      
+  describe '#handleCreates', ->
+    beforeEach ->
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @getStub = sinon.stub(@collection, 'get')
+      
+    it 'checks for each create whether it conflicts with an existing model', ->
+      @collection.handleCreates
+        id: {attribute: 'value'}
+      expect(@getStub).toHaveBeenCalledWith('id')
+      
+    
 
   describe '#handleUpdates', ->
     beforeEach ->

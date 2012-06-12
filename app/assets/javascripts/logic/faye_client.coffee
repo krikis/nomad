@@ -34,7 +34,7 @@ class @BackboneSync.FayeClient
     # TODO resync resolved and rebased if this was no presync feedback
   
   resolve: (params) ->
-    # TODO generate new id for conflicting models
+    # TODO :: generate new id for conflicting models
 
   create: (params) ->
     unless _.isEmpty(params)

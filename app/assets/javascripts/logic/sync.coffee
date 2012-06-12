@@ -19,6 +19,12 @@
       model.hasPatches() and model.isSynced()
       
   handleCreates: (models) ->
+    _.map models, (attributes, id) =>
+      if existing_model = @get(id)
+        # TODO :: generate new id for conflicting model
+        console.log existing_model
+      
+                  
 
   handleUpdates: (models) ->
     _.map models, (attributes, id) =>
