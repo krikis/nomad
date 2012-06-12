@@ -34,6 +34,8 @@ describe 'sync', ->
 
   it 'syncs a newly created model to the server', ->
     runs ->
+      expect(@model.isSynced()).toBeFalsy()
+      expect(@model.hasPatches()).toBeTruthy()
       @collection.preSync()
     waitsFor (->
       @resolveSpy.callCount > 0
@@ -69,6 +71,7 @@ describe 'sync', ->
       @model.save
         title: 'other_title'
         content: 'other_content'
+      expect(@model.hasPatches()).toBeTruthy()
       @collection.preSync()
     waitsFor (->
       @updateSpy.callCount > 0
@@ -94,5 +97,7 @@ describe 'sync', ->
     ), 'sync acknowledgement', 1000
     runs ->
       expect(@updateSpy).toHaveBeenCalledWith({})
-
-
+      
+    
+  
+  
