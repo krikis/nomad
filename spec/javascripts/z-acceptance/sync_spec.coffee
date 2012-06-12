@@ -28,24 +28,23 @@ describe 'sync', ->
       runs ->
         @collection.preSync()
       waitsFor (->
-        @fayeReceiveSpy.callCount > 1
+        @fayeReceiveSpy.callCount > 2
       ), 'receive to get called', 5000
       runs ->
-        expect(@fayeReceiveSpy).toHaveBeenCalledWith(update: {}, resolve: [])
+        expect(@fayeReceiveSpy).toHaveBeenCalledWith(resolve: [])
 
   context 'when syncing a changed object to the server', ->
-    it 'publishes a list of changed objects to the server
-        and receives a list of concurrently changed objects back', ->
+    it 'receives an acknowledgement', ->
       runs ->
         @collection.preSync()
-      waits(10)
+      waits(50)
       runs ->
         @model.save
           title: 'other_title'
           content: 'other_content'
         @collection.preSync()
       waitsFor (->
-        @fayeUpdateSpy.callCount > 3
+        @fayeUpdateSpy.callCount > 2
       ), 'update to get called', 5000
       runs ->
         expect(@fayeUpdateSpy).toHaveBeenCalledWith({})
