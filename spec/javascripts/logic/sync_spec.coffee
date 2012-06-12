@@ -6,12 +6,12 @@ describe 'Sync', ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @newModelsForSyncStub = sinon.stub(@collection, '_newModelsForSync', -> ['new', 'models'])
-      @modelsForSyncStub = sinon.stub(@collection, '_modelsForSync', -> ['other', 'models'])
+      @modelsForSyncStub = sinon.stub(@collection, '_modelsForSync', -> ['dirty', 'models'])
       @versionDetailsStub = sinon.stub(@collection, '_versionDetails', -> ['version', 'details'])
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
       )
-      
+
     it 'collects all new models that have to be synced', ->
       @collection.preSync()
       expect(@newModelsForSyncStub).toHaveBeenCalled()
@@ -19,14 +19,14 @@ describe 'Sync', ->
     it 'collects version details of all new models', ->
       @collection.preSync()
       expect(@versionDetailsStub).toHaveBeenCalledWith(['new', 'models'])
-      
-    it 'collects all other models that have to be synced', ->
+
+    it 'collects all dirty models that have to be synced', ->
       @collection.preSync()
       expect(@modelsForSyncStub).toHaveBeenCalled()
 
-    it 'collects version details of all other models', ->
+    it 'collects version details of all dirty models', ->
       @collection.preSync()
-      expect(@versionDetailsStub).toHaveBeenCalledWith(['other', 'models'])
+      expect(@versionDetailsStub).toHaveBeenCalledWith(['dirty', 'models'])
 
     it 'publishes a list of new version details to the server', ->
       @collection.preSync()
@@ -119,16 +119,41 @@ describe 'Sync', ->
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
       )
+      @newModelsForSyncStub = sinon.stub(@collection, '_newModelsForSync', -> ['new', 'models'])
+      @modelsForSyncStub = sinon.stub(@collection, '_modelsForSync', -> ['dirty', 'models'])
       @dataForSyncStub = sinon.
-        stub(@collection, '_dataForSync', -> [some: 'data'])
+        stub(@collection, '_dataForSync', ->
+          @out ||= [[new: 'data'], [dirty: 'data']]
+          @out.pop()
+        )
 
-    it 'publishes all dirty models to the server', ->
+    it 'collects all dirty models', ->
       @collection.syncModels()
-      expect(@message.updates).toEqual([some: 'data'])
+      expect(@modelsForSyncStub).toHaveBeenCalled()
 
-    it 'marks all models as synced', ->
-     @collection.syncModels()
-     expect(@dataForSyncStub).toHaveBeenCalledWith(markSynced: true)
+    it 'collects the data of the dirty models', ->
+      @collection.syncModels()
+      expect(@dataForSyncStub).toHaveBeenCalledWith(['dirty', 'models'])
+
+    it 'publishes all dirty model data to the server', ->
+      @collection.syncModels()
+      expect(@message.updates).toEqual([dirty: 'data'])
+
+    it 'collects all new models', ->
+      @collection.syncModels()
+      expect(@newModelsForSyncStub).toHaveBeenCalled()
+
+    it 'collects the data of the new models and marks them as synced', ->
+      @collection.syncModels()
+      expect(@dataForSyncStub).toHaveBeenCalledWith(['new', 'models'], markSynced: true)
+
+    it 'marks new models as synced after the dirty models have been collected', ->
+      @collection.syncModels()
+      expect(@newModelsForSyncStub).toHaveBeenCalledAfter(@modelsForSyncStub)
+
+    it 'publishes all new model data to the server', ->
+      @collection.syncModels()
+      expect(@message.creates).toEqual([new: 'data'])
 
  describe '#_dataForSync', ->
    beforeEach ->
@@ -139,15 +164,10 @@ describe 'Sync', ->
        attribute: 'some_value'
      @model.version = -> 'some_version'
      @collection.models = [@model]
-     @modelsForSyncStub = sinon.stub(@collection, '_modelsForSync', => [@model])
      @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
 
-   it 'fetches the models that have to be synced', ->
-     @collection._dataForSync()
-     expect(@modelsForSyncStub).toHaveBeenCalled()
-
-   it 'collects id, attributes and version', ->
-     expect(@collection._dataForSync()).toEqual([
+   it 'collects id, attributes and version of the models provided', ->
+     expect(@collection._dataForSync([@model])).toEqual([
        id: 'some_id'
        attributes:
          attribute: 'some_value'
@@ -155,7 +175,7 @@ describe 'Sync', ->
      ])
 
    it 'marks the models as synced if the markSynced option is set', ->
-     versions = @collection._dataForSync(markSynced: true)
+     versions = @collection._dataForSync([@model], markSynced: true)
      expect(@markAsSyncedStub).toHaveBeenCalled()
 
 

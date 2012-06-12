@@ -9,7 +9,7 @@
       id: model.id
       version: model.version()
     ).value()
-    
+
   _newModelsForSync: () ->
     _(@models).filter (model) ->
       model.hasPatches() and not model.isSynced()
@@ -25,14 +25,14 @@
 
   syncModels: (updated) ->
     @fayeClient.publish
-      updates: @_dataForSync(markSynced: true)
+      updates: @_dataForSync(@_modelsForSync())
+      creates: @_dataForSync(@_newModelsForSync(), markSynced: true)
 
-  _dataForSync: (options = {}) ->
-    models = @_modelsForSync()
+  _dataForSync: (models, options = {}) ->
     _(models).chain().map((model) ->
       json = model.toJSON()
       delete json.id
-      details = 
+      details =
         id: model.id
         attributes: json
         version: model.version()
