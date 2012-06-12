@@ -32,6 +32,9 @@ class @BackboneSync.FayeClient
     # do the actual sync if this was presync feedback
     @collection.syncModels() if meta?.preSync
     # TODO resync resolved and rebased if this was no presync feedback
+  
+  resolve: (params) ->
+    # TODO generate new id for conflicting models
 
   create: (params) ->
     unless _.isEmpty(params)
@@ -40,8 +43,6 @@ class @BackboneSync.FayeClient
   update: (params) ->
     unless _.isEmtpy(params)
       @collection.handleUpdates(params)
-    
-  resolve: (params) ->
 
   destroy: (params) ->
     _.each params, (attributes, id) =>
