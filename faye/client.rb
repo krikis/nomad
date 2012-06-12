@@ -117,6 +117,11 @@ class ServerSideClient
     end
   end
 
+  def add_create_for(object, results)
+    results['create'] ||= {}
+    results['create'][object.remote_id] = json_for(object)
+  end
+
   def handle_updates(model, updates, client_id, results)
     results['unicast']   ||= {}
     results['multicast'] ||= {}

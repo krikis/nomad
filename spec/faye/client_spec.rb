@@ -375,6 +375,17 @@ describe ServerSideClient do
     end
   end
 
+  describe '#add_create_for' do
+    let(:object) { stub(:remote_id => 'some_id') }
+    before { subject.stub(:json_for => 'some_json') }
+
+    it 'adds a create for the object to the hash provided' do
+      results = {}
+      subject.add_create_for(object, results)
+      results['create']['some_id'].should eq('some_json')
+    end
+  end
+
   describe '#handle_updates' do
     let(:update) { stub }
     let(:model)  { TestModel }
