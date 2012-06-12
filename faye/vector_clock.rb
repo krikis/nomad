@@ -3,7 +3,7 @@ class Hash
   # Check whether the provided version is obsolete 
   # with respect to the server state
   def obsoletes?(vector, client_id)
-    self[client_id] >= vector[client_id]
+    self[client_id].present? and self[client_id] >= vector[client_id]
   end
 
   # Check whether +self+ supersedes +vector+ in a vector clock way.

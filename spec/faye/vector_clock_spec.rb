@@ -27,13 +27,22 @@ describe 'VectorClock' do
       end
     end
 
-    context 'when the provided vector\'s value for the client_id
-             supersedes the value in the subject' do
+    context 'when the subject\'s value for the client_id
+             precedes the value in the provided vector' do
       let (:vector) { {'some_id'  => 4,
                        'other_id' => 2} }
 
       it 'returns false' do
         subject.obsoletes?(vector, 'some_id').should be_false
+      end
+    end
+
+    context 'when the subject has no entry for the client_id' do
+      let (:vector) { {'some_id'  => 4,
+                       'undefined_id' => 2} }
+
+      it 'returns false' do
+        subject.obsoletes?(vector, 'undefined_id').should be_false
       end
     end
   end
