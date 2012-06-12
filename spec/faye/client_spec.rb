@@ -77,7 +77,7 @@ describe ServerSideClient do
     it 'handles new versions if present' do
       message = {'new_versions' => stub, 'client_id' => 'some_id'}
       subject.should_receive(:handle_new_versions).
-        with(model, message['new_versions'], 'some_id', {})
+        with(model, message['new_versions'], {})
       subject.process_message(model, message)
     end
 
@@ -88,12 +88,17 @@ describe ServerSideClient do
       subject.process_message(model, message)
     end
 
+    it 'handles creates if present' do
+      message = {'creates' => stub, 'client_id' => 'some_id'}
+      subject.should_receive(:handle_creates).
+        with(model, message['creates'], {})
+      subject.process_message(model, message)
+    end
+
     it 'handles updates if present' do
-      message = {'updates' => stub,
-                 'client_id' => 'some_id',
-                 'model_name' => 'some_model'}
+      message = {'updates' => stub, 'client_id' => 'some_id'}
       subject.should_receive(:handle_updates).
-        with(model, message['updates'], 'some_id', 'some_model', {})
+        with(model, message['updates'], 'some_id', {})
       subject.process_message(model, message)
     end
 
@@ -114,14 +119,21 @@ describe ServerSideClient do
     before { subject.stub(:check_new_version) }
 
     it 'checks the version of each entry' do
-      subject.should_receive(:check_new_version).with(model, new_version, 'client_id', an_instance_of(Hash))
-      subject.handle_new_versions(model, [new_version], 'client_id', {})
+      subject.should_receive(:check_new_version).with(model, new_version, an_instance_of(Hash))
+      subject.handle_new_versions(model, [new_version], {})
     end
 
     it 'flags the results as preSync results' do
       results = {}
-      subject.handle_new_versions(model, [new_version], 'client_id', results)
+      subject.handle_new_versions(model, [new_version], results)
       results['meta']['preSync'].should be_true
+    end
+
+    it 'files all id conflicts for unicast' do
+      results = {}
+      subject.stub(:check_new_version) {|_, _, unicast| unicast['id'] = 'conflict'}
+      subject.handle_new_versions(model, [new_version], results)
+      results['unicast']['id'].should eq('conflict')
     end
   end
 
@@ -136,11 +148,11 @@ describe ServerSideClient do
 
     it 'tries to find an updated version' do
       model.should_receive(:find_by_remote_id).with('some_id')
-      subject.check_new_version(model, new_version, 'client_id', {})
+      subject.check_new_version(model, new_version, {})
     end
 
     it 'returns true if no object is found' do
-      subject.check_new_version(model, new_version, 'client_id', {}).should be_true
+      subject.check_new_version(model, new_version, {}).should be_true
     end
 
     context 'when an object is found' do
@@ -149,13 +161,13 @@ describe ServerSideClient do
 
       it 'files the version for conflict resolution' do
         results = {}
-        subject.check_new_version(model, new_version, 'client_id', results)
+        subject.check_new_version(model, new_version, results)
         results['resolve'].should eq(['some_id'])
         results['update'].should be_blank
       end
 
       it 'returns false' do
-        subject.check_new_version(model, new_version, 'client_id', {}).should be_false
+        subject.check_new_version(model, new_version, {}).should be_false
       end
     end
   end
@@ -246,6 +258,15 @@ describe ServerSideClient do
     end
   end
 
+  describe '#handle_creates' do
+    let(:create) { stub }
+    let(:model)  { TestModel }
+    before do
+      subject.stub(:check_new_version => true)
+    end
+
+  end
+
   describe '#handle_updates' do
     let(:update) { stub }
     let(:model)  { TestModel }
@@ -258,23 +279,25 @@ describe ServerSideClient do
 
     it 'checks the version of each update' do
       subject.should_receive(:check_version).with(model, update, 'client_id', an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', 'model_name', {})
+      subject.handle_updates(model, [update], 'client_id', {})
     end
 
     it 'issues an update if the version check is successful' do
       subject.should_receive(:process_update).with(model, object, update, an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', 'model_name', {})
+      subject.handle_updates(model, [update], 'client_id', {})
     end
 
     it 'issues no update if the version check was unsuccessful' do
       subject.stub(:check_version => [false, object])
       subject.should_not_receive(:process_update).with(model, object, update, an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', 'model_name', {})
+      subject.handle_updates(model, [update], 'client_id', {})
     end
 
-    it 'multicasts all successful updates' do
-      subject.should_receive(:mcast_updates).with('model_name', an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', 'model_name', {})
+    it 'files all successful updates for multicast' do
+      results = {}
+      subject.stub(:process_update) {|_, _, _, multicast| multicast['successful'] = 'update'}
+      subject.handle_updates(model, [update], 'client_id', results)
+      results['multicast']['successful'].should eq('update')
     end
   end
 
@@ -350,34 +373,32 @@ describe ServerSideClient do
     end
   end
 
-  describe '#mcast_updates' do
-    let(:update) { {'id' => 'some_id',
-                    'attributes' => {'attribute' => 'some_value'},
-                    'version' => 'some_version'} }
-
-    it 'multicasts a list of updates' do
-      client.should_receive(:publish).with('/sync/TestModel', [update])
-      subject.mcast_updates('TestModel', [update])
-    end
-  end
-
   describe '#publish_results' do
-    let(:results) { stub }
+    let(:unicast)   { stub }
+    let(:multicast) { stub }
+    let(:results)   { {'unicast' => unicast,
+                       'multicast' => multicast} }
+
+    it 'publishes the multicast results to all clients' do
+      message = {'model_name' => 'TestModel'}
+      client.should_receive(:publish).with('/sync/TestModel', multicast)
+      subject.publish_results(message, results)
+    end
 
     context 'when a client id is provided' do
       let(:message) { {'client_id' => 'some_unique_id',
                        'model_name' => 'TestModel'} }
 
-      it 'publishes to the sending client only' do
-        client.should_receive(:publish).with('/sync/TestModel/some_unique_id', results)
+      it 'publishes the unicast results to the sending client' do
+        client.should_receive(:publish).with('/sync/TestModel/some_unique_id', unicast)
         subject.publish_results(message, results)
       end
     end
 
     context 'when no client id is provided' do
       let(:message) { {'model_name' => 'TestModel'} }
-      it 'publishes to the global channel' do
-        client.should_receive(:publish).with('/sync/TestModel', results)
+      it 'it does not publish the unicast results' do
+        client.should_not_receive(:publish).with(an_instance_of(String), unicast)
         subject.publish_results(message, results)
       end
     end

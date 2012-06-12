@@ -22,10 +22,7 @@ class ServerSideClient
   def process_message(model, message)
     results = {}
     if message['new_versions'].present?
-      handle_new_versions(model,
-                          message['new_versions'],
-                          message['client_id'],
-                          results)
+      handle_new_versions(model, message['new_versions'], results)
     end
     if message['versions'].present?
       handle_versions(model,
@@ -33,26 +30,28 @@ class ServerSideClient
                       message['client_id'],
                       results)
     end
-    #TODO::add handle creates
+    if message['creates'].present?
+      handle_creates(model, message['creates'], results)
+    end
     if message['updates'].present?
       handle_updates(model,
                      message['updates'],
                      message['client_id'],
-                     message['model_name'],
                      results)
     end
     publish_results(message, results)
   end
 
-  def handle_new_versions(model, new_versions, client_id, results)
+  def handle_new_versions(model, new_versions, results)
     results['meta'] ||= {}
+    results['unicast'] ||= {}
     new_versions.each do |version|
-      check_new_version(model, version, client_id, results)
+      check_new_version(model, version, results['unicast'])
     end
     results['meta']['preSync'] = true
   end
 
-  def check_new_version(model, new_version, client_id, results)
+  def check_new_version(model, new_version, results)
     results['resolve'] ||= []
     object = model.find_by_remote_id(new_version['id'])
     if object
@@ -92,15 +91,18 @@ class ServerSideClient
     end
   end
 
-  def handle_updates(model, updates, client_id, model_name, results)
-    successful_updates = {}
+  def handle_creates(model, creates, results)
+
+  end
+
+  def handle_updates(model, updates, client_id, results)
+    results['multicast'] ||= {}
     updates.select do |update|
       success, object = check_version(model, update, client_id, results)
       if success
-        process_update(model, object, update, successful_updates)
+        process_update(model, object, update, results['multicast'])
       end
     end
-    mcast_updates model_name, successful_updates
   end
 
   def process_update(model, object, update, successful_updates)
@@ -124,15 +126,13 @@ class ServerSideClient
     end
   end
 
-  def mcast_updates(model_name, updates)
-    channel = "/sync/#{model_name}"
-    @client.publish(channel, updates)
-  end
-
   def publish_results(message, results)
-    channel = "/sync/#{message['model_name']}"
-    channel += "/#{message['client_id']}" if message['client_id'].present?
-    @client.publish(channel, results)
+    multicast_channel = "/sync/#{message['model_name']}"
+    @client.publish(multicast_channel, results['multicast'])
+    if message['client_id'].present?
+      unicast_channel = "#{multicast_channel}/#{message['client_id']}"
+      @client.publish(unicast_channel, results['unicast'])
+    end
   end
 
   def publish
