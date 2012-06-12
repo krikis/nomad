@@ -127,7 +127,18 @@ describe 'FayeClient', ->
       expect(@syncModelsStub).not.toHaveBeenCalled()
       
   describe '#create', ->
-    
+    beforeEach ->
+      @handleCreatesStub = sinon.stub(@collection, 'handleCreates')
+      @backboneClient = new BackboneSync.FayeClient @collection,
+                                                        modelName: @modelName
+                                                        
+    it 'has the collection process the creates when present', ->
+      @backboneClient.create(id: 'attributes')
+      expect(@handleCreatesStub).toHaveBeenCalledWith(id: 'attributes')
+      
+    it 'does nothing when no creates are present', ->
+      @backboneClient.create({})
+      expect(@handleCreatesStub).not.toHaveBeenCalled()
 
   describe '#update', ->
     beforeEach ->
@@ -135,12 +146,13 @@ describe 'FayeClient', ->
       @backboneClient = new BackboneSync.FayeClient @collection,
                                                     modelName: @modelName
 
-    afterEach ->
-      @handleUpdatesStub.restore()
-
-    it 'has the collection process the updates', ->
-      @backboneClient.update(id: {attribute: 'value'})
-      expect(@handleUpdatesStub).toHaveBeenCalledWith(id: {attribute: 'value'})
+    it 'has the collection process the updates when present', ->
+      @backboneClient.update(id: 'updates')
+      expect(@handleUpdatesStub).toHaveBeenCalledWith(id: 'updates')
+      
+    it 'does nothing when no updates are present', ->
+      @backboneClient.update({})
+      expect(@handleUpdatesStub).not.toHaveBeenCalled()
       
 
 

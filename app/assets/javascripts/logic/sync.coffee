@@ -17,6 +17,8 @@
   _dirtyModels: () ->
     _(@models).filter (model) ->
       model.hasPatches() and model.isSynced()
+      
+  handleCreates: (models) ->
 
   handleUpdates: (models) ->
     _.map models, (attributes, id) =>

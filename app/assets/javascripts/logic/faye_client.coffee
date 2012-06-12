@@ -34,10 +34,12 @@ class @BackboneSync.FayeClient
     # TODO resync resolved and rebased if this was no presync feedback
 
   create: (params) ->
-
+    unless _.isEmpty(params)
+      @collection.handleCreates(params)
   
   update: (params) ->
-    @collection.handleUpdates(params)
+    unless _.isEmtpy(params)
+      @collection.handleUpdates(params)
     
   resolve: (params) ->
 
