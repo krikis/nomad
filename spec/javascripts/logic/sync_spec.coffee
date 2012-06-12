@@ -147,12 +147,12 @@ describe 'Sync', ->
         id: {attribute: 'value'}
       expect(@getStub).toHaveBeenCalledWith('id')
 
-    it 'lets the model handle the update when it could be found', ->
+    it 'lets the model handle the update when it can be found', ->
       @collection.handleUpdates
         id: {attribute: 'value'}
       expect(@processUpdateStub).toHaveBeenCalledWith(attribute: 'value')
       
-    it 'creates a new model when it could not be found', ->
+    it 'creates a new model when it can not be found', ->
       @getStub.restore()
       @getStub = sinon.stub(@collection, 'get')
       @collection.handleUpdates
