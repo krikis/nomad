@@ -53,7 +53,7 @@
      
   _checkVersion: (remoteVersion) ->
     # if the client receives an acknowledgement from the server
-    if @version().equals(remoteVersion) or @version().supersedes(remoteVersion)
+    if @version().equal_to(remoteVersion) or @version().supersedes(remoteVersion)
       'supersedes'
     # if the client receives a conflicting update from the server
     else if @version().conflictsWith(remoteVersion)
