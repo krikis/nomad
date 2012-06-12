@@ -5,8 +5,8 @@ describe 'Sync', ->
       @message = undefined
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
-      @newModelsForSyncStub = sinon.stub(@collection, '_newModelsForSync', -> ['new', 'models'])
-      @modelsForSyncStub = sinon.stub(@collection, '_modelsForSync', -> ['dirty', 'models'])
+      @newModelsStub = sinon.stub(@collection, '_newModels', -> ['new', 'models'])
+      @dirtyModelsStub = sinon.stub(@collection, '_dirtyModels', -> ['dirty', 'models'])
       @versionDetailsStub = sinon.stub(@collection, '_versionDetails', -> ['version', 'details'])
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
@@ -14,7 +14,7 @@ describe 'Sync', ->
 
     it 'collects all new models that have to be synced', ->
       @collection.preSync()
-      expect(@newModelsForSyncStub).toHaveBeenCalled()
+      expect(@newModelsStub).toHaveBeenCalled()
 
     it 'collects version details of all new models', ->
       @collection.preSync()
@@ -22,7 +22,7 @@ describe 'Sync', ->
 
     it 'collects all dirty models that have to be synced', ->
       @collection.preSync()
-      expect(@modelsForSyncStub).toHaveBeenCalled()
+      expect(@dirtyModelsStub).toHaveBeenCalled()
 
     it 'collects version details of all dirty models', ->
       @collection.preSync()
@@ -36,7 +36,7 @@ describe 'Sync', ->
       @collection.preSync()
       expect(@message.versions).toEqual(['version', 'details'])
 
-  describe '#_newModelsForSync', ->
+  describe '#_newModels', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
@@ -47,18 +47,18 @@ describe 'Sync', ->
     it 'includes all models that have patches and have never been synced', ->
       @model.hasPatches = -> true
       @model.isSynced = -> false
-      expect(@collection._newModelsForSync()).toEqual([@model])
+      expect(@collection._newModels()).toEqual([@model])
 
     it 'does not include models that have no patches', ->
       @model.isSynced = -> false
-      expect(@collection._newModelsForSync()).toEqual([])
+      expect(@collection._newModels()).toEqual([])
 
     it 'does not include models that have been synced before', ->
       @model.hasPatches = -> true
       @model.isSynced = -> true
-      expect(@collection._newModelsForSync()).toEqual([])
+      expect(@collection._newModels()).toEqual([])
 
-  describe '#_modelsForSync', ->
+  describe '#_dirtyModels', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
@@ -69,15 +69,15 @@ describe 'Sync', ->
     it 'includes all models that have patches and have been synced before', ->
       @model.hasPatches = -> true
       @model.isSynced = -> true
-      expect(@collection._modelsForSync()).toEqual([@model])
+      expect(@collection._dirtyModels()).toEqual([@model])
 
     it 'does not include models that have no patches', ->
       @model.isSynced = -> true
-      expect(@collection._modelsForSync()).toEqual([])
+      expect(@collection._dirtyModels()).toEqual([])
 
     it 'does not include models that were never synced', ->
       @model.hasPatches = -> true
-      expect(@collection._modelsForSync()).toEqual([])
+      expect(@collection._dirtyModels()).toEqual([])
 
   describe '#_versionDetails', ->
     beforeEach ->
@@ -119,8 +119,8 @@ describe 'Sync', ->
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
       )
-      @newModelsForSyncStub = sinon.stub(@collection, '_newModelsForSync', -> ['new', 'models'])
-      @modelsForSyncStub = sinon.stub(@collection, '_modelsForSync', -> ['dirty', 'models'])
+      @newModelsStub = sinon.stub(@collection, '_newModels', -> ['new', 'models'])
+      @dirtyModelsStub = sinon.stub(@collection, '_dirtyModels', -> ['dirty', 'models'])
       @dataForSyncStub = sinon.
         stub(@collection, '_dataForSync', ->
           @out ||= [[new: 'data'], [dirty: 'data']]
@@ -129,7 +129,7 @@ describe 'Sync', ->
 
     it 'collects all dirty models', ->
       @collection.syncModels()
-      expect(@modelsForSyncStub).toHaveBeenCalled()
+      expect(@dirtyModelsStub).toHaveBeenCalled()
 
     it 'collects the data of the dirty models', ->
       @collection.syncModels()
@@ -141,7 +141,7 @@ describe 'Sync', ->
 
     it 'collects all new models', ->
       @collection.syncModels()
-      expect(@newModelsForSyncStub).toHaveBeenCalled()
+      expect(@newModelsStub).toHaveBeenCalled()
 
     it 'collects the data of the new models and marks them as synced', ->
       @collection.syncModels()
@@ -149,7 +149,7 @@ describe 'Sync', ->
 
     it 'marks new models as synced after the dirty models have been collected', ->
       @collection.syncModels()
-      expect(@newModelsForSyncStub).toHaveBeenCalledAfter(@modelsForSyncStub)
+      expect(@newModelsStub).toHaveBeenCalledAfter(@dirtyModelsStub)
 
     it 'publishes all new model data to the server', ->
       @collection.syncModels()

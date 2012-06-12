@@ -1,8 +1,8 @@
 @Sync =
   preSync: ->
     @fayeClient.publish
-      new_versions: @_versionDetails(@_newModelsForSync())
-      versions: @_versionDetails(@_modelsForSync())
+      new_versions: @_versionDetails(@_newModels())
+      versions: @_versionDetails(@_dirtyModels())
 
   _versionDetails: (models) ->
     _(models).chain().map((model) ->
@@ -10,11 +10,11 @@
       version: model.version()
     ).value()
 
-  _newModelsForSync: () ->
+  _newModels: () ->
     _(@models).filter (model) ->
       model.hasPatches() and not model.isSynced()
 
-  _modelsForSync: () ->
+  _dirtyModels: () ->
     _(@models).filter (model) ->
       model.hasPatches() and model.isSynced()
 
@@ -25,8 +25,8 @@
 
   syncModels: (updated) ->
     @fayeClient.publish
-      updates: @_dataForSync(@_modelsForSync())
-      creates: @_dataForSync(@_newModelsForSync(), markSynced: true)
+      updates: @_dataForSync(@_dirtyModels())
+      creates: @_dataForSync(@_newModels(), markSynced: true)
 
   _dataForSync: (models, options = {}) ->
     _(models).chain().map((model) ->
