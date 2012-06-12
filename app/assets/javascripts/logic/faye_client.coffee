@@ -41,7 +41,7 @@ class @BackboneSync.FayeClient
       @collection.handleCreates(params)
   
   update: (params) ->
-    unless _.isEmtpy(params)
+    unless _.isEmpty(params)
       @collection.handleUpdates(params)
 
   destroy: (params) ->
