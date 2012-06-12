@@ -5,7 +5,6 @@ describe 'sync', ->
     unless window.acceptance_client?
       delete window.client
       window.acceptance_client = true
-    # create a wrapper around the receive method so that it sets window.receive_called
     @receiveSpy = sinon.spy(BackboneSync.FayeClient::, 'receive')
     @resolveSpy = sinon.spy(BackboneSync.FayeClient::, 'resolve')
     @createSpy  = sinon.spy(BackboneSync.FayeClient::, 'create' )
@@ -80,7 +79,7 @@ describe 'sync', ->
       expect(@updateSpy).toHaveBeenCalledWith({})
     waitsFor (->
       @updateSpy.callCount > 1
-    ), 'update multicast', 1000  
+    ), 'update multicast', 1000
     runs ->
       args = {}
       attributes = @model.attributes
@@ -97,7 +96,35 @@ describe 'sync', ->
     ), 'sync acknowledgement', 1000
     runs ->
       expect(@updateSpy).toHaveBeenCalledWith({})
-      
-    
-  
-  
+
+  it 'syncs an outdated model to the server', ->
+    runs ->
+      @collection.preSync()
+    waits(50)
+    runs ->
+      @model.save
+        title: 'other_title'
+      @collection.preSync()
+    waits(50)
+    runs ->
+      @model.save
+        content: 'other_content'
+      version = new VectorClock
+        some_unique_id: 1
+        some_other_id: 1
+      @model.setVersion(version)
+      @previousId = Nomad.clientId
+      Nomad.clientId = 'some_other_id'
+      window.client.unsubscribe('/sync/Post')
+      @collection.fayeClient.subscribe()
+      @collection.preSync()
+    waitsFor (->
+      @updateSpy.callCount > 5
+    ), 'preSync acknowledgement', 1000
+    runs ->
+      expect(@updateSpy).toHaveBeenCalledWith({})
+      Nomad.clientId = @previousId
+
+
+
+
