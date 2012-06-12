@@ -218,15 +218,28 @@ describe 'Versioning', ->
       expect(@methodStub).toHaveBeenCalledWith
         attribute: 'value'
         remote_version: 'version'
+      
+  describe '#_createMethod', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
 
-    it 'does nothing when no method is returned', ->
-      @createMethodStub.restore()
-      @createMethodStub = sinon.stub(@model, '_createMethod')
-      expect(=>
-        @model.processCreate
-          attribute: 'value'
-          remote_version: 'version'
-      ).not.toThrow()
+    it 'checks the version of the update', ->
+      @checkVersionStub = sinon.stub(@model, '_checkVersion')
+      @model._createMethod 'version'
+      expect(@checkVersionStub).toHaveBeenCalledWith('version')
+
+    it 'returns the _forwardTo method when client supersedes server', ->
+      @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'supersedes')
+      expect(@model._createMethod()).toEqual('_forwardTo')
+
+    it 'returns the _changeId method when client conflicts with server', ->
+      @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'conflictsWith')
+      expect(@model._createMethod()).toEqual('_changeId')
+
+    it 'returns the _changeId method when client precedes server', ->
+      @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'precedes')
+      expect(@model._createMethod()).toEqual('_changeId')
       
   describe '#processUpdate', ->
     beforeEach ->
@@ -249,15 +262,6 @@ describe 'Versioning', ->
       expect(@methodStub).toHaveBeenCalledWith
         attribute: 'value'
         remote_version: 'version'
-        
-    it 'does nothing when no method is returned', ->
-      @updateMethodStub.restore()
-      @updateMethodStub = sinon.stub(@model, '_updateMethod')
-      expect(=>
-        @model.processUpdate
-          attribute: 'value'
-          remote_version: 'version'
-      ).not.toThrow()
         
   describe '#_updateMethod', ->
     beforeEach ->

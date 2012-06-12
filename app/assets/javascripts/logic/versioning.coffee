@@ -44,13 +44,21 @@
     
   processCreate: (attributes) ->
     method = @_createMethod(attributes['remote_version'])
-    @[method] attributes if method?
+    @[method] attributes
     
   _createMethod: (remoteVersion) ->
+    switch @_checkVersion(remoteVersion)
+      when 'supersedes' then '_forwardTo'
+      when 'conflictsWith', 'precedes' then '_changeId'
+      
+  _changeId: (attributes) ->
+    # TODO :: implement changing the model id when it conflicts 
+    # with a model created on another client
+    # think about what to do with the user interface when this happens
     
   processUpdate: (attributes) ->
     method = @_updateMethod(attributes['remote_version'])
-    @[method] attributes if method?
+    @[method] attributes
     
   _updateMethod: (remoteVersion) ->
     switch @_checkVersion(remoteVersion)
