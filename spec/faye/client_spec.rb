@@ -123,10 +123,10 @@ describe ServerSideClient do
       subject.handle_new_versions(model, [new_version], {})
     end
 
-    it 'flags the results as preSync results' do
+    it 'flags the unicast results as preSync results' do
       results = {}
       subject.handle_new_versions(model, [new_version], results)
-      results['meta']['preSync'].should be_true
+      results['unicast']['meta']['preSync'].should be_true
     end
 
     it 'files all id conflicts for unicast' do
@@ -185,10 +185,10 @@ describe ServerSideClient do
       subject.handle_versions(model, [version], 'client_id', {})
     end
 
-    it 'flags the results as preSync results' do
+    it 'flags the unicast results as preSync results' do
       results = {}
       subject.handle_versions(model, [version], 'client_id', results)
-      results['meta']['preSync'].should be_true
+      results['unicast']['meta']['preSync'].should be_true
     end
 
     it 'files all update conflicts for unicast' do

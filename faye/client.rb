@@ -43,12 +43,12 @@ class ServerSideClient
   end
 
   def handle_new_versions(model, new_versions, results)
-    results['meta']    ||= {}
     results['unicast'] ||= {}
+    results['unicast']['meta'] ||= {}
     new_versions.each do |version|
       check_new_version(model, version, results['unicast'])
     end
-    results['meta']['preSync'] = true
+    results['unicast']['meta']['preSync'] = true
   end
 
   def check_new_version(model, new_version, results)
@@ -64,12 +64,12 @@ class ServerSideClient
   end
 
   def handle_versions(model, versions, client_id, results)
-    results['meta']    ||= {}
     results['unicast'] ||= {}
+    results['unicast']['meta'] ||= {}
     versions.each do |version|
       check_version(model, version, client_id, results['unicast'])
     end
-    results['meta']['preSync'] = true
+    results['unicast']['meta']['preSync'] = true
   end
 
   def check_version(model, version, client_id, results)
