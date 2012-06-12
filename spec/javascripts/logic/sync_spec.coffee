@@ -116,6 +116,7 @@ describe 'Sync', ->
       @model = new Backbone.Model
       @createStub = sinon.stub(@collection, 'create', => @model)
       @setVersionStub = sinon.stub(@model, 'setVersion')
+      @saveStub = sinon.stub(@model, 'save')
       
     it 'creates a new model with the id and attributes provided 
         except remote_version', ->
@@ -131,6 +132,13 @@ describe 'Sync', ->
         attribute: 'value'
         remote_version: 'version'
       expect(@setVersionStub).toHaveBeenCalledWith('version')
+      
+    it 'saves the model', ->
+      @collection._processCreate 'id',
+        attribute: 'value'
+        remote_version: 'version'
+      expect(@saveStub).toHaveBeenCalled()
+      
 
   describe '#handleUpdates', ->
     beforeEach ->

@@ -31,6 +31,7 @@
     delete attributes.remote_version
     model = @create attributes
     model.setVersion(version)
+    model.save()
 
   handleUpdates: (models) ->
     _.map models, (attributes, id) =>
