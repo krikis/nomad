@@ -151,10 +151,14 @@ class ServerSideClient
 
   def publish_results(message, results)
     multicast_channel = "/sync/#{message['model_name']}"
-    @client.publish(multicast_channel, results['multicast'])
+    if results['multicast'].present?
+      @client.publish(multicast_channel, results['multicast'])
+    end
     if message['client_id'].present?
       unicast_channel = "#{multicast_channel}/#{message['client_id']}"
-      @client.publish(unicast_channel, results['unicast'])
+      if results['unicast'].present?
+        @client.publish(unicast_channel, results['unicast'])
+      end
     end
   end
 

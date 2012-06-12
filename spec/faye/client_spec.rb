@@ -513,7 +513,7 @@ describe ServerSideClient do
     let(:results)   { {'unicast' => unicast,
                        'multicast' => multicast} }
 
-    it 'publishes the multicast results to all clients' do
+    it 'publishes the multicast results to all clients if present' do
       message = {'model_name' => 'TestModel'}
       client.should_receive(:publish).with('/sync/TestModel', multicast)
       subject.publish_results(message, results)
@@ -523,7 +523,8 @@ describe ServerSideClient do
       let(:message) { {'client_id' => 'some_unique_id',
                        'model_name' => 'TestModel'} }
 
-      it 'publishes the unicast results to the sending client' do
+      it 'publishes the unicast results to the sending client 
+          when such results are present' do
         client.should_receive(:publish).
           with('/sync/TestModel/some_unique_id', unicast)
         subject.publish_results(message, results)
