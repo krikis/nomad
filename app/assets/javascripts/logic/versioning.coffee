@@ -6,6 +6,8 @@
     
   version: ->
     @_versioning?.vector
+    
+  setVersion: (version) ->
 
   addPatch: ->
     @initVersioning()
