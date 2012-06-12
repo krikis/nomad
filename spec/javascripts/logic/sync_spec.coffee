@@ -92,24 +92,24 @@ describe 'Sync', ->
       versions = @collection._versionDetails([@model])
       expect(versions).toEqual [{id: 'some_id', version: 'vector_clock'}]
 
-  describe '#processUpdates', ->
+  describe '#handleUpdates', ->
     beforeEach ->
       @model = new Backbone.Model
       @rebaseStub = sinon.stub(@model, '_rebase', -> @)
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @getStub = sinon.stub(@collection, 'get', => @model)
-      @handleUpdateStub = sinon.stub(@model, 'handleUpdate')
+      @processUpdateStub = sinon.stub(@model, 'processUpdate')
 
     it 'fetches the model with the provided id from the collection', ->
-      @collection.processUpdates
+      @collection.handleUpdates
         id: {attribute: 'value'}
       expect(@getStub).toHaveBeenCalledWith('id')
 
     it 'lets the model handle the update', ->
-      @collection.processUpdates
+      @collection.handleUpdates
         id: {attribute: 'value'}
-      expect(@handleUpdateStub).toHaveBeenCalledWith(attribute: 'value')
+      expect(@processUpdateStub).toHaveBeenCalledWith(attribute: 'value')
 
   describe '#syncModels', ->
     beforeEach ->

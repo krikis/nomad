@@ -31,16 +31,15 @@ class @BackboneSync.FayeClient
       @[event] eventArguments
     # do the actual sync if this was presync feedback
     @collection.syncModels() if meta?.preSync
-
-  update: (params) ->
-    @collection.processUpdates(params)
-    
-  resolve: (params) ->
+    # TODO resync resolved and rebased if this was no presync feedback
 
   create: (params) ->
-    _.each params, (attributes, id) =>
-      model = new @collection.model(attributes)
-      @collection.create model
+
+  
+  update: (params) ->
+    @collection.handleUpdates(params)
+    
+  resolve: (params) ->
 
   destroy: (params) ->
     _.each params, (attributes, id) =>

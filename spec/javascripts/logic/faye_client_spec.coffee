@@ -125,19 +125,22 @@ describe 'FayeClient', ->
     it 'does not sync models to the server when it is no presync feedback', ->
       @backboneClient.receive({})
       expect(@syncModelsStub).not.toHaveBeenCalled()
+      
+  describe '#create', ->
+    
 
   describe '#update', ->
     beforeEach ->
-      @processUpdatesStub = sinon.stub(@collection, 'processUpdates')
+      @handleUpdatesStub = sinon.stub(@collection, 'handleUpdates')
       @backboneClient = new BackboneSync.FayeClient @collection,
                                                     modelName: @modelName
 
     afterEach ->
-      @processUpdatesStub.restore()
+      @handleUpdatesStub.restore()
 
     it 'has the collection process the updates', ->
       @backboneClient.update(id: {attribute: 'value'})
-      expect(@processUpdatesStub).toHaveBeenCalledWith(id: {attribute: 'value'})
+      expect(@handleUpdatesStub).toHaveBeenCalledWith(id: {attribute: 'value'})
       
 
 

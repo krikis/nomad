@@ -18,10 +18,10 @@
     _(@models).filter (model) ->
       model.hasPatches() and model.isSynced()
 
-  processUpdates: (models) ->
+  handleUpdates: (models) ->
     _.map models, (attributes, id) =>
       model = @get(id)
-      model?.handleUpdate attributes
+      model?.processUpdate attributes
 
   syncModels: (updated) ->
     @fayeClient.publish

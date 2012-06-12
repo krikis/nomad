@@ -173,7 +173,7 @@ describe 'Versioning', ->
       @model._versioning = {synced: true}
       expect(@model.isSynced()).toBeTruthy()
       
-  describe '#handleUpdate', ->
+  describe '#processUpdate', ->
     beforeEach ->
       class TestModel extends Backbone.Model
         handler: ->
@@ -182,13 +182,13 @@ describe 'Versioning', ->
       @handlerStub = sinon.stub(@model, 'handler')
     
     it 'checks the version of the update', ->
-      @model.handleUpdate
+      @model.processUpdate
         attribute: 'value'
         remote_version: 'version'
       expect(@checkVersionStub).toHaveBeenCalledWith('version')
       
     it 'calls the handler returned by checkVersion', ->
-      @model.handleUpdate
+      @model.processUpdate
         attribute: 'value'
         remote_version: 'version'
       expect(@handlerStub).toHaveBeenCalledWith
