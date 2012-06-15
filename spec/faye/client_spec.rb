@@ -333,7 +333,9 @@ describe ServerSideClient do
   describe '#process_create' do
     let(:create) { {'id' => 'some_id',
                     'attributes' => {'attribute' => 'some_value'},
-                    'version' => 'some_version'} }
+                    'version' => 'some_version',
+                    'created_at' => 'created_at',
+                    'updated_at' => 'updated_at'} }
     let(:model)  { TestModel }
     let(:object) do
       stub(:update_attributes => nil,
@@ -356,15 +358,27 @@ describe ServerSideClient do
       subject.process_create(model, create, {})
     end
 
+    it 'updates the object with the attributes provided' do
+      object.should_receive(:update_attributes).
+        with('attribute' => 'some_value')
+      subject.process_create(model, create, {})
+    end
+
     it 'sets the object version' do
       object.should_receive(:update_attribute).
         with(:remote_version, 'some_version')
       subject.process_create(model, create, {})
     end
 
-    it 'updates the object with the attributes provided' do
-      object.should_receive(:update_attributes).
-        with('attribute' => 'some_value')
+    it 'sets the object created_at' do
+      object.should_receive(:update_attribute).
+        with(:created_at, 'created_at')
+      subject.process_create(model, create, {})
+    end
+
+    it 'sets the object updated_at' do
+      object.should_receive(:update_attribute).
+        with(:updated_at, 'updated_at')
       subject.process_create(model, create, {})
     end
 
@@ -374,8 +388,10 @@ describe ServerSideClient do
       model.stub :new => object
       time = DateTime.new(2012,4,12,14,30,32)
       create = {'id' => 'some_id',
-                'attributes' => {'updated_at' => time.as_json},
-                'version' => 'some_version'}
+                'attributes' => {'created_at' => Time.now},
+                'version' => 'some_version',
+                'created_at' => Time.now,
+                'updated_at' => time.as_json}
       subject.process_create(model, create, {})
       object.updated_at.should eq(time)
     end
@@ -448,7 +464,9 @@ describe ServerSideClient do
   describe '#process_update' do
     let(:update) { {'id' => 'some_id',
                     'attributes' => {'attribute' => 'some_value'},
-                    'version' => 'some_version'} }
+                    'version' => 'some_version',
+                    'created_at' => 'created_at',
+                    'updated_at' => 'updated_at'} }
     let(:model)  { TestModel }
     let(:object) do
       stub(:update_attributes => nil,
@@ -489,15 +507,27 @@ describe ServerSideClient do
       end
     end
 
+    it 'updates the object with the attributes provided' do
+      object.should_receive(:update_attributes).
+        with('attribute' => 'some_value')
+      subject.process_update(model, object, update, {})
+    end
+
     it 'sets the object version' do
       object.should_receive(:update_attribute).
         with(:remote_version, 'some_version')
       subject.process_update(model, object, update, {})
     end
 
-    it 'updates the object with the attributes provided' do
-      object.should_receive(:update_attributes).
-        with('attribute' => 'some_value')
+    it 'sets the object created_at' do
+      object.should_receive(:update_attribute).
+        with(:created_at, 'created_at')
+      subject.process_update(model, object, update, {})
+    end
+
+    it 'sets the object updated_at' do
+      object.should_receive(:update_attribute).
+        with(:updated_at, 'updated_at')
       subject.process_update(model, object, update, {})
     end
 
@@ -507,8 +537,10 @@ describe ServerSideClient do
       object.update_attribute :remote_id, 'some_id'
       time = DateTime.new(2012,4,12,14,30,32)
       update = {'id' => 'some_id',
-                'attributes' => {'updated_at' => time.as_json},
-                'version' => 'some_version'}
+                'attributes' => {'created_at' => Time.now},
+                'version' => 'some_version',
+                'created_at' => Time.now,
+                'updated_at' => time.as_json}
       subject.process_update(model, object, update, {})
       object.updated_at.should eq(time)
     end
