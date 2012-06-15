@@ -165,6 +165,14 @@ describe 'Versioning', ->
       @oldVersion = @model._versioning.vector[Nomad.clientId]
       @model._tickVersion()
       expect(@model._versioning.vector[Nomad.clientId]).toEqual(@oldVersion + 1)
+      
+    it 'overwrites updatedAt', ->
+      date = new Date(2012, 4, 15, 15, 25, 36)
+      clock = sinon.useFakeTimers(date.getTime())
+      @model._versioning.updatedAt = 'updated_at'
+      @model._tickVersion()
+      clock.restore()
+      expect(@model._versioning.updatedAt).toEqual(date.toJSON())
 
   describe '#hasPatches', ->
     beforeEach ->

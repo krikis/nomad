@@ -33,6 +33,7 @@
 
   _tickVersion: ->
     @_versioning.vector[Nomad.clientId] += 1
+    @_versioning.updatedAt = (new Date).toJSON()
 
   hasPatches: ->
     @_versioning?.patches?.size() > 0  
