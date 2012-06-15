@@ -113,8 +113,11 @@ describe 'sync', ->
       @model.save
         title: 'other_title'
       @collection.preSync()
-    waits(50)
+    waits(500)
     runs ->
+      @model.save
+        title: 'some_title'
+      @model._forwardTo(remote_version: @model.version())
       @model.save
         content: 'other_content'
       version = new VectorClock
