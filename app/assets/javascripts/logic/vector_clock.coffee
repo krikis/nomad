@@ -7,22 +7,22 @@ class @VectorClock
     
   equals: (otherVector) ->
     @_defineClocksOf(otherVector)
-    _.all _.keys(@), (clock) =>
+    _.all _.properties(@), (clock) =>
       @[clock] == (otherVector[clock] || 0)
   
   supersedes: (otherVector) ->
     @_defineClocksOf(otherVector)
-    some_greater = _.some _.keys(@), (clock) =>
+    some_greater = _.some _.properties(@), (clock) =>
       @[clock] > (otherVector[clock] || 0)
-    all_greater_equal = _.all _.keys(@), (clock) =>
+    all_greater_equal = _.all _.properties(@), (clock) =>
       @[clock] >= (otherVector[clock] || 0)
     some_greater and all_greater_equal
     
   conflictsWith: (otherVector) ->
     @_defineClocksOf(otherVector)
-    some_greater = _.some _.keys(@), (clock) =>
+    some_greater = _.some _.properties(@), (clock) =>
       @[clock] > (otherVector[clock] || 0)
-    some_less = _.some _.keys(@), (clock) =>
+    some_less = _.some _.properties(@), (clock) =>
       @[clock] < (otherVector[clock] || 0)
     some_greater and some_less
     

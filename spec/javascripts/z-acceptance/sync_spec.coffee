@@ -52,9 +52,9 @@ describe 'sync', ->
       attributes = @model.attributes
       delete attributes.id
       version = {}
-      _.each _.keys(@model.version()), (key) =>
+      _.each _.properties(@model.version()), (key) =>
         version[key] = @model.version()[key]
-      attributes.remote_version = version  
+      attributes.remote_version = version
       attributes.created_at = @model.createdAt()
       attributes.updated_at = @model.updatedAt()
       args[@model.id] = attributes
@@ -91,7 +91,7 @@ describe 'sync', ->
       attributes = @model.attributes
       delete attributes.id
       version = {}
-      _.each _.keys(@model.version()), (key) =>
+      _.each _.properties(@model.version()), (key) =>
         version[key] = @model.version()[key]
       attributes.remote_version = version
       attributes.created_at = @model.createdAt()
@@ -113,7 +113,7 @@ describe 'sync', ->
       @model.save
         title: 'other_title'
       @collection.preSync()
-    waits(500)
+    waits(50)
     runs ->
       @model.save
         content: 'other_content'
