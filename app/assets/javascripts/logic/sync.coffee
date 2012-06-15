@@ -53,6 +53,8 @@
         id: model.id
         attributes: json
         version: model.version()
+        created_at: model.createdAt()
+        updated_at: model.updatedAt()
       model.markAsSynced() if options.markSynced
       details
     ).value()

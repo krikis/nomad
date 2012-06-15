@@ -243,15 +243,19 @@ describe 'Sync', ->
         id: 'some_id'
         attribute: 'some_value'
       @model.version = -> 'some_version'
+      @model.createdAt = -> 'created_at'
+      @model.updatedAt = -> 'updated_at'
       @collection.models = [@model]
       @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
  
-    it 'collects id, attributes and version of the models provided', ->
+    it 'collects all data of the models provided', ->
       expect(@collection._dataForSync([@model])).toEqual([
         id: 'some_id'
         attributes:
           attribute: 'some_value'
         version: 'some_version'
+        created_at: 'created_at'
+        updated_at: 'updated_at'
       ])
  
     it 'marks the models as synced if the markSynced option is set', ->
