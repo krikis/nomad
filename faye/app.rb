@@ -49,14 +49,14 @@ def highlight_string_attribute(string, attribute, color, content_color)
                "\"#{color}#{attribute}#{reset}\"=>\"#{content_color}\\1#{reset}\""
 end
 
-def highlight_hash_attribute(string, attribute, color, content_color)
+def highlight_hash_attribute(string, attribute, color, content_color, container_only = false)
   string.gsub! /\"#{attribute}\"=>\{([^\}]+)\}/,
-               "\"#{color}#{attribute}#{reset}\"=>#{content_color}{\\1}#{reset}"
+               "\"#{color}#{attribute}#{reset}\"=>#{content_color}{#{reset if container_only}\\1#{content_color if container_only}}#{reset}"
 end
 
-def highlight_array_attribute(string, attribute, color, content_color)
+def highlight_array_attribute(string, attribute, color, content_color, container_only = false)
   string.gsub! /\"#{attribute}\"=>\[([^\]]+)\]/,
-               "\"#{color}#{attribute}#{reset}\"=>#{content_color}[\\1]#{reset}"
+               "\"#{color}#{attribute}#{reset}\"=>#{content_color}[#{reset if container_only}\\1#{content_color if container_only}]#{reset}"
 end
 
 App.bind(:publish) do |client_id, channel, data|
@@ -71,7 +71,14 @@ App.bind(:publish) do |client_id, channel, data|
                              green_on_black,
                              red_on_black)
   end
-  ['client_id'].each do |attribute|
+  ['attributes'].each do |keyword|
+    highlight_hash_attribute(output,
+                             keyword,
+                             light_blue_on_black,
+                             red_on_black,
+                             true)
+  end
+  ['client_id', 'id'].each do |attribute|
     highlight_string_attribute(output,
                                attribute,
                                light_blue_on_black,
