@@ -30,7 +30,7 @@
     [version, created_at, updated_at] = 
       @_extractVersioning(attributes) 
     model = @create attributes  
-    model.setVersion(version)
+    model.setVersion(version, updated_at)
     model.save()
     
   _extractVersioning: (attributes) ->  

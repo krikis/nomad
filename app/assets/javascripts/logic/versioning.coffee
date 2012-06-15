@@ -11,9 +11,10 @@
   version: ->
     @_versioning?.vector
     
-  setVersion: (version) ->
+  setVersion: (version, updated_at) ->
     vector = new VectorClock version
     @_versioning ||= {}
+    @_versioning.updatedAt = updated_at
     @_versioning.vector = vector
 
   addPatch: ->
@@ -99,7 +100,7 @@
     dummy.set attributes
     if dummy._processPatches(@_versioning.patches)
       @set dummy
-      @_updateVersionTo(version)
+      @_updateVersionTo(version, updated_at)
       @save()
       return @
     false
@@ -129,7 +130,8 @@
     else
       false
 
-  _updateVersionTo: (version) ->    
+  _updateVersionTo: (version, updated_at) ->
+    @_versioning.updatedAt = updated_at    
     vector = @_versioning.vector
     _.each version, (value, clock) ->
       if not vector[clock]? or value > vector[clock]
@@ -139,7 +141,7 @@
     [version, created_at, updated_at] = 
       @_extractVersioning(attributes)
     @set attributes
-    @_updateVersionTo(version)
+    @_updateVersionTo(version, updated_at)
     @save()
     
 # extend Backbone.Model

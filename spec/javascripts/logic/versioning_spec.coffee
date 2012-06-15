@@ -78,17 +78,21 @@ describe 'Versioning', ->
     afterEach ->
       @vectorClockStub.restore()
 
+    it 'sets the versioning updatedAt to the new value', ->
+      @model.setVersion({}, 'updated_at')
+      expect(@model.updatedAt()).toEqual('updated_at')
+
     it 'initializes a new vector clock for the version provided', ->
-      @model.setVersion(@version)
+      @model.setVersion(@version, 'updated_at')
       expect(@vectorClockStub).toHaveBeenCalledWith(@version)
 
     it 'initializes versioning if undefined', ->
       expect(@model._versioning).toBeUndefined()
-      @model.setVersion(@version)
+      @model.setVersion(@version, 'updated_at')
       expect(@model._versioning).toBeDefined()
 
     it 'sets the model vector clock to the newly generated clock', ->
-      @model.setVersion(@version)
+      @model.setVersion(@version, 'updated_at')
       expect(@model._versioning.vector).toEqual(@vector)
 
   describe '#addPatch', ->
@@ -452,9 +456,10 @@ describe 'Versioning', ->
       it 'updates the model version to the remote_version', ->
         attributes =
           attribute: 'value'
-          remote_version: 'version'
+          remote_version: 'version', 
+          updated_at: 'updated_at'
         @model._rebase(attributes)
-        expect(@updateVersionToStub).toHaveBeenCalledWith('version')
+        expect(@updateVersionToStub).toHaveBeenCalledWith('version', 'updated_at')
 
       it 'saves the rebased model to the localStorage after that', ->
         @model._rebase({})
@@ -604,12 +609,16 @@ describe 'Versioning', ->
         vector:
           some_unique_id: 3
 
+    it 'sets the versioning updatedAt to the new value', ->
+      @model._updateVersionTo({}, 'updated_at')
+      expect(@model.updatedAt()).toEqual('updated_at')
+
     it 'updates each clock with a remote value if the local value is lower', ->
-      @model._updateVersionTo(some_unique_id: 4)
+      @model._updateVersionTo({some_unique_id: 4}, 'updated_at')
       expect(@model._versioning.vector).toEqual(some_unique_id: 4)
 
     it 'adds a remote clock if it did not exist locally', ->
-      @model._updateVersionTo(some_other_id: 4)
+      @model._updateVersionTo({some_other_id: 4}, 'updated_at')
       expect(@model._versioning.vector).toEqual
         some_unique_id: 3
         some_other_id: 4
@@ -646,8 +655,9 @@ describe 'Versioning', ->
     it 'updates the model version to the remote_version', ->
       @model._update
         attribute: 'value'
-        remote_version: 'version'
-      expect(@updateVersionToStub).toHaveBeenCalledWith('version')
+        remote_version: 'version',
+        updated_at: 'updated_at'
+      expect(@updateVersionToStub).toHaveBeenCalledWith('version', 'updated_at')
 
     it 'saves the rebased model to the localStorage after that', ->
       @model._update({})

@@ -167,7 +167,8 @@ describe 'Sync', ->
       @collection._processCreate 'id',
         attribute: 'value'
         remote_version: 'version'
-      expect(@setVersionStub).toHaveBeenCalledWith('version')
+        updated_at: 'updated_at'
+      expect(@setVersionStub).toHaveBeenCalledWith('version', 'updated_at')
       
     it 'saves the model', ->
       @collection._processCreate 'id',
