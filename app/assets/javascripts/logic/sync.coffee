@@ -25,13 +25,22 @@
       else
         @_processCreate id, attributes
       
-  _processCreate: (id, attributes) ->      
+  _processCreate: (id, attributes) ->  
     attributes.id = id
-    version = attributes.remote_version
-    delete attributes.remote_version
-    model = @create attributes
+    [version, created_at, updated_at] = 
+      @_extractVersioning(attributes) 
+    model = @create attributes  
     model.setVersion(version)
     model.save()
+    
+  _extractVersioning: (attributes) ->  
+    version = attributes.remote_version
+    delete attributes.remote_version
+    created_at = attributes.created_at
+    delete attributes.created_at
+    updated_at = attributes.updated_at
+    delete attributes.updated_at
+    [version, created_at, updated_at]
 
   handleUpdates: (models) ->
     _.map models, (attributes, id) =>

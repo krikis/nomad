@@ -137,12 +137,19 @@ describe 'Sync', ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @model = new Backbone.Model
+      @extractVersioningSpy = sinon.spy(@collection, '_extractVersioning')
       @createStub = sinon.stub(@collection, 'create', => @model)
       @setVersionStub = sinon.stub(@model, 'setVersion')
       @saveStub = sinon.stub(@model, 'save')
       
-    it 'creates a new model with the id and attributes provided 
-        except remote_version', ->
+    it 'extracts the versioning attributes', ->
+      attributes = 
+        attribute: 'value'
+        remote_version: 'version'
+      @collection._processCreate 'id', attributes
+      expect(@extractVersioningSpy).toHaveBeenCalledWith(attributes)
+      
+    it 'creates a new model with the id and attributes provided', ->
       @collection._processCreate 'id',
         attribute: 'value'
         remote_version: 'version'
@@ -162,6 +169,38 @@ describe 'Sync', ->
         remote_version: 'version'
       expect(@saveStub).toHaveBeenCalled()
       
+  describe '#_extractVersioning', ->
+    beforeEach ->
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @attributes =
+        remote_version: 'remote_version'
+        created_at: 'created_at'
+        updated_at: 'updated_at'
+        
+    it 'removes remote_version from the attributes', ->
+      @collection._extractVersioning(@attributes)
+      expect(@attributes.remote_version).toBeUndefined()
+      
+    it 'returns the remote_version', ->
+      [version, b, c] = @collection._extractVersioning(@attributes)
+      expect(version).toEqual('remote_version')
+      
+    it 'removes created_at from the attributes', ->
+      @collection._extractVersioning(@attributes)
+      expect(@attributes.created_at).toBeUndefined()
+    
+    it 'returns created_at', ->
+      [a, created_at, c] = @collection._extractVersioning(@attributes)
+      expect(created_at).toEqual('created_at')
+      
+    it 'removes updated_at from the attributes', ->
+      @collection._extractVersioning(@attributes)
+      expect(@attributes.updated_at).toBeUndefined()
+    
+    it 'returns updated_at', ->
+      [a, b, updated_at] = @collection._extractVersioning(@attributes)
+      expect(updated_at).toEqual('updated_at')
 
   describe '#handleUpdates', ->
     beforeEach ->
