@@ -33,6 +33,17 @@ describe 'Versioning', ->
       @model.initVersioning()
       expect(@model._versioning?.vector[Nomad.clientId]).toEqual(1)
 
+    it 'sets the createdAt attribute when undefined', ->
+      expect(@model._versioning?.createdAt).toBeUndefined()
+      @model.initVersioning()
+      expect(@model._versioning?.createdAt).toBeDefined()
+
+    it 'retains the createdAt attribute when defined', ->
+      @model._versioning = {}
+      @model._versioning.createdAt = 'created_at'
+      @model.initVersioning()
+      expect(@model._versioning?.createdAt).toEqual('created_at')
+
   describe '#version', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -42,7 +53,7 @@ describe 'Versioning', ->
 
     it 'fetches the vector clock of the versioning object', ->
       expect(@model.version()).toEqual(@vector)
-      
+
   describe '#setVersion', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -50,19 +61,19 @@ describe 'Versioning', ->
       @version = sinon.stub()
       @vector = sinon.stub()
       @vectorClockStub = sinon.stub(window, 'VectorClock', => @vector)
-    
+
     afterEach ->
       @vectorClockStub.restore()
-      
+
     it 'initializes a new vector clock for the version provided', ->
       @model.setVersion(@version)
       expect(@vectorClockStub).toHaveBeenCalledWith(@version)
-      
+
     it 'initializes versioning if undefined', ->
       expect(@model._versioning).toBeUndefined()
       @model.setVersion(@version)
       expect(@model._versioning).toBeDefined()
-      
+
     it 'sets the model vector clock to the newly generated clock', ->
       @model.setVersion(@version)
       expect(@model._versioning.vector).toEqual(@vector)
@@ -196,15 +207,15 @@ describe 'Versioning', ->
     it 'returns whether the model has been synced yet', ->
       @model._versioning = {synced: true}
       expect(@model.isSynced()).toBeTruthy()
-      
+
   describe '#processCreate', ->
     beforeEach ->
       class TestModel extends Backbone.Model
         method: ->
       @model = new TestModel
       @createMethodStub = sinon.stub(@model, '_createMethod', -> 'method')
-      @methodStub = sinon.stub(@model, 'method')    
-      
+      @methodStub = sinon.stub(@model, 'method')
+
     it 'derives the create method', ->
       @model.processCreate
         attribute: 'value'
@@ -218,7 +229,7 @@ describe 'Versioning', ->
       expect(@methodStub).toHaveBeenCalledWith
         attribute: 'value'
         remote_version: 'version'
-      
+
   describe '#_createMethod', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -240,44 +251,44 @@ describe 'Versioning', ->
     it 'returns the _changeId method when client precedes server', ->
       @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'precedes')
       expect(@model._createMethod()).toEqual('_changeId')
-        
+
   describe '#_checkVersion', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
       @version = new VectorClock
       @model.version = => @version
-      
-    context 'when the versions equal', ->  
+
+    context 'when the versions equal', ->
       beforeEach ->
         @equalsStub = sinon.stub(@version, 'equals', -> true)
-    
+
       it 'returns supersedes', ->
         expect(@model._checkVersion({})).toEqual('supersedes')
 
-    context 'when the model version supersedes the server version', ->  
+    context 'when the model version supersedes the server version', ->
       beforeEach ->
         @equalsStub = sinon.stub(@version, 'equals', -> false)
         @supersedesStub = sinon.stub(@version, 'supersedes', -> true)
-    
+
       it 'returns supersedes', ->
         expect(@model._checkVersion({})).toEqual('supersedes')
 
-    context 'when the model version conflicts with the server version', ->  
+    context 'when the model version conflicts with the server version', ->
       beforeEach ->
         @equalsStub = sinon.stub(@version, 'equals', -> false)
         @supersedesStub = sinon.stub(@version, 'supersedes', -> false)
         @conflictsWithStub = sinon.stub(@version, 'conflictsWith', -> true)
-    
+
       it 'returns conflictsWith', ->
         expect(@model._checkVersion({})).toEqual('conflictsWith')
 
-    context 'when the client version precedes the server version', ->  
+    context 'when the client version precedes the server version', ->
       beforeEach ->
         @equalsStub = sinon.stub(@version, 'equals', -> false)
         @supersedesStub = sinon.stub(@version, 'supersedes', -> false)
         @conflictsWithStub = sinon.stub(@version, 'conflictsWith', -> false)
-    
+
       it 'returns precedes', ->
         expect(@model._checkVersion({})).toEqual('precedes')
 
@@ -299,15 +310,15 @@ describe 'Versioning', ->
       expect(@model._versioning.patches.first()).toEqual
         patch_text: 'other_patch'
         base: 1
-    
-    it 'saves the model', -> 
+
+    it 'saves the model', ->
       @model._forwardTo(remote_version: {})
       expect(@modelSaveStub).toHaveBeenCalled()
-    
-    it 'saves the model after forwarding it', ->  
+
+    it 'saves the model after forwarding it', ->
       @model._forwardTo(remote_version: {})
       expect(@patchesShiftSpy).not.toHaveBeenCalledAfter(@modelSaveStub)
-      
+
   describe '#processUpdate', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -315,13 +326,13 @@ describe 'Versioning', ->
       @model = new TestModel
       @updateMethodStub = sinon.stub(@model, '_updateMethod', -> 'method')
       @methodStub = sinon.stub(@model, 'method')
-    
+
     it 'derives the update method', ->
       @model.processUpdate
         attribute: 'value'
         remote_version: 'version'
       expect(@updateMethodStub).toHaveBeenCalledWith('version')
-      
+
     it 'calls the method returned', ->
       @model.processUpdate
         attribute: 'value'
@@ -329,28 +340,28 @@ describe 'Versioning', ->
       expect(@methodStub).toHaveBeenCalledWith
         attribute: 'value'
         remote_version: 'version'
-        
+
   describe '#_updateMethod', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
-      
+
     it 'checks the version of the update', ->
       @checkVersionStub = sinon.stub(@model, '_checkVersion')
       @model._updateMethod 'version'
       expect(@checkVersionStub).toHaveBeenCalledWith('version')
-      
+
     it 'returns the _forwardTo method when client supersedes server', ->
       @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'supersedes')
       expect(@model._updateMethod()).toEqual('_forwardTo')
-      
+
     it 'returns the _rebase method when client conflicts with server', ->
       @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'conflictsWith')
       expect(@model._updateMethod()).toEqual('_rebase')
-      
+
     it 'returns the _update method when client precedes server', ->
       @checkVersionStub = sinon.stub(@model, '_checkVersion', -> 'precedes')
-      expect(@model._updateMethod()).toEqual('_update')   
+      expect(@model._updateMethod()).toEqual('_update')
 
   describe '#_rebase', ->
     beforeEach ->
@@ -400,7 +411,7 @@ describe 'Versioning', ->
           remote_version: 'version'
         @model._rebase(attributes)
         expect(@updateVersionToStub).toHaveBeenCalledWith('version')
-        
+
       it 'saves the rebased model to the localStorage after that', ->
         @model._rebase({})
         expect(@modelSaveStub).toHaveBeenCalledAfter(@updateVersionToStub)
@@ -513,12 +524,12 @@ describe 'Versioning', ->
       class TestModel extends Backbone.Model
       @model = new TestModel
       @model._versioning =
-        vector: 
+        vector:
           some_unique_id: 3
 
     it 'updates each clock with a remote value if the local value is lower', ->
       @model._updateVersionTo(some_unique_id: 4)
-      expect(@model._versioning.vector).toEqual(some_unique_id: 4)  
+      expect(@model._versioning.vector).toEqual(some_unique_id: 4)
 
     it 'adds a remote clock if it did not exist locally', ->
       @model._updateVersionTo(some_other_id: 4)
@@ -533,20 +544,20 @@ describe 'Versioning', ->
       @modelSetStub = sinon.stub(@model, 'set')
       @updateVersionToStub = sinon.stub(@model, '_updateVersionTo')
       @modelSaveStub = sinon.stub(@model, 'save')
-      
+
     it 'sets the updated attributes on the model, except for the remote_version', ->
       @model._update
         attribute: 'value'
         remote_version: 'version'
-      expect(@modelSetStub).toHaveBeenCalledWith(attribute: 'value')  
+      expect(@modelSetStub).toHaveBeenCalledWith(attribute: 'value')
 
     it 'updates the model version to the remote_version', ->
       @model._update
         attribute: 'value'
         remote_version: 'version'
-      expect(@updateVersionToStub).toHaveBeenCalledWith('version')  
-        
+      expect(@updateVersionToStub).toHaveBeenCalledWith('version')
+
     it 'saves the rebased model to the localStorage after that', ->
       @model._update({})
       expect(@modelSaveStub).toHaveBeenCalledAfter(@updateVersionToStub)
-    
+

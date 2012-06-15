@@ -3,6 +3,7 @@
     @_versioning ||= {}
     @_versioning.vector ||= new VectorClock
     @_versioning.vector[Nomad.clientId] ||= 0
+    @_versioning.createdAt ||= (new Date).toJSON()
     
   version: ->
     @_versioning?.vector
