@@ -406,6 +406,7 @@ describe 'Versioning', ->
       @patches = sinon.stub
       @model._versioning = {patches: @patches}
       @dummy = new TestModel
+      @extractVersioningSpy = sinon.spy(@model, '_extractVersioning')
       @newModelStub = sinon.stub(TestModel::, 'constructor', => @dummy)
       @dummySetStub = sinon.stub(@dummy, 'set')
       @processPatchesStub = sinon.stub(@dummy, '_processPatches', -> true)
@@ -415,6 +416,13 @@ describe 'Versioning', ->
 
     afterEach ->
       @newModelStub.restore()
+      
+    it 'extracts the versioning attributes', ->
+      attributes = 
+        attribute: 'value'
+        remote_version: 'version'
+      @model._rebase attributes
+      expect(@extractVersioningSpy).toHaveBeenCalledWith(attributes)
 
     it 'creates a dummy model', ->
       @model._rebase({})
@@ -425,12 +433,12 @@ describe 'Versioning', ->
       @model._rebase(attributes)
       expect(@dummySetStub).toHaveBeenCalledWith(attributes)
 
-    it 'filters out the remote_version before doing so', ->
+    it 'filters out the versioning attributes before setting them', ->
       attributes =
         attribute: 'value'
         remote_version: 'version'
       @model._rebase(attributes)
-      expect(@dummySetStub).toHaveBeenCalledWith(attribute: 'value')
+      expect(@extractVersioningSpy).toHaveBeenCalledBefore(@dummySetStub)
 
     it 'applies all patches to the dummy model', ->
       @model._rebase({})
@@ -466,6 +474,39 @@ describe 'Versioning', ->
       it 'filters out the attributes that differ'
 
       it 'creates a diff for each attribute'
+      
+  describe '#_extractVersioning', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      @attributes =
+        remote_version: 'remote_version'
+        created_at: 'created_at'
+        updated_at: 'updated_at'
+        
+    it 'removes remote_version from the attributes', ->
+      @model._extractVersioning(@attributes)
+      expect(@attributes.remote_version).toBeUndefined()
+      
+    it 'returns the remote_version', ->
+      [version, b, c] = @model._extractVersioning(@attributes)
+      expect(version).toEqual('remote_version')
+      
+    it 'removes created_at from the attributes', ->
+      @model._extractVersioning(@attributes)
+      expect(@attributes.created_at).toBeUndefined()
+    
+    it 'returns created_at', ->
+      [a, created_at, c] = @model._extractVersioning(@attributes)
+      expect(created_at).toEqual('created_at')
+      
+    it 'removes updated_at from the attributes', ->
+      @model._extractVersioning(@attributes)
+      expect(@attributes.updated_at).toBeUndefined()
+    
+    it 'returns updated_at', ->
+      [a, b, updated_at] = @model._extractVersioning(@attributes)
+      expect(updated_at).toEqual('updated_at')
 
   describe '#_processPatches', ->
     beforeEach ->
@@ -577,15 +618,30 @@ describe 'Versioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
+      @extractVersioningSpy = sinon.spy(@model, '_extractVersioning')
       @modelSetStub = sinon.stub(@model, 'set')
       @updateVersionToStub = sinon.stub(@model, '_updateVersionTo')
       @modelSaveStub = sinon.stub(@model, 'save')
+      
+    it 'extracts the versioning attributes', ->
+      attributes = 
+        attribute: 'value'
+        remote_version: 'version'
+      @model._update attributes
+      expect(@extractVersioningSpy).toHaveBeenCalledWith(attributes)
 
-    it 'sets the updated attributes on the model, except for the remote_version', ->
+    it 'sets the updated attributes on the model', ->
       @model._update
         attribute: 'value'
         remote_version: 'version'
       expect(@modelSetStub).toHaveBeenCalledWith(attribute: 'value')
+
+    it 'filters out the versioning attributes before setting them', ->
+      attributes =
+        attribute: 'value'
+        remote_version: 'version'
+      @model._update(attributes)
+      expect(@extractVersioningSpy).toHaveBeenCalledBefore(@modelSetStub)
 
     it 'updates the model version to the remote_version', ->
       @model._update

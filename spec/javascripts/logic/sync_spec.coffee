@@ -156,6 +156,12 @@ describe 'Sync', ->
       expect(@createStub).toHaveBeenCalledWith
         id: 'id'
         attribute: 'value'
+
+    it 'extracts the versioning attributes before creating the object', ->
+      @collection._processCreate 'id',
+        attribute: 'value'
+        remote_version: 'version'
+      expect(@extractVersioningSpy).toHaveBeenCalledBefore(@createStub)
         
     it 'sets the model\'s version to the remote_version', ->
       @collection._processCreate 'id',

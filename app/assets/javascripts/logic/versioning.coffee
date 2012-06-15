@@ -93,8 +93,8 @@
       when 'precedes' then '_update'
 
   _rebase: (attributes) ->
-    version = attributes.remote_version
-    delete attributes.remote_version
+    [version, created_at, updated_at] = 
+      @_extractVersioning(attributes)
     dummy = new @constructor
     dummy.set attributes
     if dummy._processPatches(@_versioning.patches)
@@ -103,6 +103,15 @@
       @save()
       return @
     false
+
+  _extractVersioning: (attributes) ->  
+    version = attributes.remote_version
+    delete attributes.remote_version
+    created_at = attributes.created_at
+    delete attributes.created_at
+    updated_at = attributes.updated_at
+    delete attributes.updated_at
+    [version, created_at, updated_at]
 
   _processPatches: (patches) ->
     patches.all (patch) =>
@@ -127,8 +136,8 @@
         vector[clock] = value
         
   _update: (attributes) ->
-    version = attributes.remote_version
-    delete attributes.remote_version
+    [version, created_at, updated_at] = 
+      @_extractVersioning(attributes)
     @set attributes
     @_updateVersionTo(version)
     @save()
