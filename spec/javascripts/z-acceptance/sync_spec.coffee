@@ -31,7 +31,7 @@ describe 'sync', ->
     @updateSpy .restore()
     @destroySpy.restore()
 
-  it 'syncs a newly created model to the server', ->
+  it 'creates a model on the server', ->
     runs ->
       expect(@model.isSynced()).toBeFalsy()
       expect(@model.hasPatches()).toBeTruthy()
@@ -62,7 +62,7 @@ describe 'sync', ->
     runs ->
       expect(@resolveSpy).toHaveBeenCalledWith([])
 
-  it 'syncs an updated model to the server', ->
+  it 'updates a model on the server', ->
     runs ->
       @collection.preSync()
     waits(50)
@@ -97,7 +97,7 @@ describe 'sync', ->
     runs ->
       expect(@updateSpy).toHaveBeenCalledWith({})
 
-  it 'syncs an outdated model to the server', ->
+  it 'rebases a model after a server update', ->
     runs ->
       @collection.preSync()
     waits(50)
