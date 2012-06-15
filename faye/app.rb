@@ -22,6 +22,10 @@ def on_black
   "\e[40m"
 end
 
+def blue_on_black
+  "#{on_black}\e[1;34m"
+end
+
 def light_blue_on_black
   "#{on_black}\e[1;36m"
 end
@@ -32,6 +36,10 @@ end
 
 def red_on_black
   "#{on_black}\e[1;31m"
+end
+
+def yellow_on_black
+  "#{on_black}\e[1;33m"
 end
 
 def reset

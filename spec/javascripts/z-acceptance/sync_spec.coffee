@@ -25,6 +25,7 @@ describe 'sync', ->
   afterEach ->
     window.client.unsubscribe('/sync/Post')
     window.client.unsubscribe('/sync/Post/some_unique_id')
+    window.client.unsubscribe('/sync/Post/some_other_id')
     @receiveSpy.restore()
     @resolveSpy.restore()
     @createSpy .restore()
@@ -105,7 +106,7 @@ describe 'sync', ->
       @model.save
         title: 'other_title'
       @collection.preSync()
-    waits(50)
+    waits(500)
     runs ->
       @model.save
         content: 'other_content'
@@ -123,6 +124,8 @@ describe 'sync', ->
     ), 'preSync acknowledgement', 1000
     runs ->
       expect(@updateSpy).toHaveBeenCalledWith({})
+      expect(@model.get('title')).toEqual('other_title')
+      expect(@model.get('content')).toEqual('other_content')
       Nomad.clientId = @previousId
 
 
