@@ -14,12 +14,13 @@ describe 'sync', ->
     class TestCollection extends Backbone.Collection
       model: Post
     @collection = new TestCollection
-    now = '2012-06-12T14:24:46Z'
+    @now = '2012-06-12T14:24:46Z'
     @model = new Post
       title: 'some_title'
       content: 'some_content'
-      created_at: now
-      updated_at: now
+    @model._versioning = {}
+    @model._versioning.createdAt = @now
+    @model._versioning.updatedAt = @now
     @collection.create @model
 
   afterEach ->
@@ -36,6 +37,7 @@ describe 'sync', ->
     runs ->
       expect(@model.isSynced()).toBeFalsy()
       expect(@model.hasPatches()).toBeTruthy()
+      @model._versioning.updatedAt = @now
       @collection.preSync()
     waitsFor (->
       @resolveSpy.callCount > 0
@@ -52,7 +54,9 @@ describe 'sync', ->
       version = {}
       _.each _.keys(@model.version()), (key) =>
         version[key] = @model.version()[key]
-      attributes.remote_version = version
+      attributes.remote_version = version  
+      attributes.created_at = @model.createdAt()
+      attributes.updated_at = @model.updatedAt()
       args[@model.id] = attributes
       expect(@createSpy).toHaveBeenCalledWith(args)
       expect(@model.isSynced()).toBeTruthy()
@@ -72,6 +76,7 @@ describe 'sync', ->
         title: 'other_title'
         content: 'other_content'
       expect(@model.hasPatches()).toBeTruthy()
+      @model._versioning.updatedAt = @now
       @collection.preSync()
     waitsFor (->
       @updateSpy.callCount > 0
@@ -89,6 +94,8 @@ describe 'sync', ->
       _.each _.keys(@model.version()), (key) =>
         version[key] = @model.version()[key]
       attributes.remote_version = version
+      attributes.created_at = @model.createdAt()
+      attributes.updated_at = @model.updatedAt()
       args[@model.id] = attributes
       expect(@updateSpy).toHaveBeenCalledWith(args)
       expect(@model.hasPatches()).toBeFalsy()
