@@ -5,6 +5,9 @@
     @_versioning.vector[Nomad.clientId] ||= 0
     @_versioning.createdAt ||= (new Date).toJSON()
     
+  createdAt: ->
+    @_versioning?.createdAt
+    
   version: ->
     @_versioning?.vector
     
@@ -34,6 +37,9 @@
   _tickVersion: ->
     @_versioning.vector[Nomad.clientId] += 1
     @_versioning.updatedAt = (new Date).toJSON()
+    
+  updatedAt: ->
+    @_versioning?.updatedAt || @_versioning?.createdAt
 
   hasPatches: ->
     @_versioning?.patches?.size() > 0  

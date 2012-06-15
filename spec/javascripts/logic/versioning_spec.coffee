@@ -43,6 +43,19 @@ describe 'Versioning', ->
       @model._versioning.createdAt = 'created_at'
       @model.initVersioning()
       expect(@model._versioning?.createdAt).toEqual('created_at')
+      
+  describe '#createdAt', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('model')
+      
+    it 'is undefined when no versioning is present', ->
+      expect(@model.createdAt()).toBeUndefined()
+      
+    it 'returns the createdAt value stored on the versioning object', ->
+      @model._versioning = {}
+      @model._versioning.createdAt = 'created_at'
+      expect(@model.createdAt()).toEqual('created_at')
 
   describe '#version', ->
     beforeEach ->
@@ -173,7 +186,22 @@ describe 'Versioning', ->
       @model._tickVersion()
       clock.restore()
       expect(@model._versioning.updatedAt).toEqual(date.toJSON())
+      
+  describe '#updatedAt', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel Factory.build('model')
 
+    it 'returns the updatedAt value of the versioning object', ->
+      @model._versioning = {}
+      @model._versioning.updatedAt = 'updated_at'
+      expect(@model.updatedAt()).toEqual('updated_at')
+      
+    it 'returns the createdAt value when no updatedAt is defined', ->
+      @model._versioning = {}
+      @model._versioning.createdAt = 'created_at'
+      expect(@model.updatedAt()).toEqual('created_at')
+      
   describe '#hasPatches', ->
     beforeEach ->
       class TestModel extends Backbone.Model
