@@ -18,16 +18,20 @@ App.bind(:disconnect) do |client_id|
   # error "[ DISCONNECT] #{client_id}"
 end
 
+def on_black
+  "\e[40m"
+end
+
 def light_blue_on_black
-  "\e[40m\e[1;36m"
+  "#{on_black}\e[1;36m"
 end
 
 def green_on_black
-  "\e[40m\e[1;32m"
+  "#{on_black}\e[1;32m"
 end
 
 def red_on_black
-  "\e[40m\e[1;31m"
+  "#{on_black}\e[1;31m"
 end
 
 def reset
