@@ -138,6 +138,15 @@ describe 'Versioning', ->
     it 'updates the model\'s version after the patch has been created', ->
       @model.addPatch()
       expect(@tickVersionStub).toHaveBeenCalledAfter(@createPatchStub)
+      
+    context 'when the skipPatch option is set', ->
+      it 'does not save a patch', ->
+        @model.addPatch({}, skipPatch: true)
+        expect(@model._versioning?.patches).toBeUndefined()
+        
+      it 'does not update the model\'s version', ->
+        @model.addPatch({}, skipPatch: true)
+        expect(@tickVersionStub).not.toHaveBeenCalled()
 
   describe '#_localClock', ->
     beforeEach ->
@@ -449,9 +458,9 @@ describe 'Versioning', ->
       expect(@processPatchesStub).toHaveBeenCalledWith(@patches)
 
     context 'when all patches are successfully applied', ->
-      it 'sets the dummy\'s attributes on the model', ->
+      it 'sets the dummy\'s attributes on the model without creating a patch', ->
         @model._rebase({})
-        expect(@modelSetStub).toHaveBeenCalledWith(@dummy)
+        expect(@modelSetStub).toHaveBeenCalledWith(@dummy, skipPatch: true)
 
       it 'updates the model version to the remote_version', ->
         attributes =
@@ -639,11 +648,11 @@ describe 'Versioning', ->
       @model._update attributes
       expect(@extractVersioningSpy).toHaveBeenCalledWith(attributes)
 
-    it 'sets the updated attributes on the model', ->
+    it 'sets the updated attributes on the model without creating a patch', ->
       @model._update
         attribute: 'value'
         remote_version: 'version'
-      expect(@modelSetStub).toHaveBeenCalledWith(attribute: 'value')
+      expect(@modelSetStub).toHaveBeenCalledWith({attribute: 'value'}, skipPatch: true)
 
     it 'filters out the versioning attributes before setting them', ->
       attributes =

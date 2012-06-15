@@ -17,11 +17,12 @@
     @_versioning.updatedAt = updated_at
     @_versioning.vector = vector
 
-  addPatch: ->
-    @initVersioning()
-    @_versioning.patches ||= _([])
-    @_versioning.patches.push @_createPatch(@_localClock())
-    @_tickVersion()
+  addPatch: (model, options = {}) ->
+    unless options.skipPatch?
+      @initVersioning()
+      @_versioning.patches ||= _([])
+      @_versioning.patches.push @_createPatch(@_localClock())
+      @_tickVersion()
     
   _localClock: ->
     @_versioning.vector[Nomad.clientId]
@@ -99,7 +100,7 @@
     dummy = new @constructor
     dummy.set attributes
     if dummy._processPatches(@_versioning.patches)
-      @set dummy
+      @set dummy, skipPatch: true
       @_updateVersionTo(version, updated_at)
       @save()
       return @
@@ -140,7 +141,7 @@
   _update: (attributes) ->
     [version, created_at, updated_at] = 
       @_extractVersioning(attributes)
-    @set attributes
+    @set attributes, skipPatch: true
     @_updateVersionTo(version, updated_at)
     @save()
     
