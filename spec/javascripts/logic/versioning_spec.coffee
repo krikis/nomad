@@ -263,7 +263,7 @@ describe 'Versioning', ->
         method: ->
       @model = new TestModel
       @createMethodStub = sinon.stub(@model, '_createMethod', -> 'method')
-      @methodStub = sinon.stub(@model, 'method')
+      @methodStub = sinon.stub(@model, 'method', -> 'method_output')
 
     it 'derives the create method', ->
       @model.processCreate
@@ -278,6 +278,11 @@ describe 'Versioning', ->
       expect(@methodStub).toHaveBeenCalledWith
         attribute: 'value'
         remote_version: 'version'
+        
+    it 'returns the method\'s return value', ->
+      expect(@model.processCreate
+        remote_version: 'version'
+      ).toEqual('method_output')
 
   describe '#_createMethod', ->
     beforeEach ->
@@ -385,7 +390,7 @@ describe 'Versioning', ->
         method: ->
       @model = new TestModel
       @updateMethodStub = sinon.stub(@model, '_updateMethod', -> 'method')
-      @methodStub = sinon.stub(@model, 'method')
+      @methodStub = sinon.stub(@model, 'method', -> 'method_output')
 
     it 'derives the update method', ->
       @model.processUpdate
@@ -400,6 +405,11 @@ describe 'Versioning', ->
       expect(@methodStub).toHaveBeenCalledWith
         attribute: 'value'
         remote_version: 'version'
+        
+    it 'returns the method\'s return value', ->
+      expect(@model.processUpdate
+        remote_version: 'version'
+      ).toEqual('method_output')
 
   describe '#_updateMethod', ->
     beforeEach ->
@@ -675,7 +685,7 @@ describe 'Versioning', ->
     it 'updates the model version to the remote_version', ->
       @model._update
         attribute: 'value'
-        remote_version: 'version',
+        remote_version: 'version'
         updated_at: 'updated_at'
       expect(@updateVersionToStub).toHaveBeenCalledWith('version', 'updated_at')
 
