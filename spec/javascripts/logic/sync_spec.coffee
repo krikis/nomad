@@ -112,25 +112,43 @@ describe 'Sync', ->
       @collection = new TestCollection([], modelName: 'TestModel')
       @getStub = sinon.stub(@collection, 'get')
       @model = new Backbone.Model
-      @modelCreateStub = sinon.stub(@model, 'processCreate')
-      @processCreateStub = sinon.stub(@collection, '_processCreate')     
+      @modelCreateStub = sinon.stub(@model, 'processCreate', -> 
+        @output ||= ['model_create', null]
+        @output.pop()
+      )
+      @processCreateStub = sinon.stub(@collection, '_processCreate', -> 'process_create')     
       
     it 'fetches the model with the provided id from the collection', ->
       @collection.handleCreates
         id: {attribute: 'value'}
       expect(@getStub).toHaveBeenCalledWith('id')
-
-    it 'lets the model handle the create when it can be found', ->  
-      @getStub.restore()
-      @getStub = sinon.stub(@collection, 'get', => @model)
-      @collection.handleCreates
-        id: {attribute: 'value'}
-      expect(@modelCreateStub).toHaveBeenCalledWith(attribute: 'value')
       
-    it 'creates a new model', ->
-      @collection.handleCreates
-        id: {attribute: 'value'}
-      expect(@processCreateStub).toHaveBeenCalledWith('id', attribute: 'value')
+    context 'when a model can be found', ->
+      beforeEach ->
+        @getStub.restore()
+        @getStub = sinon.stub(@collection, 'get', => @model)
+
+      it 'lets the model handle the create when it can be found', ->  
+        @collection.handleCreates
+          id: {attribute: 'value'}
+        expect(@modelCreateStub).toHaveBeenCalledWith(attribute: 'value')
+        
+      it 'collects the compacted output of the model processCreate method', ->
+        expect(@collection.handleCreates
+          id: {attribute: 'value'}
+          other_id: {attribute: 'other_value'}
+        ).toEqual(['model_create'])
+
+    context 'when no model can be found', ->
+      it 'creates a new model', ->
+        @collection.handleCreates
+          id: {attribute: 'value'}
+        expect(@processCreateStub).toHaveBeenCalledWith('id', attribute: 'value')
+
+      it 'collects the output of the _processCreate method', ->
+        expect(@collection.handleCreates
+          id: {attribute: 'value'}
+        ).toEqual(['process_create'])
       
   describe '#_processCreate', ->
     beforeEach ->
@@ -176,6 +194,12 @@ describe 'Sync', ->
         remote_version: 'version'
       expect(@saveStub).toHaveBeenCalled()
       
+    it 'returns null', ->
+      expect(@collection._processCreate 'id',
+        attribute: 'value'
+        remote_version: 'version'
+      ).toBeNull()
+      
   describe '#_extractVersioning', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
@@ -216,26 +240,43 @@ describe 'Sync', ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @getStub = sinon.stub(@collection, 'get', => @model)
-      @processCreateStub = sinon.stub(@collection, '_processCreate')
-      @processUpdateStub = sinon.stub(@model, 'processUpdate')
+      @processCreateStub = sinon.stub(@collection, '_processCreate', -> 'create_output')
+      @processUpdateStub = sinon.stub(@model, 'processUpdate', -> 
+        @output ||= ['update_output', null]
+        @output.pop()
+      )
 
     it 'fetches the model with the provided id from the collection', ->
       @collection.handleUpdates
         id: {attribute: 'value'}
       expect(@getStub).toHaveBeenCalledWith('id')
+      
+    context 'when a model can be found', ->
+      it 'lets the model handle the update', ->
+        @collection.handleUpdates
+          id: {attribute: 'value'}
+        expect(@processUpdateStub).toHaveBeenCalledWith(attribute: 'value')
 
-    it 'lets the model handle the update when it can be found', ->
-      @collection.handleUpdates
-        id: {attribute: 'value'}
-      expect(@processUpdateStub).toHaveBeenCalledWith(attribute: 'value')
+      it 'collects the compacted output of the model processUpdate method', ->
+        expect(@collection.handleUpdates
+          id: {attribute: 'value'}
+          other_id: {attribute: 'other_value'}
+        ).toEqual(['update_output'])
       
-    it 'creates a new model when it can not be found', ->
-      @getStub.restore()
-      @getStub = sinon.stub(@collection, 'get')
-      @collection.handleUpdates
-        id: {attribute: 'value'}
-      expect(@processCreateStub).toHaveBeenCalledWith('id', attribute: 'value')
-      
+    context 'when a model cannot be found', ->
+      beforeEach ->
+        @getStub.restore()
+        @getStub = sinon.stub(@collection, 'get')
+        
+      it 'creates a new model', ->
+        @collection.handleUpdates
+          id: {attribute: 'value'}
+        expect(@processCreateStub).toHaveBeenCalledWith('id', attribute: 'value')
+
+      it 'collects the output of the _processCreate method', ->
+        expect(@collection.handleUpdates
+          id: {attribute: 'value'}
+        ).toEqual(['create_output'])
 
   describe '#syncModels', ->
     beforeEach ->

@@ -19,11 +19,12 @@
       model.hasPatches() and model.isSynced()
       
   handleCreates: (models) ->
-    _.map models, (attributes, id) =>
+    _(models).chain().map((attributes, id) =>
       if model = @get(id)
         model.processCreate attributes
       else
         @_processCreate id, attributes
+    ).compact().value()
       
   _processCreate: (id, attributes) ->  
     attributes.id = id
@@ -32,6 +33,7 @@
     model = @create attributes  
     model.setVersion(version, updated_at)
     model.save()
+    null
     
   _extractVersioning: (attributes) ->  
     version = attributes.remote_version
@@ -43,11 +45,12 @@
     [version, created_at, updated_at]
 
   handleUpdates: (models) ->
-    _.map models, (attributes, id) =>
+    _(models).chain().map((attributes, id) =>
       if model = @get(id)
         model.processUpdate attributes
       else
         @_processCreate id, attributes
+    ).compact().value()
 
   syncModels: (updated) ->
     @fayeClient.publish
