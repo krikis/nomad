@@ -78,11 +78,13 @@
     while @hasPatches() and patches.first().base < vectorClock[Nomad.clientId]
       patches.shift()
     @save()
+    null
       
   _changeId: (attributes) ->
     # TODO :: implement changing the model id when it conflicts 
     # with a model created on another client
     # think about what to do with the user interface when this happens
+    # return @
     
   processUpdate: (attributes) ->
     method = @_updateMethod(attributes['remote_version'])
@@ -104,7 +106,8 @@
       @_updateVersionTo(version, updated_at)
       @save()
       return @
-    false
+    # TODO :: implement having user resolve conflict
+    null
 
   _extractVersioning: (attributes) ->  
     version = attributes.remote_version
@@ -144,6 +147,7 @@
     @set attributes, skipPatch: true
     @_updateVersionTo(version, updated_at)
     @save()
+    null
     
 # extend Backbone.Model
 _.extend Backbone.Model::, @Versioning

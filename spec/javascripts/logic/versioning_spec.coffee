@@ -367,6 +367,17 @@ describe 'Versioning', ->
     it 'saves the model after forwarding it', ->
       @model._forwardTo(remote_version: {})
       expect(@patchesShiftSpy).not.toHaveBeenCalledAfter(@modelSaveStub)
+      
+    it 'returns null', ->
+      expect(@model._forwardTo(remote_version: {})).toBeNull()
+      
+  describe '#_changeId', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      
+    # it 'returns the model', ->
+    #   expect(@model._changeId()).toEqual(@model)
 
   describe '#processUpdate', ->
     beforeEach ->
@@ -482,8 +493,8 @@ describe 'Versioning', ->
         @processPatchesStub.restore()
         @processPatchesStub = sinon.stub(@dummy, '_processPatches', -> false)
 
-      it 'returns false', ->
-        expect(@model._rebase({})).toBeFalsy()
+      it 'returns null', ->
+        expect(@model._rebase({})).toBeNull()
 
       it 'filters out the attributes that differ'
 
@@ -671,4 +682,7 @@ describe 'Versioning', ->
     it 'saves the rebased model to the localStorage after that', ->
       @model._update({})
       expect(@modelSaveStub).toHaveBeenCalledAfter(@updateVersionToStub)
+      
+    it 'returns null', ->
+      expect(@model._update({})).toBeNull()
 
