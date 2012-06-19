@@ -159,7 +159,7 @@ describe 'FayeClient', ->
   describe '#create', ->
     beforeEach ->
       @handleCreatesStub = sinon.
-        stub(@collection, 'handleCreates', -> ['resolved', 'models'])
+        stub(@collection, 'handleCreates', -> ['other_creates'])
       @backboneClient = new BackboneSync.FayeClient @collection,
                                                     modelName: @modelName
                                                         
@@ -172,10 +172,10 @@ describe 'FayeClient', ->
         @backboneClient.create(@creates, {})
         expect(@handleCreatesStub).toHaveBeenCalledWith({id: 'attributes'})
         
-      it 'files the handleCreates output for sync', ->
-        processed = {}
+      it 'appends the handleCreates output for sync', ->
+        processed = {creates: ['creates']}
         @backboneClient.create(@creates, processed)
-        expect(processed).toEqual(creates: ['resolved', 'models'])
+        expect(processed).toEqual(creates: ['creates', 'other_creates'])
 
     context 'when no creates are present', ->      
       it 'does not invoke the collection method', ->
@@ -185,7 +185,7 @@ describe 'FayeClient', ->
   describe '#update', ->
     beforeEach ->
       @handleUpdatesStub = sinon.
-        stub(@collection, 'handleUpdates', -> ['rebased', 'models'])
+        stub(@collection, 'handleUpdates', -> ['other_updates'])
       @backboneClient = new BackboneSync.FayeClient @collection,
                                                     modelName: @modelName
 
@@ -197,10 +197,10 @@ describe 'FayeClient', ->
         @backboneClient.update(@updates, {})
         expect(@handleUpdatesStub).toHaveBeenCalledWith({id: 'updates'})
         
-      it 'returns the handleUpdates output', ->
-        processed = {}
+      it 'appends the handleUpdates output for sync', ->
+        processed = {updates: ['updates']}
         @backboneClient.update(@updates, processed)
-        expect(processed).toEqual(updates: ['rebased', 'models'])
+        expect(processed).toEqual(updates: ['updates', 'other_updates'])
       
     context 'when no updates are present', ->
       it 'does not invoke the collection method', ->

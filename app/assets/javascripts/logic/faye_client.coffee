@@ -43,11 +43,15 @@ class @BackboneSync.FayeClient
 
   create: (params, processed) ->
     unless _.isEmpty(params)
-      processed.creates = @collection.handleCreates(params)
+      processed.creates ||= []
+      resolved = @collection.handleCreates(params)
+      processed.creates.merge resolved
 
   update: (params, processed) ->
     unless _.isEmpty(params)
-      processed.updates = @collection.handleUpdates(params)
+      processed.updates ||= []
+      rebased = @collection.handleUpdates(params)
+      processed.updates.merge rebased
 
   destroy: (params, processed) ->
     # TODO :: implement deleting models
