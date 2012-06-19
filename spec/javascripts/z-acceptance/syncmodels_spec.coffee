@@ -5,15 +5,15 @@ describe 'syncmodels', ->
     # unless window.acceptance_client?
     #   delete window.client
     #   window.acceptance_client = true
-    @receiveSpy = sinon.spy(BackboneSync.FayeClient::, 'receive')
-    @resolveSpy = sinon.spy(BackboneSync.FayeClient::, 'resolve')
-    @createSpy  = sinon.spy(BackboneSync.FayeClient::, 'create' )
-    @updateSpy  = sinon.spy(BackboneSync.FayeClient::, 'update' )
-    @destroySpy = sinon.spy(BackboneSync.FayeClient::, 'destroy')
-    class Post           extends Backbone.Model
+    window.localStorage.clear()
+    class Post extends Backbone.Model
     class TestCollection extends Backbone.Collection
       model: Post
     @collection = new TestCollection
+    @resolveSpy = sinon.spy(@collection.fayeClient, 'resolve')
+    @createSpy  = sinon.spy(@collection.fayeClient, 'create' )
+    @updateSpy  = sinon.spy(@collection.fayeClient, 'update' )
+    @destroySpy = sinon.spy(@collection.fayeClient, 'destroy')
     @now = '2012-06-12T14:24:46Z'
     @model = new Post
       title: 'some_title'
@@ -25,11 +25,6 @@ describe 'syncmodels', ->
 
   afterEach ->
     @collection.leave()
-    @receiveSpy.restore()
-    @resolveSpy.restore()
-    @createSpy .restore()
-    @updateSpy .restore()
-    @destroySpy.restore()
 
   it 'creates a model on the server', ->
     runs ->
@@ -93,38 +88,52 @@ describe 'syncmodels', ->
     runs ->
       expect(@updateSpy).toHaveBeenCalledWith({})
 
-  it 'rebases a model after a server update', ->
-    runs ->
-      @collection.syncModels()
-    waits(50)
-    runs ->
-      @model.save
-        title: 'other_title'
-      @collection.syncModels()
-    waits(500)
-    runs ->
-      @model.save
-        title: 'some_title'
-      @model._forwardTo(remote_version: @model.version())
-      @model.save
-        content: 'other_content'
-      version = new VectorClock
-        some_unique_id: 1
-        some_other_id: 1
-      @model.setVersion(version)
-      @previousId = Nomad.clientId
-      Nomad.clientId = 'some_other_id'
-      window.client.unsubscribe('/sync/Post')
-      @collection.fayeClient.subscribe()
-      @collection.syncModels()
-    waitsFor (->
-      @updateSpy.callCount > 3
-    ), 'sync acknowledgement', 1000
-    runs ->
-      expect(@updateSpy).toHaveBeenCalledWith({})
-      expect(@model.get('title')).toEqual('other_title')
-      expect(@model.get('content')).toEqual('other_content')
-      Nomad.clientId = @previousId
+  context 'when a second client comes into play', ->
+    beforeEach ->
+      class SecondModel  extends Backbone.Model
+        clientId: 'second_client'
+
+      class SecondClient extends Backbone.Collection
+        model: SecondModel
+        clientId: 'second_client'
+        fayeClient: 'faye_client'
+        initialize: ->
+          @fayeClient = new BackboneSync.FayeClient @,
+            modelName: 'Post'
+            client: new Faye.Client("http://nomad.dev:9292/faye")
+      @secondCollection = new SecondClient
+      @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
+
+    afterEach ->
+      @secondCollection.leave()
+
+    it 'rebases a model after a server update', ->
+      waits(200)
+      runs ->
+        @collection.syncModels()
+      waits(500)
+      runs ->
+        @secondCollection.leave()
+      waits(200)
+      runs ->
+        @model.save
+          title: 'other_title'
+        @collection.syncModels()
+      waits(500)
+      runs ->
+        @secondCollection.fayeClient.subscribe()
+      waits(200)
+      runs ->
+        _.first(@secondCollection.models).save
+          content: 'other_content'
+        @secondCollection.syncModels()
+      waitsFor (->
+        @secondUpdateSpy.callCount > 2
+      ), 'sync acknowledgement', 1000
+      runs ->
+        expect(@secondUpdateSpy).toHaveBeenCalledWith({})
+        expect(@model.get('title')).toEqual('other_title')
+        expect(@model.get('content')).toEqual('other_content')
 
 
 
