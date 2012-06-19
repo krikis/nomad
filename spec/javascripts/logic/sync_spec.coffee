@@ -170,6 +170,7 @@ describe 'Sync', ->
       @extractVersioningSpy = sinon.spy(@collection, '_extractVersioning')
       @createStub = sinon.stub(@collection, 'create', => @model)
       @setVersionStub = sinon.stub(@model, 'setVersion')
+      @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
       @saveStub = sinon.stub(@model, 'save')
       
     it 'extracts the versioning attributes', ->
@@ -199,6 +200,10 @@ describe 'Sync', ->
         remote_version: 'version'
         updated_at: 'updated_at'
       expect(@setVersionStub).toHaveBeenCalledWith('version', 'updated_at')
+      
+    it 'marks the model as synced', ->
+      @collection._processCreate 'id', {}
+      expect(@markAsSyncedStub).toHaveBeenCalled()
       
     it 'saves the model', ->
       @collection._processCreate 'id',
