@@ -17,7 +17,7 @@ describe 'second_client', ->
       clientId: 'second_client'
 
     class SecondClient extends Backbone.Collection
-      model: FirstModel
+      model: SecondModel
       clientId: 'second_client'
       fayeClient: 'faye_client'
       initialize: ->
