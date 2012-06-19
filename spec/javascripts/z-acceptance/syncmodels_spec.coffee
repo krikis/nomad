@@ -95,38 +95,38 @@ describe 'syncmodels', ->
     runs ->
       expect(@updateSpy).toHaveBeenCalledWith({})
   
-  # it 'rebases a model after a server update', ->
-  #   runs ->
-  #     @collection.syncModels()
-  #   waits(50)
-  #   runs ->
-  #     @model.save
-  #       title: 'other_title'
-  #     @collection.syncModels()
-  #   waits(500)
-  #   runs ->
-  #     @model.save
-  #       title: 'some_title'
-  #     @model._forwardTo(remote_version: @model.version())
-  #     @model.save
-  #       content: 'other_content'
-  #     version = new VectorClock
-  #       some_unique_id: 1
-  #       some_other_id: 1
-  #     @model.setVersion(version)
-  #     @previousId = Nomad.clientId
-  #     Nomad.clientId = 'some_other_id'
-  #     window.client.unsubscribe('/sync/Post')
-  #     @collection.fayeClient.subscribe()
-  #     @collection.syncModels()
-  #   waitsFor (->
-  #     @updateSpy.callCount > 5
-  #   ), 'sync acknowledgement', 1000
-  #   runs ->
-  #     expect(@updateSpy).toHaveBeenCalledWith({})
-  #     expect(@model.get('title')).toEqual('other_title')
-  #     expect(@model.get('content')).toEqual('other_content')
-  #     Nomad.clientId = @previousId
+  it 'rebases a model after a server update', ->
+    runs ->
+      @collection.syncModels()
+    waits(50)
+    runs ->
+      @model.save
+        title: 'other_title'
+      @collection.syncModels()
+    waits(500)
+    runs ->
+      @model.save
+        title: 'some_title'
+      @model._forwardTo(remote_version: @model.version())
+      @model.save
+        content: 'other_content'
+      version = new VectorClock
+        some_unique_id: 1
+        some_other_id: 1
+      @model.setVersion(version)
+      @previousId = Nomad.clientId
+      Nomad.clientId = 'some_other_id'
+      window.client.unsubscribe('/sync/Post')
+      @collection.fayeClient.subscribe()
+      @collection.syncModels()
+    waitsFor (->
+      @updateSpy.callCount > 3
+    ), 'sync acknowledgement', 1000
+    runs ->
+      expect(@updateSpy).toHaveBeenCalledWith({})
+      expect(@model.get('title')).toEqual('other_title')
+      expect(@model.get('content')).toEqual('other_content')
+      Nomad.clientId = @previousId
   
   
   
