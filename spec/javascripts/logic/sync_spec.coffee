@@ -354,6 +354,7 @@ describe 'Sync', ->
       @model.updatedAt = -> 'updated_at'
       @collection.models = [@model]
       @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
+      @saveStub = sinon.stub(@model, 'save')
  
     it 'collects all data of the models provided', ->
       expect(@collection._dataForSync([@model])).toEqual([
@@ -365,9 +366,15 @@ describe 'Sync', ->
         updated_at: 'updated_at'
       ])
  
-    it 'marks the models as synced if the markSynced option is set', ->
-      versions = @collection._dataForSync([@model], markSynced: true)
-      expect(@markAsSyncedStub).toHaveBeenCalled()
+    context 'when the markSynced option is set', ->
+      it 'marks the models as synced', ->
+        versions = @collection._dataForSync([@model], markSynced: true)
+        expect(@markAsSyncedStub).toHaveBeenCalled()
+        
+      it 'saves the model after marking it', ->
+        versions = @collection._dataForSync([@model], markSynced: true)
+        expect(@saveStub).toHaveBeenCalledAfter(@markAsSyncedStub)
+        
 
   describe '#syncProcessed', ->
     beforeEach ->

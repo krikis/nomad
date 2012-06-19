@@ -74,7 +74,9 @@
         version: model.version()
         created_at: model.createdAt()
         updated_at: model.updatedAt()
-      model.markAsSynced() if options.markSynced
+      if options.markSynced
+        model.markAsSynced() 
+        model.save()
       details
     ).value()
     
