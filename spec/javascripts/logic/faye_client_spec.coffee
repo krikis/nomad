@@ -94,67 +94,119 @@ describe 'FayeClient', ->
   describe '#receive', ->
     beforeEach ->
       @syncModelsStub = sinon.stub(@collection, 'syncModels')
+      @syncProcessedStub = sinon.stub(@collection, 'syncProcessed')
       @backboneClient = new BackboneSync.FayeClient @collection,
                                                 modelName: @modelName
       @backboneClient.meta = sinon.stub()
-      @backboneClient.method_1 = sinon.stub()
-      @backboneClient.method_2 = sinon.stub()
+      @backboneClient.method_1 = ->
+      @backboneClient.method_2 = ->
+      @method1Stub = sinon.stub(@backboneClient, 'method_1')
+      @method2Stub = sinon.stub(@backboneClient, 'method_2')
       
     it 'calls a method for each actual entry in the message', ->
       @backboneClient.receive
         meta:
           meta: 'information'
-        method_1:
-          id: {attribute_1: 'test'}
-        method_2:
-          id: {attribute_2: 'receive'}
+        method_1: 'params'
+        method_2: 'other_params'
       expect(@backboneClient.meta).not.toHaveBeenCalled()
-      expect(@backboneClient.method_1).
-        toHaveBeenCalledWith(id: {attribute_1: 'test'})
-      expect(@backboneClient.method_2).
-        toHaveBeenCalledWith(id: {attribute_2: 'receive'})
+      expect(@method1Stub).
+        toHaveBeenCalledWith('params', {})
+      expect(@method2Stub).
+        toHaveBeenCalledWith('other_params', {})
 
-    it 'has the collection sync models to the server after that 
-        when it concerns presync feedback', ->
-      @backboneClient.receive
-        meta:
-          preSync: true
-        method_1:
-          id: {attribute_1: 'test'}
-      expect(@syncModelsStub).toHaveBeenCalled()
-      expect(@syncModelsStub).toHaveBeenCalledAfter(@backboneClient.method_1)
+    context 'when the message concerns presync feedback', ->
+      beforeEach ->
+        @message =
+          meta:
+            preSync: true
+          method_1: 'params'
+            
+      it 'syncs all dirty models to the server', ->
+        @backboneClient.receive @message
+        expect(@syncModelsStub).toHaveBeenCalled()
+        
+      it 'syncs all dirty models after processing the message', ->
+        @backboneClient.receive @message
+        expect(@syncModelsStub).
+          toHaveBeenCalledAfter(@backboneClient.method_1)
 
-    it 'does not sync models to the server when it is no presync feedback', ->
-      @backboneClient.receive({})
-      expect(@syncModelsStub).not.toHaveBeenCalled()
+    context 'when the message does not concern presync feedback', ->
+      beforeEach ->
+        @method1Stub.restore()
+        @method1Stub = sinon.stub(@backboneClient, 'method_1', (params, processed) ->
+          processed.creates = ['resolved']
+        )
+        @method2Stub.restore()
+        @method2Stub = sinon.stub(@backboneClient, 'method_2', (params, processed) ->
+          processed.updates = ['rebased']
+        )
+        @message =
+          method_1: 'params'
+          method_2: 'params'
+
+      it 'syncs all processed models to the server', ->
+        @backboneClient.receive(@message)
+        expect(@syncProcessedStub).
+          toHaveBeenCalledWith
+            creates: ['resolved']
+            updates: ['rebased']
+        
+      it 'does not sync all dirty models to the server', ->
+        @backboneClient.receive(@message)
+        expect(@syncModelsStub).not.toHaveBeenCalled()
       
   describe '#create', ->
     beforeEach ->
-      @handleCreatesStub = sinon.stub(@collection, 'handleCreates')
+      @handleCreatesStub = sinon.
+        stub(@collection, 'handleCreates', -> ['resolved', 'models'])
       @backboneClient = new BackboneSync.FayeClient @collection,
-                                                        modelName: @modelName
+                                                    modelName: @modelName
                                                         
-    it 'has the collection process the creates when present', ->
-      @backboneClient.create(id: 'attributes')
-      expect(@handleCreatesStub).toHaveBeenCalledWith(id: 'attributes')
-      
-    it 'does nothing when no creates are present', ->
-      @backboneClient.create({})
-      expect(@handleCreatesStub).not.toHaveBeenCalled()
+    context 'when creates are present', ->
+      beforeEach ->
+        @creates = 
+          id: 'attributes'
+                                                        
+      it 'has the collection process the creates', ->
+        @backboneClient.create(@creates, {})
+        expect(@handleCreatesStub).toHaveBeenCalledWith({id: 'attributes'})
+        
+      it 'files the handleCreates output for sync', ->
+        processed = {}
+        @backboneClient.create(@creates, processed)
+        expect(processed).toEqual(creates: ['resolved', 'models'])
+
+    context 'when no creates are present', ->      
+      it 'does not invoke the collection method', ->
+        @backboneClient.create({}, {})
+        expect(@handleCreatesStub).not.toHaveBeenCalled()
 
   describe '#update', ->
     beforeEach ->
-      @handleUpdatesStub = sinon.stub(@collection, 'handleUpdates')
+      @handleUpdatesStub = sinon.
+        stub(@collection, 'handleUpdates', -> ['rebased', 'models'])
       @backboneClient = new BackboneSync.FayeClient @collection,
                                                     modelName: @modelName
 
-    it 'has the collection process the updates when present', ->
-      @backboneClient.update(id: 'updates')
-      expect(@handleUpdatesStub).toHaveBeenCalledWith(id: 'updates')
+    context 'when updates are present', ->
+      beforeEach ->
+        @updates =
+          id: 'updates'
+      it 'has the collection process the updates', ->
+        @backboneClient.update(@updates, {})
+        expect(@handleUpdatesStub).toHaveBeenCalledWith({id: 'updates'})
+        
+      it 'returns the handleUpdates output', ->
+        processed = {}
+        @backboneClient.update(@updates, processed)
+        expect(processed).toEqual(updates: ['rebased', 'models'])
       
-    it 'does nothing when no updates are present', ->
-      @backboneClient.update({})
-      expect(@handleUpdatesStub).not.toHaveBeenCalled()
+    context 'when no updates are present', ->
+      it 'does not invoke the collection method', ->
+        @backboneClient.update({}, {})
+        expect(@handleUpdatesStub).not.toHaveBeenCalled()
+        
       
 
 

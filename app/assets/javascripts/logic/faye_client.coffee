@@ -5,15 +5,15 @@ class @BackboneSync.FayeClient
     Faye.Logging.logLevel = if window.development then 'info' else 'error'
     window.client ||= new Faye.Client("http://nomad.dev:9292/faye")
     # disable all non-websocket after connection to enforce websockets
-    # client.disable('long-polling'); 
-    # client.disable('cross-origin-long-polling'); 
+    # client.disable('long-polling');
+    # client.disable('cross-origin-long-polling');
     # client.disable('callback-polling');
     @client = window.client
     @collection = collection
     @modelName = options.modelName
     @subscribe()
 
-  publish: (message)->  
+  publish: (message)->
     message.client_id ||= Nomad.clientId
     message.model_name ||= @modelName
     @client.publish "/server/" + @modelName, message
@@ -27,24 +27,26 @@ class @BackboneSync.FayeClient
     meta = message.meta
     delete message.meta
     # process incoming data
-    _.each message, (eventArguments, event) =>
-      @[event] eventArguments
-    # do the actual sync if this was presync feedback
-    @collection.syncModels() if meta?.preSync
-    # TODO resync resolved and rebased if this was no presync feedback
-  
-  resolve: (params) ->
+    processed = {}
+    _.map message, (eventArguments, event) =>
+      @[event] eventArguments, processed
+    # sync all dirty models if this is presync feedback
+    if meta?.preSync
+      @collection.syncModels()
+    # sync only resolved and rebased models
+    else
+      @collection.syncProcessed(processed)
+
+  resolve: (params, processed) ->
     # TODO :: generate new id for conflicting models
 
-  create: (params) ->
+  create: (params, processed) ->
     unless _.isEmpty(params)
-      @collection.handleCreates(params)
-  
-  update: (params) ->
-    unless _.isEmpty(params)
-      @collection.handleUpdates(params)
+      processed.creates = @collection.handleCreates(params)
 
-  destroy: (params) ->
-    _.each params, (attributes, id) =>
-      model = @collection.get(id)
-      @collection.remove model
+  update: (params, processed) ->
+    unless _.isEmpty(params)
+      processed.updates = @collection.handleUpdates(params)
+
+  destroy: (params, processed) ->
+    # TODO :: implement deleting models
