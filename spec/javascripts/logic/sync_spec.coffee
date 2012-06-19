@@ -381,17 +381,30 @@ describe 'Sync', ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @message = undefined
+      @dataForSyncStub = sinon.stub(@collection, '_dataForSync')
+      @dataForSyncStub.withArgs(['resolved', 'models']).returns([resolved: 'data'])
+      @dataForSyncStub.withArgs(['rebased', 'models']).returns([rebased: 'data'])
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
       )
       
+    it 'collects data of all resolved models', ->
+      @collection.syncProcessed
+        creates: ['resolved', 'models']
+      expect(@dataForSyncStub).toHaveBeenCalledWith(['resolved', 'models'])
+
+    it 'collects data of all rebased models', ->
+      @collection.syncProcessed
+        creates: ['rebased', 'models']
+      expect(@dataForSyncStub).toHaveBeenCalledWith(['rebased', 'models'])
+      
     it 'syncs resolved and rebased models to the server', ->
       @collection.syncProcessed
-        creates: ['resolved']
-        updates: ['rebased']
+        creates: ['resolved', 'models']
+        updates: ['rebased', 'models']
       expect(@message).toEqual
-        creates: ['resolved']
-        updates: ['rebased']
+        creates: [resolved: 'data']
+        updates: [rebased: 'data']
       
     it 'does not publish to the server when there are no processed models', ->
       @collection.syncProcessed({})

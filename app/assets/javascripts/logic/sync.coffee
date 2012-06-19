@@ -82,9 +82,12 @@
     
   # sync all processed models
   syncProcessed: (processed) ->
-    unless _.isEmpty(processed.updates) and 
-           _.isEmpty(processed.creates)
-      @fayeClient.publish processed
+    message = 
+      updates: @_dataForSync(processed.updates)
+      creates: @_dataForSync(processed.creates)
+    unless _.isEmpty(message.updates) and 
+           _.isEmpty(message.creates)
+      @fayeClient.publish message
 
 # extend Backbone.Collection
 _.extend Backbone.Collection::, Sync
