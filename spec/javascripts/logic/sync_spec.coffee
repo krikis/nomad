@@ -410,9 +410,20 @@ describe 'Sync', ->
       @collection.syncProcessed({})
       expect(@publishStub).not.toHaveBeenCalled()
 
+  describe '#leave', ->
+    beforeEach ->
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @unsubscribeStub = sinon.stub(@collection.fayeClient, 'unsubscribe')
 
-
-
+    it 'unsubscribes the collection from all channels', ->
+      @collection.leave()
+      expect(@unsubscribeStub).toHaveBeenCalledWith()
+      
+    it 'unsubscribes from a specific channel if provided', ->
+      @collection.leave('some_channel')
+      expect(@unsubscribeStub).toHaveBeenCalledWith('some_channel')
+      
 
 
 

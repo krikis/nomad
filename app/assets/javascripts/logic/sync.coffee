@@ -88,6 +88,9 @@
     unless _.isEmpty(message.updates) and 
            _.isEmpty(message.creates)
       @fayeClient.publish message
+      
+  leave: (channel) ->
+    @fayeClient.unsubscribe(channel)
 
 # extend Backbone.Collection
 _.extend Backbone.Collection::, Sync
