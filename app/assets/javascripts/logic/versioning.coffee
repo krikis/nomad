@@ -11,9 +11,10 @@
   version: ->
     @_versioning?.vector
 
-  setVersion: (version, updated_at) ->
+  setVersion: (version, created_at, updated_at) ->
     vector = new VectorClock version
     @_versioning ||= {}
+    @_versioning.createdAt = created_at
     @_versioning.updatedAt = updated_at
     @_versioning.vector = vector
 

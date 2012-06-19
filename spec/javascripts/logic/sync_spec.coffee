@@ -194,12 +194,13 @@ describe 'Sync', ->
         remote_version: 'version'
       expect(@extractVersioningSpy).toHaveBeenCalledBefore(@createStub)
         
-    it 'sets the model\'s version to the remote_version', ->
+    it 'sets the model version, created_at and updated_at', ->
       @collection._processCreate 'id',
         attribute: 'value'
         remote_version: 'version'
+        created_at: 'created_at'
         updated_at: 'updated_at'
-      expect(@setVersionStub).toHaveBeenCalledWith('version', 'updated_at')
+      expect(@setVersionStub).toHaveBeenCalledWith('version', 'created_at', 'updated_at')
       
     it 'marks the model as synced', ->
       @collection._processCreate 'id', {}

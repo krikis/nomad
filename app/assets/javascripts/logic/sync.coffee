@@ -34,7 +34,7 @@
     [version, created_at, updated_at] = 
       @_extractVersioning(attributes) 
     model = @create attributes  
-    model.setVersion(version, updated_at)
+    model.setVersion(version, created_at, updated_at)
     model.markAsSynced()
     model.save()
     null

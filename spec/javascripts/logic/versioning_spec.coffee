@@ -78,21 +78,25 @@ describe 'Versioning', ->
     afterEach ->
       @vectorClockStub.restore()
 
-    it 'sets the versioning updatedAt to the new value', ->
-      @model.setVersion({}, 'updated_at')
-      expect(@model.updatedAt()).toEqual('updated_at')
-
     it 'initializes a new vector clock for the version provided', ->
-      @model.setVersion(@version, 'updated_at')
+      @model.setVersion(@version)
       expect(@vectorClockStub).toHaveBeenCalledWith(@version)
 
     it 'initializes versioning if undefined', ->
       expect(@model._versioning).toBeUndefined()
-      @model.setVersion(@version, 'updated_at')
+      @model.setVersion(@version)
       expect(@model._versioning).toBeDefined()
 
+    it 'sets the versioning createdAt to the value provided', ->
+      @model.setVersion({}, 'created_at')
+      expect(@model.createdAt()).toEqual('created_at')
+
+    it 'sets the versioning updatedAt to the value provided', ->
+      @model.setVersion({}, null, 'updated_at')
+      expect(@model.updatedAt()).toEqual('updated_at')
+
     it 'sets the model vector clock to the newly generated clock', ->
-      @model.setVersion(@version, 'updated_at')
+      @model.setVersion(@version)
       expect(@model._versioning.vector).toEqual(@vector)
 
   describe '#addPatch', ->
