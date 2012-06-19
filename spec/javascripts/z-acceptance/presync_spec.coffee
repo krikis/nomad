@@ -1,4 +1,4 @@
-describe 'sync', ->
+describe 'presync', ->
 
   beforeEach ->
     # delete faye client created during isolated tests
