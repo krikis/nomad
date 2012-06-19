@@ -29,7 +29,7 @@ class @BackboneSync.FayeClient
     
   unsubscribe: (channel) ->
     subscriptions = [channel] if channel?
-    subscriptions ||= @subscriptions
+    subscriptions ||= _.clone @subscriptions
     _.each subscriptions, (subscription) =>
       @client.unsubscribe subscription
       @subscriptions.delete(subscription)

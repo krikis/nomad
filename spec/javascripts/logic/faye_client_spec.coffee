@@ -107,9 +107,10 @@ describe 'FayeClient', ->
                                                     modelName: @modelName
                                                     
     it 'unsubscribes the wrapped client from all recorded channels', ->
-      @backboneClient.subscriptions = ['some_subscription']
+      @backboneClient.subscriptions = ['some_subscription', 'other_subscription']
       @backboneClient.unsubscribe()
       expect(@unsubscribeStub).toHaveBeenCalledWith('some_subscription')
+      expect(@unsubscribeStub).toHaveBeenCalledWith('other_subscription')
       
     it 'unsubscribes from a specific channel if provided', ->  
       @backboneClient.subscriptions = ['some_channel', 'other_channel']
