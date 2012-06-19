@@ -27,8 +27,10 @@ class @BackboneSync.FayeClient
     @client.subscribe private_channel, @receive, @
     @subscriptions.push(private_channel)
     
-  unsubscribe: ->
-    _.each @subscriptions, (subscription) =>
+  unsubscribe: (channel) ->
+    subscriptions = [channel] if channel?
+    subscriptions ||= @subscriptions
+    _.each subscriptions, (subscription) =>
       @client.unsubscribe subscription
 
   receive: (message) ->

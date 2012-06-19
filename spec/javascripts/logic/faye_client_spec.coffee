@@ -110,6 +110,10 @@ describe 'FayeClient', ->
       @backboneClient.subscriptions = ['some_subscription']
       @backboneClient.unsubscribe()
       expect(@unsubscribeStub).toHaveBeenCalledWith('some_subscription')
+      
+    it 'unsubscribes from a specific channel if provided', ->  
+      @backboneClient.unsubscribe('some_channel')
+      expect(@unsubscribeStub).toHaveBeenCalledWith('some_channel')
 
   describe '#receive', ->
     beforeEach ->
