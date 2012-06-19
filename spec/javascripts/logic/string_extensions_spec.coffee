@@ -1,4 +1,4 @@
-describe 'Strings', ->
+describe 'string_extensions', ->
   
   describe '#underscore', ->
     it 'converts camelcase to underscored format', ->
