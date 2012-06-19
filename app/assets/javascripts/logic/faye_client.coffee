@@ -11,17 +11,18 @@ class @BackboneSync.FayeClient
     @client = window.client
     @collection = collection
     @modelName = options.modelName
+    @clientId = options.clientId
     @subscriptions = []
     @subscribe()
 
   publish: (message)->
-    message.client_id ||= Nomad.clientId
+    message.client_id ||= @clientId
     message.model_name ||= @modelName
     @client.publish "/server/" + @modelName, message
 
   subscribe: ->
     global_channel = "/sync/#{@modelName}"
-    private_channel = "/sync/#{@modelName}/#{Nomad.clientId}"
+    private_channel = "/sync/#{@modelName}/#{@clientId}"
     @client.subscribe global_channel, @receive, @
     @subscriptions.push(global_channel)
     @client.subscribe private_channel, @receive, @

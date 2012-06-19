@@ -37,6 +37,7 @@ Backbone.Collection = ((Collection) ->
                       'or pass a modelName option!')
     @fayeClient ||= new BackboneSync.FayeClient(@,
       modelName: @modelName
+      clientId: Nomad.clientId
     )
     @localStorage ||= new Backbone.LocalStorage(@modelName)
     return

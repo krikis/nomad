@@ -4,13 +4,13 @@
     @_versioning.vector ||= new VectorClock
     @_versioning.vector[Nomad.clientId] ||= 0
     @_versioning.createdAt ||= (new Date).toJSON()
-    
+
   createdAt: ->
     @_versioning?.createdAt
-    
+
   version: ->
     @_versioning?.vector
-    
+
   setVersion: (version, updated_at) ->
     vector = new VectorClock version
     @_versioning ||= {}
@@ -23,7 +23,7 @@
       @_versioning.patches ||= _([])
       @_versioning.patches.push @_createPatch(@_localClock())
       @_tickVersion()
-    
+
   _localClock: ->
     @_versioning.vector[Nomad.clientId]
 
@@ -39,28 +39,28 @@
   _tickVersion: ->
     @_versioning.vector[Nomad.clientId] += 1
     @_versioning.updatedAt = (new Date).toJSON()
-    
+
   updatedAt: ->
     @_versioning?.updatedAt || @_versioning?.createdAt
 
   hasPatches: ->
-    @_versioning?.patches?.size() > 0  
-    
+    @_versioning?.patches?.size() > 0
+
   markAsSynced: ->
-    @_versioning.synced = true  
-    
+    @_versioning.synced = true
+
   isSynced: ->
     @_versioning?.synced
-    
+
   processCreate: (attributes) ->
     method = @_createMethod(attributes['remote_version'])
     @[method] attributes
-    
+
   _createMethod: (remoteVersion) ->
     switch @_checkVersion(remoteVersion)
       when 'supersedes' then '_forwardTo'
       when 'conflictsWith', 'precedes' then '_changeId'
-     
+
   _checkVersion: (remoteVersion) ->
     # if the client receives an acknowledgement from the server
     if @version().equals(remoteVersion) or @version().supersedes(remoteVersion)
@@ -71,7 +71,7 @@
     # if the server version supersedes the client version
     else
       'precedes'
-      
+
   _forwardTo: (attributes) ->
     vectorClock = attributes.remote_version
     patches = @_versioning.patches
@@ -79,17 +79,17 @@
       patches.shift()
     @save()
     null
-      
+
   _changeId: (attributes) ->
-    # TODO :: implement changing the model id when it conflicts 
+    # TODO :: implement changing the model id when it conflicts
     # with a model created on another client
     # think about what to do with the user interface when this happens
     # return @
-    
+
   processUpdate: (attributes) ->
     method = @_updateMethod(attributes['remote_version'])
     @[method] attributes
-    
+
   _updateMethod: (remoteVersion) ->
     switch @_checkVersion(remoteVersion)
       when 'supersedes' then '_forwardTo'
@@ -97,7 +97,7 @@
       when 'precedes' then '_update'
 
   _rebase: (attributes) ->
-    [version, created_at, updated_at] = 
+    [version, created_at, updated_at] =
       @_extractVersioning(attributes)
     dummy = new @constructor
     dummy.set attributes
@@ -109,7 +109,7 @@
     # TODO :: implement having user resolve conflict
     null
 
-  _extractVersioning: (attributes) ->  
+  _extractVersioning: (attributes) ->
     version = attributes.remote_version
     delete attributes.remote_version
     created_at = attributes.created_at
@@ -135,20 +135,20 @@
       false
 
   _updateVersionTo: (version, updated_at) ->
-    @_versioning.updatedAt = updated_at    
+    @_versioning.updatedAt = updated_at
     vector = @_versioning.vector
     _.each version, (value, clock) ->
       if not vector[clock]? or value > vector[clock]
         vector[clock] = value
-        
+
   _update: (attributes) ->
-    [version, created_at, updated_at] = 
+    [version, created_at, updated_at] =
       @_extractVersioning(attributes)
     @set attributes, skipPatch: true
     @_updateVersionTo(version, updated_at)
     @save()
     null
-    
+
 # extend Backbone.Model
 _.extend Backbone.Model::, @Versioning
 

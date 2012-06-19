@@ -81,6 +81,7 @@ describe 'Overrides', ->
       it 'initializes a new fayeclient for the model name', ->
         expect(@fayeClientStub).toHaveBeenCalledWith(@collection, {
           modelName: @collection.modelName
+          clientId: Nomad.clientId
         })
         expect(@collection.fayeClient).toEqual @fayeClient
         
