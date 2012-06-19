@@ -1,14 +1,16 @@
 @BackboneSync ||= {}
 
 class @BackboneSync.FayeClient
-  constructor: (collection, options) ->
+  constructor: (collection, options = {}) ->
     @client = options.client
+    @modelName = options.modelName
+    @clientId = options.clientId
     unless @client?
       window.client ||= new Faye.Client("http://nomad.dev:9292/faye")
       @client = window.client
     @collection = collection
-    @modelName = options.modelName
-    @clientId = options.clientId
+    @modelName ||= collection.modelName
+    @clientId ||= collection.clientId
     @subscriptions = []
     @subscribe()
     Faye.Logging.logLevel = if window.development then 'info' else 'error'

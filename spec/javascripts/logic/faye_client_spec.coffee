@@ -9,11 +9,14 @@ describe 'FayeClient', ->
     @publishStub = sinon.stub(@fayeClient, 'publish')
     @clientConstructorStub = sinon.stub(Faye, 'Client')
     @clientConstructorStub.returns @fayeClient
-    @collection = new Backbone.Collection([], modelName: 'TestModel')
-    delete window.client
-    @clientConstructorStub.reset()
     @modelName = 'TestModel'
     @clientId = 'client_id'
+    @collection = new Backbone.Collection([], 
+      modelName: @modelName
+      clientId: @clientId
+    )
+    delete window.client
+    @clientConstructorStub.reset()
 
   afterEach ->
     @clientConstructorStub.restore()
@@ -27,15 +30,26 @@ describe 'FayeClient', ->
     beforeEach ->
       # stub before creation because of callback binding
       @backboneClientStub = sinon.stub(BackboneSync.FayeClient::, 'subscribe')
-      @backboneClient = new BackboneSync.FayeClient @collection,
-                                                    modelName: @modelName
-                                                    clientId: @clientId
-                                                    client: 'faye_client'
+      @backboneClient = new BackboneSync.FayeClient @collection
 
     afterEach ->
       @backboneClientStub.restore()
       
-    context 'when no client option was passed in', ->
+    it 'sets the clientId from the options', ->  
+      @backboneClient = new BackboneSync.FayeClient @collection,
+        clientId: 'some_id'
+      expect(@backboneClient.clientId).toEqual('some_id')
+
+    it 'sets the modelName from the options', ->  
+      @backboneClient = new BackboneSync.FayeClient @collection,
+        modelName: 'model_name'
+      expect(@backboneClient.modelName).toEqual('model_name')
+      
+    context 'when a client option was passed in', ->
+      beforeEach ->
+        @clientConstructorStub.reset()
+        @backboneClient = new BackboneSync.FayeClient @collection,
+                                                      client: 'faye_client'
       it 'sets the client property', ->
         expect(@backboneClient.client).toEqual('faye_client')
 
@@ -43,11 +57,6 @@ describe 'FayeClient', ->
         expect(@clientConstructorStub).not.toHaveBeenCalled()
 
     context 'when no client option was passed in', ->
-      beforeEach ->
-        @backboneClient = new BackboneSync.FayeClient @collection,
-                                                      modelName: @modelName
-                                                      clientId: @clientId
-
       it 'fires up a new Faye client', ->
         expect(@clientConstructorStub).toHaveBeenCalled()
       
@@ -58,9 +67,7 @@ describe 'FayeClient', ->
         beforeEach ->
           window.client = 'faye_client'
           @clientConstructorStub.reset()
-          @backboneClient = new BackboneSync.FayeClient @collection,
-                                                        modelName: @modelName
-                                                        clientId: @clientId
+          @backboneClient = new BackboneSync.FayeClient @collection
 
         it 'does not fire up a new one', ->
           expect(@clientConstructorStub).not.toHaveBeenCalled()
@@ -68,10 +75,10 @@ describe 'FayeClient', ->
     it 'sets the collection property', ->
       expect(@backboneClient.collection).toEqual @collection
       
-    it 'sets the modelName property', ->
+    it 'sets the modelName property from the collection', ->
       expect(@backboneClient.modelName).toEqual @modelName
       
-    it 'sets the clientId property', ->
+    it 'sets the clientId property from the collection', ->
       expect(@backboneClient.clientId).toEqual @clientId
       
     it 'initializes the subscriptions array', ->
@@ -82,9 +89,7 @@ describe 'FayeClient', ->
 
   describe '#publish', ->
     beforeEach ->
-      @backboneClient = new BackboneSync.FayeClient @collection,
-                                                    modelName: @modelName
-                                                    clientId: @clientId
+      @backboneClient = new BackboneSync.FayeClient @collection
 
     it 'adds the Nomad client id to the message', ->
       message = {}
@@ -114,9 +119,7 @@ describe 'FayeClient', ->
 
   describe '#subscribe', ->
     beforeEach ->
-      @backboneClient = new BackboneSync.FayeClient @collection,
-                                                    modelName: @modelName
-                                                    clientId: @clientId
+      @backboneClient = new BackboneSync.FayeClient @collection
 
     it 'subscribes the wrapped client to the channel', ->
       expect(@subscribeStub).
@@ -136,9 +139,7 @@ describe 'FayeClient', ->
         
   describe '#unsubscribe', ->
     beforeEach ->
-      @backboneClient = new BackboneSync.FayeClient @collection,
-                                                    modelName: @modelName
-                                                    clientId: @clientId
+      @backboneClient = new BackboneSync.FayeClient @collection
                                                     
     it 'unsubscribes the wrapped client from all recorded channels', ->
       @backboneClient.subscriptions = ['some_subscription', 'other_subscription']
@@ -156,9 +157,7 @@ describe 'FayeClient', ->
     beforeEach ->
       @syncModelsStub = sinon.stub(@collection, 'syncModels')
       @syncProcessedStub = sinon.stub(@collection, 'syncProcessed')
-      @backboneClient = new BackboneSync.FayeClient @collection,
-                                                modelName: @modelName
-                                                clientId: @clientId
+      @backboneClient = new BackboneSync.FayeClient @collection
       @backboneClient.meta = sinon.stub()
       @backboneClient.method_1 = ->
       @backboneClient.method_2 = ->
@@ -222,9 +221,7 @@ describe 'FayeClient', ->
     beforeEach ->
       @handleCreatesStub = sinon.
         stub(@collection, 'handleCreates', -> ['other_creates'])
-      @backboneClient = new BackboneSync.FayeClient @collection,
-                                                    modelName: @modelName
-                                                    clientId: @clientId
+      @backboneClient = new BackboneSync.FayeClient @collection
                                                         
     context 'when creates are present', ->
       beforeEach ->
@@ -249,9 +246,7 @@ describe 'FayeClient', ->
     beforeEach ->
       @handleUpdatesStub = sinon.
         stub(@collection, 'handleUpdates', -> ['other_updates'])
-      @backboneClient = new BackboneSync.FayeClient @collection,
-                                                    modelName: @modelName
-                                                    clientId: @clientId
+      @backboneClient = new BackboneSync.FayeClient @collection
 
     context 'when updates are present', ->
       beforeEach ->
