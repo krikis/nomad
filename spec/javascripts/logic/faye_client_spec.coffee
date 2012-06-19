@@ -1,15 +1,17 @@
 describe 'FayeClient', ->
   beforeEach ->
-    fayeClient = {}
-    fayeClient.subscribe = ->
-    fayeClient.unsubscribe = ->
-    fayeClient.publish = ->
-    @subscribeStub = sinon.stub(fayeClient, 'subscribe')
-    @unsubscribeStub = sinon.stub(fayeClient, 'unsubscribe')
-    @publishStub = sinon.stub(fayeClient, 'publish')
+    @fayeClient = {}
+    @fayeClient.subscribe = ->
+    @fayeClient.unsubscribe = ->
+    @fayeClient.publish = ->
+    @subscribeStub = sinon.stub(@fayeClient, 'subscribe')
+    @unsubscribeStub = sinon.stub(@fayeClient, 'unsubscribe')
+    @publishStub = sinon.stub(@fayeClient, 'publish')
     @clientConstructorStub = sinon.stub(Faye, 'Client')
-    @clientConstructorStub.returns fayeClient
+    @clientConstructorStub.returns @fayeClient
     @collection = new Backbone.Collection([], modelName: 'TestModel')
+    delete window.client
+    @clientConstructorStub.reset()
     @modelName = 'TestModel'
     @clientId = 'client_id'
 
@@ -28,12 +30,40 @@ describe 'FayeClient', ->
       @backboneClient = new BackboneSync.FayeClient @collection,
                                                     modelName: @modelName
                                                     clientId: @clientId
+                                                    client: 'faye_client'
 
     afterEach ->
       @backboneClientStub.restore()
+      
+    context 'when no client option was passed in', ->
+      it 'sets the client property', ->
+        expect(@backboneClient.client).toEqual('faye_client')
 
-    it 'fires up the Faye client', ->
-      expect(@clientConstructorStub).toHaveBeenCalled()
+      it 'does not fire up a new Faye client', ->
+        expect(@clientConstructorStub).not.toHaveBeenCalled()
+
+    context 'when no client option was passed in', ->
+      beforeEach ->
+        @backboneClient = new BackboneSync.FayeClient @collection,
+                                                      modelName: @modelName
+                                                      clientId: @clientId
+
+      it 'fires up a new Faye client', ->
+        expect(@clientConstructorStub).toHaveBeenCalled()
+      
+      it 'sets the client property to the newly created client', ->
+        expect(@backboneClient.client).toEqual(@fayeClient)
+        
+      context 'when a Faye client is already running', ->
+        beforeEach ->
+          window.client = 'faye_client'
+          @clientConstructorStub.reset()
+          @backboneClient = new BackboneSync.FayeClient @collection,
+                                                        modelName: @modelName
+                                                        clientId: @clientId
+
+        it 'does not fire up a new one', ->
+          expect(@clientConstructorStub).not.toHaveBeenCalled()
 
     it 'sets the collection property', ->
       expect(@backboneClient.collection).toEqual @collection
@@ -49,12 +79,6 @@ describe 'FayeClient', ->
 
     it 'calls the subscribe method', ->
       expect(@backboneClientStub).toHaveBeenCalled()
-
-    it 'does not fire up a new Faye client if one is already running', ->
-      @otherClient = new BackboneSync.FayeClient @collection,
-                                                 modelName: @modelName
-                                                 clientId: @clientId
-      expect(@clientConstructorStub).toHaveBeenCalledOnce()
 
   describe '#publish', ->
     beforeEach ->

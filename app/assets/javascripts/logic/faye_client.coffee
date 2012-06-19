@@ -2,18 +2,20 @@
 
 class @BackboneSync.FayeClient
   constructor: (collection, options) ->
-    Faye.Logging.logLevel = if window.development then 'info' else 'error'
-    window.client ||= new Faye.Client("http://nomad.dev:9292/faye")
-    # disable all non-websocket after connection to enforce websockets
-    # client.disable('long-polling');
-    # client.disable('cross-origin-long-polling');
-    # client.disable('callback-polling');
-    @client = window.client
+    @client = options.client
+    unless @client?
+      window.client ||= new Faye.Client("http://nomad.dev:9292/faye")
+      @client = window.client
     @collection = collection
     @modelName = options.modelName
     @clientId = options.clientId
     @subscriptions = []
     @subscribe()
+    Faye.Logging.logLevel = if window.development then 'info' else 'error'
+    # disable all non-websocket after connection to enforce websockets
+    # client.disable('long-polling');
+    # client.disable('cross-origin-long-polling');
+    # client.disable('callback-polling');
 
   publish: (message)->
     message.client_id ||= @clientId
