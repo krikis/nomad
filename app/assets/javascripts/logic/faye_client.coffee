@@ -32,6 +32,7 @@ class @BackboneSync.FayeClient
     subscriptions ||= @subscriptions
     _.each subscriptions, (subscription) =>
       @client.unsubscribe subscription
+      @subscriptions.delete(subscription)
 
   receive: (message) ->
     # extract meta information
