@@ -49,7 +49,14 @@ describe 'Overrides', ->
         @fayeClientStub.restore()
         @localStorageStub.restore()
         
-      it 'sets the clientId', ->
+      it 'sets the clientId from the options', ->  
+        class TestModel extends Backbone.Model
+        class TestCollection extends Backbone.Collection
+          model: TestModel
+        @collection = new TestCollection([], clientId: 'client_id')
+        expect(@collection.clientId).toEqual('client_id')
+        
+      it 'sets the clientId from Nomad clientId', ->
         expect(@collection.clientId).toEqual(Nomad.clientId)
         
       it 'preservers the clientId if it is already set', ->        
@@ -99,10 +106,7 @@ describe 'Overrides', ->
 
 
       it 'initializes a new fayeclient for the model name', ->
-        expect(@fayeClientStub).toHaveBeenCalledWith(@collection, {
-          modelName: @collection.modelName
-          clientId: Nomad.clientId
-        })
+        expect(@fayeClientStub).toHaveBeenCalledWith(@collection)
         expect(@collection.fayeClient).toEqual @fayeClient
         
       it 'preserves the fayeclient if it is already set', ->

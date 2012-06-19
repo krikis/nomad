@@ -30,6 +30,7 @@ Backbone.Collection = ((Collection) ->
   # Define the new constructor
   Backbone.Collection = (models, options = {}) ->
     Collection.apply @, arguments
+    @clientId ||= options.clientId
     @clientId ||= Nomad.clientId
     @url ||= "/#{@constructor.name.underscore()}"
     @modelName ||= options.modelName
@@ -37,10 +38,7 @@ Backbone.Collection = ((Collection) ->
     unless @modelName? and @modelName.length > 0
       throw new Error('Model name undefined: either set a valid Backbone.Model ' +
                       'or pass a modelName option!')
-    @fayeClient ||= new BackboneSync.FayeClient(@,
-      modelName: @modelName
-      clientId: @clientId
-    )
+    @fayeClient ||= new BackboneSync.FayeClient(@)
     @localStorage ||= new Backbone.LocalStorage(@modelName)
     return
   # Clone static properties
