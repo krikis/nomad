@@ -26,6 +26,10 @@ class @BackboneSync.FayeClient
     @subscriptions.push(global_channel)
     @client.subscribe private_channel, @receive, @
     @subscriptions.push(private_channel)
+    
+  unsubscribe: ->
+    _.each @subscriptions, (subscription) =>
+      @client.unsubscribe subscription
 
   receive: (message) ->
     # extract meta information

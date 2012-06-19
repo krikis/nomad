@@ -2,8 +2,10 @@ describe 'FayeClient', ->
   beforeEach ->
     fayeClient = {}
     fayeClient.subscribe = ->
+    fayeClient.unsubscribe = ->
     fayeClient.publish = ->
     @subscribeStub = sinon.stub(fayeClient, 'subscribe')
+    @unsubscribeStub = sinon.stub(fayeClient, 'unsubscribe')
     @publishStub = sinon.stub(fayeClient, 'publish')
     @clientConstructorStub = sinon.stub(Faye, 'Client')
     @clientConstructorStub.returns fayeClient
@@ -98,6 +100,16 @@ describe 'FayeClient', ->
     it 'collects the subscriptions', ->
       expect(@backboneClient.subscriptions).
         toEqual(['/sync/TestModel', '/sync/TestModel/some_unique_id'])
+        
+  describe '#unsubscribe', ->
+    beforeEach ->
+      @backboneClient = new BackboneSync.FayeClient @collection,
+                                                    modelName: @modelName
+                                                    
+    it 'unsubscribes the wrapped client from all recorded channels', ->
+      @backboneClient.subscriptions = ['some_subscription']
+      @backboneClient.unsubscribe()
+      expect(@unsubscribeStub).toHaveBeenCalledWith('some_subscription')
 
   describe '#receive', ->
     beforeEach ->
