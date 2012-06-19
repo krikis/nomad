@@ -149,7 +149,7 @@ class ServerSideClient
 
   def json_for(object)
     object.attributes.reject do |key, value|
-      ['id', 'remote_id'].include? key.to_s
+      ['id', 'remote_id'].include? key.to_s or value.nil?
     end
   end
 

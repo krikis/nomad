@@ -561,6 +561,13 @@ describe ServerSideClient do
       json = subject.json_for(object)
       json.should eq({:attribute => 'value', :remote_version => 'some_hash'})
     end
+
+    it 'filters out attributes with no value' do
+      object = stub(:attributes => {:attribute => 'value',
+                                    :other_attribute => nil})
+      json = subject.json_for(object)
+      json.should eq({:attribute => 'value'})
+    end
   end
 
   describe '#publish_results' do
