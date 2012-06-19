@@ -1,4 +1,4 @@
-describe 'modelVersioning', ->
+describe 'versioning', ->
   
   beforeEach ->
     # delete faye client created during isolated tests
