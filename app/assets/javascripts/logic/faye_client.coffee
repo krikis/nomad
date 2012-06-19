@@ -39,6 +39,7 @@ class @BackboneSync.FayeClient
 
   resolve: (params, processed) ->
     # TODO :: generate new id for conflicting models
+    # TODO :: sync resolved models back to server
 
   create: (params, processed) ->
     unless _.isEmpty(params)

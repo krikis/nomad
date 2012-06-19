@@ -21,7 +21,9 @@ describe 'Sync', ->
       @collection = new TestCollection([], modelName: 'TestModel')
       @newModelsStub = sinon.stub(@collection, '_newModels', -> ['new', 'models'])
       @dirtyModelsStub = sinon.stub(@collection, '_dirtyModels', -> ['dirty', 'models'])
-      @versionDetailsStub = sinon.stub(@collection, '_versionDetails', -> ['version', 'details'])
+      @versionDetailsStub = sinon.stub(@collection, '_versionDetails')
+      @versionDetailsStub.withArgs(['new', 'models']).returns(['new', 'version', 'details'])
+      @versionDetailsStub.withArgs(['dirty', 'models']).returns(['version', 'details'])
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
       )
@@ -42,13 +44,23 @@ describe 'Sync', ->
       @collection.preSync()
       expect(@versionDetailsStub).toHaveBeenCalledWith(['dirty', 'models'])
 
-    it 'publishes a list of new version details to the server', ->
-      @collection.preSync()
-      expect(@message.new_versions).toEqual(['version', 'details'])
+    context 'when at least some details are present', ->
+      it 'publishes a list of new version details to the server', ->
+        @collection.preSync()
+        expect(@message.new_versions).toEqual(['new', 'version', 'details'])
 
-    it 'publishes a list of version details to the server', ->
-      @collection.preSync()
-      expect(@message.versions).toEqual(['version', 'details'])
+      it 'publishes a list of version details to the server', ->
+        @collection.preSync()
+        expect(@message.versions).toEqual(['version', 'details'])
+        
+    context 'when no details are present', ->
+      beforeEach ->
+        @versionDetailsStub.restore()
+        @versionDetailsStub = sinon.stub(@collection, '_versionDetails', -> [])
+        
+      it 'does not publish to the server', ->
+        @collection.preSync()
+        expect(@publishStub).not.toHaveBeenCalled()
 
   describe '#_newModels', ->
     beforeEach ->
@@ -288,11 +300,9 @@ describe 'Sync', ->
       )
       @newModelsStub = sinon.stub(@collection, '_newModels', -> ['new', 'models'])
       @dirtyModelsStub = sinon.stub(@collection, '_dirtyModels', -> ['dirty', 'models'])
-      @dataForSyncStub = sinon.
-        stub(@collection, '_dataForSync', ->
-          @out ||= [[new: 'data'], [dirty: 'data']]
-          @out.pop()
-        )
+      @dataForSyncStub = sinon.stub(@collection, '_dataForSync')
+      @dataForSyncStub.withArgs(['new', 'models']).returns([new: 'data'])
+      @dataForSyncStub.withArgs(['dirty', 'models']).returns([dirty: 'data'])
 
     it 'collects all dirty models', ->
       @collection.syncModels()
@@ -301,10 +311,6 @@ describe 'Sync', ->
     it 'collects the data of the dirty models', ->
       @collection.syncModels()
       expect(@dataForSyncStub).toHaveBeenCalledWith(['dirty', 'models'])
-
-    it 'publishes all dirty model data to the server', ->
-      @collection.syncModels()
-      expect(@message.updates).toEqual([dirty: 'data'])
 
     it 'collects all new models', ->
       @collection.syncModels()
@@ -317,10 +323,24 @@ describe 'Sync', ->
     it 'marks new models as synced after the dirty models have been collected', ->
       @collection.syncModels()
       expect(@newModelsStub).toHaveBeenCalledAfter(@dirtyModelsStub)
+    
+    context 'when at least some data was collected', ->
+      it 'publishes all dirty model data to the server', ->
+        @collection.syncModels()
+        expect(@message.updates).toEqual([dirty: 'data'])
 
-    it 'publishes all new model data to the server', ->
-      @collection.syncModels()
-      expect(@message.creates).toEqual([new: 'data'])
+      it 'publishes all new model data to the server', ->
+        @collection.syncModels()
+        expect(@message.creates).toEqual([new: 'data'])
+        
+    context 'when no data was collected', ->
+      beforeEach ->
+        @dataForSyncStub.restore()
+        @dataForSyncStub = sinon.stub(@collection, '_dataForSync', -> [])
+        
+      it 'does not publish to the server', ->
+        @collection.syncModels()
+        expect(@publishStub).not.toHaveBeenCalled()
 
   describe '#_dataForSync', ->
     beforeEach ->
@@ -349,7 +369,26 @@ describe 'Sync', ->
       versions = @collection._dataForSync([@model], markSynced: true)
       expect(@markAsSyncedStub).toHaveBeenCalled()
 
-
+  describe '#syncProcessed', ->
+    beforeEach ->
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @message = undefined
+      @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
+        @message = message
+      )
+      
+    it 'syncs resolved and rebased models to the server', ->
+      @collection.syncProcessed
+        creates: ['resolved']
+        updates: ['rebased']
+      expect(@message).toEqual
+        creates: ['resolved']
+        updates: ['rebased']
+      
+    it 'does not publish to the server when there are no processed models', ->
+      @collection.syncProcessed({})
+      expect(@publishStub).not.toHaveBeenCalled()
 
 
 

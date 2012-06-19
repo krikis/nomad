@@ -1,8 +1,11 @@
 @Sync =
   preSync: ->
-    @fayeClient.publish
+    message = 
       new_versions: @_versionDetails(@_newModels())
       versions: @_versionDetails(@_dirtyModels())
+    unless _.isEmpty(message.new_versions) and 
+           _.isEmpty(message.versions)
+      @fayeClient.publish message
 
   _versionDetails: (models) ->
     _(models).chain().map((model) ->
@@ -52,10 +55,14 @@
         @_processCreate id, attributes
     ).compact().value()
 
-  syncModels: (updated) ->
-    @fayeClient.publish
+  # sync all dirty models
+  syncModels: () ->
+    message = 
       updates: @_dataForSync(@_dirtyModels())
       creates: @_dataForSync(@_newModels(), markSynced: true)
+    unless _.isEmpty(message.updates) and 
+           _.isEmpty(message.creates)
+      @fayeClient.publish message
 
   _dataForSync: (models, options = {}) ->
     _(models).chain().map((model) ->
@@ -70,6 +77,12 @@
       model.markAsSynced() if options.markSynced
       details
     ).value()
+    
+  # sync all processed models
+  syncProcessed: (processed) ->
+    unless _.isEmpty(processed.updates) and 
+           _.isEmpty(processed.creates)
+      @fayeClient.publish processed
 
 # extend Backbone.Collection
 _.extend Backbone.Collection::, Sync
