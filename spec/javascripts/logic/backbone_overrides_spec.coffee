@@ -21,6 +21,15 @@ describe 'Overrides', ->
       it 'binds #addPatch to the model change event', ->
         @model.trigger 'change'
         expect(@addPatchStub).toHaveBeenCalled()
+        
+      it 'sets the model clientId', ->
+        expect(@model.clientId).toEqual(Nomad.clientId)
+        
+      it 'preserves the clientId when it is already set', ->
+        class TestModel extends Backbone.Model
+          clientId: 'client_id'
+        model = new TestModel
+        expect(model.clientId).toEqual('client_id')
 
   describe 'Backbone.Collection', ->
     describe '.constructor', ->
@@ -39,6 +48,17 @@ describe 'Overrides', ->
       afterEach ->
         @fayeClientStub.restore()
         @localStorageStub.restore()
+        
+      it 'sets the clientId', ->
+        expect(@collection.clientId).toEqual(Nomad.clientId)
+        
+      it 'preservers the clientId if it is already set', ->        
+        class TestModel extends Backbone.Model
+        class TestCollection extends Backbone.Collection
+          model: TestModel
+          clientId: 'client_id'
+        @collection = new TestCollection
+        expect(@collection.clientId).toEqual('client_id')
         
       it 'sets the url to the collection\'s constructor name', ->
         expect(@collection.url).toEqual('/test_collection')

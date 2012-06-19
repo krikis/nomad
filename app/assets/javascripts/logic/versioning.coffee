@@ -2,7 +2,7 @@
   initVersioning: ->
     @_versioning ||= {}
     @_versioning.vector ||= new VectorClock
-    @_versioning.vector[Nomad.clientId] ||= 0
+    @_versioning.vector[@clientId] ||= 0
     @_versioning.createdAt ||= (new Date).toJSON()
 
   createdAt: ->
@@ -25,7 +25,7 @@
       @_tickVersion()
 
   _localClock: ->
-    @_versioning.vector[Nomad.clientId]
+    @_versioning.vector[@clientId]
 
   _createPatch: (base) ->
     @dmp = new diff_match_patch
@@ -37,7 +37,7 @@
     base: base
 
   _tickVersion: ->
-    @_versioning.vector[Nomad.clientId] += 1
+    @_versioning.vector[@clientId] += 1
     @_versioning.updatedAt = (new Date).toJSON()
 
   updatedAt: ->
@@ -75,7 +75,7 @@
   _forwardTo: (attributes) ->
     vectorClock = attributes.remote_version
     patches = @_versioning.patches
-    while @hasPatches() and patches.first().base < vectorClock[Nomad.clientId]
+    while @hasPatches() and patches.first().base < vectorClock[@clientId]
       patches.shift()
     @save()
     null

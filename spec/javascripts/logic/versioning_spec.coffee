@@ -22,16 +22,16 @@ describe 'Versioning', ->
       expect(@model._versioning?.vector).toBeDefined()
 
     it 'initializes the local clock to zero if undefined', ->
-      expect(@model._versioning?.vector[Nomad.clientId]).toBeUndefined()
+      expect(@model._versioning?.vector[@model.clientId]).toBeUndefined()
       @model.initVersioning()
-      expect(@model._versioning?.vector[Nomad.clientId]).toBeDefined()
+      expect(@model._versioning?.vector[@model.clientId]).toBeDefined()
 
     it 'retains the local clock if it is already set', ->
       vector = {}
-      vector[Nomad.clientId] = 1
+      vector[@model.clientId] = 1
       @model._versioning = {vector: vector}
       @model.initVersioning()
-      expect(@model._versioning?.vector[Nomad.clientId]).toEqual(1)
+      expect(@model._versioning?.vector[@model.clientId]).toEqual(1)
 
     it 'sets the createdAt attribute when undefined', ->
       expect(@model._versioning?.createdAt).toBeUndefined()
@@ -153,7 +153,7 @@ describe 'Versioning', ->
       class TestModel extends Backbone.Model
       @model = new TestModel
       vector = {}
-      vector[Nomad.clientId] = 1
+      vector[@model.clientId] = 1
       @model._versioning = {vector: vector}
 
     it 'returns the local clock of the model\'s version', ->
@@ -184,13 +184,13 @@ describe 'Versioning', ->
       class TestModel extends Backbone.Model
       @model = new TestModel
       vector = {}
-      vector[Nomad.clientId] = 1
+      vector[@model.clientId] = 1
       @model._versioning = {vector: vector}
 
     it 'increments the version for the current model', ->
-      @oldVersion = @model._versioning.vector[Nomad.clientId]
+      @oldVersion = @model._versioning.vector[@model.clientId]
       @model._tickVersion()
-      expect(@model._versioning.vector[Nomad.clientId]).toEqual(@oldVersion + 1)
+      expect(@model._versioning.vector[@model.clientId]).toEqual(@oldVersion + 1)
       
     it 'overwrites updatedAt', ->
       date = new Date(2012, 4, 15, 15, 25, 36)
@@ -359,7 +359,7 @@ describe 'Versioning', ->
 
     it 'removes all patches older than the version provided', ->
       vector = {}
-      vector[Nomad.clientId] = 1
+      vector[@model.clientId] = 1
       @model._forwardTo(remote_version: vector)
       expect(@model._versioning.patches.first()).toEqual
         patch_text: 'other_patch'
