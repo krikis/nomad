@@ -2,9 +2,9 @@ describe 'versioning', ->
   
   beforeEach ->
     # delete faye client created during isolated tests
-    unless window.acceptance_client?
-      delete window.client
-      window.acceptance_client = true
+    # unless window.acceptance_client?
+    #   delete window.client
+    #   window.acceptance_client = true
 
   context 'when a model is saved without an id', ->
     beforeEach ->

@@ -2,9 +2,9 @@ describe 'presync', ->
 
   beforeEach ->
     # delete faye client created during isolated tests
-    unless window.acceptance_client?
-      delete window.client
-      window.acceptance_client = true
+    # unless window.acceptance_client?
+    #   delete window.client
+    #   window.acceptance_client = true
     @receiveSpy = sinon.spy(BackboneSync.FayeClient::, 'receive')
     @resolveSpy = sinon.spy(BackboneSync.FayeClient::, 'resolve')
     @createSpy  = sinon.spy(BackboneSync.FayeClient::, 'create' )

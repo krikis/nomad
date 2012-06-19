@@ -2,9 +2,9 @@ describe 'syncmodels', ->
 
   beforeEach ->
     # delete faye client created during isolated tests
-    unless window.acceptance_client?
-      delete window.client
-      window.acceptance_client = true
+    # unless window.acceptance_client?
+    #   delete window.client
+    #   window.acceptance_client = true
     @receiveSpy = sinon.spy(BackboneSync.FayeClient::, 'receive')
     @resolveSpy = sinon.spy(BackboneSync.FayeClient::, 'resolve')
     @createSpy  = sinon.spy(BackboneSync.FayeClient::, 'create' )
@@ -61,7 +61,7 @@ describe 'syncmodels', ->
     ), 'sync acknowledgement', 1000
     runs ->
       expect(@resolveSpy).toHaveBeenCalledWith([])
-  
+
   it 'updates a model on the server', ->
     runs ->
       @collection.syncModels()
@@ -94,7 +94,7 @@ describe 'syncmodels', ->
     ), 'sync acknowledgement', 1000
     runs ->
       expect(@updateSpy).toHaveBeenCalledWith({})
-  
+
   it 'rebases a model after a server update', ->
     runs ->
       @collection.syncModels()
@@ -127,7 +127,7 @@ describe 'syncmodels', ->
       expect(@model.get('title')).toEqual('other_title')
       expect(@model.get('content')).toEqual('other_content')
       Nomad.clientId = @previousId
-  
-  
-  
-  
+
+
+
+
