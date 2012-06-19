@@ -24,9 +24,7 @@ describe 'presync', ->
     @collection.create @model
 
   afterEach ->
-    window.client.unsubscribe('/sync/Post')
-    window.client.unsubscribe('/sync/Post/some_unique_id')
-    window.client.unsubscribe('/sync/Post/some_other_id')
+    @collection.leave()
     @receiveSpy.restore()
     @resolveSpy.restore()
     @createSpy .restore()
@@ -126,7 +124,7 @@ describe 'presync', ->
       @model.setVersion(version)
       @previousId = Nomad.clientId
       Nomad.clientId = 'some_other_id'
-      window.client.unsubscribe('/sync/Post')
+      @collection.leave('/sync/Post')
       @collection.fayeClient.subscribe()
       @collection.preSync()
     waitsFor (->

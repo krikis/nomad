@@ -18,6 +18,9 @@ describe 'versioning', ->
       @collection.add @model
       @model.save()
 
+    afterEach ->
+      @collection.leave()
+
     it 'adds versioning to it', ->
       expect(@initVersioningSpy).toHaveBeenCalled()
       
@@ -52,6 +55,9 @@ describe 'versioning', ->
       @tickVersionSpy = sinon.spy(@model, '_tickVersion')
       @collection.add @model
       @model.save()
+
+    afterEach ->
+      @collection.leave()
 
     it 'adds versioning to it', ->
       expect(@initVersioningSpy).toHaveBeenCalled()

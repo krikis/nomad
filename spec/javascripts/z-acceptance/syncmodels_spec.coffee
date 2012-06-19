@@ -24,9 +24,7 @@ describe 'syncmodels', ->
     @collection.create @model
 
   afterEach ->
-    window.client.unsubscribe('/sync/Post')
-    window.client.unsubscribe('/sync/Post/some_unique_id')
-    window.client.unsubscribe('/sync/Post/some_other_id')
+    @collection.leave()
     @receiveSpy.restore()
     @resolveSpy.restore()
     @createSpy .restore()
