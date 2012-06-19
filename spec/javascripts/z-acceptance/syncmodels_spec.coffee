@@ -111,7 +111,7 @@ describe 'syncmodels', ->
       waits(200)
       runs ->
         @collection.syncModels()
-      waits(500)
+      waits(200)
       runs ->
         @secondCollection.leave()
       waits(200)
@@ -119,7 +119,7 @@ describe 'syncmodels', ->
         @model.save
           title: 'other_title'
         @collection.syncModels()
-      waits(500)
+      waits(200)
       runs ->
         @secondCollection.fayeClient.subscribe()
       waits(200)

@@ -121,7 +121,7 @@ describe 'presync', ->
       waits(200)
       runs ->
         @collection.preSync()
-      waits(500)
+      waits(200)
       runs ->
         @secondCollection.leave()
       waits(200)
@@ -129,7 +129,7 @@ describe 'presync', ->
         @model.save
           title: 'other_title'
         @collection.preSync()
-      waits(500)
+      waits(200)
       runs ->
         @secondCollection.fayeClient.subscribe()
       waits(200)
