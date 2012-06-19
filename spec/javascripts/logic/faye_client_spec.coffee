@@ -9,6 +9,7 @@ describe 'FayeClient', ->
     @clientConstructorStub.returns fayeClient
     @collection = new Backbone.Collection([], modelName: 'TestModel')
     @modelName = 'TestModel'
+    Nomad.clientId = 'some_unique_id'
 
   afterEach ->
     @clientConstructorStub.restore()
@@ -34,6 +35,9 @@ describe 'FayeClient', ->
     it 'sets the collection and modelName property', ->
       expect(@backboneClient.collection).toEqual @collection
       expect(@backboneClient.modelName).toEqual @modelName
+      
+    it 'initializes the subscriptions array', ->
+      expect(@backboneClient.subscriptions).toEqual([])
 
     it 'calls the subscribe method', ->
       expect(@backboneClientStub).toHaveBeenCalled()
@@ -81,15 +85,19 @@ describe 'FayeClient', ->
 
     it 'subscribes the wrapped client to the channel', ->
       expect(@subscribeStub).
-        toHaveBeenCalledWith('/sync/' + @modelName,
+        toHaveBeenCalledWith('/sync/TestModel',
                              @backboneClient.receive,
                              @backboneClient)
 
     it 'subscribes the wrapped client to a personal channel', ->
       expect(@subscribeStub).
-          toHaveBeenCalledWith("/sync/#{@modelName}/#{Nomad.clientId}",
+          toHaveBeenCalledWith('/sync/TestModel/some_unique_id',
                                @backboneClient.receive,
                                @backboneClient)
+                               
+    it 'collects the subscriptions', ->
+      expect(@backboneClient.subscriptions).
+        toEqual(['/sync/TestModel', '/sync/TestModel/some_unique_id'])
 
   describe '#receive', ->
     beforeEach ->

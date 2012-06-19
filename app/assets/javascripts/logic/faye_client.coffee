@@ -11,6 +11,7 @@ class @BackboneSync.FayeClient
     @client = window.client
     @collection = collection
     @modelName = options.modelName
+    @subscriptions = []
     @subscribe()
 
   publish: (message)->
@@ -19,8 +20,12 @@ class @BackboneSync.FayeClient
     @client.publish "/server/" + @modelName, message
 
   subscribe: ->
-    @client.subscribe "/sync/#{@modelName}", @receive, @
-    @client.subscribe "/sync/#{@modelName}/#{Nomad.clientId}", @receive, @
+    global_channel = "/sync/#{@modelName}"
+    private_channel = "/sync/#{@modelName}/#{Nomad.clientId}"
+    @client.subscribe global_channel, @receive, @
+    @subscriptions.push(global_channel)
+    @client.subscribe private_channel, @receive, @
+    @subscriptions.push(private_channel)
 
   receive: (message) ->
     # extract meta information
