@@ -20,7 +20,7 @@ class ServerSideClient
   end
 
   def process_message(model, message)
-    results = {}
+    results = init_results
     if message['new_versions'].present?
       handle_new_versions(model, message['new_versions'], results)
     end
@@ -42,9 +42,17 @@ class ServerSideClient
     publish_results(message, results)
   end
 
+  def init_results
+    time = Time.now
+    {'unicast'   => {'meta'    => {'timestamp' => time},
+                     'resolve' => [],
+                     'update'  => {}},
+     'multicast' => {'meta'    => {'timestamp' => time}                ,
+                     'create'  => {},
+                     'update'  => {}}}
+  end
+
   def handle_new_versions(model, new_versions, results)
-    results['unicast'] ||= {}
-    results['unicast']['meta'] ||= {}
     new_versions.each do |version|
       check_new_version(model, version, results['unicast'])
     end
@@ -52,7 +60,6 @@ class ServerSideClient
   end
 
   def check_new_version(model, new_version, results)
-    results['resolve'] ||= []
     object = model.find_by_remote_id(new_version['id'])
     if object
       # File update for id resolution if random generated id is already taken
@@ -64,8 +71,6 @@ class ServerSideClient
   end
 
   def handle_versions(model, versions, client_id, results)
-    results['unicast'] ||= {}
-    results['unicast']['meta'] ||= {}
     versions.each do |version|
       check_version(model, version, client_id, results['unicast'])
     end
@@ -73,7 +78,6 @@ class ServerSideClient
   end
 
   def check_version(model, version, client_id, results)
-    results['update'] ||= {}
     object = model.find_by_remote_id(version['id'])
     if object
       # Discard update if obsolete
@@ -93,13 +97,10 @@ class ServerSideClient
   end
 
   def add_update_for(object, results)
-    results['update'] ||= {}
     results['update'][object.remote_id] = json_for(object)
   end
 
   def handle_creates(model, creates, results)
-    results['unicast']   ||= {}
-    results['multicast'] ||= {}
     creates.each do |create|
       if check_new_version(model, create, results['unicast'])
         process_create(model, create, results['multicast'])
@@ -119,18 +120,16 @@ class ServerSideClient
     object.update_attribute(:remote_id, attributes['id']) unless object.remote_id.present?
     object.update_attributes(attributes['attributes'])
     object.update_attribute(:remote_version, attributes['version'])
+    object.update_attribute(:last_update, Time.now)
     object.update_attribute(:created_at, attributes['created_at'])
     object.update_attribute(:updated_at, attributes['updated_at'])
   end
 
   def add_create_for(object, results)
-    results['create'] ||= {}
     results['create'][object.remote_id] = json_for(object)
   end
 
   def handle_updates(model, updates, client_id, results)
-    results['unicast']   ||= {}
-    results['multicast'] ||= {}
     updates.each do |update|
       success, object = check_version(model, update, client_id, results['unicast'])
       if success
@@ -155,12 +154,14 @@ class ServerSideClient
 
   def publish_results(message, results)
     multicast_channel = "/sync/#{message['model_name']}"
-    if results['multicast'].present?
+    if results['multicast']['create'].present? or
+       results['multicast']['update'].present?
       @client.publish(multicast_channel, results['multicast'])
     end
     if message['client_id'].present?
       unicast_channel = "#{multicast_channel}/#{message['client_id']}"
-      if results['unicast'].present?
+      if results['unicast']['resolve'].present? or
+         results['unicast']['update'].present?
         @client.publish(unicast_channel, results['unicast'])
       end
     end

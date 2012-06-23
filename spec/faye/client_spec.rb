@@ -71,34 +71,41 @@ describe ServerSideClient do
   describe '#process_message' do
     let(:model)   { TestModel }
     before do
-      subject.stub(:publish_results)
+      @results = stub
+      subject.stub(:publish_results => nil,
+                   :init_results => @results)
+    end
+
+    it 'initializes the results hash' do
+      subject.should_receive(:init_results)
+      subject.process_message(model, {})
     end
 
     it 'handles new versions if present' do
       message = {'new_versions' => stub, 'client_id' => 'some_id'}
       subject.should_receive(:handle_new_versions).
-        with(model, message['new_versions'], {})
+        with(model, message['new_versions'], @results)
       subject.process_message(model, message)
     end
 
     it 'handles versions if present' do
       message = {'versions' => stub, 'client_id' => 'some_id'}
       subject.should_receive(:handle_versions).
-        with(model, message['versions'], 'some_id', {})
+        with(model, message['versions'], 'some_id', @results)
       subject.process_message(model, message)
     end
 
     it 'handles creates if present' do
       message = {'creates' => stub, 'client_id' => 'some_id'}
       subject.should_receive(:handle_creates).
-        with(model, message['creates'], {})
+        with(model, message['creates'], @results)
       subject.process_message(model, message)
     end
 
     it 'handles updates if present' do
       message = {'updates' => stub, 'client_id' => 'some_id'}
       subject.should_receive(:handle_updates).
-        with(model, message['updates'], 'some_id', {})
+        with(model, message['updates'], 'some_id', @results)
       subject.process_message(model, message)
     end
 
@@ -108,29 +115,70 @@ describe ServerSideClient do
 
     it 'publishes the results' do
       message = {}
-      subject.should_receive(:publish_results).with(message, an_instance_of(Hash))
+      subject.should_receive(:publish_results).with(message, @results)
       subject.process_message(model, message)
+    end
+  end
+
+  describe '#initresults' do
+    before do
+      @time = stub
+      Time.stub(:now => @time)
+    end
+
+    it 'initializes the unicast message' do
+      subject.init_results['unicast'].should be
+    end
+
+    it 'initializes the unicast meta tag' do
+      subject.init_results['unicast']['meta'].
+        should eq({'timestamp' => @time})
+    end
+
+    it 'initializes the resolve list' do
+      subject.init_results['unicast']['resolve'].should eq([])
+    end
+
+    it 'initializes the rebase list' do
+      subject.init_results['unicast']['update'].should eq({})
+    end
+
+    it 'initializes the multicast message' do
+      subject.init_results['multicast'].should be
+    end
+
+    it 'initializes the multicast meta tag' do
+      subject.init_results['multicast']['meta'].
+        should eq({'timestamp' => @time})
+    end
+
+    it 'initializes the create list' do
+      subject.init_results['multicast']['create'].should eq({})
+    end
+
+    it 'initializes the update list' do
+      subject.init_results['multicast']['update'].should eq({})
     end
   end
 
   describe '#handle_new_versions' do
     let(:new_version) { stub }
-    let(:model)   { TestModel }
+    let(:model)       { TestModel }
+    let(:results)     { {'unicast' => {'meta' => {}}} }
     before { subject.stub(:check_new_version) }
 
     it 'checks the version of each entry' do
-      subject.should_receive(:check_new_version).with(model, new_version, an_instance_of(Hash))
-      subject.handle_new_versions(model, [new_version], {})
+      subject.should_receive(:check_new_version).
+        with(model, new_version, an_instance_of(Hash))
+      subject.handle_new_versions(model, [new_version], results)
     end
 
     it 'flags the unicast results as preSync results' do
-      results = {}
       subject.handle_new_versions(model, [new_version], results)
       results['unicast']['meta']['preSync'].should be_true
     end
 
     it 'files all id conflicts for unicast' do
-      results = {}
       subject.stub(:check_new_version) do |_, _, unicast|
         unicast['id'] = 'conflict'
       end
@@ -142,7 +190,8 @@ describe ServerSideClient do
   describe '#check_new_version' do
     let(:new_version) { {'id' => 'some_id',
                          'version' => 'some_version'} }
-    let(:model)   { TestModel }
+    let(:model)       { TestModel }
+    let(:results)     { {'resolve' => []} }
     before do
       TestModel.stub(:find_by_remote_id)
       subject.stub(:json_for => 'some_json')
@@ -150,11 +199,11 @@ describe ServerSideClient do
 
     it 'tries to find an updated version' do
       model.should_receive(:find_by_remote_id).with('some_id')
-      subject.check_new_version(model, new_version, {})
+      subject.check_new_version(model, new_version, results)
     end
 
     it 'returns true if no object is found' do
-      subject.check_new_version(model, new_version, {}).should be_true
+      subject.check_new_version(model, new_version, results).should be_true
     end
 
     context 'when an object is found' do
@@ -162,14 +211,13 @@ describe ServerSideClient do
       before { TestModel.stub(:find_by_remote_id).and_return(object) }
 
       it 'files the version for conflict resolution' do
-        results = {}
         subject.check_new_version(model, new_version, results)
         results['resolve'].should eq(['some_id'])
         results['update'].should be_blank
       end
 
       it 'returns false' do
-        subject.check_new_version(model, new_version, {}).should be_false
+        subject.check_new_version(model, new_version, results).should be_false
       end
     end
   end
@@ -177,22 +225,21 @@ describe ServerSideClient do
   describe '#handle_versions' do
     let(:version) { stub }
     let(:model)   { TestModel }
+    let(:results) { {'unicast' => {'meta' => {}}} }
     before { subject.stub(:check_version) }
 
     it 'checks the version of each entry' do
       subject.should_receive(:check_version).
         with(model, version, 'client_id', an_instance_of(Hash))
-      subject.handle_versions(model, [version], 'client_id', {})
+      subject.handle_versions(model, [version], 'client_id', results)
     end
 
     it 'flags the unicast results as preSync results' do
-      results = {}
       subject.handle_versions(model, [version], 'client_id', results)
       results['unicast']['meta']['preSync'].should be_true
     end
 
     it 'files all update conflicts for unicast' do
-      results = {}
       subject.stub(:check_version) do |_, _, _, unicast|
         unicast['update'] = 'conflict'
       end
@@ -276,18 +323,20 @@ describe ServerSideClient do
 
   describe '#add_update_for' do
     let(:object) { stub(:remote_id => 'some_id') }
+    let(:results) { {'update' => {}}}
     before { subject.stub(:json_for => 'some_json') }
 
     it 'adds an update for the object to the hash provided' do
-      results = {}
       subject.add_update_for(object, results)
       results['update']['some_id'].should eq('some_json')
     end
   end
 
   describe '#handle_creates' do
-    let(:create) { stub }
-    let(:model)  { TestModel }
+    let(:create)  { stub }
+    let(:model)   { TestModel }
+    let(:results) { {'unicast' =>   {'meta' => {}},
+                     'multicast' => {'meta' => {}}} }
     before do
       subject.stub(:check_new_version => true,
                    :process_create => nil)
@@ -296,11 +345,10 @@ describe ServerSideClient do
     it 'checks the version of each create' do
       subject.should_receive(:check_new_version).
         with(model, create, an_instance_of(Hash))
-      subject.handle_creates(model, [create], {})
+      subject.handle_creates(model, [create], results)
     end
 
     it 'files all id conflicts for unicast' do
-      results = {}
       subject.stub(:check_new_version) do |_, _, unicast|
         unicast['id'] = 'conflict'
       end
@@ -311,17 +359,16 @@ describe ServerSideClient do
     it 'issues a create when the version check is successful' do
       subject.should_receive(:process_create).
         with(model, create, an_instance_of(Hash))
-      subject.handle_creates(model, [create], {})
+      subject.handle_creates(model, [create], results)
     end
 
     it 'issues no create when the version check is unsuccessful' do
       subject.stub(:check_new_version => false)
       subject.should_not_receive(:process_create)
-      subject.handle_creates(model, [create], {})
+      subject.handle_creates(model, [create], results)
     end
 
     it 'files all successful creates for multicast' do
-      results = {}
       subject.stub(:process_create) do |_, _, multicast|
         multicast['successful'] = 'create'
       end
@@ -403,6 +450,15 @@ describe ServerSideClient do
       subject.set_attributes(object, attributes)
     end
 
+    it 'sets the object last update time' do
+      time = Time.new(2012, 5, 18, 15, 30, 20)
+      Timecop.freeze(time) do
+        object.should_receive(:update_attribute).
+          with(:last_update, time)
+        subject.set_attributes(object, attributes)
+      end
+    end
+
     it 'sets the object created_at' do
       object.should_receive(:update_attribute).
         with(:created_at, 'created_at')
@@ -430,19 +486,21 @@ describe ServerSideClient do
 
   describe '#add_create_for' do
     let(:object) { stub(:remote_id => 'some_id') }
+    let(:results) { {'create' => {}}}
     before { subject.stub(:json_for => 'some_json') }
 
     it 'adds a create for the object to the hash provided' do
-      results = {}
       subject.add_create_for(object, results)
       results['create']['some_id'].should eq('some_json')
     end
   end
 
   describe '#handle_updates' do
-    let(:update) { stub }
-    let(:model)  { TestModel }
-    let(:object) { stub }
+    let(:update)  { stub }
+    let(:model)   { TestModel }
+    let(:object)  { stub }
+    let(:results) { {'unicast' =>   {'meta' => {}},
+                     'multicast' => {'meta' => {}}} }
     before do
       subject.stub(:check_version => [true, object],
                    :process_update => nil)
@@ -451,11 +509,10 @@ describe ServerSideClient do
     it 'checks the version of each update' do
       subject.should_receive(:check_version).
         with(model, update, 'client_id', an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', {})
+      subject.handle_updates(model, [update], 'client_id', results)
     end
 
     it 'files all update conflicts for unicast' do
-      results = {}
       subject.stub(:check_version) do |_, _, _, unicast|
         unicast['update'] = 'conflict'
       end
@@ -466,18 +523,17 @@ describe ServerSideClient do
     it 'issues an update when the version check is successful' do
       subject.should_receive(:process_update).
         with(model, object, update, an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', {})
+      subject.handle_updates(model, [update], 'client_id', results)
     end
 
     it 'issues no update when the version check is unsuccessful' do
       subject.stub(:check_version => [false, object])
       subject.should_not_receive(:process_update).
         with(model, object, update, an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', {})
+      subject.handle_updates(model, [update], 'client_id', results)
     end
 
     it 'files all successful updates for multicast' do
-      results = {}
       subject.stub(:process_update) do |_, _, _, multicast|
         multicast['successful'] = 'update'
       end
@@ -551,9 +607,9 @@ describe ServerSideClient do
   end
 
   describe '#publish_results' do
-    let(:unicast)   { stub }
-    let(:multicast) { stub }
-    let(:results)   { {'unicast' => unicast,
+    let(:unicast)   { {'resolve' => stub} }
+    let(:multicast) { {'update'  => stub} }
+    let(:results)   { {'unicast'   => unicast,
                        'multicast' => multicast} }
 
     it 'publishes the multicast results to all clients if present' do
