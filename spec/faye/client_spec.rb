@@ -344,7 +344,8 @@ describe ServerSideClient do
     end
     before do
       model.stub(:new => object)
-      subject.stub(:add_create_for => nil)
+      subject.stub(:set_attributes => nil,
+                   :add_create_for => nil)
     end
 
     it 'creates a new object' do
@@ -352,54 +353,78 @@ describe ServerSideClient do
       subject.process_create(model, create, {})
     end
 
-    it 'sets the object remote_id' do
-      object.should_receive(:update_attribute).
-        with(:remote_id, 'some_id')
+    it 'sets the object attributes' do
+      subject.should_receive(:set_attributes).with(object, create)
       subject.process_create(model, create, {})
-    end
-
-    it 'updates the object with the attributes provided' do
-      object.should_receive(:update_attributes).
-        with('attribute' => 'some_value')
-      subject.process_create(model, create, {})
-    end
-
-    it 'sets the object version' do
-      object.should_receive(:update_attribute).
-        with(:remote_version, 'some_version')
-      subject.process_create(model, create, {})
-    end
-
-    it 'sets the object created_at' do
-      object.should_receive(:update_attribute).
-        with(:created_at, 'created_at')
-      subject.process_create(model, create, {})
-    end
-
-    it 'sets the object updated_at' do
-      object.should_receive(:update_attribute).
-        with(:updated_at, 'updated_at')
-      subject.process_create(model, create, {})
-    end
-
-    it 'preserves the updated_at attribute when set on the client' do
-      model = Post
-      object = Post.new
-      model.stub :new => object
-      time = DateTime.new(2012,4,12,14,30,32)
-      create = {'id' => 'some_id',
-                'attributes' => {'created_at' => Time.now},
-                'version' => 'some_version',
-                'created_at' => Time.now,
-                'updated_at' => time.as_json}
-      subject.process_create(model, create, {})
-      object.updated_at.should eq(time)
     end
 
     it 'adds a create for the object when it was successfully created' do
       creates = stub
       subject.should_receive(:add_create_for).with(object, creates)
       subject.process_create(model, create, creates)
+    end
+  end
+
+  describe '#set_attributes' do
+    let(:attributes) { {'id' => 'some_id',
+                        'attributes' => {'attribute' => 'some_value'},
+                        'version' => 'some_version',
+                        'created_at' => 'created_at',
+                        'updated_at' => 'updated_at'} }
+    let(:object) do
+      stub(:update_attributes => nil,
+           :update_attribute => nil,
+           :remote_id => nil,
+           :valid? => true)
+    end
+
+    it 'sets the object remote_id' do
+      object.should_receive(:update_attribute).
+        with(:remote_id, 'some_id')
+      subject.set_attributes(object, attributes)
+    end
+
+    it 'preserves the object remote_id if it preexists' do
+      object.stub(:remote_id => 'remote_id')
+      object.should_not_receive(:update_attribute).
+        with(:remote_id, 'some_id')
+      subject.set_attributes(object, attributes)
+    end
+
+    it 'updates the object with the attributes provided' do
+      object.should_receive(:update_attributes).
+        with('attribute' => 'some_value')
+      subject.set_attributes(object, attributes)
+    end
+
+    it 'sets the object version' do
+      object.should_receive(:update_attribute).
+        with(:remote_version, 'some_version')
+      subject.set_attributes(object, attributes)
+    end
+
+    it 'sets the object created_at' do
+      object.should_receive(:update_attribute).
+        with(:created_at, 'created_at')
+      subject.set_attributes(object, attributes)
+    end
+
+    it 'sets the object updated_at' do
+      object.should_receive(:update_attribute).
+        with(:updated_at, 'updated_at')
+      subject.set_attributes(object, attributes)
+    end
+
+    it 'preserves the updated_at attribute when given' do
+      object = Post.new
+      time = DateTime.new(2012,4,12,14,30,32)
+      attributes = {'id' => 'some_id',
+                    'attributes' => {'created_at' => Time.now},
+                    'version' => 'some_version',
+                    'created_at' => Time.now,
+                    'updated_at' => time.as_json}
+      subject.set_attributes(object, attributes)
+      object.updated_at.should eq(time)
     end
   end
 
@@ -486,12 +511,6 @@ describe ServerSideClient do
         model.should_receive(:new).with()
         subject.process_update(model, nil, update, {})
       end
-
-      it 'sets the object remote_id' do
-        object.should_receive(:update_attribute).
-          with(:remote_id, 'some_id')
-        subject.process_update(model, nil, update, {})
-      end
     end
 
     context 'when an object is passed in' do
@@ -499,50 +518,11 @@ describe ServerSideClient do
         model.should_not_receive(:new)
         subject.process_update(model, object, update, {})
       end
-
-      it 'does not set the object remote_id' do
-        object.should_not_receive(:update_attribute).
-          with(:remote_id, 'some_id')
-        subject.process_update(model, object, update, {})
-      end
     end
 
-    it 'updates the object with the attributes provided' do
-      object.should_receive(:update_attributes).
-        with('attribute' => 'some_value')
+    it 'sets the object attributes' do
+      subject.should_receive(:set_attributes).with(object, update)
       subject.process_update(model, object, update, {})
-    end
-
-    it 'sets the object version' do
-      object.should_receive(:update_attribute).
-        with(:remote_version, 'some_version')
-      subject.process_update(model, object, update, {})
-    end
-
-    it 'sets the object created_at' do
-      object.should_receive(:update_attribute).
-        with(:created_at, 'created_at')
-      subject.process_update(model, object, update, {})
-    end
-
-    it 'sets the object updated_at' do
-      object.should_receive(:update_attribute).
-        with(:updated_at, 'updated_at')
-      subject.process_update(model, object, update, {})
-    end
-
-    it 'preserves the updated_at attribute when set on the client' do
-      model = Post
-      object = Post.new
-      object.update_attribute :remote_id, 'some_id'
-      time = DateTime.new(2012,4,12,14,30,32)
-      update = {'id' => 'some_id',
-                'attributes' => {'created_at' => Time.now},
-                'version' => 'some_version',
-                'created_at' => Time.now,
-                'updated_at' => time.as_json}
-      subject.process_update(model, object, update, {})
-      object.updated_at.should eq(time)
     end
 
     it 'adds an update for the object when it successfully updated' do
