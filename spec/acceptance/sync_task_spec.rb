@@ -9,7 +9,8 @@ feature 'post synchronization' do
 
     client.subscribe('/server/*') {|message| }
 
-    client.publish('/sync/Post', {"create" => { post.id => post.as_json }})
+    client.publish('/sync/Post', {"create" => { post.id => post.as_json },
+                                  "meta" => {"timestamp" => "timestamp"}})
 
     page.should have_content(post.title)
     page.should have_content(post.content)
