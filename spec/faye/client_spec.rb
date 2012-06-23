@@ -608,26 +608,70 @@ describe ServerSideClient do
   end
 
   describe '#publish_results' do
-    let(:unicast)   { {'resolve' => stub} }
-    let(:multicast) { {'update'  => stub} }
+    let(:message)   { {'model_name' => 'TestModel'} }
+    let(:unicast)   { stub }
+    let(:multicast) { stub }
     let(:results)   { {'unicast'   => unicast,
                        'multicast' => multicast} }
 
-    it 'publishes the multicast results to all clients if present' do
-      message = {'model_name' => 'TestModel'}
-      client.should_receive(:publish).with('/sync/TestModel', multicast)
-      subject.publish_results(message, results)
+    context 'when there were creates in the received message' do
+      before { message['creates'] = [stub] }
+      it 'publishes the multicast results to all clients' do
+        client.should_receive(:publish).with('/sync/TestModel', multicast)
+        subject.publish_results(message, results)
+      end
+    end
+
+    context 'when there were updates in the received message' do
+      before { message['updates'] = [stub] }
+
+      it 'publishes the multicast results to all clients' do
+        client.should_receive(:publish).with('/sync/TestModel', multicast)
+        subject.publish_results(message, results)
+      end
     end
 
     context 'when a client id is provided' do
-      let(:message) { {'client_id' => 'some_unique_id',
-                       'model_name' => 'TestModel'} }
+      before { message['client_id'] = 'some_unique_id' }
 
-      it 'publishes the unicast results to the sending client
-          when such results are present' do
-        client.should_receive(:publish).
-          with('/sync/TestModel/some_unique_id', unicast)
-        subject.publish_results(message, results)
+      context 'and there were new_versions in the received message' do
+        before { message['new_versions'] = [stub] }
+
+        it 'publishes the unicast results to the sending client' do
+          client.should_receive(:publish).
+            with('/sync/TestModel/some_unique_id', unicast)
+          subject.publish_results(message, results)
+        end
+      end
+
+      context 'and there were versions in the received message' do
+        before { message['versions'] = [stub] }
+
+        it 'publishes the unicast results to the sending client' do
+          client.should_receive(:publish).
+            with('/sync/TestModel/some_unique_id', unicast)
+          subject.publish_results(message, results)
+        end
+      end
+
+      context 'and there were creates in the received message' do
+        before { message['creates'] = [stub] }
+
+        it 'publishes the unicast results to the sending client' do
+          client.should_receive(:publish).
+            with('/sync/TestModel/some_unique_id', unicast)
+          subject.publish_results(message, results)
+        end
+      end
+
+      context 'and there were updates in the received message' do
+        before { message['updates'] = [stub] }
+
+        it 'publishes the unicast results to the sending client' do
+          client.should_receive(:publish).
+            with('/sync/TestModel/some_unique_id', unicast)
+          subject.publish_results(message, results)
+        end
       end
     end
 
