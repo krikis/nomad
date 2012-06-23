@@ -67,7 +67,7 @@ describe 'syncmodels', ->
       @model._versioning.updatedAt = @now
       @collection.syncModels()
     waitsFor (->
-      @updateSpy.callCount > 0
+      @updateSpy.callCount > 2
     ), 'update multicast', 1000
     runs ->
       args = {}
@@ -83,7 +83,7 @@ describe 'syncmodels', ->
       expect(@updateSpy).toHaveBeenCalledWith(args)
       expect(@model.hasPatches()).toBeFalsy()
     waitsFor (->
-      @updateSpy.callCount > 1
+      @updateSpy.callCount > 3
     ), 'sync acknowledgement', 1000
     runs ->
       expect(@updateSpy).toHaveBeenCalledWith({})
@@ -128,7 +128,7 @@ describe 'syncmodels', ->
           content: 'other_content'
         @secondCollection.syncModels()
       waitsFor (->
-        @secondUpdateSpy.callCount > 2
+        @secondUpdateSpy.callCount > 4
       ), 'sync acknowledgement', 1000
       runs ->
         expect(@secondUpdateSpy).toHaveBeenCalledWith({})

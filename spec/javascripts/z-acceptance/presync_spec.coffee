@@ -72,12 +72,12 @@ describe 'presync', ->
       @model._versioning.updatedAt = @now
       @collection.preSync()
     waitsFor (->
-      @updateSpy.callCount > 0
+      @updateSpy.callCount > 3
     ), 'preSync acknowledgement', 1000
     runs ->
       expect(@updateSpy).toHaveBeenCalledWith({})
     waitsFor (->
-      @updateSpy.callCount > 1
+      @updateSpy.callCount > 4
     ), 'update multicast', 1000
     runs ->
       args = {}
@@ -93,7 +93,7 @@ describe 'presync', ->
       expect(@updateSpy).toHaveBeenCalledWith(args)
       expect(@model.hasPatches()).toBeFalsy()
     waitsFor (->
-      @updateSpy.callCount > 2
+      @updateSpy.callCount > 5
     ), 'sync acknowledgement', 1000
     runs ->
       expect(@updateSpy).toHaveBeenCalledWith({})
