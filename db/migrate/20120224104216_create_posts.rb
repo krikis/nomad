@@ -5,6 +5,7 @@ class CreatePosts < ActiveRecord::Migration
       t.string :content
       t.string :remote_id
       t.text :remote_version
+      t.datetime :last_update
 
       t.timestamps
     end

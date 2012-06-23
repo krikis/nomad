@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(:version => 20120420085920) do
     t.string   "content"
     t.string   "remote_id"
     t.text     "remote_version"
+    t.datetime "last_update"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
   end
