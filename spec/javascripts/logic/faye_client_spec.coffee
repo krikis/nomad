@@ -155,6 +155,7 @@ describe 'FayeClient', ->
 
   describe '#receive', ->
     beforeEach ->
+      @setLastSyncedStub = sinon.stub(@collection, 'setLastSynced')
       @syncModelsStub = sinon.stub(@collection, 'syncModels')
       @syncProcessedStub = sinon.stub(@collection, 'syncProcessed')
       @backboneClient = new BackboneSync.FayeClient @collection
@@ -175,6 +176,12 @@ describe 'FayeClient', ->
         toHaveBeenCalledWith('params', {})
       expect(@method2Stub).
         toHaveBeenCalledWith('other_params', {})
+        
+    it 'updates the collection sync state', ->
+      @backboneClient.receive
+        meta:
+          timestamp: 'timestamp'
+      expect(@setLastSyncedStub).toHaveBeenCalledWith('timestamp')
 
     context 'when the message concerns presync feedback', ->
       beforeEach ->
@@ -203,6 +210,8 @@ describe 'FayeClient', ->
           processed.updates = ['rebased']
         )
         @message =
+          meta:
+            timestamp: 'timestamp'
           method_1: 'params'
           method_2: 'params'
 

@@ -19,6 +19,7 @@
     @name = name
     store = @localStorage().getItem(@name)
     @records = (store and store.split(",")) or []
+    @lastSynced = @localStorage().getItem("#{@name}-lastSynced")
     return
 
   _.extend Backbone.LocalStorage::,
@@ -26,6 +27,7 @@
     # Save the current state of the **Store** to *localStorage*.
     save: ->
       @localStorage().setItem @name, @records.join(",")
+      @localStorage().setItem "#{@name}-lastSynced", @lastSynced
       return
 
     # Generate a pseudo-GUID by concatenating random hexadecimal.

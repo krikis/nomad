@@ -47,6 +47,8 @@ class @BackboneSync.FayeClient
     processed = {}
     _.map message, (eventArguments, event) =>
       @[event] eventArguments, processed
+    # update the collection sync state
+    @collection.setLastSynced(meta.timestamp)
     # sync all dirty models if this is presync feedback
     if meta?.preSync
       @collection.syncModels()

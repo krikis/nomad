@@ -21,6 +21,13 @@
     _(@models).filter (model) ->
       model.hasPatches() and model.isSynced()
       
+  lastSynced: () ->
+    @localStorage.lastSynced
+      
+  setLastSynced: (timestamp) ->
+    @localStorage.lastSynced = timestamp
+    @localStorage.save()
+      
   handleCreates: (models) ->
     _(models).chain().map((attributes, id) =>
       if model = @get(id)

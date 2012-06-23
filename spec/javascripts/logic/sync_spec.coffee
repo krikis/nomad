@@ -52,15 +52,28 @@ describe 'Sync', ->
       it 'publishes a list of version details to the server', ->
         @collection.preSync()
         expect(@message.versions).toEqual(['version', 'details'])
-        
+
     context 'when no details are present', ->
       beforeEach ->
         @versionDetailsStub.restore()
         @versionDetailsStub = sinon.stub(@collection, '_versionDetails', -> [])
-        
+
       it 'does not publish to the server', ->
         @collection.preSync()
         expect(@publishStub).not.toHaveBeenCalled()
+
+  describe '#_versionDetails', ->
+    beforeEach ->
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @model = new Backbone.Model
+        id: 'some_id'
+      @model.version = -> 'vector_clock'
+
+    it 'collects the ids and versions of the models', ->
+      @model.isSynced = -> true
+      versions = @collection._versionDetails([@model])
+      expect(versions).toEqual [{id: 'some_id', version: 'vector_clock'}]
 
   describe '#_newModels', ->
     beforeEach ->
@@ -105,46 +118,56 @@ describe 'Sync', ->
       @model.hasPatches = -> true
       expect(@collection._dirtyModels()).toEqual([])
 
-  describe '#_versionDetails', ->
+  describe '#lastSynced', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
-      @model = new Backbone.Model
-        id: 'some_id'
-      @model.version = -> 'vector_clock'
 
-    it 'collects the ids and versions of the models', ->
-      @model.isSynced = -> true
-      versions = @collection._versionDetails([@model])
-      expect(versions).toEqual [{id: 'some_id', version: 'vector_clock'}]
-      
+    it 'returns the lastSynced property of the localStorage object', ->
+      @collection.localStorage.lastSynced = 'timestamp'
+      expect(@collection.lastSynced()).toEqual('timestamp')
+
+  describe '#setLastSynced', ->
+    beforeEach ->
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+      @saveStorageStub = sinon.stub(@collection.localStorage, 'save')
+
+    it 'sets the last synced timestamp on the localStorage object', ->
+      @collection.setLastSynced('timestamp')
+      expect(@collection.localStorage.lastSynced).toEqual('timestamp')
+
+    it 'saves the localStorage object', ->
+      @collection.setLastSynced('timestamp')
+      expect(@saveStorageStub).toHaveBeenCalled()
+
   describe '#handleCreates', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @getStub = sinon.stub(@collection, 'get')
       @model = new Backbone.Model
-      @modelCreateStub = sinon.stub(@model, 'processCreate', -> 
+      @modelCreateStub = sinon.stub(@model, 'processCreate', ->
         @output ||= ['model_create', null]
         @output.pop()
       )
-      @processCreateStub = sinon.stub(@collection, '_processCreate', -> 'process_create')     
-      
+      @processCreateStub = sinon.stub(@collection, '_processCreate', -> 'process_create')
+
     it 'fetches the model with the provided id from the collection', ->
       @collection.handleCreates
         id: {attribute: 'value'}
       expect(@getStub).toHaveBeenCalledWith('id')
-      
+
     context 'when a model can be found', ->
       beforeEach ->
         @getStub.restore()
         @getStub = sinon.stub(@collection, 'get', => @model)
 
-      it 'lets the model handle the create when it can be found', ->  
+      it 'lets the model handle the create when it can be found', ->
         @collection.handleCreates
           id: {attribute: 'value'}
         expect(@modelCreateStub).toHaveBeenCalledWith(attribute: 'value')
-        
+
       it 'collects the compacted output of the model processCreate method', ->
         expect(@collection.handleCreates
           id: {attribute: 'value'}
@@ -161,7 +184,7 @@ describe 'Sync', ->
         expect(@collection.handleCreates
           id: {attribute: 'value'}
         ).toEqual(['process_create'])
-      
+
   describe '#_processCreate', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
@@ -172,14 +195,14 @@ describe 'Sync', ->
       @setVersionStub = sinon.stub(@model, 'setVersion')
       @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
       @saveStub = sinon.stub(@model, 'save')
-      
+
     it 'extracts the versioning attributes', ->
-      attributes = 
+      attributes =
         attribute: 'value'
         remote_version: 'version'
       @collection._processCreate 'id', attributes
       expect(@extractVersioningSpy).toHaveBeenCalledWith(attributes)
-      
+
     it 'creates a new model with the id and attributes provided', ->
       @collection._processCreate 'id',
         attribute: 'value'
@@ -193,7 +216,7 @@ describe 'Sync', ->
         attribute: 'value'
         remote_version: 'version'
       expect(@extractVersioningSpy).toHaveBeenCalledBefore(@createStub)
-        
+
     it 'sets the model version, created_at and updated_at', ->
       @collection._processCreate 'id',
         attribute: 'value'
@@ -201,23 +224,23 @@ describe 'Sync', ->
         created_at: 'created_at'
         updated_at: 'updated_at'
       expect(@setVersionStub).toHaveBeenCalledWith('version', 'created_at', 'updated_at')
-      
+
     it 'marks the model as synced', ->
       @collection._processCreate 'id', {}
       expect(@markAsSyncedStub).toHaveBeenCalled()
-      
+
     it 'saves the model', ->
       @collection._processCreate 'id',
         attribute: 'value'
         remote_version: 'version'
       expect(@saveStub).toHaveBeenCalled()
-      
+
     it 'returns null', ->
       expect(@collection._processCreate 'id',
         attribute: 'value'
         remote_version: 'version'
       ).toBeNull()
-      
+
   describe '#_extractVersioning', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
@@ -226,27 +249,27 @@ describe 'Sync', ->
         remote_version: 'remote_version'
         created_at: 'created_at'
         updated_at: 'updated_at'
-        
+
     it 'removes remote_version from the attributes', ->
       @collection._extractVersioning(@attributes)
       expect(@attributes.remote_version).toBeUndefined()
-      
+
     it 'returns the remote_version', ->
       [version, b, c] = @collection._extractVersioning(@attributes)
       expect(version).toEqual('remote_version')
-      
+
     it 'removes created_at from the attributes', ->
       @collection._extractVersioning(@attributes)
       expect(@attributes.created_at).toBeUndefined()
-    
+
     it 'returns created_at', ->
       [a, created_at, c] = @collection._extractVersioning(@attributes)
       expect(created_at).toEqual('created_at')
-      
+
     it 'removes updated_at from the attributes', ->
       @collection._extractVersioning(@attributes)
       expect(@attributes.updated_at).toBeUndefined()
-    
+
     it 'returns updated_at', ->
       [a, b, updated_at] = @collection._extractVersioning(@attributes)
       expect(updated_at).toEqual('updated_at')
@@ -259,7 +282,7 @@ describe 'Sync', ->
       @collection = new TestCollection([], modelName: 'TestModel')
       @getStub = sinon.stub(@collection, 'get', => @model)
       @processCreateStub = sinon.stub(@collection, '_processCreate', -> 'create_output')
-      @processUpdateStub = sinon.stub(@model, 'processUpdate', -> 
+      @processUpdateStub = sinon.stub(@model, 'processUpdate', ->
         @output ||= ['update_output', null]
         @output.pop()
       )
@@ -268,7 +291,7 @@ describe 'Sync', ->
       @collection.handleUpdates
         id: {attribute: 'value'}
       expect(@getStub).toHaveBeenCalledWith('id')
-      
+
     context 'when a model can be found', ->
       it 'lets the model handle the update', ->
         @collection.handleUpdates
@@ -280,12 +303,12 @@ describe 'Sync', ->
           id: {attribute: 'value'}
           other_id: {attribute: 'other_value'}
         ).toEqual(['update_output'])
-      
+
     context 'when a model cannot be found', ->
       beforeEach ->
         @getStub.restore()
         @getStub = sinon.stub(@collection, 'get')
-        
+
       it 'creates a new model', ->
         @collection.handleUpdates
           id: {attribute: 'value'}
@@ -329,7 +352,7 @@ describe 'Sync', ->
     it 'marks new models as synced after the dirty models have been collected', ->
       @collection.syncModels()
       expect(@newModelsStub).toHaveBeenCalledAfter(@dirtyModelsStub)
-    
+
     context 'when at least some data was collected', ->
       it 'publishes all dirty model data to the server', ->
         @collection.syncModels()
@@ -338,12 +361,12 @@ describe 'Sync', ->
       it 'publishes all new model data to the server', ->
         @collection.syncModels()
         expect(@message.creates).toEqual([new: 'data'])
-        
+
     context 'when no data was collected', ->
       beforeEach ->
         @dataForSyncStub.restore()
         @dataForSyncStub = sinon.stub(@collection, '_dataForSync', -> [])
-        
+
       it 'does not publish to the server', ->
         @collection.syncModels()
         expect(@publishStub).not.toHaveBeenCalled()
@@ -361,7 +384,7 @@ describe 'Sync', ->
       @collection.models = [@model]
       @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
       @saveStub = sinon.stub(@model, 'save')
- 
+
     it 'collects all data of the models provided', ->
       expect(@collection._dataForSync([@model])).toEqual([
         id: 'some_id'
@@ -371,16 +394,16 @@ describe 'Sync', ->
         created_at: 'created_at'
         updated_at: 'updated_at'
       ])
- 
+
     context 'when the markSynced option is set', ->
       it 'marks the models as synced', ->
         versions = @collection._dataForSync([@model], markSynced: true)
         expect(@markAsSyncedStub).toHaveBeenCalled()
-        
+
       it 'saves the model after marking it', ->
         versions = @collection._dataForSync([@model], markSynced: true)
         expect(@saveStub).toHaveBeenCalledAfter(@markAsSyncedStub)
-        
+
 
   describe '#syncProcessed', ->
     beforeEach ->
@@ -393,7 +416,7 @@ describe 'Sync', ->
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
       )
-      
+
     it 'collects data of all resolved models', ->
       @collection.syncProcessed
         creates: ['resolved', 'models']
@@ -403,7 +426,7 @@ describe 'Sync', ->
       @collection.syncProcessed
         creates: ['rebased', 'models']
       expect(@dataForSyncStub).toHaveBeenCalledWith(['rebased', 'models'])
-      
+
     it 'syncs resolved and rebased models to the server', ->
       @collection.syncProcessed
         creates: ['resolved', 'models']
@@ -411,7 +434,7 @@ describe 'Sync', ->
       expect(@message).toEqual
         creates: [resolved: 'data']
         updates: [rebased: 'data']
-      
+
     it 'does not publish to the server when there are no processed models', ->
       @collection.syncProcessed({})
       expect(@publishStub).not.toHaveBeenCalled()
@@ -425,11 +448,11 @@ describe 'Sync', ->
     it 'unsubscribes the collection from all channels', ->
       @collection.leave()
       expect(@unsubscribeStub).toHaveBeenCalledWith()
-      
+
     it 'unsubscribes from a specific channel if provided', ->
       @collection.leave('some_channel')
       expect(@unsubscribeStub).toHaveBeenCalledWith('some_channel')
-      
+
 
 
 

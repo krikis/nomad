@@ -139,6 +139,26 @@ describe 'Bacbone.LocalStorage', ->
       remoteModel = new MyRemoteModel()
       method = Backbone.getSyncMethod(remoteModel)
       expect(method).toEqual Backbone.ajaxSync #
+      
+  describe '#constructor', ->
+    beforeEach ->
+      window.localStorage.setItem('TestCollection-lastSynced', 'timestamp')
+      @localStorage = new Backbone.LocalStorage('TestCollection')
+                        
+    it 'initializes lastSynced from the localStorage', ->
+      expect(@localStorage.lastSynced).toEqual('timestamp')
+      
+  describe '#save', ->
+    beforeEach ->
+      @localStorage = new Backbone.LocalStorage('TestCollection')
+      
+    it 'saves the last_synced timestamp to the localstorage', ->
+      @localStorage.lastSynced = 'timestamp'
+      @localStorage.save()
+      expect(
+        window.localStorage.
+          getItem("#{@localStorage.name}-lastSynced")
+      ).toEqual('timestamp')
 
   describe '#versioningKeyFor', ->
     beforeEach ->
