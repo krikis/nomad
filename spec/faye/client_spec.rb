@@ -589,10 +589,11 @@ describe ServerSideClient do
   end
 
   describe '#json_for' do
-    it 'filters out the id and remote_id attribute in the JSON' do
+    it 'filters out the id, remote_id and last_update attributes' do
       object = stub(:attributes => {:attribute => 'value',
                                     :id => 1,
                                     :remote_id => 'some_id',
+                                    :last_update => 'last_update',
                                     :remote_version => 'some_hash'})
       json = subject.json_for(object)
       json.should eq({:attribute => 'value', :remote_version => 'some_hash'})
