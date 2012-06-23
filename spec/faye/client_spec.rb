@@ -389,6 +389,8 @@ describe ServerSideClient do
            :update_attribute => nil,
            :valid? => true)
     end
+    let(:time)    { stub }
+    let(:results) { {'meta' => {'timestamp' => time}} }
     before do
       model.stub(:new => object)
       subject.stub(:set_attributes => nil,
@@ -397,18 +399,17 @@ describe ServerSideClient do
 
     it 'creates a new object' do
       model.should_receive(:new).with()
-      subject.process_create(model, create, {})
+      subject.process_create(model, create, results)
     end
 
     it 'sets the object attributes' do
-      subject.should_receive(:set_attributes).with(object, create)
-      subject.process_create(model, create, {})
+      subject.should_receive(:set_attributes).with(object, create, time)
+      subject.process_create(model, create, results)
     end
 
     it 'adds a create for the object when it was successfully created' do
-      creates = stub
-      subject.should_receive(:add_create_for).with(object, creates)
-      subject.process_create(model, create, creates)
+      subject.should_receive(:add_create_for).with(object, results)
+      subject.process_create(model, create, results)
     end
   end
 
@@ -450,13 +451,11 @@ describe ServerSideClient do
       subject.set_attributes(object, attributes)
     end
 
-    it 'sets the object last update time' do
-      time = Time.new(2012, 5, 18, 15, 30, 20)
-      Timecop.freeze(time) do
-        object.should_receive(:update_attribute).
-          with(:last_update, time)
-        subject.set_attributes(object, attributes)
-      end
+    it 'sets the object last update time if provided' do
+      time = stub
+      object.should_receive(:update_attribute).
+        with(:last_update, time)
+      subject.set_attributes(object, attributes, time)
     end
 
     it 'sets the object created_at' do
@@ -555,6 +554,8 @@ describe ServerSideClient do
            :remote_id => 'some_id',
            :valid? => true)
     end
+    let(:time)    { stub }
+    let(:results) { {'meta' => {'timestamp' => time}} }
     before { subject.stub(:add_update_for => nil) }
 
     context 'when no object is passed in' do
@@ -565,26 +566,25 @@ describe ServerSideClient do
 
       it 'creates an object' do
         model.should_receive(:new).with()
-        subject.process_update(model, nil, update, {})
+        subject.process_update(model, nil, update, results)
       end
     end
 
     context 'when an object is passed in' do
       it 'does not create a new object' do
         model.should_not_receive(:new)
-        subject.process_update(model, object, update, {})
+        subject.process_update(model, object, update, results)
       end
     end
 
     it 'sets the object attributes' do
-      subject.should_receive(:set_attributes).with(object, update)
-      subject.process_update(model, object, update, {})
+      subject.should_receive(:set_attributes).with(object, update, time)
+      subject.process_update(model, object, update, results)
     end
 
     it 'adds an update for the object when it successfully updated' do
-      updates = stub
-      subject.should_receive(:add_update_for).with(object, updates)
-      subject.process_update(model, object, update, updates)
+      subject.should_receive(:add_update_for).with(object, results)
+      subject.process_update(model, object, update, results)
     end
   end
 

@@ -110,17 +110,19 @@ class ServerSideClient
 
   def process_create(model, create, successful_creates)
     object = model.new
-    set_attributes(object, create)
+    set_attributes(object, create, successful_creates['meta']['timestamp'])
     if object.valid?
       add_create_for(object, successful_creates)
     end
   end
 
-  def set_attributes(object, attributes)
-    object.update_attribute(:remote_id, attributes['id']) unless object.remote_id.present?
+  def set_attributes(object, attributes, last_update = nil)
+    unless object.remote_id.present?
+      object.update_attribute(:remote_id, attributes['id'])
+    end
     object.update_attributes(attributes['attributes'])
     object.update_attribute(:remote_version, attributes['version'])
-    object.update_attribute(:last_update, Time.now)
+    object.update_attribute(:last_update, last_update) if last_update
     object.update_attribute(:created_at, attributes['created_at'])
     object.update_attribute(:updated_at, attributes['updated_at'])
   end
@@ -140,7 +142,7 @@ class ServerSideClient
 
   def process_update(model, object, update, successful_updates)
     object ||= model.new
-    set_attributes(object, update)
+    set_attributes(object, update, successful_updates['meta']['timestamp'])
     if object.valid?
       add_update_for(object, successful_updates)
     end
