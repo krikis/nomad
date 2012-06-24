@@ -22,6 +22,7 @@ class @BackboneSync.FayeClient
   publish: (message)->
     message.client_id ||= @clientId
     message.model_name ||= @modelName
+    message.last_synced ||= @collection.lastSynced()
     @client.publish "/server/" + @modelName, message
 
   subscribe: ->

@@ -90,6 +90,7 @@ describe 'FayeClient', ->
   describe '#publish', ->
     beforeEach ->
       @backboneClient = new BackboneSync.FayeClient @collection
+      @lastSyncedStub = sinon.stub(@collection, 'lastSynced', -> 'timestamp')
 
     it 'adds the Nomad client id to the message', ->
       message = {}
@@ -110,6 +111,11 @@ describe 'FayeClient', ->
       message = {model_name: 'preset_name'}
       @backboneClient.publish(message)
       expect(message.model_name).toEqual('preset_name')
+      
+    it 'adds the lastSynced timestamp to the message', ->
+      message = {}
+      @backboneClient.publish(message)
+      expect(message.last_synced).toEqual('timestamp')
 
     it 'calls the publish method on the faye client object', ->
       message = sinon.stub()
