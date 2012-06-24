@@ -4,6 +4,9 @@ require 'sync'
 class TestModel
   def self.find_by_remote_id
   end
+
+  def self.where
+  end
 end
 
 class KlassWithFayeSync
@@ -387,6 +390,16 @@ describe Faye::Sync do
                                     :other_attribute => nil})
       json = subject.json_for(object)
       json.should eq({:attribute => 'value'})
+    end
+  end
+
+  describe '#add_missing_updates' do
+    let(:model)  { TestModel }
+    before { subject.stub(:where => []) }
+
+    it 'queries the model for all recently updated/created objects' do
+      model.should_receive(:where).with(['last_update > ?', 'timestamp'])
+      subject.add_missed_updates(model, 'timestamp', {})
     end
   end
 

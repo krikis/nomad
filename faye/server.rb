@@ -51,7 +51,6 @@ class SyncServer
   def setup_server_side_client
     server_side_client = ServerSideClient.new(App.get_client)
     server_side_client.subscribe
-    server_side_client.publish
   end
 end
 

@@ -66,17 +66,21 @@ describe SyncServer do
 
   describe '#setup_server_side_client' do
     subject { SyncServer.new }
-    let(:client) { stub 'client' }
-    let(:server) { stub 'server',
-                        :publish => nil,
-                        :subscribe => nil }
+    let(:client)             { stub 'client' }
+    let(:server_side_client) { stub 'server_side_client',
+                                    :subscribe => nil }
     before do
       App.stub(:get_client => client)
-      ServerSideClient.stub(:new).and_return(server)
+      ServerSideClient.stub(:new).and_return(server_side_client)
     end
 
     it 'creates a new ServerSideClient providing it the servers client' do
       ServerSideClient.should_receive(:new).with(client)
+      subject.setup_server_side_client
+    end
+
+    it 'subscribes the client for server messages' do
+      server_side_client.should_receive(:subscribe)
       subject.setup_server_side_client
     end
   end

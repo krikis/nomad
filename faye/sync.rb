@@ -91,8 +91,8 @@ module Faye::Sync
     end
   end
 
-  def add_missed_updates(timestamp, results)
-
+  def add_missed_updates(model, timestamp, results)
+    objects = model.where(['last_update > ?', timestamp])
   end
 
 end
