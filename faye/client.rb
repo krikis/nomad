@@ -33,10 +33,4 @@ class ServerSideClient
       end
     end
   end
-
-  def publish
-    EM.add_periodic_timer(360) {
-      @client.publish('/sync/some_channel', 'hello' => 'world')
-    }
-  end
 end

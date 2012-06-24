@@ -145,13 +145,4 @@ describe ServerSideClient do
       end
     end
   end
-
-  describe '#publish' do
-    before { EM.stub(:add_periodic_timer) {|time, &block| block.call } }
-
-    it 'calls publish on the client attribute' do
-      client.should_receive(:publish)
-      subject.publish
-    end
-  end
 end
