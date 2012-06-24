@@ -395,10 +395,19 @@ describe Faye::Sync do
 
   describe '#add_missing_updates' do
     let(:model)  { TestModel }
-    before { subject.stub(:where => []) }
+    let(:object) { stub }
+    before do
+      model.stub(:where => [object])
+      subject.stub(:add_update_for)
+    end
 
     it 'queries the model for all recently updated/created objects' do
       model.should_receive(:where).with(['last_update > ?', 'timestamp'])
+      subject.add_missed_updates(model, 'timestamp', {})
+    end
+
+    it 'files each object for sync' do
+      subject.should_receive(:add_update_for).with(object, {})
       subject.add_missed_updates(model, 'timestamp', {})
     end
   end
