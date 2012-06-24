@@ -21,7 +21,7 @@ module Faye::Sync
                      results)
     end
     add_missed_updates(message['last_synced'], results)
-    publish_results(message, results)
+    results
   end
 
   def init_results

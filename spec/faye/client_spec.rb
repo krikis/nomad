@@ -42,9 +42,16 @@ describe ServerSideClient do
       context 'and it responds to find_by_remote_id' do
         let(:model) { TestModel }
         let(:message) { {'model_name' => "#{model}"} }
+        let(:results) { stub }
+        before { subject.stub(:process_message => results) }
 
         it 'processes the message' do
           subject.should_receive(:process_message).with(model, message)
+          subject.on_server_message(message)
+        end
+
+        it 'publishes the results' do
+          subject.should_receive(:publish_results).with(message, results)
           subject.on_server_message(message)
         end
       end

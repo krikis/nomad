@@ -1,6 +1,11 @@
 require_relative 'faye_helper'
 require 'sync'
 
+class TestModel
+  def self.find_by_remote_id
+  end
+end
+
 class KlassWithFayeSync
   include Faye::Sync
 end
@@ -60,10 +65,8 @@ describe Faye::Sync do
       subject.process_message(model, message)
     end
 
-    it 'publishes the results' do
-      message = {:key => stub}
-      subject.should_receive(:publish_results).with(message, @results)
-      subject.process_message(model, message)
+    it 'returns the results' do
+      subject.process_message(model, {}).should eq(@results)
     end
   end
 

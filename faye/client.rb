@@ -15,7 +15,8 @@ class ServerSideClient
   def on_server_message(message)
     if model = message['model_name'].safe_constantize
       if model.respond_to? :find_by_remote_id
-        process_message(model, message)
+        results = process_message(model, message)
+        publish_results(message, results)
       end
     end
   end
