@@ -1,6 +1,7 @@
 class ServerSideClient
   include Faye::Logging
   include Faye::Sync
+  include Faye::Versioning
 
   def initialize(client)
     @client = client
