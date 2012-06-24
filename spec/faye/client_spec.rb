@@ -50,6 +50,12 @@ describe ServerSideClient do
           subject.on_server_message(message)
         end
 
+        it 'collects all missed updates' do
+          message['last_synced'] = 'timestamp'
+          subject.should_receive(:add_missed_updates).with('timestamp', results)
+          subject.on_server_message(message)
+        end
+
         it 'publishes the results' do
           subject.should_receive(:publish_results).with(message, results)
           subject.on_server_message(message)

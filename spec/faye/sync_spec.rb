@@ -18,7 +18,6 @@ describe Faye::Sync do
     before do
       @results = stub
       subject.stub(:init_results => @results,
-                   :add_missed_updates => nil,
                    :publish_results => nil)
     end
 
@@ -57,12 +56,6 @@ describe Faye::Sync do
 
     it 'handles destroys if present' do
 
-    end
-
-    it 'collects all missed updates' do
-      message = {'last_synced' => 'timestamp'}
-      subject.should_receive(:add_missed_updates).with('timestamp', @results)
-      subject.process_message(model, message)
     end
 
     it 'returns the results' do

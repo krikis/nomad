@@ -16,6 +16,7 @@ class ServerSideClient
     if model = message['model_name'].safe_constantize
       if model.respond_to? :find_by_remote_id
         results = process_message(model, message)
+        add_missed_updates(message['last_synced'], results)
         publish_results(message, results)
       end
     end

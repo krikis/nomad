@@ -20,7 +20,6 @@ module Faye::Sync
                      message['client_id'],
                      results)
     end
-    add_missed_updates(message['last_synced'], results)
     results
   end
 
@@ -135,5 +134,9 @@ module Faye::Sync
       ['id', 'remote_id', 'last_update'].include? key.to_s or value.nil?
     end
   end
-  
+
+  def add_missed_updates(timestamp, results)
+
+  end
+
 end
