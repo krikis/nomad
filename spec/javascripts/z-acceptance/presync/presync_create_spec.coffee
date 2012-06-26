@@ -17,7 +17,6 @@ describe 'presync_create', ->
     ), 'client to connect', 1000
 
   afterEach ->
-    console.log 'TESTEN'
     @collection.leave()
 
   context 'when a model is freshly created', ->
