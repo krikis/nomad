@@ -37,7 +37,7 @@ describe 'syncmodels', ->
     ), 'create multicast', 1000
     runs ->
       args = {}
-      attributes = @model.attributes
+      attributes = _.clone @model.attributes
       delete attributes.id
       version = {}
       _.each _.properties(@model.version()), (key) =>
@@ -71,7 +71,7 @@ describe 'syncmodels', ->
     ), 'update multicast', 1000
     runs ->
       args = {}
-      attributes = @model.attributes
+      attributes = _.clone @model.attributes
       delete attributes.id
       version = {}
       _.each _.properties(@model.version()), (key) =>
