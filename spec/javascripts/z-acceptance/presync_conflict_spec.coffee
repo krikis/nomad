@@ -1,5 +1,5 @@
 # Resolve a conflict detected during presync
-scenario 'presync_conflict', ->
+describe 'presync_conflict', ->
 
   describe 'VersionedModel', ->
     beforeEach ->
@@ -73,13 +73,13 @@ scenario 'presync_conflict', ->
           waitsFor (->
             @secondUpdateSpy.callCount > 3
           ), 'update unicast', 1000
-          
+
         it 'receives an empty update unicast', ->
           expect(@secondUpdateSpy).toHaveBeenCalledWith({})
 
         it 'reflects the first update', ->
           expect(@model.get('title')).toEqual('other_title')
-          
+
         it 'reflects the second update', ->
           expect(@model.get('content')).toEqual('other_content')
 
