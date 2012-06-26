@@ -1,5 +1,5 @@
-# Resolve a conflict detected during presync
-scenario 'presync_conflict', ->
+# Resolve a conflict detected during sync
+scenario 'sync_conflict', ->
 
   describe 'VersionedModel', ->
     beforeEach ->
@@ -36,7 +36,7 @@ scenario 'presync_conflict', ->
           title: 'some_title'
           content: 'some_content'
         @collection.create @model
-        @collection.preSync()
+        @collection.syncModels()
       # wait until model is successfully synced to all clients
       waitsFor (->
         @createSpy.callCount > 0 and @secondCreateSpy.callCount > 0
@@ -49,29 +49,29 @@ scenario 'presync_conflict', ->
       @collection.leave()
       @secondCollection.leave()
 
-    context 'when a client updates a model and presyncs it', ->
+    context 'when a client updates a model and syncs it', ->
       beforeEach ->
         # update the model and sync it
         @model.save
           title: 'other_title'
-        @collection.preSync()
+        @collection.syncModels()
         waitsFor (->
-          @updateSpy.callCount > 5
+          @updateSpy.callCount > 3
         ), 'update unicast', 1000
 
       it 'is not received by an offline client', ->
         expect(_.first(@secondCollection.models).get('title')).toEqual('some_title')
 
-      context 'and another client updates the same model and presyncs it', ->
+      context 'and another client updates the same model and syncs it', ->
         beforeEach ->
           # take the second client back online
           @secondCollection.fayeClient._online()
           # create a conflicting update and sync it
           _.first(@secondCollection.models).save
             content: 'other_content'
-          @secondCollection.preSync()
+          @secondCollection.syncModels()
           waitsFor (->
-            @secondUpdateSpy.callCount > 3
+            @updateSpy.callCount > 4 and @secondUpdateSpy.callCount > 3
           ), 'update unicast', 1000
           
         it 'receives an empty update unicast', ->
