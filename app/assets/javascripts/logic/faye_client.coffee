@@ -49,8 +49,6 @@ class @BackboneSync.FayeClient
     @isOffline = false
     
   receive: (message) ->
-    # handle offline test mode
-    return if @isOffline
     # extract meta information
     meta = message.meta
     delete message.meta
@@ -58,6 +56,8 @@ class @BackboneSync.FayeClient
     processed = {}
     _.map message, (eventArguments, event) =>
       @[event] eventArguments, processed
+    # handle offline test mode
+    return if @isOffline
     # update the collection sync state
     @collection.setLastSynced(meta.timestamp)
     # sync all dirty models if this is presync feedback
@@ -68,20 +68,28 @@ class @BackboneSync.FayeClient
       @collection.syncProcessed(processed)
 
   resolve: (params, processed) ->
+    # handle offline test mode
+    return if @isOffline
     # TODO :: generate new id for conflicting models
     # TODO :: sync resolved models back to server
 
   create: (params, processed) ->
+    # handle offline test mode
+    return if @isOffline
     unless _.isEmpty(params)
       processed.creates ||= []
       resolved = @collection.handleCreates(params)
       processed.creates.merge resolved
 
   update: (params, processed) ->
+    # handle offline test mode
+    return if @isOffline
     unless _.isEmpty(params)
       processed.updates ||= []
       rebased = @collection.handleUpdates(params)
       processed.updates.merge rebased
 
   destroy: (params, processed) ->
+    # handle offline test mode
+    return if @isOffline
     # TODO :: implement deleting models

@@ -253,15 +253,6 @@ describe 'FayeClient', ->
       beforeEach ->
         @backboneClient.isOffline = true
         
-      it 'does not call methods for any entries in the message', ->
-        @backboneClient.receive
-          meta:
-            timestamp: 'timestamp'
-          method_1: 'params'
-          method_2: 'other_params'
-        expect(@method1Stub).not.toHaveBeenCalled()
-        expect(@method2Stub).not.toHaveBeenCalled()
-        
       it 'does not updates the collection sync state', ->
         @backboneClient.receive
           meta:
@@ -304,6 +295,14 @@ describe 'FayeClient', ->
       it 'does not invoke the collection method', ->
         @backboneClient.create({}, {})
         expect(@handleCreatesStub).not.toHaveBeenCalled()
+        
+    context 'when the client is offline', ->
+      beforeEach ->
+        @backboneClient.isOffline = true
+        
+      it 'does not invoke the collection method', ->
+        @backboneClient.create({}, {})
+        expect(@handleCreatesStub).not.toHaveBeenCalled()
 
   describe '#update', ->
     beforeEach ->
@@ -325,6 +324,14 @@ describe 'FayeClient', ->
         expect(processed).toEqual(updates: ['updates', 'other_updates'])
       
     context 'when no updates are present', ->
+      it 'does not invoke the collection method', ->
+        @backboneClient.update({}, {})
+        expect(@handleUpdatesStub).not.toHaveBeenCalled()
+        
+    context 'when the client is offline', ->
+      beforeEach ->
+        @backboneClient.isOffline = true
+        
       it 'does not invoke the collection method', ->
         @backboneClient.update({}, {})
         expect(@handleUpdatesStub).not.toHaveBeenCalled()
