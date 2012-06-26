@@ -55,7 +55,7 @@ describe 'sync_update', ->
       beforeEach ->
         @collection.syncModels()
         waitsFor (->
-          @updateSpy.callCount > 3 and @updateSpy.callCount > 1
+          @updateSpy.callCount > 3 and @secondUpdateSpy.callCount > 1
         ), 'update multicast', 1000
         
       it 'receives an update multicast', ->
