@@ -4,9 +4,16 @@ describe 'Overrides', ->
     beforeEach ->
       window.localStorage.clear()
       @server = sinon.fakeServer.create()
+      fayeClient = 
+        publish: ->
+        subscribe: ->
+      @clientConstructorStub = sinon.stub(Faye, 'Client', -> fayeClient)
 
     afterEach ->
       @server.restore()
+      @clientConstructorStub.restore()
+      # remove stub from window.client
+      delete window.client
 
     describe '.constructor', ->
       beforeEach ->

@@ -1,13 +1,10 @@
 describe 'Sync', ->
   beforeEach ->
     window.localStorage.clear()
-    fayeClient = {}
-    fayeClient.subscribe = ->
-    fayeClient.publish = ->
-    @subscribeStub = sinon.stub(fayeClient, 'subscribe')
-    @publishStub = sinon.stub(fayeClient, 'publish')
-    @clientConstructorStub = sinon.stub(Faye, 'Client')
-    @clientConstructorStub.returns fayeClient
+    fayeClient = 
+      publish: ->
+      subscribe: ->
+    @clientConstructorStub = sinon.stub(Faye, 'Client', -> fayeClient)
 
   afterEach ->
     @clientConstructorStub.restore()

@@ -1,8 +1,17 @@
 describe "AnswersRouterSpec", ->
   
   beforeEach ->
+    fayeClient = 
+      publish: ->
+      subscribe: ->
+    @clientConstructorStub = sinon.stub(Faye, 'Client', -> fayeClient)
     @AnswersRouter = Nomad.Routers.AnswersRouter
     @router = new @AnswersRouter
+
+  afterEach ->
+    @clientConstructorStub.restore()
+    # remove stub from window.client
+    delete window.client
   
   describe "routes", ->  
     beforeEach ->

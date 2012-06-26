@@ -1,7 +1,17 @@
 describe "IndexViewSpec", ->
   
   beforeEach ->
+    window.localStorage.clear()
+    fayeClient = 
+      publish: ->
+      subscribe: ->
+    @clientConstructorStub = sinon.stub(Faye, 'Client', -> fayeClient)
     @view = new Nomad.Views.Answers.IndexView
+    
+  afterEach ->
+    @clientConstructorStub.restore()
+    # remove stub from window.client
+    delete window.client
     
   describe "Instantiation", ->
     it "creates a div element", ->
