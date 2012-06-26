@@ -29,7 +29,6 @@ describe 'sync_create', ->
     waitsFor (->
       @secondCollection.fayeClient.client.getState() == 'CONNECTED'
     ), 'second client connected', 1000
-    waits(200)
 
   afterEach ->
     @collection.leave()

@@ -28,7 +28,6 @@ describe 'sync_update', ->
     waitsFor (->
       @secondCollection.fayeClient.client.getState() == 'CONNECTED'
     ), 'second client connected', 1000
-    waits(200)
     runs ->
       @model = new Post
         title: 'some_title'
