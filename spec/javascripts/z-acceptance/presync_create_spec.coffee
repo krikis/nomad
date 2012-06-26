@@ -38,7 +38,7 @@ scenario 'create_and_presync', ->
             @resolveSpy.callCount > 0
           ), 'resolve unicast', 1000
 
-        it 'receives a resolve unicast', ->
+        it 'receives an empty resolve unicast', ->
           expect(@resolveSpy).toHaveBeenCalledWith([])
 
         context 'and synced', ->
@@ -56,5 +56,5 @@ scenario 'create_and_presync', ->
           it 'is forwarded to its last version', ->
             expect(@model.hasPatches()).toBeFalsy()
 
-          it 'receives a resolve unicast', ->
+          it 'receives an empty resolve unicast', ->
             expect(@resolveSpy).toHaveBeenCalledWith([])

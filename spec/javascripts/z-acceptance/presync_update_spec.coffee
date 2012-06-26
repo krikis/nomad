@@ -40,7 +40,7 @@ scenario 'update_and_presync', ->
             @updateSpy.callCount > 3
           ), 'update unicast', 1000
           
-        it 'receives an update unicast', ->
+        it 'receives an empty update unicast', ->
           expect(@updateSpy).toHaveBeenCalledWith({})
 
         context 'and synced', ->
@@ -55,7 +55,7 @@ scenario 'update_and_presync', ->
           it 'is forwarded to its last version', ->
             expect(@model.hasPatches()).toBeFalsy()
             
-          it 'received an update unicast', ->
+          it 'received an empty update unicast', ->
             expect(@updateSpy).toHaveBeenCalledWith({})
             
           
