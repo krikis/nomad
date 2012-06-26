@@ -34,7 +34,7 @@ module Faye::Sync
   end
 
   def add_update_for(object, results)
-    results['update'][object.remote_id] = json_for(object)
+    results['update'][object.remote_id] ||= json_for(object)
   end
 
   def handle_creates(model, creates, results)
