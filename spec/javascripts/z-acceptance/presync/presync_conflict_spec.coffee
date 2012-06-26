@@ -64,6 +64,9 @@ describe 'presync_conflict', ->
 
       context 'and another client updates the same model and presyncs it', ->
         beforeEach ->
+          waitsFor (->
+            @secondUpdateSpy.callCount > 1
+          ), 'update multicast', 1000
           # take the second client back online
           @secondCollection.fayeClient._online()
           # create a conflicting update and sync it
@@ -71,14 +74,14 @@ describe 'presync_conflict', ->
             content: 'other_content'
           @secondCollection.preSync()
           waitsFor (->
-            @updateSpy.callCount > 6 and @secondUpdateSpy.callCount > 3
+            @updateSpy.callCount > 6 and @secondUpdateSpy.callCount > 4
           ), 'update unicast', 1000
 
-        it 'receives an empty update unicast', ->
-          expect(@secondUpdateSpy).toHaveBeenCalledWith({})
+        # it 'receives an empty update unicast', ->
+        #   expect(@secondUpdateSpy).toHaveBeenCalledWith({})
 
-        it 'reflects the first update', ->
-          expect(@model.get('title')).toEqual('other_title')
+        # it 'reflects the first update', ->
+        #   expect(@model.get('title')).toEqual('other_title')
 
         it 'reflects the second update', ->
           expect(@model.get('content')).toEqual('other_content')

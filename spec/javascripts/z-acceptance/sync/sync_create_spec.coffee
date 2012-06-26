@@ -41,8 +41,8 @@ describe 'sync_create', ->
         content: 'some_content'
       @collection.create @model
 
-    it 'is not synced', ->
-      expect(@model.isSynced()).toBeFalsy()
+    # it 'is not synced', ->
+    #   expect(@model.isSynced()).toBeFalsy()
 
     it 'has patches', ->
       expect(@model.hasPatches()).toBeTruthy()
@@ -54,17 +54,17 @@ describe 'sync_create', ->
           @createSpy.callCount > 0 and @secondCreateSpy.callCount > 0
         ), 'create multicast', 1000
 
-      it 'receives a create multicast', ->
-        expect(@createSpy).toHaveBeenCalled()
+      # it 'receives a create multicast', ->
+      #   expect(@createSpy).toHaveBeenCalled()
 
-      it 'is synced', ->
-        expect(@model.isSynced()).toBeTruthy()
+      # it 'is synced', ->
+      #   expect(@model.isSynced()).toBeTruthy()
 
       it 'is forwarded to its last version', ->
         expect(@model.hasPatches()).toBeFalsy()
 
-      it 'receives an empty resolve unicast', ->
-        expect(@resolveSpy).toHaveBeenCalledWith([])
+      # it 'receives an empty resolve unicast', ->
+      #   expect(@resolveSpy).toHaveBeenCalledWith([])
         
       it 'exists on another client', ->
         expect(_.first(@secondCollection.models).toJSON())

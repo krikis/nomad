@@ -58,14 +58,14 @@ describe 'sync_update', ->
           @updateSpy.callCount > 3 and @secondUpdateSpy.callCount > 1
         ), 'update multicast', 1000
         
-      it 'receives an update multicast', ->
-        expect(@updateSpy).toHaveBeenCalled()
+      # it 'receives an update multicast', ->
+      #   expect(@updateSpy).toHaveBeenCalled()
 
       it 'is forwarded to its last version', ->
         expect(@model.hasPatches()).toBeFalsy()
         
-      it 'received an empty update unicast', ->
-        expect(@updateSpy).toHaveBeenCalledWith({})
+      # it 'received an empty update unicast', ->
+      #   expect(@updateSpy).toHaveBeenCalledWith({})
         
       it 'is updated on another client', ->
         expect(_.first(@secondCollection.models).toJSON())

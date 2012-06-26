@@ -39,8 +39,8 @@ describe 'presync_update', ->
           @updateSpy.callCount > 3
         ), 'update unicast', 1000
         
-      it 'receives an empty update unicast', ->
-        expect(@updateSpy).toHaveBeenCalledWith({})
+      # it 'receives an empty update unicast', ->
+      #   expect(@updateSpy).toHaveBeenCalledWith({})
 
       context 'and synced', ->
         beforeEach ->
@@ -48,14 +48,14 @@ describe 'presync_update', ->
             @updateSpy.callCount > 5
           ), 'update multicast', 1000
           
-        it 'receives an update multicast', ->
-          expect(@updateSpy).toHaveBeenCalled()
+        # it 'receives an update multicast', ->
+        #   expect(@updateSpy).toHaveBeenCalled()
 
         it 'is forwarded to its last version', ->
           expect(@model.hasPatches()).toBeFalsy()
           
-        it 'received an empty update unicast', ->
-          expect(@updateSpy).toHaveBeenCalledWith({})
+        # it 'received an empty update unicast', ->
+        #   expect(@updateSpy).toHaveBeenCalledWith({})
           
           
       
