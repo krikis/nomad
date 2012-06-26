@@ -158,6 +158,23 @@ describe 'FayeClient', ->
       @backboneClient.unsubscribe('some_channel')
       expect(@unsubscribeStub).toHaveBeenCalledWith('some_channel')
       expect(@backboneClient.subscriptions).toEqual(['other_channel'])
+      
+  describe '#_offline', -> 
+    beforeEach ->
+      @backboneClient = new BackboneSync.FayeClient sinon.stub()
+      
+    it 'sets the isOffline flag', ->
+      @backboneClient._offline()
+      expect(@backboneClient.isOffline).toBeTruthy()
+      
+  describe '#_online', ->
+    beforeEach ->
+      @backboneClient = new BackboneSync.FayeClient sinon.stub()
+      
+    it 'unsets the isOffline flag', ->
+      @backboneClient.isOffline = true
+      @backboneClient._online()
+      expect(@backboneClient.isOffline).toBeFalsy()
 
   describe '#receive', ->
     beforeEach ->
@@ -231,6 +248,37 @@ describe 'FayeClient', ->
       it 'does not sync all dirty models to the server', ->
         @backboneClient.receive(@message)
         expect(@syncModelsStub).not.toHaveBeenCalled()
+        
+    context 'when the client is offline', ->
+      beforeEach ->
+        @backboneClient.isOffline = true
+        
+      it 'does not call methods for any entries in the message', ->
+        @backboneClient.receive
+          meta:
+            timestamp: 'timestamp'
+          method_1: 'params'
+          method_2: 'other_params'
+        expect(@method1Stub).not.toHaveBeenCalled()
+        expect(@method2Stub).not.toHaveBeenCalled()
+        
+      it 'does not updates the collection sync state', ->
+        @backboneClient.receive
+          meta:
+            timestamp: 'timestamp'
+        expect(@setLastSyncedStub).not.toHaveBeenCalled()    
+        
+      it 'does not sync all dirty models to the server', ->
+        @backboneClient.receive
+          meta:
+            timestamp: 'timestamp'
+        expect(@syncModelsStub).not.toHaveBeenCalled()
+
+      it 'does not sync all processed models to the server', ->
+        @backboneClient.receive
+          meta:
+            timestamp: 'timestamp'
+        expect(@syncProcessedStub).not.toHaveBeenCalled()
       
   describe '#create', ->
     beforeEach ->

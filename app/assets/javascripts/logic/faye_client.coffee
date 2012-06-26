@@ -39,8 +39,18 @@ class @BackboneSync.FayeClient
     _.each subscriptions, (subscription) =>
       @client.unsubscribe subscription
       @subscriptions.delete(subscription)
-
+      
+  # convenience test method for taking a client offline
+  _offline: () ->
+    @isOffline = true
+    
+  # convenience test method for bringing a client back online
+  _online: () ->
+    @isOffline = false
+    
   receive: (message) ->
+    # handle offline test mode
+    return if @isOffline
     # extract meta information
     meta = message.meta
     delete message.meta
