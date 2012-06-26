@@ -29,6 +29,7 @@ describe 'sync_conflict', ->
     waitsFor (->
       @secondCollection.fayeClient.client.getState() == 'CONNECTED'
     ), 'second client connected', 1000
+    waits(200)
     runs ->
       # create model on first client
       @model = new Post
