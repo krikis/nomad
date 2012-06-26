@@ -71,7 +71,7 @@ describe 'presync_conflict', ->
             content: 'other_content'
           @secondCollection.preSync()
           waitsFor (->
-            @secondUpdateSpy.callCount > 3
+            @updateSpy.callCount > 6 and @secondUpdateSpy.callCount > 3
           ), 'update unicast', 1000
 
         it 'receives an empty update unicast', ->

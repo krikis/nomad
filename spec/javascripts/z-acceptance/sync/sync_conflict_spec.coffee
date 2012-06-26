@@ -10,8 +10,8 @@ describe 'sync_conflict', ->
     class TestCollection extends Backbone.Collection
       model: Post
     @collection = new TestCollection
-    @createSpy  = sinon.spy(@collection.fayeClient, 'create' )
-    @updateSpy  = sinon.spy(@collection.fayeClient, 'update' )
+    @createSpy  = sinon.spy(@collection.fayeClient, 'create')
+    @updateSpy  = sinon.spy(@collection.fayeClient, 'update')
     # create second client
     class SecondPost extends Backbone.Model
       clientId: 'second_client'
@@ -70,7 +70,7 @@ describe 'sync_conflict', ->
           content: 'other_content'
         @secondCollection.syncModels()
         waitsFor (->
-          @updateSpy.callCount > 4 and @secondUpdateSpy.callCount > 3
+          @updateSpy.callCount > 5 and @secondUpdateSpy.callCount > 3
         ), 'update unicast', 1000
 
       it 'receives an empty update unicast', ->
