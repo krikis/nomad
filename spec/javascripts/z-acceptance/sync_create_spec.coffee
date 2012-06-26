@@ -44,3 +44,6 @@ describe 'sync_create', ->
 
       it 'is forwarded to its last version', ->
         expect(@model.hasPatches()).toBeFalsy()
+
+      it 'receives an empty resolve unicast', ->
+        expect(@resolveSpy).toHaveBeenCalledWith([])
