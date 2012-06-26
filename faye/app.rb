@@ -7,11 +7,11 @@ App = Faye::RackAdapter.new(#Sinatra::Application,
 )
 
 App.bind(:subscribe) do |client_id, channel|
-  error "[  SUBSCRIBE] #{client_id} -> #{channel}"
+  # error "[  SUBSCRIBE] #{client_id} -> #{channel}"
 end
 
 App.bind(:unsubscribe) do |client_id, channel|
-  error "[UNSUBSCRIBE] #{client_id} -> #{channel}"
+  # error "[UNSUBSCRIBE] #{client_id} -> #{channel}"
 end
 
 App.bind(:disconnect) do |client_id|
@@ -92,5 +92,5 @@ App.bind(:publish) do |client_id, channel, data|
                                light_blue_on_black,
                                green_on_black)
   end
-  # error output
+  error output
 end
