@@ -3,7 +3,7 @@ scenario 'update_and_presync', ->
 
   describe 'VersionedModel', ->
     beforeEach ->
-      # delete window.client instead of waiting for unsubscribes to get acknowledged
+      # delete window.client to speed up tests
       delete window.client
       window.localStorage.clear()
       class Post extends Backbone.Model
@@ -12,7 +12,7 @@ scenario 'update_and_presync', ->
       @collection = new TestCollection
       @createSpy  = sinon.spy(@collection.fayeClient, 'create' )
       @updateSpy  = sinon.spy(@collection.fayeClient, 'update' )
-      @model = new @Post
+      @model = new Post
         title: 'some_title'
         content: 'some_content'
       @collection.create @model

@@ -3,7 +3,7 @@ scenario 'create_and_presync', ->
 
   describe 'VersionedModel', ->
     beforeEach ->
-      # delete window.client instead of waiting for unsubscribes to get acknowledged
+      # delete window.client to speed up tests
       delete window.client
       window.localStorage.clear()
       class Post extends Backbone.Model
