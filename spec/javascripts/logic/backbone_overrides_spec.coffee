@@ -30,7 +30,14 @@ describe 'Overrides', ->
           clientId: 'client_id'
         model = new TestModel
         expect(model.clientId).toEqual('client_id')
-
+        
+      it 'exposes the clientId to the initialize method', ->
+        class TestModel extends Backbone.Model
+          initialize: ->
+            @client_id_during_initialize = @clientId
+        model = new TestModel
+        expect(model.client_id_during_initialize).toEqual(Nomad.clientId)
+        
   describe 'Backbone.Collection', ->
     describe '.constructor', ->
       beforeEach ->
@@ -67,6 +74,15 @@ describe 'Overrides', ->
         @collection = new TestCollection
         expect(@collection.clientId).toEqual('client_id')
         
+      it 'exposes the clientId to the initialize method', ->
+        class TestModel extends Backbone.Model
+        class TestCollection extends Backbone.Collection
+          model: TestModel
+          initialize: ->
+            @client_id_during_initialize = @clientId
+        @collection = new TestCollection([], clientId: 'client_id')
+        expect(@collection.client_id_during_initialize).toEqual('client_id')
+        
       it 'sets the url to the collection\'s constructor name', ->
         expect(@collection.url).toEqual('/test_collection')
         
@@ -77,6 +93,15 @@ describe 'Overrides', ->
           url: 'preset_url'
         @collection = new TestCollection
         expect(@collection.url).toEqual('preset_url')
+        
+      it 'exposes the url to the initialize method', ->
+        class TestModel extends Backbone.Model
+        class TestCollection extends Backbone.Collection
+          model: TestModel
+          initialize: ->
+            @url_during_initialize = @url
+        @collection = new TestCollection
+        expect(@collection.url_during_initialize).toEqual('/test_collection')
 
       it 'sets the model name to the associated model\'s constructor name', ->
         expect(@collection.modelName).toEqual 'TestModel'
@@ -85,8 +110,8 @@ describe 'Overrides', ->
         class TestModel extends Backbone.Model
         class TestCollection extends Backbone.Collection
           model: TestModel
-        @collection = new TestCollection([], modelName: 'TestModel')
-        expect(@collection.modelName).toEqual 'TestModel'
+        @collection = new TestCollection([], modelName: 'model_name')
+        expect(@collection.modelName).toEqual 'model_name'
 
       it 'retains the model name if it was defined in the collection class', ->
         class TestModel extends Backbone.Model
@@ -95,7 +120,15 @@ describe 'Overrides', ->
           modelName: 'predefined'
         @collection = new TestCollection([], modelName: 'TestModel')
         expect(@collection.modelName).toEqual 'predefined'
-
+        
+      it 'exposes the model name to the initialize method', ->
+        class TestModel extends Backbone.Model
+        class TestCollection extends Backbone.Collection
+          model: TestModel
+          initialize: ->
+            @model_name_during_initialize = @modelName
+        @collection = new TestCollection
+        expect(@collection.model_name_during_initialize).toEqual('TestModel')
 
       it 'throws an error if no model name could be set', ->
         class TestModel extends Backbone.Model
@@ -103,7 +136,6 @@ describe 'Overrides', ->
         expect(-> @collection = new TestCollection()).
           toThrow 'Model name undefined: either set a valid Backbone.Model ' +
                   'or pass a modelName option!'
-
 
       it 'initializes a new fayeclient for the model name', ->
         expect(@fayeClientStub).toHaveBeenCalledWith(@collection)

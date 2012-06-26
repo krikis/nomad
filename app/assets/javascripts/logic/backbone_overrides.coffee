@@ -3,9 +3,9 @@
 Backbone.Model = ((Model) ->
   # Define the new constructor
   Backbone.Model = (attributes, options) ->
+    @clientId ||= Nomad.clientId
     Model.apply @, arguments
     @on 'change', @addPatch, @
-    @clientId ||= Nomad.clientId
     return
   # Clone static properties
   _.extend(Backbone.Model, Model)
@@ -29,7 +29,6 @@ _.extend Backbone.Collection::
 Backbone.Collection = ((Collection) ->
   # Define the new constructor
   Backbone.Collection = (models, options = {}) ->
-    Collection.apply @, arguments
     @clientId ||= options.clientId
     @clientId ||= Nomad.clientId
     @url ||= "/#{@constructor.name.underscore()}"
@@ -40,6 +39,7 @@ Backbone.Collection = ((Collection) ->
                       'or pass a modelName option!')
     @fayeClient ||= new BackboneSync.FayeClient(@)
     @localStorage ||= new Backbone.LocalStorage(@modelName)
+    Collection.apply @, arguments
     return
   # Clone static properties
   _.extend(Backbone.Collection, Collection)
