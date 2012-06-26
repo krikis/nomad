@@ -1,10 +1,6 @@
 describe 'syncmodels', ->
 
   beforeEach ->
-    # delete faye client created during isolated tests
-    # unless window.acceptance_client?
-    #   delete window.client
-    #   window.acceptance_client = true
     window.localStorage.clear()
     class Post extends Backbone.Model
     class TestCollection extends Backbone.Collection
