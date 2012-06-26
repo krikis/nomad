@@ -1,6 +1,6 @@
 # Create a versioned model and sync it with the server using sync
 describe 'sync_create', ->
-  
+
   beforeEach ->
     # delete window.client to speed up tests
     delete window.client
@@ -12,9 +12,27 @@ describe 'sync_create', ->
     @resolveSpy = sinon.spy(@collection.fayeClient, 'resolve')
     @createSpy  = sinon.spy(@collection.fayeClient, 'create' )
     @Post = Post
+    # create second client
+    class SecondPost extends Backbone.Model
+      clientId: 'second_client'
+    class SecondCollection extends Backbone.Collection
+      model: SecondPost
+      clientId: 'second_client'
+      fayeClient: 'faye_client'
+      initialize: ->
+        @fayeClient = new BackboneSync.FayeClient @,
+          modelName: 'Post'
+          client: new Faye.Client("http://nomad.dev:9292/faye")
+    @secondCollection = new SecondCollection
+    @secondCreateSpy  = sinon.spy(@secondCollection.fayeClient, 'create')
+    @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
+    waitsFor (->
+      @secondCollection.fayeClient.client.getState() == 'CONNECTED'
+    ), 'second client connected', 1000
 
   afterEach ->
     @collection.leave()
+    @secondCollection.leave()
 
   context 'when a model is freshly created', ->
     beforeEach ->
@@ -33,7 +51,7 @@ describe 'sync_create', ->
       beforeEach ->
         @collection.syncModels()
         waitsFor (->
-          @createSpy.callCount > 0
+          @createSpy.callCount > 0 and @secondCreateSpy.callCount > 0
         ), 'create multicast', 1000
 
       it 'receives a create multicast', ->
@@ -47,3 +65,14 @@ describe 'sync_create', ->
 
       it 'receives an empty resolve unicast', ->
         expect(@resolveSpy).toHaveBeenCalledWith([])
+        
+      it 'exists on another client', ->
+        expect(_.first(@secondCollection.models).toJSON())
+          .toEqual(@model.toJSON())
+          
+          
+        
+
+
+
+

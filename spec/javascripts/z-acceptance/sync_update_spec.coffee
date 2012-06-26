@@ -11,17 +11,36 @@ describe 'sync_update', ->
     @collection = new TestCollection
     @createSpy  = sinon.spy(@collection.fayeClient, 'create' )
     @updateSpy  = sinon.spy(@collection.fayeClient, 'update' )
-    @model = new Post
-      title: 'some_title'
-      content: 'some_content'
-    @collection.create @model
-    @collection.syncModels()
+    # create second client
+    class SecondPost extends Backbone.Model
+      clientId: 'second_client'
+    class SecondCollection extends Backbone.Collection
+      model: SecondPost
+      clientId: 'second_client'
+      fayeClient: 'faye_client'
+      initialize: ->
+        @fayeClient = new BackboneSync.FayeClient @,
+          modelName: 'Post'
+          client: new Faye.Client("http://nomad.dev:9292/faye")
+    @secondCollection = new SecondCollection
+    @secondCreateSpy  = sinon.spy(@secondCollection.fayeClient, 'create')
+    @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
+    waitsFor (->
+      @secondCollection.fayeClient.client.getState() == 'CONNECTED'
+    ), 'second client connected', 1000
+    runs ->
+      @model = new Post
+        title: 'some_title'
+        content: 'some_content'
+      @collection.create @model
+      @collection.syncModels()
     waitsFor (->
       @createSpy.callCount > 0
     ), 'create multicast', 1000
 
   afterEach ->
     @collection.leave()
+    @secondCollection.leave()
     
   context 'when a model is updated', ->
     beforeEach ->
@@ -36,7 +55,7 @@ describe 'sync_update', ->
       beforeEach ->
         @collection.syncModels()
         waitsFor (->
-          @updateSpy.callCount > 3
+          @updateSpy.callCount > 3 and @updateSpy.callCount > 1
         ), 'update multicast', 1000
         
       it 'receives an update multicast', ->
@@ -47,6 +66,10 @@ describe 'sync_update', ->
         
       it 'received an empty update unicast', ->
         expect(@updateSpy).toHaveBeenCalledWith({})
+        
+      it 'is updated on another client', ->
+        expect(_.first(@secondCollection.models).toJSON())
+          .toEqual(@model.toJSON())
           
           
       
