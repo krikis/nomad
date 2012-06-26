@@ -12,5 +12,5 @@
   Collections: {}
   Routers: {}
   Views: {}
-  clientId: window.clientId
+  clientId: @clientId
 
