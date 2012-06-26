@@ -29,7 +29,7 @@ describe 'presync_conflict', ->
       @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
       waitsFor (->
         @secondCollection.fayeClient.client.getState() == 'CONNECTED'
-      ), 'second client connected', 1000
+      ), 'second client to connect', 1000
       runs ->
         # create model on first client
         @model = new Post

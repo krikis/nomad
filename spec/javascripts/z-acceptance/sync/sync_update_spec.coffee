@@ -27,7 +27,7 @@ describe 'sync_update', ->
     @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
     waitsFor (->
       @secondCollection.fayeClient.client.getState() == 'CONNECTED'
-    ), 'second client connected', 1000
+    ), 'second client to connect', 1000
     runs ->
       @model = new Post
         title: 'some_title'

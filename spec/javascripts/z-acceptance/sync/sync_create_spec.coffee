@@ -28,7 +28,7 @@ describe 'sync_create', ->
     @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
     waitsFor (->
       @secondCollection.fayeClient.client.getState() == 'CONNECTED'
-    ), 'second client connected', 1000
+    ), 'second client to connect', 1000
 
   afterEach ->
     @collection.leave()

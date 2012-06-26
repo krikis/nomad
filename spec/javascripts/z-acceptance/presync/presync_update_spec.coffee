@@ -11,11 +11,15 @@ describe 'presync_update', ->
     @collection = new TestCollection
     @createSpy  = sinon.spy(@collection.fayeClient, 'create' )
     @updateSpy  = sinon.spy(@collection.fayeClient, 'update' )
-    @model = new Post
-      title: 'some_title'
-      content: 'some_content'
-    @collection.create @model
-    @collection.preSync()
+    waitsFor (->
+      @collection.fayeClient.client.getState() == 'CONNECTED'
+    ), 'client to connect', 1000
+    runs ->
+      @model = new Post
+        title: 'some_title'
+        content: 'some_content'
+      @collection.create @model
+      @collection.preSync()
     waitsFor (->
       @createSpy.callCount > 0
     ), 'create multicast', 1000
