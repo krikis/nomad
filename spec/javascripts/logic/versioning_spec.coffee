@@ -167,7 +167,7 @@ describe 'Versioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('answer')
-  
+
     it 'creates a patch for the new model version', ->
       @model.attributes.values =
         v_1: "other_value_1"
@@ -175,73 +175,13 @@ describe 'Versioning', ->
       out = @model._createPatch()
       expect(out.patch_text).toContain 'other_'
       expect(out.patch_text).not.toContain 'value_2'
-  
+
     it 'sets the model\'s current version on the newly created patch', ->
       @model.attributes.values =
         v_1: "other_value_1"
         v_2: "value_2"
       out = @model._createPatch('local_clock')
       expect(out.base).toEqual('local_clock')
-
-  describe '#_updatePatchFor', ->
-    beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel
-      @changedAttributes =
-        number: 1234.5
-        text: 'some_text'
-      @previousAttributes =
-        number: 1001.1
-        text: 'previous_text'
-
-    it 'saves all changed no-text attributes', ->
-      patch = @model._updatePatchFor(null,
-                                     @changedAttributes,
-                                     @previousAttributes)
-      expect(patch.number).
-        toEqual(@changedAttributes.number)
-        
-    context 'when no patch object exists', ->        
-      it 'initializes the patch object', ->
-        patch = @model._updatePatchFor(null,
-                                       @changedAttributes,
-                                       @previousAttributes)
-        expect(patch).toBeDefined()
-
-      it 'retains the previous version of all text attributes', ->
-        patch = @model._updatePatchFor(null,
-                                       @changedAttributes,
-                                       @previousAttributes)
-        expect(patch.text).toEqual('previous_text')
-        
-    context 'when a patch object exists', ->
-      beforeEach ->
-        @patch =
-          number: 1001.1
-          text: 'original_text'
-
-      it 'retains the original version of all text attributes', ->
-        patch = @model._updatePatchFor(@patch,
-                                       @changedAttributes,
-                                       @previousAttributes)
-        expect(patch.text).toEqual('original_text')
-    
-    context 'when the changed attributes contain an object', ->
-      beforeEach ->
-        @changedAttributes =
-          object:
-            number: 1234.5
-            text: 'some_text'
-        @updatePatchSpy = sinon.spy(@model, '_updatePatchFor')
-            
-      it 'recursively updates the patch for this object', ->
-        patch = @model._updatePatchFor(@patch,
-                                       @changedAttributes,
-                                       @previousAttributes)
-        expect(@updatePatchSpy).
-          toHaveBeenCalledWith(undefined, number: 1234.5, text: 'some_text', undefined)
-        
-    
 
   describe '#_tickVersion', ->
     beforeEach ->
