@@ -16,53 +16,44 @@ end
 describe Faye::Sync do
   subject { KlassWithFayeSync.new }
 
-  describe '#process_message' do
+  describe '#add_missing_updates' do
     let(:model)   { TestModel }
+    let(:object)  { stub }
+    let(:results) { stub(:[] => nil) }
     before do
-      @results = stub
-      subject.stub(:init_results => @results,
-                   :publish_results => nil)
+      model.stub(:where => [object])
+      model.stub(:all => [])
+      subject.stub(:init_results => results,
+                   :add_update_for => nil)
+      Time.stub_chain(:parse, :to_s => 'time_stamp')
     end
 
     it 'initializes the results hash' do
       subject.should_receive(:init_results)
-      subject.process_message(model, {})
+      subject.add_missed_updates(model, 'timestamp')
     end
 
-    it 'handles new versions if present' do
-      message = {'new_versions' => stub, 'client_id' => 'some_id'}
-      subject.should_receive(:handle_new_versions).
-        with(model, message['new_versions'], @results)
-      subject.process_message(model, message)
+    it 'queries the model for all recently updated/created objects' do
+      model.should_receive(:where).with(['last_update > ?', 'time_stamp'])
+      subject.add_missed_updates(model, 'timestamp')
     end
 
-    it 'handles versions if present' do
-      message = {'versions' => stub, 'client_id' => 'some_id'}
-      subject.should_receive(:handle_versions).
-        with(model, message['versions'], 'some_id', @results)
-      subject.process_message(model, message)
+    it 'files each object for sync' do
+      unicast = stub
+      subject.stub(:init_results => {'unicast' => unicast})
+      subject.should_receive(:add_update_for).with(object, unicast)
+      subject.add_missed_updates(model, 'timestamp')
     end
 
-    it 'handles creates if present' do
-      message = {'creates' => stub, 'client_id' => 'some_id'}
-      subject.should_receive(:handle_creates).
-        with(model, message['creates'], @results)
-      subject.process_message(model, message)
-    end
-
-    it 'handles updates if present' do
-      message = {'updates' => stub, 'client_id' => 'some_id'}
-      subject.should_receive(:handle_updates).
-        with(model, message['updates'], 'some_id', @results)
-      subject.process_message(model, message)
-    end
-
-    it 'handles destroys if present' do
-
+    context 'when no timestamp is given' do
+      it 'queries the model for all objects' do
+        model.should_receive(:all)
+        subject.add_missed_updates(model, nil)
+      end
     end
 
     it 'returns the results' do
-      subject.process_message(model, {}).should eq(@results)
+      subject.add_missed_updates(model, 'timestamp').should eq(results)
     end
   end
 
@@ -104,6 +95,46 @@ describe Faye::Sync do
 
     it 'initializes the update list' do
       subject.init_results['multicast']['update'].should eq({})
+    end
+  end
+
+  describe '#process_message' do
+    let(:model)   { TestModel }
+    let(:results) { stub }
+    before do
+      subject.stub(:publish_results => nil)
+    end
+
+    it 'handles new versions if present' do
+      message = {'new_versions' => stub, 'client_id' => 'some_id'}
+      subject.should_receive(:handle_new_versions).
+        with(model, message['new_versions'], results)
+      subject.process_message(model, message, results)
+    end
+
+    it 'handles versions if present' do
+      message = {'versions' => stub, 'client_id' => 'some_id'}
+      subject.should_receive(:handle_versions).
+        with(model, message['versions'], 'some_id', results)
+      subject.process_message(model, message, results)
+    end
+
+    it 'handles creates if present' do
+      message = {'creates' => stub, 'client_id' => 'some_id'}
+      subject.should_receive(:handle_creates).
+        with(model, message['creates'], results)
+      subject.process_message(model, message, results)
+    end
+
+    it 'handles updates if present' do
+      message = {'updates' => stub, 'client_id' => 'some_id'}
+      subject.should_receive(:handle_updates).
+        with(model, message['updates'], 'some_id', results)
+      subject.process_message(model, message, results)
+    end
+
+    it 'handles destroys if present' do
+
     end
   end
 
@@ -390,36 +421,6 @@ describe Faye::Sync do
                                     :other_attribute => nil})
       json = subject.json_for(object)
       json.should eq({:attribute => 'value'})
-    end
-  end
-
-  describe '#add_missing_updates' do
-    let(:model)  { TestModel }
-    let(:object) { stub }
-    before do
-      model.stub(:where => [object])
-      model.stub(:all => [])
-      subject.stub(:add_update_for)
-      Time.stub_chain(:parse, :to_s => 'time_stamp')
-    end
-
-    it 'queries the model for all recently updated/created objects' do
-      model.should_receive(:where).with(['last_update > ?', 'time_stamp'])
-      subject.add_missed_updates(model, 'timestamp', {})
-    end
-
-    it 'files each object for sync' do
-      unicast = stub
-      results = {'unicast' => unicast}
-      subject.should_receive(:add_update_for).with(object, unicast)
-      subject.add_missed_updates(model, 'timestamp', results)
-    end
-
-    context 'when no timestamp is given' do
-      it 'queries the model for all objects' do
-        model.should_receive(:all)
-        subject.add_missed_updates(model, nil, {})
-      end
     end
   end
 

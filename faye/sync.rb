@@ -1,7 +1,30 @@
 module Faye::Sync
 
-  def process_message(model, message)
+  def add_missed_updates(model, timestamp)
     results = init_results
+    objects = if timestamp
+      model.where(['last_update > ?', Time.parse(timestamp).to_s(:db)])
+    else
+      model.all
+    end
+    objects.each do |object|
+      add_update_for(object, results['unicast'])
+    end
+    results
+  end
+
+  def init_results
+    time = Time.now.utc
+    {'unicast'   => {'meta'    => {'timestamp' => time,
+                                   'unicast' => true},
+                     'resolve' => [],
+                     'update'  => {}},
+     'multicast' => {'meta'    => {'timestamp' => time}                ,
+                     'create'  => {},
+                     'update'  => {}}}
+  end
+
+  def process_message(model, message, results)
     if message['new_versions'].present?
       handle_new_versions(model, message['new_versions'], results)
     end
@@ -20,18 +43,6 @@ module Faye::Sync
                      message['client_id'],
                      results)
     end
-    results
-  end
-
-  def init_results
-    time = Time.now.utc
-    {'unicast'   => {'meta'    => {'timestamp' => time,
-                                   'unicast' => true},
-                     'resolve' => [],
-                     'update'  => {}},
-     'multicast' => {'meta'    => {'timestamp' => time}                ,
-                     'create'  => {},
-                     'update'  => {}}}
   end
 
   def add_update_for(object, results)
@@ -89,17 +100,6 @@ module Faye::Sync
   def json_for(object)
     object.attributes.reject do |key, value|
       ['id', 'remote_id', 'last_update'].include? key.to_s or value.nil?
-    end
-  end
-
-  def add_missed_updates(model, timestamp, results)
-    objects = if timestamp
-      model.where(['last_update > ?', Time.parse(timestamp).to_s(:db)])
-    else
-      model.all
-    end
-    objects.each do |object|
-      add_update_for(object, results['unicast'])
     end
   end
 

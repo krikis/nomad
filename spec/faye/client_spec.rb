@@ -43,18 +43,18 @@ describe ServerSideClient do
         let(:model) { TestModel }
         let(:message) { {'model_name' => "#{model}"} }
         let(:results) { stub }
-        before { subject.stub(:process_message => results,
-                              :add_missed_updates => nil,
+        before { subject.stub(:process_message => nil,
+                              :add_missed_updates => results,
                               :publish_results => nil) }
-
-        it 'processes the message' do
-          subject.should_receive(:process_message).with(model, message)
-          subject.on_server_message(message)
-        end
 
         it 'collects all missed updates' do
           message['last_synced'] = 'timestamp'
-          subject.should_receive(:add_missed_updates).with(model, 'timestamp', results)
+          subject.should_receive(:add_missed_updates).with(model, 'timestamp')
+          subject.on_server_message(message)
+        end
+
+        it 'processes the message' do
+          subject.should_receive(:process_message).with(model, message, results)
           subject.on_server_message(message)
         end
 
