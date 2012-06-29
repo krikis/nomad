@@ -78,7 +78,7 @@ describe Faye::Sync do
 
     it 'initializes the unicast meta tag' do
       subject.init_results['unicast']['meta'].
-        should eq({'timestamp' => @time})
+        should eq({'timestamp' => @time, 'unicast' => true})
     end
 
     it 'initializes the resolve list' do

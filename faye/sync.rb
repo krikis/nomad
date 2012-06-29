@@ -25,7 +25,8 @@ module Faye::Sync
 
   def init_results
     time = Time.now
-    {'unicast'   => {'meta'    => {'timestamp' => time},
+    {'unicast'   => {'meta'    => {'timestamp' => time,
+                                   'unicast' => true},
                      'resolve' => [],
                      'update'  => {}},
      'multicast' => {'meta'    => {'timestamp' => time}                ,
