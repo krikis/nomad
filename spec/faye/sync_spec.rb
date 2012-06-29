@@ -407,8 +407,10 @@ describe Faye::Sync do
     end
 
     it 'files each object for sync' do
-      subject.should_receive(:add_update_for).with(object, {})
-      subject.add_missed_updates(model, 'timestamp', {})
+      unicast = stub
+      results = {'unicast' => unicast}
+      subject.should_receive(:add_update_for).with(object, unicast)
+      subject.add_missed_updates(model, 'timestamp', results)
     end
   end
 

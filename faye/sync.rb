@@ -94,7 +94,7 @@ module Faye::Sync
   def add_missed_updates(model, timestamp, results)
     objects = model.where(['last_update > ?', timestamp])
     objects.each do |object|
-      add_update_for(object, results)
+      add_update_for(object, results['unicast'])
     end
   end
 
