@@ -50,15 +50,6 @@ describe 'Sync', ->
         @collection.preSync()
         expect(@message.versions).toEqual(['version', 'details'])
 
-    context 'when no details are present', ->
-      beforeEach ->
-        @versionDetailsStub.restore()
-        @versionDetailsStub = sinon.stub(@collection, '_versionDetails', -> [])
-
-      it 'does not publish to the server', ->
-        @collection.preSync()
-        expect(@publishStub).not.toHaveBeenCalled()
-
   describe '#_versionDetails', ->
     beforeEach ->
       class TestCollection extends Backbone.Collection
@@ -358,15 +349,6 @@ describe 'Sync', ->
       it 'publishes all new model data to the server', ->
         @collection.syncModels()
         expect(@message.creates).toEqual([new: 'data'])
-
-    context 'when no data was collected', ->
-      beforeEach ->
-        @dataForSyncStub.restore()
-        @dataForSyncStub = sinon.stub(@collection, '_dataForSync', -> [])
-
-      it 'does not publish to the server', ->
-        @collection.syncModels()
-        expect(@publishStub).not.toHaveBeenCalled()
 
   describe '#_dataForSync', ->
     beforeEach ->

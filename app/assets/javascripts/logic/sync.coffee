@@ -3,9 +3,7 @@
     message = 
       new_versions: @_versionDetails(@_newModels())
       versions: @_versionDetails(@_dirtyModels())
-    unless _.isEmpty(message.new_versions) and 
-           _.isEmpty(message.versions)
-      @fayeClient.publish message
+    @fayeClient.publish message
 
   _versionDetails: (models) ->
     _(models).chain().map((model) ->
@@ -68,9 +66,7 @@
     message = 
       updates: @_dataForSync(@_dirtyModels())
       creates: @_dataForSync(@_newModels(), markSynced: true)
-    unless _.isEmpty(message.updates) and 
-           _.isEmpty(message.creates)
-      @fayeClient.publish message
+    @fayeClient.publish message
 
   _dataForSync: (models, options = {}) ->
     _(models).chain().map((model) ->
