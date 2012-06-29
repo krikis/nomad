@@ -43,15 +43,15 @@ describe 'Versioning', ->
       @model._versioning.createdAt = 'created_at'
       @model.initVersioning()
       expect(@model._versioning?.createdAt).toEqual('created_at')
-      
+
   describe '#createdAt', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('model')
-      
+
     it 'is undefined when no versioning is present', ->
       expect(@model.createdAt()).toBeUndefined()
-      
+
     it 'returns the createdAt value stored on the versioning object', ->
       @model._versioning = {}
       @model._versioning.createdAt = 'created_at'
@@ -142,12 +142,12 @@ describe 'Versioning', ->
     it 'updates the model\'s version after the patch has been created', ->
       @model.addPatch()
       expect(@tickVersionStub).toHaveBeenCalledAfter(@createPatchStub)
-      
+
     context 'when the skipPatch option is set', ->
       it 'does not save a patch', ->
         @model.addPatch({}, skipPatch: true)
         expect(@model._versioning?.patches).toBeUndefined()
-        
+
       it 'does not update the model\'s version', ->
         @model.addPatch({}, skipPatch: true)
         expect(@tickVersionStub).not.toHaveBeenCalled()
@@ -167,21 +167,81 @@ describe 'Versioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('answer')
+  #
+  #   it 'creates a patch for the new model version', ->
+  #     @model.attributes.values =
+  #       v_1: "other_value_1"
+  #       v_2: "value_2"
+  #     out = @model._createPatch()
+  #     expect(out.patch_text).toContain 'other_'
+  #     expect(out.patch_text).not.toContain 'value_2'
+  #
+  #   it 'sets the model\'s current version on the newly created patch', ->
+  #     @model.attributes.values =
+  #       v_1: "other_value_1"
+  #       v_2: "value_2"
+  #     out = @model._createPatch('local_clock')
+  #     expect(out.base).toEqual('local_clock')
 
-    it 'creates a patch for the new model version', ->
-      @model.attributes.values =
-        v_1: "other_value_1"
-        v_2: "value_2"
-      out = @model._createPatch()
-      expect(out.patch_text).toContain 'other_'
-      expect(out.patch_text).not.toContain 'value_2'
+  describe '#_updatePatchFor', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      @changedAttributes =
+        number: 1234.5
+        text: 'some_text'
+      @previousAttributes =
+        number: 1001.1
+        text: 'previous_text'
 
-    it 'sets the model\'s current version on the newly created patch', ->
-      @model.attributes.values =
-        v_1: "other_value_1"
-        v_2: "value_2"
-      out = @model._createPatch('local_clock')
-      expect(out.base).toEqual('local_clock')
+    it 'saves all changed no-text attributes', ->
+      patch = @model._updatePatchFor(null,
+                                     @changedAttributes,
+                                     @previousAttributes)
+      expect(patch.number).
+        toEqual(@changedAttributes.number)
+        
+    context 'when no patch object exists', ->        
+      it 'initializes the patch object', ->
+        patch = @model._updatePatchFor(null,
+                                       @changedAttributes,
+                                       @previousAttributes)
+        expect(patch).toBeDefined()
+
+      it 'retains the previous version of all text attributes', ->
+        patch = @model._updatePatchFor(null,
+                                       @changedAttributes,
+                                       @previousAttributes)
+        expect(patch.text).toEqual('previous_text')
+        
+    context 'when a patch object exists', ->
+      beforeEach ->
+        @patch =
+          number: 1001.1
+          text: 'original_text'
+
+      it 'retains the original version of all text attributes', ->
+        patch = @model._updatePatchFor(@patch,
+                                       @changedAttributes,
+                                       @previousAttributes)
+        expect(patch.text).toEqual('original_text')
+    
+    context 'when the changed attributes contain an object', ->
+      beforeEach ->
+        @changedAttributes =
+          object:
+            number: 1234.5
+            text: 'some_text'
+        @updatePatchSpy = sinon.spy(@model, '_updatePatchFor')
+            
+      it 'recursively updates the patch for this object', ->
+        patch = @model._updatePatchFor(@patch,
+                                       @changedAttributes,
+                                       @previousAttributes)
+        expect(@updatePatchSpy).
+          toHaveBeenCalledWith(undefined, number: 1234.5, text: 'some_text', undefined)
+        
+    
 
   describe '#_tickVersion', ->
     beforeEach ->
@@ -194,8 +254,9 @@ describe 'Versioning', ->
     it 'increments the version for the current model', ->
       @oldVersion = @model._versioning.vector[@model.clientId]
       @model._tickVersion()
-      expect(@model._versioning.vector[@model.clientId]).toEqual(@oldVersion + 1)
-      
+      expect(@model._versioning.vector[@model.clientId]).
+        toEqual(@oldVersion + 1)
+
     it 'overwrites updatedAt', ->
       date = new Date(2012, 4, 15, 15, 25, 36)
       clock = sinon.useFakeTimers(date.getTime())
@@ -203,7 +264,7 @@ describe 'Versioning', ->
       @model._tickVersion()
       clock.restore()
       expect(@model._versioning.updatedAt).toEqual(date.toJSON())
-      
+
   describe '#updatedAt', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -213,12 +274,12 @@ describe 'Versioning', ->
       @model._versioning = {}
       @model._versioning.updatedAt = 'updated_at'
       expect(@model.updatedAt()).toEqual('updated_at')
-      
+
     it 'returns the createdAt value when no updatedAt is defined', ->
       @model._versioning = {}
       @model._versioning.createdAt = 'created_at'
       expect(@model.updatedAt()).toEqual('created_at')
-      
+
   describe '#hasPatches', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -282,7 +343,7 @@ describe 'Versioning', ->
       expect(@methodStub).toHaveBeenCalledWith
         attribute: 'value'
         remote_version: 'version'
-        
+
     it 'returns the method\'s return value', ->
       expect(@model.processCreate
         remote_version: 'version'
@@ -376,15 +437,15 @@ describe 'Versioning', ->
     it 'saves the model after forwarding it', ->
       @model._forwardTo(remote_version: {})
       expect(@patchesShiftSpy).not.toHaveBeenCalledAfter(@modelSaveStub)
-      
+
     it 'returns null', ->
       expect(@model._forwardTo(remote_version: {})).toBeNull()
-      
+
   describe '#_changeId', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
-      
+
     # it 'returns the model', ->
     #   expect(@model._changeId()).toEqual(@model)
 
@@ -409,7 +470,7 @@ describe 'Versioning', ->
       expect(@methodStub).toHaveBeenCalledWith
         attribute: 'value'
         remote_version: 'version'
-        
+
     it 'returns the method\'s return value', ->
       expect(@model.processUpdate
         remote_version: 'version'
@@ -454,9 +515,9 @@ describe 'Versioning', ->
 
     afterEach ->
       @newModelStub.restore()
-      
+
     it 'extracts the versioning attributes', ->
-      attributes = 
+      attributes =
         attribute: 'value'
         remote_version: 'version'
       @model._rebase attributes
@@ -490,7 +551,7 @@ describe 'Versioning', ->
       it 'updates the model version to the remote_version', ->
         attributes =
           attribute: 'value'
-          remote_version: 'version', 
+          remote_version: 'version',
           updated_at: 'updated_at'
         @model._rebase(attributes)
         expect(@updateVersionToStub).toHaveBeenCalledWith('version', 'updated_at')
@@ -513,7 +574,7 @@ describe 'Versioning', ->
       it 'filters out the attributes that differ'
 
       it 'creates a diff for each attribute'
-      
+
   describe '#_extractVersioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -522,27 +583,27 @@ describe 'Versioning', ->
         remote_version: 'remote_version'
         created_at: 'created_at'
         updated_at: 'updated_at'
-        
+
     it 'removes remote_version from the attributes', ->
       @model._extractVersioning(@attributes)
       expect(@attributes.remote_version).toBeUndefined()
-      
+
     it 'returns the remote_version', ->
       [version, b, c] = @model._extractVersioning(@attributes)
       expect(version).toEqual('remote_version')
-      
+
     it 'removes created_at from the attributes', ->
       @model._extractVersioning(@attributes)
       expect(@attributes.created_at).toBeUndefined()
-    
+
     it 'returns created_at', ->
       [a, created_at, c] = @model._extractVersioning(@attributes)
       expect(created_at).toEqual('created_at')
-      
+
     it 'removes updated_at from the attributes', ->
       @model._extractVersioning(@attributes)
       expect(@attributes.updated_at).toBeUndefined()
-    
+
     it 'returns updated_at', ->
       [a, b, updated_at] = @model._extractVersioning(@attributes)
       expect(updated_at).toEqual('updated_at')
@@ -665,9 +726,9 @@ describe 'Versioning', ->
       @modelSetStub = sinon.stub(@model, 'set')
       @updateVersionToStub = sinon.stub(@model, '_updateVersionTo')
       @modelSaveStub = sinon.stub(@model, 'save')
-      
+
     it 'extracts the versioning attributes', ->
-      attributes = 
+      attributes =
         attribute: 'value'
         remote_version: 'version'
       @model._update attributes
@@ -696,7 +757,7 @@ describe 'Versioning', ->
     it 'saves the rebased model to the localStorage after that', ->
       @model._update({})
       expect(@modelSaveStub).toHaveBeenCalledAfter(@updateVersionToStub)
-      
+
     it 'returns null', ->
       expect(@model._update({})).toBeNull()
 
