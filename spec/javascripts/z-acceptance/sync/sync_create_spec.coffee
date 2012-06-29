@@ -51,7 +51,7 @@ describe 'sync_create', ->
       beforeEach ->
         @collection.syncModels()
         waitsFor (->
-          @createSpy.callCount > 0 and @secondCreateSpy.callCount > 0
+          @createSpy.callCount >= 1 and @secondCreateSpy.callCount >= 1
         ), 'create multicast', 1000
 
       # it 'receives a create multicast', ->
@@ -62,9 +62,6 @@ describe 'sync_create', ->
 
       it 'is forwarded to its last version', ->
         expect(@model.hasPatches()).toBeFalsy()
-
-      # it 'receives an empty resolve unicast', ->
-      #   expect(@resolveSpy).toHaveBeenCalledWith([])
         
       it 'exists on another client', ->
         expect(_.first(@secondCollection.models).toJSON())

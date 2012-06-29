@@ -35,7 +35,7 @@ describe 'sync_update', ->
       @collection.create @model
       @collection.syncModels()
     waitsFor (->
-      @createSpy.callCount > 0
+      @createSpy.callCount >= 1
     ), 'create multicast', 1000
 
   afterEach ->
@@ -55,7 +55,7 @@ describe 'sync_update', ->
       beforeEach ->
         @collection.syncModels()
         waitsFor (->
-          @updateSpy.callCount > 3 and @secondUpdateSpy.callCount > 1
+          @updateSpy.callCount >= 2 and @secondUpdateSpy.callCount >= 2
         ), 'update multicast', 1000
         
       # it 'receives an update multicast', ->
@@ -63,9 +63,6 @@ describe 'sync_update', ->
 
       it 'is forwarded to its last version', ->
         expect(@model.hasPatches()).toBeFalsy()
-        
-      # it 'received an empty update unicast', ->
-      #   expect(@updateSpy).toHaveBeenCalledWith({})
         
       it 'is updated on another client', ->
         expect(_.first(@secondCollection.models).toJSON())

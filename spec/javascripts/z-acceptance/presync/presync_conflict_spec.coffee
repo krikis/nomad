@@ -57,7 +57,7 @@ describe 'presync_conflict', ->
         @collection.preSync()
         waitsFor (->
           @updateSpy.callCount >= 4 and @secondUpdateSpy.callCount >= 2
-        ), 'update unicast and multicast', 1000
+        ), 'update multicast', 1000
 
       it 'is not received by an offline client', ->
         expect(_.first(@secondCollection.models).get('title')).toEqual('some_title')
