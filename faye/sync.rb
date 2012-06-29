@@ -22,7 +22,7 @@ module Faye::Sync
                                    'unicast' => true},
                      'resolve' => [],
                      'update'  => {}},
-     'multicast' => {'meta'    => {'timestamp' => time}                ,
+     'multicast' => {'meta'    => {'timestamp' => time},
                      'create'  => {},
                      'update'  => {}}}
   end
