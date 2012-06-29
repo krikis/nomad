@@ -3,7 +3,10 @@ module Faye::Sync
   def add_missed_updates(model, timestamp)
     results = init_results
     objects = if timestamp
-      model.where(['last_update > ?', Time.zone.parse(timestamp) + 0.001])
+      # make sure to skip previous updates that supersede 
+      # the timestamp because of rounding errors
+      tick_timestamp = Time.zone.parse(timestamp) + 0.001
+      model.where(['last_update > ?', tick_timestamp])
     else
       model.all
     end

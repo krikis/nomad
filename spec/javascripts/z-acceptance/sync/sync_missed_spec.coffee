@@ -43,7 +43,6 @@ describe 'sync_missed', ->
     runs ->
       # make sure the second client misses the first client update
       @secondCollection.fayeClient._offline()
-    waits(1000)
 
   afterEach ->
     @collection.leave()
