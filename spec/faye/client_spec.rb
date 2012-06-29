@@ -85,24 +85,26 @@ describe ServerSideClient do
 
   describe '#publish_results' do
     let(:message)   { {'model_name' => 'TestModel'} }
-    let(:unicast)   { stub }
-    let(:multicast) { stub }
+    let(:unicast)   { stub(:[] => nil) }
+    let(:multicast) { stub(:[] => nil) }
     let(:results)   { {'unicast'   => unicast,
                        'multicast' => multicast} }
 
-    context 'when there were creates in the received message' do
-      before { message['creates'] = [stub] }
+    context 'when there are creates in the result message' do
+      before { results['multicast'] = {'create' => [multicast]} }
       it 'publishes the multicast results to all clients' do
-        client.should_receive(:publish).with('/sync/TestModel', multicast)
+        client.should_receive(:publish).
+          with('/sync/TestModel', {'create' => [multicast]})
         subject.publish_results(message, results)
       end
     end
 
-    context 'when there were updates in the received message' do
-      before { message['updates'] = [stub] }
+    context 'when there are updates in the result message' do
+      before { results['multicast'] = {'update' => [multicast]} }
 
       it 'publishes the multicast results to all clients' do
-        client.should_receive(:publish).with('/sync/TestModel', multicast)
+        client.should_receive(:publish).
+          with('/sync/TestModel', {'update' => [multicast]})
         subject.publish_results(message, results)
       end
     end
@@ -130,22 +132,22 @@ describe ServerSideClient do
         end
       end
 
-      context 'and there were creates in the received message' do
-        before { message['creates'] = [stub] }
+      context 'and there are resolves in the result message' do
+        before { results['unicast'] = {'resolve' => [unicast]} }
 
         it 'publishes the unicast results to the sending client' do
           client.should_receive(:publish).
-            with('/sync/TestModel/some_unique_id', unicast)
+            with('/sync/TestModel/some_unique_id', {'resolve' => [unicast]})
           subject.publish_results(message, results)
         end
       end
 
-      context 'and there were updates in the received message' do
-        before { message['updates'] = [stub] }
+      context 'and there are updates in the result message' do
+        before { results['unicast'] = {'update' => [unicast]} }
 
         it 'publishes the unicast results to the sending client' do
           client.should_receive(:publish).
-            with('/sync/TestModel/some_unique_id', unicast)
+            with('/sync/TestModel/some_unique_id', {'update' => [unicast]})
           subject.publish_results(message, results)
         end
       end
