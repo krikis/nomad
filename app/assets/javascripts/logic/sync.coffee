@@ -23,8 +23,9 @@
     @localStorage.lastSynced
 
   setLastSynced: (timestamp) ->
-    @localStorage.lastSynced = timestamp
-    @localStorage.save()
+    unless @localStorage.lastSynced == timestamp
+      @localStorage.lastSynced = timestamp
+      @localStorage.save()
 
   handleCreates: (models) ->
     _(models).chain().map((attributes, id) =>

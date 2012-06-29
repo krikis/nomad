@@ -128,6 +128,14 @@ describe 'Sync', ->
     it 'saves the localStorage object', ->
       @collection.setLastSynced('timestamp')
       expect(@saveStorageStub).toHaveBeenCalled()
+      
+    context 'when the timestamp is already up to date', ->
+      beforeEach ->
+        @collection.localStorage.lastSynced = 'timestamp'
+      
+      it 'does not save the localStorage object', ->
+        @collection.setLastSynced('timestamp')
+        expect(@saveStorageStub).not.toHaveBeenCalled()
 
   describe '#handleCreates', ->
     beforeEach ->
