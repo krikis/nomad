@@ -21,7 +21,7 @@ describe 'presync_update', ->
       @collection.create @model
       @collection.preSync()
     waitsFor (->
-      @createSpy.callCount > 0
+      @createSpy.callCount >= 1
     ), 'create multicast', 1000
 
   afterEach ->
@@ -40,7 +40,7 @@ describe 'presync_update', ->
       beforeEach ->
         @collection.preSync()
         waitsFor (->
-          @updateSpy.callCount > 3
+          @updateSpy.callCount >= 3
         ), 'update unicast', 1000
         
       # it 'receives an empty update unicast', ->
@@ -49,7 +49,7 @@ describe 'presync_update', ->
       context 'and synced', ->
         beforeEach ->
           waitsFor (->
-            @updateSpy.callCount > 5
+            @updateSpy.callCount >= 4
           ), 'update multicast', 1000
           
         # it 'receives an update multicast', ->
@@ -57,9 +57,6 @@ describe 'presync_update', ->
 
         it 'is forwarded to its last version', ->
           expect(@model.hasPatches()).toBeFalsy()
-          
-        # it 'received an empty update unicast', ->
-        #   expect(@updateSpy).toHaveBeenCalledWith({})
           
           
       
