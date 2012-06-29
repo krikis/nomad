@@ -349,6 +349,20 @@ describe 'Sync', ->
       it 'publishes all new model data to the server', ->
         @collection.syncModels()
         expect(@message.creates).toEqual([new: 'data'])
+        
+    context 'when no data was collected', ->
+      beforeEach ->
+        @dataForSyncStub.restore()
+        @dataForSyncStub = sinon.stub(@collection, '_dataForSync', -> [])
+        
+      it 'publishes an empty message to the server', ->
+        @collection.syncModels()
+        expect(@publishStub).toHaveBeenCalledWith(creates: [], updates: [])
+        
+      context 'and it is a follow up on presync', ->    
+        it 'does not publish to the server', ->
+          @collection.syncModels(afterPresync: true)
+          expect(@publishStub).not.toHaveBeenCalled()
 
   describe '#_dataForSync', ->
     beforeEach ->

@@ -71,6 +71,10 @@ describe 'sync_update', ->
         expect(_.first(@secondCollection.models).toJSON())
           .toEqual(@model.toJSON())
           
+      # it 'has no patches on another client', ->
+      #   expect(_.first(@secondCollection.models).hasPatches())
+      #     .toBeFalsy()
+          
           
       
         

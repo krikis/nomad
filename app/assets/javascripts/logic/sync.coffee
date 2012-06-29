@@ -1,6 +1,6 @@
 @Sync =
   preSync: ->
-    message = 
+    message =
       new_versions: @_versionDetails(@_newModels())
       versions: @_versionDetails(@_dirtyModels())
     @fayeClient.publish message
@@ -18,14 +18,14 @@
   _dirtyModels: () ->
     _(@models).filter (model) ->
       model.hasPatches() and model.isSynced()
-      
+
   lastSynced: () ->
     @localStorage.lastSynced
-      
+
   setLastSynced: (timestamp) ->
     @localStorage.lastSynced = timestamp
     @localStorage.save()
-      
+
   handleCreates: (models) ->
     _(models).chain().map((attributes, id) =>
       if model = @get(id)
@@ -33,18 +33,18 @@
       else
         @_processCreate id, attributes
     ).compact().value()
-      
-  _processCreate: (id, attributes) ->  
+
+  _processCreate: (id, attributes) ->
     attributes.id = id
-    [version, created_at, updated_at] = 
-      @_extractVersioning(attributes) 
-    model = @create attributes  
+    [version, created_at, updated_at] =
+      @_extractVersioning(attributes)
+    model = @create attributes
     model.setVersion(version, created_at, updated_at)
     model.markAsSynced()
     model.save()
     null
-    
-  _extractVersioning: (attributes) ->  
+
+  _extractVersioning: (attributes) ->
     version = attributes.remote_version
     delete attributes.remote_version
     created_at = attributes.created_at
@@ -62,11 +62,14 @@
     ).compact().value()
 
   # sync all dirty models
-  syncModels: () ->
-    message = 
+  syncModels: (options = {}) ->
+    message =
       updates: @_dataForSync(@_dirtyModels())
       creates: @_dataForSync(@_newModels(), markSynced: true)
-    @fayeClient.publish message
+    unless options['afterPresync']? and
+           _.isEmpty(message.updates) and
+           _.isEmpty(message.creates)
+      @fayeClient.publish message
 
   _dataForSync: (models, options = {}) ->
     _(models).chain().map((model) ->
@@ -79,20 +82,20 @@
         created_at: model.createdAt()
         updated_at: model.updatedAt()
       if options.markSynced
-        model.markAsSynced() 
+        model.markAsSynced()
         model.save()
       details
     ).value()
-    
+
   # sync all processed models
   syncProcessed: (processed) ->
-    message = 
+    message =
       updates: @_dataForSync(processed.updates)
       creates: @_dataForSync(processed.creates)
-    unless _.isEmpty(message.updates) and 
+    unless _.isEmpty(message.updates) and
            _.isEmpty(message.creates)
       @fayeClient.publish message
-      
+
   leave: (channel) ->
     @fayeClient.unsubscribe(channel)
 

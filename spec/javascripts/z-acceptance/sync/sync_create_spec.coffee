@@ -70,6 +70,10 @@ describe 'sync_create', ->
         expect(_.first(@secondCollection.models).toJSON())
           .toEqual(@model.toJSON())
           
+      # it 'has no patches on another client', ->
+      #   expect(_.first(@secondCollection.models).hasPatches())
+      #     .toBeFalsy()
+          
           
         
 

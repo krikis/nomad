@@ -62,7 +62,7 @@ class @BackboneSync.FayeClient
     @collection.setLastSynced(meta.timestamp)
     # sync all dirty models if this is presync feedback
     if meta?.preSync
-      @collection.syncModels()
+      @collection.syncModels(afterPresync: true)
     # sync only resolved and rebased models
     else
       @collection.syncProcessed(processed)

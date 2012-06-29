@@ -215,7 +215,7 @@ describe 'FayeClient', ->
             
       it 'syncs all dirty models to the server', ->
         @backboneClient.receive @message
-        expect(@syncModelsStub).toHaveBeenCalled()
+        expect(@syncModelsStub).toHaveBeenCalledWith(afterPresync: true)
         
       it 'syncs all dirty models after processing the message', ->
         @backboneClient.receive @message
