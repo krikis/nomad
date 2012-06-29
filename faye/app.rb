@@ -18,35 +18,51 @@ App.bind(:disconnect) do |client_id|
   # error "[ DISCONNECT] #{client_id}"
 end
 
-def on_black
+def black
   "\e[40m"
 end
 
-def blue_on_black
-  "#{on_black}\e[1;34m"
+def azure_on(background)
+  "#{background}\e[1;36m"
 end
 
-def light_blue_on_black
-  "#{on_black}\e[1;36m"
+def blue_on(background)
+  "#{background}\e[1;34m"
 end
 
-def green_on_black
-  "#{on_black}\e[1;32m"
+def gray_on(background)
+  "#{background}\e[1;30m"
 end
 
-def red_on_black
-  "#{on_black}\e[1;31m"
+def green_on(background)
+  "#{background}\e[1;32m"
 end
 
-def yellow_on_black
-  "#{on_black}\e[1;33m"
+def pink_on(background)
+  "#{background}\e[1;35m"
+end
+
+def red_on(background)
+  "#{background}\e[1;31m"
+end
+
+def white_on(background)
+  "#{background}\e[1;37m"
+end
+
+def yellow_on(background)
+  "#{background}\e[1;33m"
 end
 
 def reset
   "\e[0m"
 end
 
-def highlight_keyword(string, keyword, color)
+def highlight_key(string, keyword, color)
+  string.gsub! /\"#{keyword}\"/,  "\"#{color}#{keyword}#{reset}\""
+end
+
+def highlight_key_with_content(string, keyword, color)
   string.gsub! /\"#{keyword}\"=>\"([^"]+)\"/,  "\"#{color}#{keyword}#{reset}\"=>\"\\1\""
   string.gsub! /\"#{keyword}\"=>\[([^\]]+)\]/, "\"#{color}#{keyword}#{reset}\"=>[\\1]"
   string.gsub! /\"#{keyword}\"=>\{([^\}]+)\}/, "\"#{color}#{keyword}#{reset}\"=>{\\1}"
@@ -71,26 +87,29 @@ App.bind(:publish) do |client_id, channel, data|
   output = data.inspect
   ['new_versions', 'create', 'creates',
    'versions',     'update', 'updates'].each do |keyword|
-    highlight_keyword(output, keyword, light_blue_on_black)
+    highlight_key_with_content(output, keyword, azure_on(black))
   end
   ['version', 'remote_version'].each do |keyword|
     highlight_hash_attribute(output,
                              keyword,
-                             green_on_black,
-                             red_on_black)
+                             green_on(black),
+                             red_on(black))
   end
   ['attributes'].each do |keyword|
     highlight_hash_attribute(output,
                              keyword,
-                             light_blue_on_black,
-                             red_on_black,
+                             azure_on(black),
+                             red_on(black),
                              true)
   end
   ['client_id', 'id'].each do |attribute|
     highlight_string_attribute(output,
                                attribute,
-                               light_blue_on_black,
-                               green_on_black)
+                               azure_on(black),
+                               green_on(black))
+  end
+  ['unicast'].each do |keyword|
+    highlight_key(output, keyword, pink_on(black))
   end
   error output
 end
