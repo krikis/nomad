@@ -18,7 +18,7 @@
     @_versioning.updatedAt = updated_at
     @_versioning.vector = vector
 
-  addPatch: (model, options = {}) ->
+  addVersion: (model, options = {}) ->
     unless options.skipPatch?
       @initVersioning()
       @_versioning.patches ||= _([])

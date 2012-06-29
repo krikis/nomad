@@ -99,7 +99,7 @@ describe 'Versioning', ->
       @model.setVersion(@version)
       expect(@model._versioning.vector).toEqual(@vector)
 
-  describe '#addPatch', ->
+  describe '#addVersion', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
@@ -117,39 +117,39 @@ describe 'Versioning', ->
       @createPatchStub.restore()
 
     it 'initializes _versioning', ->
-      @model.addPatch()
+      @model.addVersion()
       expect(@initVersioningSpy).toHaveBeenCalled()
 
     it 'initializes _versioning.patches as an empty array', ->
       expect(@model._versioning?.patches).toBeUndefined()
-      @model.addPatch()
+      @model.addVersion()
       expect(@model._versioning?.patches).toBeDefined()
       expect(@model._versioning?.patches._wrapped).toBeDefined()
       expect(@model._versioning?.patches._wrapped.constructor.name).toEqual("Array")
 
     it 'creates a patch providing it with the model\'s local clock', ->
-      @model.addPatch()
+      @model.addVersion()
       expect(@createPatchStub).toHaveBeenCalledWith(@model._localClock())
 
     it 'saves a patch for the update to _versioning.patches', ->
-      @model.addPatch()
+      @model.addVersion()
       expect(@model._versioning.patches.first()).toEqual @patch
 
     it 'updates the model\'s version', ->
-      @model.addPatch()
+      @model.addVersion()
       expect(@tickVersionStub).toHaveBeenCalled()
 
     it 'updates the model\'s version after the patch has been created', ->
-      @model.addPatch()
+      @model.addVersion()
       expect(@tickVersionStub).toHaveBeenCalledAfter(@createPatchStub)
 
     context 'when the skipPatch option is set', ->
       it 'does not save a patch', ->
-        @model.addPatch({}, skipPatch: true)
+        @model.addVersion({}, skipPatch: true)
         expect(@model._versioning?.patches).toBeUndefined()
 
       it 'does not update the model\'s version', ->
-        @model.addPatch({}, skipPatch: true)
+        @model.addVersion({}, skipPatch: true)
         expect(@tickVersionStub).not.toHaveBeenCalled()
 
   describe '#_localClock', ->

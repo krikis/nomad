@@ -19,15 +19,15 @@ describe 'Overrides', ->
       beforeEach ->
         class TestModel extends Backbone.Model
         # stub before creation because of callback binding
-        @addPatchStub = sinon.stub Backbone.Model::, "addPatch"
+        @addVersionStub = sinon.stub Backbone.Model::, "addVersion"
         @model = new TestModel Factory.build("answer")
 
       afterEach ->
-        @addPatchStub.restore()
+        @addVersionStub.restore()
 
-      it 'binds #addPatch to the model change event', ->
+      it 'binds #addVersion to the model change event', ->
         @model.trigger 'change'
-        expect(@addPatchStub).toHaveBeenCalled()
+        expect(@addVersionStub).toHaveBeenCalled()
         
       it 'sets the model clientId', ->
         expect(@model.clientId).toEqual(Nomad.clientId)
