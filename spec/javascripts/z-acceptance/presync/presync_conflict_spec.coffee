@@ -74,12 +74,12 @@ describe 'presync_conflict', ->
             @updateSpy.callCount >= 5 and @secondUpdateSpy.callCount >= 4
           ), 'update unicast', 1000
 
-        # it 'receives an empty update unicast', ->
-        #   expect(@secondUpdateSpy).toHaveBeenCalledWith({})
-
         # it 'reflects the first update', ->
         #   expect(@model.get('title')).toEqual('other_title')
 
         it 'reflects the second update', ->
           expect(@model.get('content')).toEqual('other_content')
+          
+        # it 'contains no patches for the second update', ->
+        #   expect(@model.hasPatches()).toBeFalsy()
 

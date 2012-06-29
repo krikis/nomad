@@ -37,7 +37,7 @@ describe 'presync_create', ->
         runs ->
           @collection.preSync()
         waitsFor (->
-          @resolveSpy.callCount > 0
+          @resolveSpy.callCount >= 1
         ), 'resolve unicast', 1000
 
       # it 'receives an empty resolve unicast', ->
@@ -46,7 +46,7 @@ describe 'presync_create', ->
       context 'and synced', ->
         beforeEach ->
           waitsFor (->
-            @createSpy.callCount > 0 and @resolveSpy.callCount > 1
+            @createSpy.callCount >= 1
           ), 'create multicast and resolve unicast', 1000
           
         # it 'receives a create multicast', ->
@@ -57,6 +57,3 @@ describe 'presync_create', ->
 
         it 'is forwarded to its last version', ->
           expect(@model.hasPatches()).toBeFalsy()
-
-        # it 'receives an empty resolve unicast', ->
-        #   expect(@resolveSpy).toHaveBeenCalledWith([])
