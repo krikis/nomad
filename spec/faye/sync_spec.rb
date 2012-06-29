@@ -399,10 +399,11 @@ describe Faye::Sync do
     before do
       model.stub(:where => [object])
       subject.stub(:add_update_for)
+      Time.stub_chain(:parse, :to_s => 'time_stamp')
     end
 
     it 'queries the model for all recently updated/created objects' do
-      model.should_receive(:where).with(['last_update > ?', 'timestamp'])
+      model.should_receive(:where).with(['last_update > ?', 'time_stamp'])
       subject.add_missed_updates(model, 'timestamp', {})
     end
 
