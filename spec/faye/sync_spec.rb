@@ -17,15 +17,16 @@ describe Faye::Sync do
   subject { KlassWithFayeSync.new }
 
   describe '#add_missing_updates' do
-    let(:model)   { TestModel }
-    let(:object)  { stub }
-    let(:results) { stub(:[] => nil) }
+    let(:model)     { TestModel }
+    let(:object)    { stub }
+    let(:results)   { stub(:[] => nil) }
+    let(:timestamp) { Time.zone.now }
     before do
       model.stub(:where => [object])
       model.stub(:all => [])
       subject.stub(:init_results => results,
                    :add_update_for => nil)
-      Time.stub_chain(:zone, :parse => 'time_stamp')
+      Time.stub_chain(:zone, :parse => timestamp)
     end
 
     it 'initializes the results hash' do
@@ -34,7 +35,7 @@ describe Faye::Sync do
     end
 
     it 'queries the model for all recently updated/created objects' do
-      model.should_receive(:where).with(['last_update > ?', 'time_stamp'])
+      model.should_receive(:where).with(['last_update > ?', timestamp + 0.001])
       subject.add_missed_updates(model, 'timestamp')
     end
 
@@ -58,9 +59,9 @@ describe Faye::Sync do
   end
 
   describe '#initresults' do
+    let(:time) { stub }
     before do
-      @time = stub
-      Time.stub_chain(:zone, :now => @time)
+      Time.stub_chain(:zone, :now => time)
     end
 
     it 'initializes the unicast message' do
@@ -69,7 +70,7 @@ describe Faye::Sync do
 
     it 'initializes the unicast meta tag' do
       subject.init_results['unicast']['meta'].
-        should eq({'timestamp' => @time, 'unicast' => true})
+        should eq({'timestamp' => time, 'unicast' => true})
     end
 
     it 'initializes the resolve list' do
@@ -86,7 +87,7 @@ describe Faye::Sync do
 
     it 'initializes the multicast meta tag' do
       subject.init_results['multicast']['meta'].
-        should eq({'timestamp' => @time})
+        should eq({'timestamp' => time})
     end
 
     it 'initializes the create list' do
