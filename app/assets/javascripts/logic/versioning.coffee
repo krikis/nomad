@@ -29,13 +29,13 @@
     @_versioning.vector[@clientId]
 
   _createPatch: (base) ->
-    # dmp = new diff_match_patch
-    # diff = dmp.diff_main JSON.stringify(@previousAttributes()),
-    #                      JSON.stringify(@)
-    # patch = dmp.patch_make JSON.stringify(@previousAttributes()),
-    #                        diff
-    # patch_text: dmp.patch_toText(patch)
-    # base: base
+    dmp = new diff_match_patch
+    diff = dmp.diff_main JSON.stringify(@previousAttributes()),
+                         JSON.stringify(@)
+    patch = dmp.patch_make JSON.stringify(@previousAttributes()),
+                           diff
+    patch_text: dmp.patch_toText(patch)
+    base: base
     
   _updatePatchFor: (patch, changed, previous) ->
     newPatch = not patch?
