@@ -24,7 +24,7 @@ module Faye::Sync
   end
 
   def init_results
-    time = Time.now
+    time = Time.now.utc
     {'unicast'   => {'meta'    => {'timestamp' => time,
                                    'unicast' => true},
                      'resolve' => [],

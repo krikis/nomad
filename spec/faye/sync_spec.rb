@@ -69,7 +69,7 @@ describe Faye::Sync do
   describe '#initresults' do
     before do
       @time = stub
-      Time.stub(:now => @time)
+      Time.stub_chain(:now, :utc => @time)
     end
 
     it 'initializes the unicast message' do
