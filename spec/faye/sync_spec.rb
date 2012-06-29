@@ -25,7 +25,7 @@ describe Faye::Sync do
       model.stub(:all => [])
       subject.stub(:init_results => results,
                    :add_update_for => nil)
-      Time.stub_chain(:parse, :to_s => 'time_stamp')
+      Time.stub_chain(:parse => 'time_stamp')
     end
 
     it 'initializes the results hash' do
