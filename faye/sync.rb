@@ -3,7 +3,7 @@ module Faye::Sync
   def add_missed_updates(model, timestamp)
     results = init_results
     objects = if timestamp
-      model.where(['last_update > ?', Time.parse(timestamp)])
+      model.where(['last_update > ?', Time.zone.parse(timestamp)])
     else
       model.all
     end
@@ -14,7 +14,7 @@ module Faye::Sync
   end
 
   def init_results
-    time = Time.now.utc
+    time = Time.zone.now
     {'unicast'   => {'meta'    => {'timestamp' => time,
                                    'unicast' => true},
                      'resolve' => [],

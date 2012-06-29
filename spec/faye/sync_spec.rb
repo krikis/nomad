@@ -25,7 +25,7 @@ describe Faye::Sync do
       model.stub(:all => [])
       subject.stub(:init_results => results,
                    :add_update_for => nil)
-      Time.stub_chain(:parse => 'time_stamp')
+      Time.stub_chain(:zone, :parse => 'time_stamp')
     end
 
     it 'initializes the results hash' do
@@ -60,7 +60,7 @@ describe Faye::Sync do
   describe '#initresults' do
     before do
       @time = stub
-      Time.stub_chain(:now, :utc => @time)
+      Time.stub_chain(:zone, :now => @time)
     end
 
     it 'initializes the unicast message' do
@@ -289,11 +289,11 @@ describe Faye::Sync do
 
     it 'preserves the updated_at attribute when given' do
       object = Post.new
-      time = DateTime.new(2012,4,12,14,30,32)
+      time = Time.zone.local(2012,4,12,14,30,32)
       attributes = {'id' => 'some_id',
-                    'attributes' => {'created_at' => Time.now},
+                    'attributes' => {'created_at' => Time.zone.now},
                     'version' => 'some_version',
-                    'created_at' => Time.now,
+                    'created_at' => Time.zone.now,
                     'updated_at' => time.as_json}
       subject.set_attributes(object, attributes)
       object.updated_at.should eq(time)
