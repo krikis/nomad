@@ -398,6 +398,7 @@ describe Faye::Sync do
     let(:object) { stub }
     before do
       model.stub(:where => [object])
+      model.stub(:all => [])
       subject.stub(:add_update_for)
       Time.stub_chain(:parse, :to_s => 'time_stamp')
     end
@@ -412,6 +413,13 @@ describe Faye::Sync do
       results = {'unicast' => unicast}
       subject.should_receive(:add_update_for).with(object, unicast)
       subject.add_missed_updates(model, 'timestamp', results)
+    end
+
+    context 'when no timestamp is given' do
+      it 'queries the model for all objects' do
+        model.should_receive(:all)
+        subject.add_missed_updates(model, nil, {})
+      end
     end
   end
 
