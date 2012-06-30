@@ -137,14 +137,18 @@ describe 'Versioning', ->
         @model._versioning.patches = _([])
         @model.addVersion({}, skipPatch: true)
         expect(@model._versioning.patches.size()).toEqual(0)
-        
+
       it 'does not update the model\'s version', ->
         @model.addVersion({}, skipPatch: true)
         expect(@tickVersionStub).not.toHaveBeenCalled()
-    
+
     context 'when a structured content diff is used for versioning', ->
       beforeEach ->
+        @previousVersioning = Nomad.versioning
         Nomad.versioning = 'structured_content_diff'
+
+      afterEach ->
+        Nomad.versioning = @previousVersioning
 
       it 'creates a patch providing it with the model\'s local clock', ->
         @model.addVersion()
@@ -157,34 +161,36 @@ describe 'Versioning', ->
       it 'updates the model\'s version after the patch has been created', ->
         @model.addVersion()
         expect(@tickVersionStub).toHaveBeenCalledAfter(@createPatchStub)
-        
+
     context 'when a per attribute diff is used for versioning', ->
       beforeEach ->
+        @previousVersioning = Nomad.versioning
         Nomad.versioning = 'per_attribute_diff'
-        @newModelPatchStub = sinon.stub(window, 
-                                        'ModelPatch', 
+        @newModelPatchStub = sinon.stub(window,
+                                        'ModelPatch',
                                         => @patch)
         @changedStub = sinon.stub()
         sinon.stub(@model, 'changedAttributes', => @changedStub)
         @previousStub = sinon.stub()
         sinon.stub(@model, 'previousAttributes', => @previousStub)
-        
+
       afterEach ->
         @newModelPatchStub.restore()
-        
+        Nomad.versioning = @previousVersioning
+
       it 'creates a new modelPatch object', ->
         @model.addVersion()
         expect(@newModelPatchStub).toHaveBeenCalledWith(@changedStub,
                                                         @previousStub)
 
-      it 'adds the patch to the list of patches', ->  
+      it 'adds the patch to the list of patches', ->
         @model.addVersion()
         expect(@model._versioning.patches.first()).toBe(@patch)
 
       it 'updates the model version after the patch has been created', ->
         @model.addVersion()
         expect(@tickVersionStub).toHaveBeenCalledAfter(@newModelPatchStub)
-          
+
 
   describe '#_localClock', ->
     beforeEach ->
