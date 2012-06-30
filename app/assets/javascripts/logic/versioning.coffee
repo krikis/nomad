@@ -21,8 +21,13 @@
   addVersion: (model, options = {}) ->
     unless options.skipPatch?
       @initVersioning()
-      @_versioning.patches ||= _([])
-      @_versioning.patches.push @_createPatch(@_localClock())
+      if Nomad.versioning == 'structured_content_diff'
+        @_versioning.patches ||= _([])
+        @_versioning.patches.push @_createPatch(@_localClock())
+      else
+        @_versioning.patch ||= new ModelPatch
+        @_versioning.patch.updateFor(@changedAttributes(),
+                                     @previousAttributes())
       @_tickVersion()
 
   _localClock: ->
