@@ -25,7 +25,8 @@
       if Nomad.versioning == 'structured_content_diff'
         patch = @_createPatch(@_localClock())
       else
-        patch = new ModelPatch(@changedAttributes(),
+        patch = new ModelPatch(@_localClock(),
+                               @changedAttributes(),
                                @previousAttributes())
       @_versioning.patches.push patch
       @_tickVersion()

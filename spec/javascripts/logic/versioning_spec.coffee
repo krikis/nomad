@@ -180,7 +180,8 @@ describe 'Versioning', ->
 
       it 'creates a new modelPatch object', ->
         @model.addVersion()
-        expect(@newModelPatchStub).toHaveBeenCalledWith(@changedStub,
+        expect(@newModelPatchStub).toHaveBeenCalledWith(@model._localClock(),
+                                                        @changedStub,
                                                         @previousStub)
 
       it 'adds the patch to the list of patches', ->

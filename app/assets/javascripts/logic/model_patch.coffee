@@ -1,6 +1,7 @@
 class @ModelPatch
     
-  constructor: (changed, previous) ->
+  constructor: (base, changed, previous) ->
+    @base = base
     @_patch = @_createPatchFor(changed, previous)
     
   _createPatchFor: (changed, previous) ->

@@ -2,6 +2,7 @@ describe 'ModelPatch', ->
     
   describe '.new', ->
     beforeEach ->
+      @base               = sinon.stub()
       @changedAttributes  = sinon.stub()
       @previousAttributes = sinon.stub()
       @createPatchForStub = sinon.stub(ModelPatch::, 
@@ -11,15 +12,23 @@ describe 'ModelPatch', ->
     afterEach ->
       @createPatchForStub.restore()
       
+    it 'sets the patch base', ->
+      @modelPatch = new ModelPatch(@base, 
+                                   @changedAttributes,
+                                   @previousAttributes)
+      expect(@modelPatch.base).toEqual(@base)
+      
     it 'calls the _createPatchFor method', ->
-      @modelPatch = new ModelPatch(@changedAttributes,
+      @modelPatch = new ModelPatch(@base, 
+                                   @changedAttributes,
                                    @previousAttributes)
       expect(@createPatchForStub).
         toHaveBeenCalledWith(@changedAttributes,
                              @previousAttributes)
                              
     it 'stores the output in _patch', ->
-      @modelPatch = new ModelPatch(@changedAttributes,
+      @modelPatch = new ModelPatch(@base, 
+                                   @changedAttributes,
                                    @previousAttributes)
       expect(@modelPatch._patch).toEqual('new_patch')
 
@@ -34,7 +43,8 @@ describe 'ModelPatch', ->
       @createPatchForStub = sinon.stub(ModelPatch::, 
                                        '_createPatchFor', 
                                        -> 'new_patch')
-      @modelPatch = new ModelPatch(@changedAttributes,
+      @modelPatch = new ModelPatch(@base, 
+                                   @changedAttributes,
                                    @previousAttributes)
       @createPatchForStub.restore()
 
