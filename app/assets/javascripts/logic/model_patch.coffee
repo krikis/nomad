@@ -1,20 +1,17 @@
 class @ModelPatch
     
-  updateFor: (changed, previous) ->
-    @_patch = @_updatePatchFor(@_patch, changed, previous)
+  constructor: (changed, previous) ->
+    @_patch = @_createPatchFor(changed, previous)
     
-  _updatePatchFor: (patch, changed, previous) ->
-    newPatch = not patch?
-    patch ||= {}
+  _createPatchFor: (changed, previous) ->
+    patch = _.clone(changed)
     previous ||= {}
     _.each changed, (value, attribute) =>
       if _.isString value
-        patch[attribute] = previous[attribute] if newPatch
+        patch[attribute] = previous[attribute]
       else if _.isObject value
-        patch[attribute] = @_updatePatchFor(patch[attribute],
-                                            changed[attribute],
+        patch[attribute] = @_createPatchFor(changed[attribute],
                                             previous[attribute])
-      else
-        patch[attribute] = changed[attribute]
     patch
+    
     

@@ -116,15 +116,28 @@ describe 'Versioning', ->
       @tickVersionStub.restore()
       @createPatchStub.restore()
 
-    it 'initializes _versioning', ->
+    it 'initializes versioning', ->
       @model.addVersion()
       expect(@initVersioningSpy).toHaveBeenCalled()
+
+    it 'initializes a list of patches', ->
+      expect(@model._versioning?.patches).toBeUndefined()
+      @model.addVersion()
+      expect(@model._versioning?.patches).toBeDefined()
+      expect(@model._versioning?.patches._wrapped).toBeDefined()
+      expect(@model._versioning?.patches._wrapped.constructor.name).toEqual("Array")
 
     it 'updates the model\'s version', ->
       @model.addVersion()
       expect(@tickVersionStub).toHaveBeenCalled()
 
     context 'when the skipPatch option is set', ->
+      it 'does not save a patch', ->
+        @model._versioning = {}
+        @model._versioning.patches = _([])
+        @model.addVersion({}, skipPatch: true)
+        expect(@model._versioning.patches.size()).toEqual(0)
+        
       it 'does not update the model\'s version', ->
         @model.addVersion({}, skipPatch: true)
         expect(@tickVersionStub).not.toHaveBeenCalled()
@@ -132,13 +145,6 @@ describe 'Versioning', ->
     context 'when a structured content diff is used for versioning', ->
       beforeEach ->
         Nomad.versioning = 'structured_content_diff'
-
-      it 'initializes _versioning.patches as an empty array', ->
-        expect(@model._versioning?.patches).toBeUndefined()
-        @model.addVersion()
-        expect(@model._versioning?.patches).toBeDefined()
-        expect(@model._versioning?.patches._wrapped).toBeDefined()
-        expect(@model._versioning?.patches._wrapped.constructor.name).toEqual("Array")
 
       it 'creates a patch providing it with the model\'s local clock', ->
         @model.addVersion()
@@ -151,20 +157,13 @@ describe 'Versioning', ->
       it 'updates the model\'s version after the patch has been created', ->
         @model.addVersion()
         expect(@tickVersionStub).toHaveBeenCalledAfter(@createPatchStub)
-
-      context 'when the skipPatch option is set', ->
-        it 'does not save a patch', ->
-          @model.addVersion({}, skipPatch: true)
-          expect(@model._versioning?.patches).toBeUndefined()
         
     context 'when a per attribute diff is used for versioning', ->
       beforeEach ->
         Nomad.versioning = 'per_attribute_diff'
-        @modelPatch = new ModelPatch
         @newModelPatchStub = sinon.stub(window, 
                                         'ModelPatch', 
-                                        => @modelPatch)
-        @updateForStub = sinon.stub(@modelPatch, 'updateFor')
+                                        => @patch)
         @changedStub = sinon.stub()
         sinon.stub(@model, 'changedAttributes', => @changedStub)
         @previousStub = sinon.stub()
@@ -173,24 +172,18 @@ describe 'Versioning', ->
       afterEach ->
         @newModelPatchStub.restore()
         
-      it 'initializes the model patch object', ->
-        expect(@model._versioning?.patch).toBeUndefined()
+      it 'creates a new modelPatch object', ->
         @model.addVersion()
-        expect(@model._versioning?.patch).toBe(@modelPatch)
-          
-      it 'updates the patch object for the current update', ->
-        @model.addVersion()
-        expect(@updateForStub).toHaveBeenCalledWith(@changedStub,
-                                                    @previousStub)
+        expect(@newModelPatchStub).toHaveBeenCalledWith(@changedStub,
+                                                        @previousStub)
 
-      it 'updates the model\'s version after the patch has been updated', ->
+      it 'adds the patch to the list of patches', ->  
         @model.addVersion()
-        expect(@tickVersionStub).toHaveBeenCalledAfter(@updateForStub)
+        expect(@model._versioning.patches.first()).toBe(@patch)
 
-      context 'when the skipPatch option is set', ->
-        it 'does not update the patch object', ->
-          @model.addVersion({}, skipPatch: true)
-          expect(@updateForStub).not.toHaveBeenCalled()
+      it 'updates the model version after the patch has been created', ->
+        @model.addVersion()
+        expect(@tickVersionStub).toHaveBeenCalledAfter(@newModelPatchStub)
           
 
   describe '#_localClock', ->

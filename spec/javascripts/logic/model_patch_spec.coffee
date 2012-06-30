@@ -1,28 +1,29 @@
 describe 'ModelPatch', ->
-  beforeEach ->
-    @modelPatch = new ModelPatch
     
-  describe '#updateFor', ->
+  describe '.new', ->
     beforeEach ->
-      @modelPatch._patch  = 'old_patch'
       @changedAttributes  = sinon.stub()
       @previousAttributes = sinon.stub()
-      @updatePatchForStub = sinon.stub(@modelPatch, '_updatePatchFor', -> 'new_patch')
+      @createPatchForStub = sinon.stub(ModelPatch::, 
+                                       '_createPatchFor', 
+                                       -> 'new_patch')
       
-    it 'calls the _updatePatchFor method', ->
-      @modelPatch.updateFor(@changedAttributes,
-                            @previousAttributes)
-      expect(@updatePatchForStub).
-        toHaveBeenCalledWith('old_patch',
-                             @changedAttributes,
+    afterEach ->
+      @createPatchForStub.restore()
+      
+    it 'calls the _createPatchFor method', ->
+      @modelPatch = new ModelPatch(@changedAttributes,
+                                   @previousAttributes)
+      expect(@createPatchForStub).
+        toHaveBeenCalledWith(@changedAttributes,
                              @previousAttributes)
                              
     it 'stores the output in _patch', ->
-      @modelPatch.updateFor(@changedAttributes,
-                            @previousAttributes)
+      @modelPatch = new ModelPatch(@changedAttributes,
+                                   @previousAttributes)
       expect(@modelPatch._patch).toEqual('new_patch')
 
-  describe '#_updatePatchFor', ->
+  describe '#_createPatchFor', ->
     beforeEach ->
       @changedAttributes =
         number: 1234.5
@@ -30,38 +31,23 @@ describe 'ModelPatch', ->
       @previousAttributes =
         number: 1001.1
         text: 'previous_text'
+      @createPatchForStub = sinon.stub(ModelPatch::, 
+                                       '_createPatchFor', 
+                                       -> 'new_patch')
+      @modelPatch = new ModelPatch(@changedAttributes,
+                                   @previousAttributes)
+      @createPatchForStub.restore()
 
     it 'saves all changed no-text attributes', ->
-      patch = @modelPatch._updatePatchFor(null,
-                                          @changedAttributes,
+      patch = @modelPatch._createPatchFor(@changedAttributes,
                                           @previousAttributes)
       expect(patch.number).
         toEqual(@changedAttributes.number)
 
-    context 'when no patch object exists', ->
-      it 'initializes the patch object', ->
-        patch = @modelPatch._updatePatchFor(null,
-                                            @changedAttributes,
-                                            @previousAttributes)
-        expect(patch).toBeDefined()
-
-      it 'retains the previous version of all text attributes', ->
-        patch = @modelPatch._updatePatchFor(null,
-                                            @changedAttributes,
-                                            @previousAttributes)
-        expect(patch.text).toEqual('previous_text')
-
-    context 'when a patch object exists', ->
-      beforeEach ->
-        @patch =
-          number: 1001.1
-          text: 'original_text'
-
-      it 'retains the original version of all text attributes', ->
-        patch = @modelPatch._updatePatchFor(@patch,
-                                            @changedAttributes,
-                                            @previousAttributes)
-        expect(patch.text).toEqual('original_text')
+    it 'retains the previous version of all text attributes', ->
+      patch = @modelPatch._createPatchFor(@changedAttributes,
+                                          @previousAttributes)
+      expect(patch.text).toEqual('previous_text')
 
     context 'when the changed attributes contain an object', ->
       beforeEach ->
@@ -69,11 +55,14 @@ describe 'ModelPatch', ->
           object:
             number: 1234.5
             text: 'some_text'
-        @updatePatchSpy = sinon.spy(@modelPatch, '_updatePatchFor')
+        @updatePatchSpy = sinon.spy(@modelPatch, '_createPatchFor')
 
       it 'recursively updates the patch for this object', ->
-        patch = @modelPatch._updatePatchFor(@patch,
-                                            @changedAttributes,
+        patch = @modelPatch._createPatchFor(@changedAttributes,
                                             @previousAttributes)
         expect(@updatePatchSpy).
-          toHaveBeenCalledWith(undefined, number: 1234.5, text: 'some_text', undefined)
+          toHaveBeenCalledWith(number: 1234.5, text: 'some_text', undefined)
+          
+          
+          
+          
