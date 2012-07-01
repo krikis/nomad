@@ -108,7 +108,7 @@
       @_extractVersioning(attributes)
     dummy = new @constructor
     dummy.set attributes
-    if dummy._processPatches(@_versioning.patches)
+    if dummy._processPatchesOf(@)
       @set dummy, skipPatch: true
       @_updateVersionTo(version, updated_at)
       @save()
@@ -126,12 +126,13 @@
     delete attributes.updated_at
     [version, created_at, updated_at]
 
-  _processPatches: (patches) ->  
+  _processPatchesOf: (model) ->
+    patches = model._versioning.patches
     if Nomad.versioning == 'structured_content_diff'
       patches.all (patch) =>
         @_applyPatch(patch.patch_text)
     else
-      patches.last().applyTo(@, patches.first())
+      patches.last().applyTo(@, patches.first(), model.attributes)
 
   _applyPatch: (patch_text) ->
     @dmp = new diff_match_patch

@@ -489,7 +489,7 @@ describe 'Versioning', ->
       @extractVersioningSpy = sinon.spy(@model, '_extractVersioning')
       @newModelStub = sinon.stub(TestModel::, 'constructor', => @dummy)
       @dummySetStub = sinon.stub(@dummy, 'set')
-      @processPatchesStub = sinon.stub(@dummy, '_processPatches', -> true)
+      @processPatchesStub = sinon.stub(@dummy, '_processPatchesOf', -> true)
       @modelSetStub = sinon.stub(@model, 'set')
       @updateVersionToStub = sinon.stub(@model, '_updateVersionTo')
       @modelSaveStub = sinon.stub(@model, 'save')
@@ -522,7 +522,7 @@ describe 'Versioning', ->
 
     it 'applies all patches to the dummy model', ->
       @model._rebase({})
-      expect(@processPatchesStub).toHaveBeenCalledWith(@patches)
+      expect(@processPatchesStub).toHaveBeenCalledWith(@model)
 
     context 'when all patches are successfully applied', ->
       it 'sets the dummy\'s attributes on the model without creating a patch', ->
@@ -547,7 +547,7 @@ describe 'Versioning', ->
     context 'when not all patches were applied successfully', ->
       beforeEach ->
         @processPatchesStub.restore()
-        @processPatchesStub = sinon.stub(@dummy, '_processPatches', -> false)
+        @processPatchesStub = sinon.stub(@dummy, '_processPatchesOf', -> false)
 
       it 'returns null', ->
         expect(@model._rebase({})).toBeNull()
@@ -589,7 +589,7 @@ describe 'Versioning', ->
       [a, b, updated_at] = @model._extractVersioning(@attributes)
       expect(updated_at).toEqual('updated_at')
 
-  describe '#_processPatches', ->
+  describe '#_processPatchesOf', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
@@ -602,18 +602,21 @@ describe 'Versioning', ->
       beforeEach ->
         @origVersioning = Nomad.versioning
         Nomad.versioning = 'structured_content_diff'
+        @originalModel = {}
+        @originalModel._versioning = {}
+        @originalModel._versioning.patches = _([{patch_text: 'some'},
+                                                {patch_text: 'patches'}])
         
       afterEach ->
         Nomad.versioning = @origVersioning
 
       it 'applies each patch to the model', ->
-        @model._processPatches(_([{patch_text: 'some'},
-                                  {patch_text: 'patches'}]))
+        @model._processPatchesOf(@originalModel)
         expect(@applyPatchStub).toHaveBeenCalledWith('some')
         expect(@applyPatchStub).toHaveBeenCalledWith('patches')
 
       it 'returns true when all patches apply successfully', ->
-        expect(@model._processPatches(_(['some', 'patches']))).toBeTruthy()
+        expect(@model._processPatchesOf(@originalModel)).toBeTruthy()
 
       context 'when at least one patch did not apply successfully', ->
         beforeEach ->
@@ -624,7 +627,7 @@ describe 'Versioning', ->
           )
 
         it 'returns false', ->
-          expect(@model._processPatches(_(['some', 'more', 'patches']))).toBeFalsy()
+          expect(@model._processPatchesOf(@originalModel)).toBeFalsy()
           
     context 'when a per attribute diff is used for versioning', ->
       beforeEach ->
@@ -634,13 +637,20 @@ describe 'Versioning', ->
         @lastPatch = sinon.stub()
         @lastPatch.applyTo = ->
         @applyToStub = sinon.stub(@lastPatch, 'applyTo')
+        @attributes = sinon.stub()
+        @originalModel = {}
+        @originalModel._versioning = {}
+        @originalModel._versioning.patches = _([@firstPatch, @lastPatch])
+        @originalModel.attributes = @attributes
       
       afterEach ->
         Nomad.versioning = @origVersioning
         
       it 'applies the most recent patch to the model', ->
-        @model._processPatches(_([@firstPatch, @lastPatch]))
-        expect(@applyToStub).toHaveBeenCalledWith(@model, @firstPatch)
+        @model._processPatchesOf(@originalModel)
+        expect(@applyToStub).toHaveBeenCalledWith(@model, 
+                                                  @firstPatch, 
+                                                  @attributes)
 
   describe '#_applyPatch', ->
     beforeEach ->
