@@ -28,18 +28,7 @@ class @ModelPatch
   _patchAttribute: (attribute, value, attributesToPatch, originalValue, currentValue) ->
     if _.isString(currentValue)
       if _.isString(originalValue)
-        diff = @dmp.diff_main originalValue,
-                              currentValue
-        patch = @dmp.patch_make originalValue,
-                                diff
-        [patched_value, results] = @dmp.patch_apply patch, 
-                                                    attributesToPatch[attribute]
-        if not false in results
-          attributesToPatch[attribute] = patched_value
-          true
-        else
-          # TODO: handle failed patch
-          false
+        @_patchString(attribute, attributesToPatch, originalValue, currentValue)
       else
         attributesToPatch[attribute] = currentValue
         true
@@ -53,6 +42,21 @@ class @ModelPatch
     else
       attributesToPatch[attribute] = currentValue
       true
+      
+  _patchString: (attribute, attributesToPatch, originalValue, currentValue) ->    
+    diff = @dmp.diff_main originalValue,
+                          currentValue
+    patch = @dmp.patch_make originalValue,
+                            diff
+    [patched_value, results] = @dmp.patch_apply patch, 
+                                                attributesToPatch[attribute]
+    if not false in results
+      attributesToPatch[attribute] = patched_value
+      true
+    else
+      # TODO: handle failed patch
+      false
+    
     
     
     

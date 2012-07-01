@@ -241,62 +241,14 @@ describe 'ModelPatch', ->
           text: 'model_text'
         @originalValue = 'original_text'
         @currentValue = 'current_text'
-        @dmp = new diff_match_patch
-        @modelPatch.dmp = @dmp
-        @dmpStub        = sinon.stub(window, 'diff_match_patch', => @dmp)
-        @diffStub       = sinon.stub(@dmp, 'diff_main', -> 'some_diff')
-        @patchStub      = sinon.stub(@dmp, 'patch_make', -> 'some_patch')
-        @patchApplyStub = sinon.stub(@dmp, 'patch_apply', 
-                                     -> ['patched_value', [true]])
+        @patchStringStub = sinon.stub(@modelPatch, '_patchString')
 
-      afterEach ->
-        @dmpStub.restore()
-
-      it 'generates a diff for the attribute', ->  
+      it 'calls the _patchString method', ->  
         @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
                                     @originalValue, @currentValue)
-        expect(@diffStub).toHaveBeenCalledWith(@originalValue, @currentValue)
-      
-      it 'generates a patch for the attribute', ->
-        @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                    @originalValue, @currentValue)
-        expect(@patchStub).toHaveBeenCalledWith(@originalValue, 'some_diff')
-      
-      it 'applies a patch on the model attribute', ->
-        @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                    @originalValue, @currentValue)
-        expect(@patchApplyStub).toHaveBeenCalledWith('some_patch', 
-                                                     'model_text')
-    
-      context 'and patching a text-attribute succeeds', ->
-        it 'sets the successfully patched attribute on the model', ->
-          @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                      @originalValue, @currentValue)
-          expect(@attributesToPatch.text).toEqual('patched_value')
-                                            
-        it 'returns true', ->
-          expect(
-            @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                        @originalValue, @currentValue)
-          ).toBeTruthy()
-      
-      context 'and patching a text-attribute fails', ->
-        beforeEach ->
-          @patchApplyStub.restore()
-          @patchApplyStub = sinon.stub(@dmp, 
-                                       'patch_apply', 
-                                       -> ['patched_value', [false]])
-        
-        it 'does not set the patched attribute on the model', ->
-          @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                      @originalValue, @currentValue)
-          expect(@attributesToPatch.text).toEqual('model_text')
-        
-        it 'returns false', ->
-          expect(
-            @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                        @originalValue, @currentValue)
-          ).toBeFalsy()
+        expect(@patchStringStub).
+          toHaveBeenCalledWith(@attribute, @attributesToPatch, 
+                               @originalValue, @currentValue)
           
       context 'and the original value is not text', ->
         beforeEach ->
@@ -313,8 +265,75 @@ describe 'ModelPatch', ->
                                         @originalValue, @currentValue)
           ).toBeTruthy()
       
-        
-      
+  describe '#_patchString', ->
+    beforeEach ->
+      @createPatchForStub = sinon.stub(ModelPatch::,
+                                       '_createPatchFor',
+                                       -> 'new_patch')
+      @modelPatch = new ModelPatch
+      @attribute = 'text'
+      @attributesToPatch =
+        text: 'model_text'
+      @originalValue = 'original_text'
+      @currentValue = 'current_text'
+      @dmp = new diff_match_patch
+      @modelPatch.dmp = @dmp
+      @dmpStub        = sinon.stub(window, 'diff_match_patch', => @dmp)
+      @diffStub       = sinon.stub(@dmp, 'diff_main', -> 'some_diff')
+      @patchStub      = sinon.stub(@dmp, 'patch_make', -> 'some_patch')
+      @patchApplyStub = sinon.stub(@dmp, 'patch_apply', 
+                                   -> ['patched_value', [true]])
+  
+    afterEach ->
+      @createPatchForStub.restore()
+      @dmpStub.restore()
+  
+    it 'generates a diff for the attribute', ->  
+      @modelPatch._patchString(@attribute, @attributesToPatch, 
+                               @originalValue, @currentValue)
+      expect(@diffStub).toHaveBeenCalledWith(@originalValue, @currentValue)
+  
+    it 'generates a patch for the attribute', ->
+      @modelPatch._patchString(@attribute, @attributesToPatch, 
+                               @originalValue, @currentValue)
+      expect(@patchStub).toHaveBeenCalledWith(@originalValue, 'some_diff')
+  
+    it 'applies a patch on the model attribute', ->
+      @modelPatch._patchString(@attribute, @attributesToPatch, 
+                               @originalValue, @currentValue)
+      expect(@patchApplyStub).toHaveBeenCalledWith('some_patch', 
+                                                   'model_text')
+  
+    context 'and patching a text-attribute succeeds', ->
+      it 'sets the successfully patched attribute on the model', ->
+        @modelPatch._patchString(@attribute, @attributesToPatch, 
+                                 @originalValue, @currentValue)
+        expect(@attributesToPatch.text).toEqual('patched_value')
+  
+      it 'returns true', ->
+        expect(
+          @modelPatch._patchString(@attribute, @attributesToPatch, 
+                                   @originalValue, @currentValue)
+        ).toBeTruthy()
+  
+    context 'and patching a text-attribute fails', ->
+      beforeEach ->
+        @patchApplyStub.restore()
+        @patchApplyStub = sinon.stub(@dmp, 
+                                     'patch_apply', 
+                                     -> ['patched_value', [false]])
+  
+      it 'does not set the patched attribute on the model', ->
+        @modelPatch._patchString(@attribute, @attributesToPatch, 
+                                 @originalValue, @currentValue)
+        expect(@attributesToPatch.text).toEqual('model_text')
+  
+      it 'returns false', ->
+        expect(
+          @modelPatch._patchString(@attribute, @attributesToPatch, 
+                                   @originalValue, @currentValue)
+        ).toBeFalsy() 
+  
       
 
 
