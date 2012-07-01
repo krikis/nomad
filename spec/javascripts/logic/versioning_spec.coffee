@@ -597,26 +597,50 @@ describe 'Versioning', ->
         @results ||= [true, true]
         @results.pop()
       )
-
-    it 'applies each patch to the model', ->
-      @model._processPatches(_([{patch_text: 'some'},
-                               {patch_text: 'patches'}]))
-      expect(@applyPatchStub).toHaveBeenCalledWith('some')
-      expect(@applyPatchStub).toHaveBeenCalledWith('patches')
-
-    it 'returns true when all patches apply successfully', ->
-      expect(@model._processPatches(_(['some', 'patches']))).toBeTruthy()
-
-    context 'when at least one patch did not apply successfully', ->
+      
+    context 'when a structured content diff is used for versioning', ->
       beforeEach ->
-        @applyPatchStub.restore()
-        @applyPatchStub = sinon.stub(@model, '_applyPatch', ->
-          @results ||= [true, false, true]
-          @results.pop()
-        )
+        @origVersioning = Nomad.versioning
+        Nomad.versioning = 'structured_content_diff'
+        
+      afterEach ->
+        Nomad.versioning = @origVersioning
 
-      it 'returns false when at least one patch was unsuccessful', ->
-        expect(@model._processPatches(_(['some', 'more', 'patches']))).toBeFalsy()
+      it 'applies each patch to the model', ->
+        @model._processPatches(_([{patch_text: 'some'},
+                                  {patch_text: 'patches'}]))
+        expect(@applyPatchStub).toHaveBeenCalledWith('some')
+        expect(@applyPatchStub).toHaveBeenCalledWith('patches')
+
+      it 'returns true when all patches apply successfully', ->
+        expect(@model._processPatches(_(['some', 'patches']))).toBeTruthy()
+
+      context 'when at least one patch did not apply successfully', ->
+        beforeEach ->
+          @applyPatchStub.restore()
+          @applyPatchStub = sinon.stub(@model, '_applyPatch', ->
+            @results ||= [true, false, true]
+            @results.pop()
+          )
+
+        it 'returns false', ->
+          expect(@model._processPatches(_(['some', 'more', 'patches']))).toBeFalsy()
+          
+    context 'when a per attribute diff is used for versioning', ->
+      beforeEach ->
+        @origVersioning = Nomad.versioning
+        Nomad.versioning = 'per_attribute_diff'
+        @firstPatch = sinon.stub()
+        @lastPatch = sinon.stub()
+        @lastPatch.applyTo = ->
+        @applyToStub = sinon.stub(@lastPatch, 'applyTo')
+      
+      afterEach ->
+        Nomad.versioning = @origVersioning
+        
+      it 'applies the most recent patch to the model', ->
+        @model._processPatches(_([@firstPatch, @lastPatch]))
+        expect(@applyToStub).toHaveBeenCalledWith(@model, @firstPatch)
 
   describe '#_applyPatch', ->
     beforeEach ->

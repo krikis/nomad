@@ -113,7 +113,8 @@
       @_updateVersionTo(version, updated_at)
       @save()
       return @
-    # TODO :: implement having user resolve conflict
+    else
+      # TODO :: implement having user resolve conflict
     null
 
   _extractVersioning: (attributes) ->
@@ -125,9 +126,12 @@
     delete attributes.updated_at
     [version, created_at, updated_at]
 
-  _processPatches: (patches) ->
-    patches.all (patch) =>
-      @_applyPatch(patch.patch_text)
+  _processPatches: (patches) ->  
+    if Nomad.versioning == 'structured_content_diff'
+      patches.all (patch) =>
+        @_applyPatch(patch.patch_text)
+    else
+      patches.last().applyTo(@, patches.first())
 
   _applyPatch: (patch_text) ->
     @dmp = new diff_match_patch
