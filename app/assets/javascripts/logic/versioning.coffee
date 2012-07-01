@@ -135,10 +135,10 @@
       patches.last().applyTo(@, patches.first(), model.attributes)
 
   _applyPatch: (patch_text) ->
-    @dmp = new diff_match_patch
-    patch = @dmp.patch_fromText(patch_text)
+    dmp = new diff_match_patch
+    patch = dmp.patch_fromText(patch_text)
     json = JSON.stringify(@)
-    [new_json, results] = @dmp.patch_apply(patch, json)
+    [new_json, results] = dmp.patch_apply(patch, json)
     if not false in results
       patched_attributes = JSON.parse(new_json)
       @set patched_attributes

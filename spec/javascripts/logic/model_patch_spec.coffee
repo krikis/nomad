@@ -104,27 +104,36 @@ describe 'ModelPatch', ->
                                        '_createPatchFor',
                                        -> 'new_patch')
       @modelPatch = new ModelPatch
-      @modelPatch._patch =
+      @lastPatch = 
         number: 1234.5
         text: 'base_text'
+      @modelPatch._patch = @lastPatch
       @model = new Backbone.Model
         number: 3212.1
         text: 'original_text_and_more'
-      @first =
-        _patch:
-          number: 1101.1
-          text: 'original_text'
+      @firstPatch =
+        number: 1101.1
+        text: 'original_text'
       @current =
         number: 1234.5
         text: 'current_text'
+      @dmp = new diff_match_patch
+      @modelPatch.dmp = @dmp
+      @dmpStub = sinon.stub(window, 'diff_match_patch', => @dmp)
+      @diffStub = sinon.stub(@dmp, 'diff_main')
+      @patchStub = sinon.stub(@dmp, 'patch_make')
 
     afterEach ->
       @createPatchForStub.restore()
+      @dmpStub.restore()
 
     it 'sets the non-text attributes from the _patch', ->
-      @modelPatch._applyPatch(@modelPatch._patch, @model, @first, @current)
+      @modelPatch._applyPatch(@lastPatch, @model, @firstPatch, @current)
       expect(@model.get('number')).toEqual(1234.5)
 
-    it 'generates a patch'
+    it 'generates a diff for text attributes', ->
+      @modelPatch._applyPatch(@lastPatch, @model, @firstPatch, @current)
+      expect(@diffStub).toHaveBeenCalledWith('original_text', 'current_text')
+      
 
 
