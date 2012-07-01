@@ -73,7 +73,7 @@ describe 'ModelPatch', ->
         expect(@updatePatchSpy).
           toHaveBeenCalledWith(number: 1234.5, text: 'some_text', undefined)
 
-  describe '#applyPatchTo', ->
+  describe '#applyTo', ->
     beforeEach ->
       @createPatchForStub = sinon.stub(ModelPatch::,
                                        '_createPatchFor',
@@ -92,7 +92,7 @@ describe 'ModelPatch', ->
       @createPatchForStub.restore()
 
     it 'calls _applyPatch', ->
-      @modelPatch.applyPatchTo(@model, @first, @current)
+      @modelPatch.applyTo(@model, @first, @current)
       expect(@applyPatchStub).toHaveBeenCalledWith(@patch,
                                                    @model,
                                                    @firstPatch,
@@ -120,20 +120,65 @@ describe 'ModelPatch', ->
       @dmp = new diff_match_patch
       @modelPatch.dmp = @dmp
       @dmpStub = sinon.stub(window, 'diff_match_patch', => @dmp)
-      @diffStub = sinon.stub(@dmp, 'diff_main')
-      @patchStub = sinon.stub(@dmp, 'patch_make')
+      @diffStub = sinon.stub(@dmp, 'diff_main', -> 'some_diff')
+      @patchStub = sinon.stub(@dmp, 'patch_make', -> 'some_patch')
+      @patchApplyStub = sinon.stub(@dmp, 
+                                   'patch_apply', 
+                                   -> ['patched_value', [true]])
+      @setStub = sinon.stub(@model, 'set')
 
     afterEach ->
       @createPatchForStub.restore()
       @dmpStub.restore()
 
-    it 'sets the non-text attributes from the _patch', ->
+    it 'sets the non-text attributes from the patch', ->
       @modelPatch._applyPatch(@lastPatch, @model, @firstPatch, @current)
-      expect(@model.get('number')).toEqual(1234.5)
+      expect(@setStub).toHaveBeenCalledWith('number', 1234.5, skipPatch: true)
 
     it 'generates a diff for text attributes', ->
       @modelPatch._applyPatch(@lastPatch, @model, @firstPatch, @current)
       expect(@diffStub).toHaveBeenCalledWith('original_text', 'current_text')
+      
+    it 'generates a patch for text attributes', ->
+      @modelPatch._applyPatch(@lastPatch, @model, @firstPatch, @current)
+      expect(@patchStub).toHaveBeenCalledWith('original_text', 'some_diff')
+      
+    it 'applies a patch to the model text attribute', ->
+      @modelPatch._applyPatch(@lastPatch, @model, @firstPatch, @current)
+      expect(@patchApplyStub).toHaveBeenCalledWith('some_patch', 
+                                                   'original_text_and_more')
+    
+    context 'when patching a text-attribute succeeds', ->
+      it 'sets the successfully patched attribute on the model', ->
+        @modelPatch._applyPatch(@lastPatch, @model, @firstPatch, @current)
+        expect(@setStub).toHaveBeenCalledWith('text', 
+                                              'patched_value', 
+                                              skipPatch: true)
+                                            
+      it 'returns true', ->
+        expect(
+          @modelPatch._applyPatch(@lastPatch, @model, @firstPatch, @current)
+        ).toBeTruthy()
+      
+    context 'when patching a text-attribute fails', ->
+      beforeEach ->
+        @patchApplyStub.restore()
+        @patchApplyStub = sinon.stub(@dmp, 
+                                     'patch_apply', 
+                                     -> ['patched_value', [false]])
+        
+      it 'does not set the patched attribute on the model', ->
+        @modelPatch._applyPatch(@lastPatch, @model, @firstPatch, @current)
+        expect(@setStub).not.toHaveBeenCalledWith('text', 
+                                                  'patched_value', 
+                                                  skipPatch: true)
+        
+      it 'returns false', ->
+        expect(
+          @modelPatch._applyPatch(@lastPatch, @model, @firstPatch, @current)
+        ).toBeFalsy()
+        
+      
       
 
 
