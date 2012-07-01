@@ -17,27 +17,39 @@ class @ModelPatch
     
   applyTo: (model, first, currentAttributes) ->
     @dmp = new diff_match_patch
-    @_applyPatch(@_patch, model, first._patch, currentAttributes)
+    @_applyPatch(@_patch, model.attributes, first._patch, currentAttributes)
     
-  _applyPatch: (patch, model, firstAttributes, currentAttributes) ->
-    success = true
-    _.each patch, (value, attribute) =>
-      currentValue = currentAttributes[attribute]
-      if _.isString(currentValue)
-        originalValue = firstAttributes[attribute]
-        if _.isString(originalValue)
-          diff = @dmp.diff_main originalValue,
-                                currentValue
-          patch = @dmp.patch_make originalValue,
-                                  diff
-          [patched_value, results] = @dmp.patch_apply(patch, model.get(attribute))
-          if not false in results
-            model.set(attribute, patched_value, skipPatch: true)
-          else
-            # TODO: handle failed patch
-            success = false
-      else if _.isObject(currentValue)
-      
+  _applyPatch: (patch, attributesToPatch, firstAttributes, currentAttributes) ->
+    _.all patch, (value, attribute) =>
+      originalValue =   firstAttributes[attribute]
+      currentValue  = currentAttributes[attribute]
+      @_patchAttribute(attribute, value, attributesToPatch, originalValue, currentValue)
+    
+  _patchAttribute: (attribute, value, attributesToPatch, originalValue, currentValue) ->
+    if _.isString(currentValue)
+      if _.isString(originalValue)
+        diff = @dmp.diff_main originalValue,
+                              currentValue
+        patch = @dmp.patch_make originalValue,
+                                diff
+        [patched_value, results] = @dmp.patch_apply patch, 
+                                                    attributesToPatch[attribute]
+        if not false in results
+          attributesToPatch[attribute] = patched_value
+          true
+        else
+          # TODO: handle failed patch
+          false
       else
-        model.set(attribute, currentValue, skipPatch: true)
-    success
+        attributesToPatch[attribute] = currentValue
+        true
+    else if _.isObject(currentValue)
+      objectToPatch = attributesToPatch[attribute]
+      @_applyPatch(value, objectToPatch, originalValue, currentValue)
+    else
+      attributesToPatch[attribute] = currentValue
+      true
+    
+    
+    
+    
