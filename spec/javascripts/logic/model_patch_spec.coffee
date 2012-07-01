@@ -195,12 +195,13 @@ describe 'ModelPatch', ->
       beforeEach ->
         @attribute = 'attribute'
         @value = sinon.stub()
-        @objectToPatch = sinon.stub()
+        @objectToPatch = 
+          object: 'value'
         @attributesToPatch =
           attribute: @objectToPatch
         @originalValue = sinon.stub()
         @currentValue = 
-          attribute: 'value'
+          object: 'current_value'
         @applyPatchStub = sinon.stub(@modelPatch, '_applyPatch')
           
       it 'recursively calls the _applyPatch method', ->
@@ -209,6 +210,28 @@ describe 'ModelPatch', ->
         expect(@applyPatchStub).
           toHaveBeenCalledWith(@value, @objectToPatch, 
                                @originalValue, @currentValue)
+                               
+      context 'and the value to patch is not an object', ->
+        beforeEach ->
+          @objectToPatch = 'value_to_patch'
+          @attributesToPatch =
+            attribute: @objectToPatch
+          
+        it 'does not go into recursion', ->
+          @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
+                                      @originalValue, @currentValue)
+          expect(@applyPatchStub).not.toHaveBeenCalled()
+          
+        it 'sets the attribute to the current value', ->
+          @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
+                                      @originalValue, @currentValue)
+          expect(@attributesToPatch[@attribute]).toEqual(@currentValue)
+          
+        it 'returns true', ->
+          expect(
+            @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
+                                        @originalValue, @currentValue)
+          ).toBeTruthy()
     
     context 'when it concerns a text attribute', ->
       beforeEach ->

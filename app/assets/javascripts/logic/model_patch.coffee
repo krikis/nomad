@@ -45,7 +45,11 @@ class @ModelPatch
         true
     else if _.isObject(currentValue)
       objectToPatch = attributesToPatch[attribute]
-      @_applyPatch(value, objectToPatch, originalValue, currentValue)
+      if _.isObject(objectToPatch)
+        @_applyPatch(value, objectToPatch, originalValue, currentValue)
+      else
+        attributesToPatch[attribute] = currentValue
+        true
     else
       attributesToPatch[attribute] = currentValue
       true
