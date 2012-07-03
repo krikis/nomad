@@ -20,10 +20,15 @@ describe 'Patcher', ->
         changedAttributes: => @changedAttributes
         previousAttributes: => @previousAttributes
       @patcher = new Patcher(@model)
+      @cleanupPatchesStub = sinon.stub(@patcher, '_cleanupPatches')
       @patch = {}
       @createPatchForStub = sinon.stub(@patcher,
                                        '_createPatchFor',
                                        => @patch)
+                                       
+    it 'cleans up the model patches', ->
+      @patcher.updatePatches()
+      expect(@cleanupPatchesStub).toHaveBeenCalled()
 
     it 'calls the _createPatchFor method', ->
       @patcher.updatePatches()

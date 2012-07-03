@@ -4,6 +4,7 @@ class @Patcher
     @model = model
     
   updatePatches: ->
+    @_cleanupPatches()
     @model.patches().push
       _patch: @_createPatchFor(@model.changedAttributes(), 
                                @model.previousAttributes())
