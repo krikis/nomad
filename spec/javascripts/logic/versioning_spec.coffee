@@ -178,7 +178,7 @@ describe 'Versioning', ->
         @newPatcherStub.restore()
         Nomad.versioning = @previousVersioning
 
-      it 'creates a new modelPatch object', ->
+      it 'creates a new patcher object', ->
         @model.addVersion()
         expect(@newPatcherStub).toHaveBeenCalledWith(@model.localClock(),
                                                      @changedStub,

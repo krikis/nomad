@@ -13,24 +13,24 @@ describe 'Patcher', ->
       @createPatchForStub.restore()
 
     it 'sets the patch base', ->
-      @modelPatch = new Patcher(@base,
-                                @changedAttributes,
-                                @previousAttributes)
-      expect(@modelPatch.base).toEqual(@base)
+      @patcher = new Patcher(@base,
+                             @changedAttributes,
+                             @previousAttributes)
+      expect(@patcher.base).toEqual(@base)
 
     it 'calls the _createPatchFor method', ->
-      @modelPatch = new Patcher(@base,
-                                @changedAttributes,
-                                @previousAttributes)
+      @patcher = new Patcher(@base,
+                             @changedAttributes,
+                             @previousAttributes)
       expect(@createPatchForStub).
         toHaveBeenCalledWith(@changedAttributes,
                              @previousAttributes)
 
     it 'stores the output in _patch', ->
-      @modelPatch = new Patcher(@base,
-                                @changedAttributes,
-                                @previousAttributes)
-      expect(@modelPatch._patch).toEqual('new_patch')
+      @patcher = new Patcher(@base,
+                             @changedAttributes,
+                             @previousAttributes)
+      expect(@patcher._patch).toEqual('new_patch')
 
   describe '#_createPatchFor', ->
     beforeEach ->
@@ -43,20 +43,20 @@ describe 'Patcher', ->
       @createPatchForStub = sinon.stub(Patcher::,
                                        '_createPatchFor',
                                        -> 'new_patch')
-      @modelPatch = new Patcher(@base,
-                                @changedAttributes,
-                                @previousAttributes)
+      @patcher = new Patcher(@base,
+                             @changedAttributes,
+                             @previousAttributes)
       @createPatchForStub.restore()
 
     it 'saves all changed no-text attributes', ->
-      patch = @modelPatch._createPatchFor(@changedAttributes,
-                                          @previousAttributes)
+      patch = @patcher._createPatchFor(@changedAttributes,
+                                       @previousAttributes)
       expect(patch.number).
         toEqual(@changedAttributes.number)
 
     it 'retains the previous version of all text attributes', ->
-      patch = @modelPatch._createPatchFor(@changedAttributes,
-                                          @previousAttributes)
+      patch = @patcher._createPatchFor(@changedAttributes,
+                                       @previousAttributes)
       expect(patch.text).toEqual('previous_text')
 
     context 'when the changed attributes contain an object', ->
@@ -65,11 +65,11 @@ describe 'Patcher', ->
           object:
             number: 1234.5
             text: 'some_text'
-        @updatePatchSpy = sinon.spy(@modelPatch, '_createPatchFor')
+        @updatePatchSpy = sinon.spy(@patcher, '_createPatchFor')
 
       it 'recursively updates the patch for this object', ->
-        patch = @modelPatch._createPatchFor(@changedAttributes,
-                                            @previousAttributes)
+        patch = @patcher._createPatchFor(@changedAttributes,
+                                         @previousAttributes)
         expect(@updatePatchSpy).
           toHaveBeenCalledWith(number: 1234.5, text: 'some_text', undefined)
 
@@ -78,10 +78,10 @@ describe 'Patcher', ->
       @createPatchForStub = sinon.stub(Patcher::,
                                        '_createPatchFor',
                                        -> 'new_patch')
-      @modelPatch = new Patcher
-      @applyPatchStub = sinon.stub(@modelPatch, '_applyPatch')
+      @patcher = new Patcher
+      @applyPatchStub = sinon.stub(@patcher, '_applyPatch')
       @patch = sinon.stub()
-      @modelPatch._patch = @patch
+      @v._patch = @patch
       @attributesToPatch = sinon.stub()
       @model =
         attributes: @attributesToPatch
@@ -94,7 +94,7 @@ describe 'Patcher', ->
       @createPatchForStub.restore()
 
     it 'calls _applyPatch', ->
-      @modelPatch.applyTo(@model, @first, @current)
+      @v.applyTo(@model, @first, @current)
       expect(@applyPatchStub).toHaveBeenCalledWith(@patch,
                                                    @attributesToPatch,
                                                    @firstPatch,
@@ -105,8 +105,8 @@ describe 'Patcher', ->
       @createPatchForStub = sinon.stub(Patcher::,
                                        '_createPatchFor',
                                        -> 'new_patch')
-      @modelPatch = new Patcher
-      @patchAttributeStub = sinon.stub(@modelPatch, '_patchAttribute')
+      @v = new Patcher
+      @patchAttributeStub = sinon.stub(@v, '_patchAttribute')
       @originalValue = sinon.stub()
       @firstPatch = 
         attribute: @originalValue
@@ -122,8 +122,8 @@ describe 'Patcher', ->
       @createPatchForStub.restore()
       
     it 'calls the _patchAttribute method for each attribute', ->
-      @modelPatch._applyPatch(@lastPatch, @attributesToPatch, 
-                              @firstPatch, @current)
+      @patcher._applyPatch(@lastPatch, @attributesToPatch, 
+                           @firstPatch, @current)
       expect(@patchAttributeStub).
         toHaveBeenCalledWith('attribute', @value, @attributesToPatch, 
                              @originalValue, @currentValue)
@@ -134,15 +134,15 @@ describe 'Patcher', ->
         @lastPatch .secondAttribute = sinon.stub()
         @current   .secondAttribute = sinon.stub()
         @patchAttributeStub.restore()
-        @patchAttributeStub = sinon.stub(@modelPatch, '_patchAttribute', ->
+        @patchAttributeStub = sinon.stub(@v, '_patchAttribute', ->
           @out ||= [true, true]
           @out.pop()
         )
         
       it 'returns true', ->
         expect(
-          @modelPatch._applyPatch(@lastPatch, @attributesToPatch, 
-                                  @firstPatch, @current)
+          @patcher._applyPatch(@lastPatch, @attributesToPatch, 
+                               @firstPatch, @current)
         ).toBeTruthy()
     
     context 'when at least one call for an attribute returns false', ->
@@ -151,15 +151,15 @@ describe 'Patcher', ->
         @lastPatch .secondAttribute = sinon.stub()
         @current   .secondAttribute = sinon.stub()
         @patchAttributeStub.restore()
-        @patchAttributeStub = sinon.stub(@modelPatch, '_patchAttribute', ->
+        @patchAttributeStub = sinon.stub(@patcher, '_patchAttribute', ->
           @out ||= [false, true]
           @out.pop()
         )
     
       it 'returns false', ->
         expect(
-          @modelPatch._applyPatch(@lastPatch, @attributesToPatch, 
-                                  @firstPatch, @current)
+          @patcher._applyPatch(@lastPatch, @attributesToPatch, 
+                               @firstPatch, @current)
         ).toBeFalsy()
 
   describe '_patchAttribute', ->
@@ -167,7 +167,7 @@ describe 'Patcher', ->
       @createPatchForStub = sinon.stub(Patcher::,
                                        '_createPatchFor',
                                        -> 'new_patch')
-      @modelPatch = new Patcher
+      @patcher = new Patcher
 
     afterEach ->
       @createPatchForStub.restore()
@@ -181,14 +181,14 @@ describe 'Patcher', ->
         @currentValue = 1234.5
 
       it 'sets the attribute on the model', ->
-        @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                    @originalValue, @currentValue)
+        @patcher._patchAttribute(@attribute, @value, @attributesToPatch, 
+                                 @originalValue, @currentValue)
         expect(@attributesToPatch[@attribute]).toEqual(@currentValue)
                                               
       it 'returns true', ->
         expect(
-          @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                      @originalValue, @currentValue)
+          @patcher._patchAttribute(@attribute, @value, @attributesToPatch, 
+                                   @originalValue, @currentValue)
         ).toBeTruthy()
         
     context 'when it concerns an object', ->
@@ -202,11 +202,11 @@ describe 'Patcher', ->
         @originalValue = sinon.stub()
         @currentValue = 
           object: 'current_value'
-        @applyPatchStub = sinon.stub(@modelPatch, '_applyPatch')
+        @applyPatchStub = sinon.stub(@patcher, '_applyPatch')
           
       it 'recursively calls the _applyPatch method', ->
-        @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                    @originalValue, @currentValue)
+        @patcher._patchAttribute(@attribute, @value, @attributesToPatch, 
+                                 @originalValue, @currentValue)
         expect(@applyPatchStub).
           toHaveBeenCalledWith(@value, @objectToPatch, 
                                @originalValue, @currentValue)
@@ -218,19 +218,19 @@ describe 'Patcher', ->
             attribute: @objectToPatch
           
         it 'does not go into recursion', ->
-          @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                      @originalValue, @currentValue)
+          @patcher._patchAttribute(@attribute, @value, @attributesToPatch, 
+                                   @originalValue, @currentValue)
           expect(@applyPatchStub).not.toHaveBeenCalled()
           
         it 'sets the attribute to the current value', ->
-          @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                      @originalValue, @currentValue)
+          @patcher._patchAttribute(@attribute, @value, @attributesToPatch, 
+                                   @originalValue, @currentValue)
           expect(@attributesToPatch[@attribute]).toEqual(@currentValue)
           
         it 'returns true', ->
           expect(
-            @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                        @originalValue, @currentValue)
+            @patcher._patchAttribute(@attribute, @value, @attributesToPatch, 
+                                     @originalValue, @currentValue)
           ).toBeTruthy()
     
     context 'when it concerns a text attribute', ->
@@ -241,11 +241,11 @@ describe 'Patcher', ->
           text: 'model_text'
         @originalValue = 'original_text'
         @currentValue = 'current_text'
-        @patchStringStub = sinon.stub(@modelPatch, '_patchString')
+        @patchStringStub = sinon.stub(@patcher, '_patchString')
 
       it 'calls the _patchString method', ->  
-        @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                    @originalValue, @currentValue)
+        @patcher._patchAttribute(@attribute, @value, @attributesToPatch, 
+                                 @originalValue, @currentValue)
         expect(@patchStringStub).
           toHaveBeenCalledWith(@attribute, @attributesToPatch, 
                                @originalValue, @currentValue)
@@ -255,14 +255,14 @@ describe 'Patcher', ->
           @originalValue = sinon.stub()
           
         it 'sets the current value on the model', ->
-          @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                      @originalValue, @currentValue)
+          @patcher._patchAttribute(@attribute, @value, @attributesToPatch, 
+                                   @originalValue, @currentValue)
           expect(@attributesToPatch.text).toEqual(@currentValue)
         
         it 'returns true', ->
           expect(
-            @modelPatch._patchAttribute(@attribute, @value, @attributesToPatch, 
-                                        @originalValue, @currentValue)
+            @patcher._patchAttribute(@attribute, @value, @attributesToPatch, 
+                                     @originalValue, @currentValue)
           ).toBeTruthy()
       
   describe '#_patchString', ->
@@ -270,14 +270,14 @@ describe 'Patcher', ->
       @createPatchForStub = sinon.stub(Patcher::,
                                        '_createPatchFor',
                                        -> 'new_patch')
-      @modelPatch = new Patcher
+      @patcher = new Patcher
       @attribute = 'text'
       @attributesToPatch =
         text: 'model_text'
       @originalValue = 'original_text'
       @currentValue = 'current_text'
       @dmp = new diff_match_patch
-      @modelPatch.dmp = @dmp
+      @patcher.dmp = @dmp
       @dmpStub        = sinon.stub(window, 'diff_match_patch', => @dmp)
       @diffStub       = sinon.stub(@dmp, 'diff_main', -> 'some_diff')
       @patchStub      = sinon.stub(@dmp, 'patch_make', -> 'some_patch')
@@ -289,31 +289,31 @@ describe 'Patcher', ->
       @dmpStub.restore()
   
     it 'generates a diff for the attribute', ->  
-      @modelPatch._patchString(@attribute, @attributesToPatch, 
-                               @originalValue, @currentValue)
+      @patcher._patchString(@attribute, @attributesToPatch, 
+                            @originalValue, @currentValue)
       expect(@diffStub).toHaveBeenCalledWith(@originalValue, @currentValue)
   
     it 'generates a patch for the attribute', ->
-      @modelPatch._patchString(@attribute, @attributesToPatch, 
-                               @originalValue, @currentValue)
+      @patcher._patchString(@attribute, @attributesToPatch, 
+                            @originalValue, @currentValue)
       expect(@patchStub).toHaveBeenCalledWith(@originalValue, 'some_diff')
   
     it 'applies a patch on the model attribute', ->
-      @modelPatch._patchString(@attribute, @attributesToPatch, 
-                               @originalValue, @currentValue)
+      @patcher._patchString(@attribute, @attributesToPatch, 
+                            @originalValue, @currentValue)
       expect(@patchApplyStub).toHaveBeenCalledWith('some_patch', 
                                                    'model_text')
   
     context 'and patching a text-attribute succeeds', ->
       it 'sets the successfully patched attribute on the model', ->
-        @modelPatch._patchString(@attribute, @attributesToPatch, 
-                                 @originalValue, @currentValue)
+        @patcher._patchString(@attribute, @attributesToPatch, 
+                              @originalValue, @currentValue)
         expect(@attributesToPatch.text).toEqual('patched_value')
   
       it 'returns true', ->
         expect(
-          @modelPatch._patchString(@attribute, @attributesToPatch, 
-                                   @originalValue, @currentValue)
+          @patcher._patchString(@attribute, @attributesToPatch, 
+                                @originalValue, @currentValue)
         ).toBeTruthy()
   
     context 'and patching a text-attribute fails', ->
@@ -324,14 +324,14 @@ describe 'Patcher', ->
                                      -> ['patched_value', [false]])
   
       it 'does not set the patched attribute on the model', ->
-        @modelPatch._patchString(@attribute, @attributesToPatch, 
-                                 @originalValue, @currentValue)
+        @patcher._patchString(@attribute, @attributesToPatch, 
+                              @originalValue, @currentValue)
         expect(@attributesToPatch.text).toEqual('model_text')
   
       it 'returns false', ->
         expect(
-          @modelPatch._patchString(@attribute, @attributesToPatch, 
-                                   @originalValue, @currentValue)
+          @patcher._patchString(@attribute, @attributesToPatch, 
+                                @originalValue, @currentValue)
         ).toBeFalsy() 
   
       
