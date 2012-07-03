@@ -45,13 +45,7 @@ describe 'Patcher', ->
       @previousAttributes =
         number: 1001.1
         text: 'previous_text'
-      @createPatchForStub = sinon.stub(Patcher::,
-                                       '_createPatchFor',
-                                       -> 'new_patch')
-      @patcher = new Patcher(@base,
-                             @changedAttributes,
-                             @previousAttributes)
-      @createPatchForStub.restore()
+      @patcher = new Patcher(sinon.stub())
 
     it 'saves all changed no-text attributes', ->
       patch = @patcher._createPatchFor(@changedAttributes,
@@ -70,12 +64,12 @@ describe 'Patcher', ->
           object:
             number: 1234.5
             text: 'some_text'
-        @updatePatchSpy = sinon.spy(@patcher, '_createPatchFor')
+        @createPatchForSpy = sinon.spy(@patcher, '_createPatchFor')
 
       it 'recursively updates the patch for this object', ->
         patch = @patcher._createPatchFor(@changedAttributes,
                                          @previousAttributes)
-        expect(@updatePatchSpy).
+        expect(@createPatchForSpy).
           toHaveBeenCalledWith(number: 1234.5, text: 'some_text', undefined)
 
   describe '#applyPatches', ->
