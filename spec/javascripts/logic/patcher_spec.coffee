@@ -74,21 +74,17 @@ describe 'Patcher', ->
 
   describe '#applyPatchesTo', ->
     beforeEach ->
-      @firstPatch = sinon.stub()
       @first =
-        _patch: @firstPatch
-      @lastPatch = sinon.stub()
+        _patch: @firstPatch = sinon.stub()
       @last =
-        _patch: @lastPatch
-      @currentAttributes = sinon.stub()
+        _patch: @lastPatch = sinon.stub()
       @model = 
         patches: => [@first, @last]
-        attributes: @currentAttributes
+        attributes: @currentAttributes = sinon.stub()
       @patcher = new Patcher(@model)
       @applyPatchStub = sinon.stub(@patcher, '_applyPatch')
-      @attributesToPatch = sinon.stub()
       @dummy =
-        attributes: @attributesToPatch
+        attributes: @attributesToPatch = sinon.stub()
 
     it 'calls _applyPatch', ->
       @patcher.applyPatchesTo(@dummy)
