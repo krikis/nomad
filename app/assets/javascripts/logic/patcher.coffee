@@ -20,9 +20,13 @@ class @Patcher
                                             previous[attribute])
     patch
     
-  applyPatches: (model, first, currentAttributes) ->
+  applyPatchesTo: (dummy) ->
     @dmp = new diff_match_patch
-    @_applyPatch(@_patch, model.attributes, first._patch, currentAttributes)
+    patches = _(@model.patches())
+    @_applyPatch(patches.last()._patch, 
+                 dummy.attributes, 
+                 patches.first()._patch, 
+                 @model.attributes)
     
   _applyPatch: (patch, attributesToPatch, firstAttributes, currentAttributes) ->
     _.all patch, (value, attribute) =>

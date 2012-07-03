@@ -72,32 +72,30 @@ describe 'Patcher', ->
         expect(@createPatchForSpy).
           toHaveBeenCalledWith(number: 1234.5, text: 'some_text', undefined)
 
-  describe '#applyPatches', ->
+  describe '#applyPatchesTo', ->
     beforeEach ->
-      @createPatchForStub = sinon.stub(Patcher::,
-                                       '_createPatchFor',
-                                       -> 'new_patch')
-      @patcher = new Patcher()
-      @applyPatchStub = sinon.stub(@patcher, '_applyPatch')
-      @patch = sinon.stub()
-      @patcher._patch = @patch
-      @attributesToPatch = sinon.stub()
-      @model =
-        attributes: @attributesToPatch
       @firstPatch = sinon.stub()
       @first =
         _patch: @firstPatch
-      @current = sinon.stub()
-
-    afterEach ->
-      @createPatchForStub.restore()
+      @lastPatch = sinon.stub()
+      @last =
+        _patch: @lastPatch
+      @currentAttributes = sinon.stub()
+      @model = 
+        patches: => [@first, @last]
+        attributes: @currentAttributes
+      @patcher = new Patcher(@model)
+      @applyPatchStub = sinon.stub(@patcher, '_applyPatch')
+      @attributesToPatch = sinon.stub()
+      @dummy =
+        attributes: @attributesToPatch
 
     it 'calls _applyPatch', ->
-      @patcher.applyPatches(@model, @first, @current)
-      expect(@applyPatchStub).toHaveBeenCalledWith(@patch,
+      @patcher.applyPatchesTo(@dummy)
+      expect(@applyPatchStub).toHaveBeenCalledWith(@lastPatch,
                                                    @attributesToPatch,
                                                    @firstPatch,
-                                                   @current)
+                                                   @currentAttributes)
 
   describe '#_applyPatch', ->
     beforeEach ->
