@@ -4,10 +4,17 @@ class @Patcher
     @model = model
     
   updatePatches: ->
-    @model._versioning.patches.push
+    @model.patches().push
       _patch: @_createPatchFor(@model.changedAttributes(), 
                                @model.previousAttributes())
       base: @model.localClock()
+
+  _cleanupPatches: () ->
+    patches = _.clone @model.patches()
+    _.each patches, (patch) =>
+      unless patch == @model.patches()[0] or
+             patch.base in @model.syncingVersions()
+        @model.patches().delete patch
     
   _createPatchFor: (changed, previous) ->
     patch = {}
@@ -21,8 +28,6 @@ class @Patcher
       else
         patch[attribute] = null
     patch
-    
-  _cleanupPatches: () ->
     
   applyPatchesTo: (dummy) ->
     @dmp = new diff_match_patch

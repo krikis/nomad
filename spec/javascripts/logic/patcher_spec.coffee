@@ -13,9 +13,9 @@ describe 'Patcher', ->
       @base               = sinon.stub()
       @changedAttributes  = sinon.stub()
       @previousAttributes = sinon.stub()
+      @patches = []
       @model =
-        _versioning:
-          patches: []
+        patches: => @patches
         localClock: => @base
         changedAttributes: => @changedAttributes
         previousAttributes: => @previousAttributes
@@ -31,12 +31,36 @@ describe 'Patcher', ->
         toHaveBeenCalledWith(@changedAttributes,
                              @previousAttributes)
 
-    it 'appends the patch to te list of patches', ->
+    it 'appends the patch to the list of patches', ->
       @patcher.updatePatches()
-      expect(@model._versioning.patches[0]).toEqual
+      expect(@model.patches()[0]).toEqual
         _patch: @patch
         base: @base
-
+        
+  describe '#_cleanupPatches', ->
+    beforeEach ->
+      @patches = [
+        @first = {base: 1}
+        @second = {base: 2}
+        @last = {base: 3}
+      ]
+      @model =
+        patches: => @patches
+        syncingVersions: ->
+      @patcher = new Patcher(@model)
+          
+    it 'retains the first patch', ->
+      @patcher._cleanupPatches()
+      expect(@model.patches()).toEqual([@first])
+      
+    context 'when there are versions currently being synced', ->
+      beforeEach -> 
+        @model.syncingVersions = -> [2]
+        
+      it 'retains all patches based on these versions', ->
+        @patcher._cleanupPatches()
+        expect(@model.patches()).toEqual([@first, @second])
+      
   describe '#_createPatchFor', ->
     beforeEach ->
       @changedAttributes =
