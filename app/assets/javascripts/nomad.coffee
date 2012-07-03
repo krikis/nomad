@@ -13,5 +13,5 @@
   Routers: {}
   Views: {}
   clientId: @clientId
-  versioning: 'structured_content_diff'
+  # versioning: 'structured_content_diff'
 

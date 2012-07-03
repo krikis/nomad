@@ -25,7 +25,7 @@ describe 'Patcher', ->
       @createPatchForStub = sinon.stub(@patcher,
                                        '_createPatchFor',
                                        => @patch)
-                                       
+
     it 'cleans up the model patches', ->
       @patcher.updatePatches()
       expect(@cleanupPatchesStub).toHaveBeenCalled()
@@ -41,7 +41,7 @@ describe 'Patcher', ->
       expect(@model.patches()[0]).toEqual
         _patch: @patch
         base: @base
-        
+
   describe '#_cleanupPatches', ->
     beforeEach ->
       @patches = [
@@ -51,21 +51,21 @@ describe 'Patcher', ->
       ]
       @model =
         patches: => @patches
-        syncingVersions: ->
+        syncingVersions: -> []
       @patcher = new Patcher(@model)
-          
+
     it 'retains the first patch', ->
       @patcher._cleanupPatches()
       expect(@model.patches()).toEqual([@first])
-      
+
     context 'when there are versions currently being synced', ->
-      beforeEach -> 
+      beforeEach ->
         @model.syncingVersions = -> [2]
-        
+
       it 'retains all patches based on these versions', ->
         @patcher._cleanupPatches()
         expect(@model.patches()).toEqual([@first, @second])
-      
+
   describe '#_createPatchFor', ->
     beforeEach ->
       @changedAttributes =
@@ -106,7 +106,7 @@ describe 'Patcher', ->
         _patch: @firstPatch = sinon.stub()
       @last =
         _patch: @lastPatch = sinon.stub()
-      @model = 
+      @model =
         patches: => [@first, @last]
         attributes: @currentAttributes = sinon.stub()
       @patcher = new Patcher(@model)

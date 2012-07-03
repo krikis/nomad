@@ -351,6 +351,13 @@ describe 'Versioning', ->
   
     it 'returns the versions the model is currently syncing', ->
       expect(@model.syncingVersions()).toEqual(@syncingVersions)
+      
+    context 'when there are no versions being synced', ->
+      beforeEach ->
+        @model._versioning = {}
+        
+      it 'returns an empty array', ->
+        expect(@model.syncingVersions()).toEqual([])
 
   describe '#markAsSynced', ->
     beforeEach ->
