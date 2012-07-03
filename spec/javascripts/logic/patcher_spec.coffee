@@ -78,15 +78,15 @@ describe 'Patcher', ->
         expect(@updatePatchSpy).
           toHaveBeenCalledWith(number: 1234.5, text: 'some_text', undefined)
 
-  describe '#applyTo', ->
+  describe '#applyPatches', ->
     beforeEach ->
       @createPatchForStub = sinon.stub(Patcher::,
                                        '_createPatchFor',
                                        -> 'new_patch')
-      @patcher = new Patcher
+      @patcher = new Patcher()
       @applyPatchStub = sinon.stub(@patcher, '_applyPatch')
       @patch = sinon.stub()
-      @v._patch = @patch
+      @patcher._patch = @patch
       @attributesToPatch = sinon.stub()
       @model =
         attributes: @attributesToPatch
@@ -99,7 +99,7 @@ describe 'Patcher', ->
       @createPatchForStub.restore()
 
     it 'calls _applyPatch', ->
-      @v.applyTo(@model, @first, @current)
+      @patcher.applyPatches(@model, @first, @current)
       expect(@applyPatchStub).toHaveBeenCalledWith(@patch,
                                                    @attributesToPatch,
                                                    @firstPatch,
@@ -110,8 +110,8 @@ describe 'Patcher', ->
       @createPatchForStub = sinon.stub(Patcher::,
                                        '_createPatchFor',
                                        -> 'new_patch')
-      @v = new Patcher
-      @patchAttributeStub = sinon.stub(@v, '_patchAttribute')
+      @patcher = new Patcher
+      @patchAttributeStub = sinon.stub(@patcher, '_patchAttribute')
       @originalValue = sinon.stub()
       @firstPatch =
         attribute: @originalValue
@@ -139,7 +139,7 @@ describe 'Patcher', ->
         @lastPatch .secondAttribute = sinon.stub()
         @current   .secondAttribute = sinon.stub()
         @patchAttributeStub.restore()
-        @patchAttributeStub = sinon.stub(@v, '_patchAttribute', ->
+        @patchAttributeStub = sinon.stub(@patcher, '_patchAttribute', ->
           @out ||= [true, true]
           @out.pop()
         )

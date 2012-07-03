@@ -728,8 +728,8 @@ describe 'Versioning', ->
         Nomad.versioning = 'per_attribute_diff'
         @firstPatch = sinon.stub()
         @lastPatch = sinon.stub()
-        @lastPatch.applyTo = ->
-        @applyToStub = sinon.stub(@lastPatch, 'applyTo')
+        @lastPatch.applyPatches = ->
+        @applyPatchesStub = sinon.stub(@lastPatch, 'applyPatches')
         @attributes = sinon.stub()
         @originalModel = {}
         @originalModel._versioning = {}
@@ -741,7 +741,7 @@ describe 'Versioning', ->
         
       it 'applies the most recent patch to the model', ->
         @model._processPatchesOf(@originalModel)
-        expect(@applyToStub).toHaveBeenCalledWith(@model, 
+        expect(@applyPatchesStub).toHaveBeenCalledWith(@model, 
                                                   @firstPatch, 
                                                   @attributes)
 

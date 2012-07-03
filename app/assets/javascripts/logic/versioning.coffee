@@ -149,7 +149,7 @@
       patches.all (patch) =>
         @_applyPatch(patch.patch_text)
     else
-      patches.last().applyTo(@, patches.first(), model.attributes)
+      patches.last().applyPatches(@, patches.first(), model.attributes)
 
   _applyPatch: (patch_text) ->
     dmp = new diff_match_patch

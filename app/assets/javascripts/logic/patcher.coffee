@@ -20,7 +20,7 @@ class @Patcher
                                             previous[attribute])
     patch
     
-  applyTo: (model, first, currentAttributes) ->
+  applyPatches: (model, first, currentAttributes) ->
     @dmp = new diff_match_patch
     @_applyPatch(@_patch, model.attributes, first._patch, currentAttributes)
     
