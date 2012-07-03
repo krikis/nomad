@@ -63,6 +63,9 @@
 
   hasPatches: ->
     @_versioning?.patches?.length > 0
+    
+  syncingVersions: ->
+    @_versioning?.syncingVersions
 
   markAsSynced: ->
     @_versioning.syncingVersions ||= []

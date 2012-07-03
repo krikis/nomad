@@ -341,6 +341,16 @@ describe 'Versioning', ->
 
       it 'returns true', ->
         expect(@model.hasPatches()).toBeTruthy()
+        
+  describe '#syncingVersions', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      @model._versioning =
+        syncingVersions: @syncingVersions = sinon.stub()
+  
+    it 'returns the versions the model is currently syncing', ->
+      expect(@model.syncingVersions()).toEqual(@syncingVersions)
 
   describe '#markAsSynced', ->
     beforeEach ->
