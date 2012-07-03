@@ -576,13 +576,13 @@ describe 'Versioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('answer')
+      @applyPatchesToStub = sinon.stub(@model, '_applyPatchesTo', -> true)
       @patches = sinon.stub
       @model._versioning = {patches: @patches}
       @dummy = new TestModel
       @extractVersioningSpy = sinon.spy(@model, '_extractVersioning')
       @newModelStub = sinon.stub(TestModel::, 'constructor', => @dummy)
       @dummySetStub = sinon.stub(@dummy, 'set')
-      @processPatchesStub = sinon.stub(@dummy, '_processPatchesOf', -> true)
       @modelSetStub = sinon.stub(@model, 'set')
       @updateVersionToStub = sinon.stub(@model, '_updateVersionTo')
       @modelSaveStub = sinon.stub(@model, 'save')
@@ -615,7 +615,7 @@ describe 'Versioning', ->
 
     it 'applies all patches to the dummy model', ->
       @model._rebase({})
-      expect(@processPatchesStub).toHaveBeenCalledWith(@model)
+      expect(@applyPatchesToStub).toHaveBeenCalledWith(@dummy)
 
     context 'when all patches are successfully applied', ->
       it 'sets the dummy\'s attributes on the model without creating a patch', ->
@@ -639,8 +639,8 @@ describe 'Versioning', ->
 
     context 'when not all patches were applied successfully', ->
       beforeEach ->
-        @processPatchesStub.restore()
-        @processPatchesStub = sinon.stub(@dummy, '_processPatchesOf', -> false)
+        @applyPatchesToStub.restore()
+        @applyPatchesToStub = sinon.stub(@model, '_applyPatchesTo', -> false)
 
       it 'returns null', ->
         expect(@model._rebase({})).toBeNull()
@@ -682,68 +682,73 @@ describe 'Versioning', ->
       [a, b, updated_at] = @model._extractVersioning(@attributes)
       expect(updated_at).toEqual('updated_at')
 
-  describe '#_processPatchesOf', ->
+  describe '#_applyPatchesTo', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
-      @applyPatchStub = sinon.stub(@model, '_applyPatch', ->
-        @results ||= [true, true]
-        @results.pop()
-      )
+      @dummy = new TestModel
       
     context 'when a structured content diff is used for versioning', ->
       beforeEach ->
         @origVersioning = Nomad.versioning
         Nomad.versioning = 'structured_content_diff'
-        @originalModel = {}
-        @originalModel._versioning = {}
-        @originalModel._versioning.patches = [{patch_text: 'some'},
-                                              {patch_text: 'patches'}]
+        @applyPatchStub = sinon.stub(@dummy, '_applyPatch', ->
+          @results ||= [true, true]
+          @results.pop()
+        )
+        @model._versioning = {}
+        @model._versioning.patches = [{patch_text: 'some'},
+                                      {patch_text: 'patches'}]
         
       afterEach ->
         Nomad.versioning = @origVersioning
 
-      it 'applies each patch to the model', ->
-        @model._processPatchesOf(@originalModel)
+      it 'applies each patch to the dummy', ->
+        @model._applyPatchesTo(@dummy)
         expect(@applyPatchStub).toHaveBeenCalledWith('some')
         expect(@applyPatchStub).toHaveBeenCalledWith('patches')
 
       it 'returns true when all patches apply successfully', ->
-        expect(@model._processPatchesOf(@originalModel)).toBeTruthy()
+        expect(@model._applyPatchesTo(@dummy)).toBeTruthy()
 
       context 'when at least one patch did not apply successfully', ->
         beforeEach ->
           @applyPatchStub.restore()
-          @applyPatchStub = sinon.stub(@model, '_applyPatch', ->
+          @applyPatchStub = sinon.stub(@dummy, '_applyPatch', ->
             @results ||= [true, false, true]
             @results.pop()
           )
 
         it 'returns false', ->
-          expect(@model._processPatchesOf(@originalModel)).toBeFalsy()
+          expect(@model._applyPatchesTo(@dummy)).toBeFalsy()
           
     context 'when a per attribute diff is used for versioning', ->
       beforeEach ->
         @origVersioning = Nomad.versioning
         Nomad.versioning = 'per_attribute_diff'
-        @firstPatch = sinon.stub()
-        @lastPatch = sinon.stub()
-        @lastPatch.applyPatches = ->
-        @applyPatchesStub = sinon.stub(@lastPatch, 'applyPatches')
-        @attributes = sinon.stub()
-        @originalModel = {}
-        @originalModel._versioning = {}
-        @originalModel._versioning.patches = [@firstPatch, @lastPatch]
-        @originalModel.attributes = @attributes
-      
+        @patcher = 
+          applyPatchesTo: ->
+        @applyPatchesToStub = sinon.stub(@patcher, 'applyPatchesTo', 
+                                         -> 'patcher_result')
+        @newPatcherStub = sinon.stub(window,
+                                     'Patcher',
+                                     => @patcher)
+
       afterEach ->
+        @newPatcherStub.restore()
         Nomad.versioning = @origVersioning
         
-      it 'applies the most recent patch to the model', ->
-        @model._processPatchesOf(@originalModel)
-        expect(@applyPatchesStub).toHaveBeenCalledWith(@model, 
-                                                  @firstPatch, 
-                                                  @attributes)
+      it 'creates a new patcher instance', ->
+        @model._applyPatchesTo(@dummy)
+        expect(@newPatcherStub).toHaveBeenCalledWith(@model)
+        
+      it 'calls the patcher applyPatchesTo method', ->
+        @model._applyPatchesTo(@dummy)
+        expect(@applyPatchesToStub).
+          toHaveBeenCalledWith(@dummy)
+          
+      it 'propagates the applyPatchesTo return value', ->
+        expect(@model._applyPatchesTo(@dummy)).toEqual('patcher_result')
 
   describe '#_applyPatch', ->
     beforeEach ->
