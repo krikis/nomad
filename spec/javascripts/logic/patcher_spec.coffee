@@ -179,10 +179,9 @@ describe 'Patcher', ->
       beforeEach ->
         @attribute = 'attribute'
         @value = sinon.stub()
-        @objectToPatch =
-          object: 'value'
         @attributesToPatch =
-          attribute: @objectToPatch
+          attribute: @objectToPatch =
+            object: 'value'
         @originalValue = sinon.stub()
         @currentValue =
           object: 'current_value'
@@ -197,9 +196,8 @@ describe 'Patcher', ->
 
       context 'and the value to patch is not an object', ->
         beforeEach ->
-          @objectToPatch = 'value_to_patch'
           @attributesToPatch =
-            attribute: @objectToPatch
+            attribute: @objectToPatch = 'value_to_patch'
 
         it 'does not go into recursion', ->
           @patcher._patchAttribute(@attribute, @value, @attributesToPatch,
@@ -260,8 +258,7 @@ describe 'Patcher', ->
         text: 'model_text'
       @originalValue = 'original_text'
       @currentValue = 'current_text'
-      @dmp = new diff_match_patch
-      @patcher.dmp = @dmp
+      @patcher.dmp = @dmp = new diff_match_patch
       @dmpStub        = sinon.stub(window, 'diff_match_patch', => @dmp)
       @diffStub       = sinon.stub(@dmp, 'diff_main', -> 'some_diff')
       @patchStub      = sinon.stub(@dmp, 'patch_make', -> 'some_patch')
