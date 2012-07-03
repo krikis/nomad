@@ -32,7 +32,7 @@ class DbCleaner
   end
 end
 
-guard 'jasmine', :console => :always, :errors => :always, :timeout => 30000, :keep_failed => false, :all_after_pass => false do
+guard 'jasmine', :console => :always, :errors => :always, :timeout => 10000, :keep_failed => false, :all_after_pass => false do
   watch(%r{spec/javascripts/helpers/.*(js\.coffee|js|coffee)$})    { 'spec/javascripts' }
   watch(%r{spec/javascripts/spec\.(js\.coffee|js|coffee)$})        { 'spec/javascripts' }
   watch(%r{^spec/javascripts/.*_factory\..*})                      { 'spec/javascripts' }
