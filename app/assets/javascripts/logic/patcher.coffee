@@ -10,7 +10,7 @@ class @Patcher
       base: @model.localClock()
     
   _createPatchFor: (changed, previous) ->
-    patch = _.clone(changed)
+    patch = {}
     previous ||= {}
     _.each changed, (value, attribute) =>
       if _.isString(value)
@@ -18,7 +18,11 @@ class @Patcher
       else if _.isObject(value)
         patch[attribute] = @_createPatchFor(changed[attribute],
                                             previous[attribute])
+      else
+        patch[attribute] = null
     patch
+    
+  _cleanupPatches: () ->
     
   applyPatchesTo: (dummy) ->
     @dmp = new diff_match_patch

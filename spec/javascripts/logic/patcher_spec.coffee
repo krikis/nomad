@@ -47,11 +47,10 @@ describe 'Patcher', ->
         text: 'previous_text'
       @patcher = new Patcher(sinon.stub())
 
-    it 'saves all changed no-text attributes', ->
+    it 'saves all keys of no-text attributes', ->
       patch = @patcher._createPatchFor(@changedAttributes,
                                        @previousAttributes)
-      expect(patch.number).
-        toEqual(@changedAttributes.number)
+      expect(_.keys(patch)).toContain('number')
 
     it 'retains the previous version of all text attributes', ->
       patch = @patcher._createPatchFor(@changedAttributes,
