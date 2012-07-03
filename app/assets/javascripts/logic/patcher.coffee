@@ -1,4 +1,4 @@
-class @ModelPatch
+class @Patcher
     
   constructor: (base, changed, previous) ->
     @base = base

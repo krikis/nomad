@@ -1,11 +1,11 @@
-describe 'ModelPatch', ->
+describe 'Patcher', ->
 
   describe '.new', ->
     beforeEach ->
       @base               = sinon.stub()
       @changedAttributes  = sinon.stub()
       @previousAttributes = sinon.stub()
-      @createPatchForStub = sinon.stub(ModelPatch::,
+      @createPatchForStub = sinon.stub(Patcher::,
                                        '_createPatchFor',
                                        -> 'new_patch')
 
@@ -13,23 +13,23 @@ describe 'ModelPatch', ->
       @createPatchForStub.restore()
 
     it 'sets the patch base', ->
-      @modelPatch = new ModelPatch(@base,
-                                   @changedAttributes,
-                                   @previousAttributes)
+      @modelPatch = new Patcher(@base,
+                                @changedAttributes,
+                                @previousAttributes)
       expect(@modelPatch.base).toEqual(@base)
 
     it 'calls the _createPatchFor method', ->
-      @modelPatch = new ModelPatch(@base,
-                                   @changedAttributes,
-                                   @previousAttributes)
+      @modelPatch = new Patcher(@base,
+                                @changedAttributes,
+                                @previousAttributes)
       expect(@createPatchForStub).
         toHaveBeenCalledWith(@changedAttributes,
                              @previousAttributes)
 
     it 'stores the output in _patch', ->
-      @modelPatch = new ModelPatch(@base,
-                                   @changedAttributes,
-                                   @previousAttributes)
+      @modelPatch = new Patcher(@base,
+                                @changedAttributes,
+                                @previousAttributes)
       expect(@modelPatch._patch).toEqual('new_patch')
 
   describe '#_createPatchFor', ->
@@ -40,12 +40,12 @@ describe 'ModelPatch', ->
       @previousAttributes =
         number: 1001.1
         text: 'previous_text'
-      @createPatchForStub = sinon.stub(ModelPatch::,
+      @createPatchForStub = sinon.stub(Patcher::,
                                        '_createPatchFor',
                                        -> 'new_patch')
-      @modelPatch = new ModelPatch(@base,
-                                   @changedAttributes,
-                                   @previousAttributes)
+      @modelPatch = new Patcher(@base,
+                                @changedAttributes,
+                                @previousAttributes)
       @createPatchForStub.restore()
 
     it 'saves all changed no-text attributes', ->
@@ -75,10 +75,10 @@ describe 'ModelPatch', ->
 
   describe '#applyTo', ->
     beforeEach ->
-      @createPatchForStub = sinon.stub(ModelPatch::,
+      @createPatchForStub = sinon.stub(Patcher::,
                                        '_createPatchFor',
                                        -> 'new_patch')
-      @modelPatch = new ModelPatch
+      @modelPatch = new Patcher
       @applyPatchStub = sinon.stub(@modelPatch, '_applyPatch')
       @patch = sinon.stub()
       @modelPatch._patch = @patch
@@ -102,10 +102,10 @@ describe 'ModelPatch', ->
 
   describe '#_applyPatch', ->
     beforeEach ->
-      @createPatchForStub = sinon.stub(ModelPatch::,
+      @createPatchForStub = sinon.stub(Patcher::,
                                        '_createPatchFor',
                                        -> 'new_patch')
-      @modelPatch = new ModelPatch
+      @modelPatch = new Patcher
       @patchAttributeStub = sinon.stub(@modelPatch, '_patchAttribute')
       @originalValue = sinon.stub()
       @firstPatch = 
@@ -164,10 +164,10 @@ describe 'ModelPatch', ->
 
   describe '_patchAttribute', ->
     beforeEach ->
-      @createPatchForStub = sinon.stub(ModelPatch::,
+      @createPatchForStub = sinon.stub(Patcher::,
                                        '_createPatchFor',
                                        -> 'new_patch')
-      @modelPatch = new ModelPatch
+      @modelPatch = new Patcher
 
     afterEach ->
       @createPatchForStub.restore()
@@ -267,10 +267,10 @@ describe 'ModelPatch', ->
       
   describe '#_patchString', ->
     beforeEach ->
-      @createPatchForStub = sinon.stub(ModelPatch::,
+      @createPatchForStub = sinon.stub(Patcher::,
                                        '_createPatchFor',
                                        -> 'new_patch')
-      @modelPatch = new ModelPatch
+      @modelPatch = new Patcher
       @attribute = 'text'
       @attributesToPatch =
         text: 'model_text'

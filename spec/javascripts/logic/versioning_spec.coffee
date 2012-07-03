@@ -166,23 +166,23 @@ describe 'Versioning', ->
       beforeEach ->
         @previousVersioning = Nomad.versioning
         Nomad.versioning = 'per_attribute_diff'
-        @newModelPatchStub = sinon.stub(window,
-                                        'ModelPatch',
-                                        => @patch)
+        @newPatcherStub = sinon.stub(window,
+                                     'Patcher',
+                                     => @patch)
         @changedStub = sinon.stub()
         sinon.stub(@model, 'changedAttributes', => @changedStub)
         @previousStub = sinon.stub()
         sinon.stub(@model, 'previousAttributes', => @previousStub)
 
       afterEach ->
-        @newModelPatchStub.restore()
+        @newPatcherStub.restore()
         Nomad.versioning = @previousVersioning
 
       it 'creates a new modelPatch object', ->
         @model.addVersion()
-        expect(@newModelPatchStub).toHaveBeenCalledWith(@model.localClock(),
-                                                        @changedStub,
-                                                        @previousStub)
+        expect(@newPatcherStub).toHaveBeenCalledWith(@model.localClock(),
+                                                     @changedStub,
+                                                     @previousStub)
 
       it 'adds the patch to the list of patches', ->
         @model.addVersion()
@@ -190,7 +190,7 @@ describe 'Versioning', ->
 
       it 'updates the model version after the patch has been created', ->
         @model.addVersion()
-        expect(@tickVersionStub).toHaveBeenCalledAfter(@newModelPatchStub)  
+        expect(@tickVersionStub).toHaveBeenCalledAfter(@newPatcherStub)  
 
   describe '#localClock', ->
     beforeEach ->
