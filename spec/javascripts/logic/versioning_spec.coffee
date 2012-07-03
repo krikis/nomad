@@ -341,6 +341,16 @@ describe 'Versioning', ->
       class TestModel extends Backbone.Model
       @model = new TestModel
       @model._versioning = {}
+      @localClockStub = sinon.stub(@model, '_localClock', -> 'current_version')
+      
+    it 'initializes the syncedVersions array', ->
+      expect(@model._versioning.syncedVersions).toBeUndefined()
+      @model.markAsSynced()
+      expect(@model._versioning.syncedVersions).toBeDefined()
+      
+    it 'adds the model version to the list of synced versions', ->
+      @model.markAsSynced()
+      expect(@model._versioning.syncedVersions[0]).toEqual('current_version')
 
     it 'sets the synced property on the versioning object to true', ->
       @model.markAsSynced()

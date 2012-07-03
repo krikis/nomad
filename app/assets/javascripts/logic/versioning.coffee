@@ -64,6 +64,8 @@
     @_versioning?.patches?.size() > 0
 
   markAsSynced: ->
+    @_versioning.syncedVersions ||= []
+    @_versioning.syncedVersions.push @_localClock()
     @_versioning.synced = true
 
   isSynced: ->
