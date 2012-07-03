@@ -42,6 +42,14 @@
                            diff
     patch_text: dmp.patch_toText(patch)
     base: base
+    
+  _sortPropertiesIn: (object) ->
+    return object unless _.isObject(object)
+    sorted = {}
+    keys = _.keys(object).sort()
+    _.each keys, (key) =>
+      sorted[key] = @_sortPropertiesIn object[key]
+    sorted
 
   _tickVersion: ->
     @_versioning.vector[@clientId] += 1

@@ -192,7 +192,6 @@ describe 'Versioning', ->
         @model.addVersion()
         expect(@tickVersionStub).toHaveBeenCalledAfter(@newModelPatchStub)
 
-
   describe '#_localClock', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -217,12 +216,32 @@ describe 'Versioning', ->
       expect(out.patch_text).toContain 'other_'
       expect(out.patch_text).not.toContain 'value_2'
 
-    it 'sets the model\'s current version on the newly created patch', ->
+    it 'sets the model current version on the newly created patch', ->
       @model.attributes.values =
         v_1: "other_value_1"
         v_2: "value_2"
       out = @model._createPatch('local_clock')
       expect(out.base).toEqual('local_clock')
+      
+  describe '#_sortPropertiesIn', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      
+    it 'creates a clone with sorted attributes', ->
+      object =
+        last: 'value'
+        first: 'value'
+      ordered = @model._sortPropertiesIn(object)
+      expect(_.keys(ordered)[0]).toEqual('first')
+      
+    it 'sorts the attributes of nested objects', ->
+      object = 
+        nested:
+          last: 'value'
+          first: 'value'
+      ordered = @model._sortPropertiesIn(object)
+      expect(_.keys(ordered.nested)[0]).toEqual('first')
 
   describe '#_tickVersion', ->
     beforeEach ->
