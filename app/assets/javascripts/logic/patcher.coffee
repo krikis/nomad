@@ -1,8 +1,13 @@
 class @Patcher
     
-  constructor: (base, changed, previous) ->
-    @base = base
-    @_patch = @_createPatchFor(changed, previous)
+  constructor: (model) ->
+    @model = model
+    
+  updatePatches: ->
+    @model._versioning.patches.push
+      _patch: @_createPatchFor(@model.changedAttributes(), 
+                               @model.previousAttributes())
+      base: @model.localClock()
     
   _createPatchFor: (changed, previous) ->
     patch = _.clone(changed)

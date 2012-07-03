@@ -123,9 +123,7 @@ describe 'Versioning', ->
     it 'initializes a list of patches', ->
       expect(@model._versioning?.patches).toBeUndefined()
       @model.addVersion()
-      expect(@model._versioning?.patches).toBeDefined()
-      expect(@model._versioning?.patches._wrapped).toBeDefined()
-      expect(@model._versioning?.patches._wrapped.constructor.name).toEqual("Array")
+      expect(@model._versioning?.patches).toEqual([])
 
     it 'updates the model\'s version', ->
       @model.addVersion()
@@ -134,7 +132,7 @@ describe 'Versioning', ->
     context 'when the skipPatch option is set', ->
       it 'does not save a patch', ->
         @model._versioning = {}
-        @model._versioning.patches = _([])
+        @model._versioning.patches = []
         @model.addVersion({}, skipPatch: true)
         expect(@model._versioning.patches.size()).toEqual(0)
 
@@ -335,7 +333,7 @@ describe 'Versioning', ->
 
     context 'when the model has no patches', ->
       beforeEach ->
-        @model._versioning = {patches: _([])}
+        @model._versioning = {patches: []}
 
       it 'returns false', ->
         expect(@model.hasPatches()).toBeFalsy()

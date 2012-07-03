@@ -21,7 +21,7 @@
   addVersion: (model, options = {}) ->
     unless options.skipPatch?
       @initVersioning()
-      @_versioning.patches ||= _([])
+      @_versioning.patches ||= []
       if Nomad.versioning == 'structured_content_diff'
         @_versioning.patches.push @_createPatch(@localClock())
       else
