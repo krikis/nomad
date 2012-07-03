@@ -312,6 +312,17 @@ describe 'Versioning', ->
       @model._versioning = {}
       @model._versioning.createdAt = 'created_at'
       expect(@model.updatedAt()).toEqual('created_at')
+      
+  describe '#patches', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      @patches = sinon.stub()
+      @model._versioning =
+        patches: @patches
+        
+    it 'returns the model patches', ->
+      expect(@model.patches()).toEqual(@patches)
 
   describe '#hasPatches', ->
     beforeEach ->

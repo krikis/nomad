@@ -59,6 +59,9 @@
 
   updatedAt: ->
     @_versioning?.updatedAt || @_versioning?.createdAt
+    
+  patches: ->
+    @_versioning?.patches
 
   hasPatches: ->
     @_versioning?.patches?.size() > 0
