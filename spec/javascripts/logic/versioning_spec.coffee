@@ -123,7 +123,7 @@ describe 'Versioning', ->
     it 'initializes a list of patches', ->
       expect(@model._versioning?.patches).toBeUndefined()
       @model.addVersion()
-      expect(@model._versioning?.patches).toEqual([])
+      expect(@model._versioning?.patches.constructor.name).toEqual("Array")
 
     it 'updates the model\'s version', ->
       @model.addVersion()
@@ -134,7 +134,7 @@ describe 'Versioning', ->
         @model._versioning = {}
         @model._versioning.patches = []
         @model.addVersion({}, skipPatch: true)
-        expect(@model._versioning.patches.size()).toEqual(0)
+        expect(@model._versioning.patches.length).toEqual(0)
 
       it 'does not update the model\'s version', ->
         @model.addVersion({}, skipPatch: true)
@@ -154,7 +154,7 @@ describe 'Versioning', ->
 
       it 'saves a patch for the update to _versioning.patches', ->
         @model.addVersion()
-        expect(@model._versioning.patches.first()).toEqual @patch
+        expect(@model._versioning.patches[0]).toEqual @patch
 
       it 'updates the model\'s version after the patch has been created', ->
         @model.addVersion()
@@ -164,13 +164,12 @@ describe 'Versioning', ->
       beforeEach ->
         @previousVersioning = Nomad.versioning
         Nomad.versioning = 'per_attribute_diff'
+        @patcher =
+          updatePatches: ->
+        @updatePatchesStub = sinon.stub(@patcher, 'updatePatches')
         @newPatcherStub = sinon.stub(window,
                                      'Patcher',
-                                     => @patch)
-        @changedStub = sinon.stub()
-        sinon.stub(@model, 'changedAttributes', => @changedStub)
-        @previousStub = sinon.stub()
-        sinon.stub(@model, 'previousAttributes', => @previousStub)
+                                     => @patcher)
 
       afterEach ->
         @newPatcherStub.restore()
@@ -178,17 +177,15 @@ describe 'Versioning', ->
 
       it 'creates a new patcher object', ->
         @model.addVersion()
-        expect(@newPatcherStub).toHaveBeenCalledWith(@model.localClock(),
-                                                     @changedStub,
-                                                     @previousStub)
+        expect(@newPatcherStub).toHaveBeenCalledWith(@model)
 
-      it 'adds the patch to the list of patches', ->
+      it 'updates the model patches', ->
         @model.addVersion()
-        expect(@model._versioning.patches.first()).toBe(@patch)
+        expect(@updatePatchesStub).toHaveBeenCalled()
 
       it 'updates the model version after the patch has been created', ->
         @model.addVersion()
-        expect(@tickVersionStub).toHaveBeenCalledAfter(@newPatcherStub)  
+        expect(@tickVersionStub).toHaveBeenCalledAfter(@updatePatchesStub)  
 
   describe '#localClock', ->
     beforeEach ->
@@ -340,7 +337,7 @@ describe 'Versioning', ->
 
     context 'when the model has patches', ->
       beforeEach ->
-        @model._versioning = {patches: _([{}])}
+        @model._versioning = {patches: [{}]}
 
       it 'returns true', ->
         expect(@model.hasPatches()).toBeTruthy()
@@ -470,7 +467,7 @@ describe 'Versioning', ->
       patches = [{patch_text: 'some_patch',  base: 0},
                  {patch_text: 'other_patch', base: 1}]
       @model._versioning =
-        patches: _(patches)
+        patches: patches
       @remoteVersion = sinon.stub()
       @finishedSyncingStub = sinon.stub(@model, '_finishedSyncing')
       @patchesShiftSpy = sinon.spy(@model._versioning.patches, 'shift')
@@ -480,7 +477,7 @@ describe 'Versioning', ->
       vector = {}
       vector[@model.clientId] = 1
       @model._forwardTo(remote_version: vector)
-      expect(@model._versioning.patches.first()).toEqual
+      expect(@model._versioning.patches[0]).toEqual
         patch_text: 'other_patch'
         base: 1
         
@@ -700,8 +697,8 @@ describe 'Versioning', ->
         Nomad.versioning = 'structured_content_diff'
         @originalModel = {}
         @originalModel._versioning = {}
-        @originalModel._versioning.patches = _([{patch_text: 'some'},
-                                                {patch_text: 'patches'}])
+        @originalModel._versioning.patches = [{patch_text: 'some'},
+                                              {patch_text: 'patches'}]
         
       afterEach ->
         Nomad.versioning = @origVersioning
@@ -736,7 +733,7 @@ describe 'Versioning', ->
         @attributes = sinon.stub()
         @originalModel = {}
         @originalModel._versioning = {}
-        @originalModel._versioning.patches = _([@firstPatch, @lastPatch])
+        @originalModel._versioning.patches = [@firstPatch, @lastPatch]
         @originalModel.attributes = @attributes
       
       afterEach ->

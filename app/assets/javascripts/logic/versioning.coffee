@@ -25,10 +25,8 @@
       if Nomad.versioning == 'structured_content_diff'
         @_versioning.patches.push @_createPatch(@localClock())
       else
-        patch = new Patcher(@localClock(),
-                            @changedAttributes(),
-                            @previousAttributes())
-        @_versioning.patches.push patch                    
+        patcher = new Patcher(@)
+        patcher.updatePatches()                   
       @_tickVersion()    
 
   localClock: ->
@@ -64,7 +62,7 @@
     @_versioning?.patches
 
   hasPatches: ->
-    @_versioning?.patches?.size() > 0
+    @_versioning?.patches?.length > 0
 
   markAsSynced: ->
     @_versioning.syncingVersions ||= []
@@ -96,7 +94,7 @@
 
   _forwardTo: (attributes) ->
     vectorClock = attributes.remote_version
-    patches = @_versioning.patches
+    patches = _(@_versioning.patches)
     while @hasPatches() and patches.first().base < vectorClock[@clientId]
       patches.shift()
     @_finishedSyncing(vectorClock)
@@ -146,7 +144,7 @@
     [version, created_at, updated_at]
 
   _processPatchesOf: (model) ->
-    patches = model._versioning.patches
+    patches = _(model._versioning.patches)
     if Nomad.versioning == 'structured_content_diff'
       patches.all (patch) =>
         @_applyPatch(patch.patch_text)

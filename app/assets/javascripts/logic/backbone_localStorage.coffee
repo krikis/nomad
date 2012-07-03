@@ -97,7 +97,7 @@
 
     setVersioning: (model) ->
       versioning = JSON.parse @localStorage().
-                  getItem(@versioningKeyFor model)
+                     getItem(@versioningKeyFor model)
       model._versioning = versioning if versioning?
 
     # Delete a model from `@data`, returning it.
