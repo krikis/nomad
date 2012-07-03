@@ -35,10 +35,12 @@
     @_versioning.vector[@clientId]
 
   _createPatch: (base) ->
+    sorted_previous = @_sortPropertiesIn @previousAttributes()
+    sorted_attributes = @_sortPropertiesIn @attributes
     dmp = new diff_match_patch
-    diff = dmp.diff_main JSON.stringify(@previousAttributes()),
-                         JSON.stringify(@)
-    patch = dmp.patch_make JSON.stringify(@previousAttributes()),
+    diff = dmp.diff_main JSON.stringify(sorted_previous),
+                         JSON.stringify(sorted_attributes)
+    patch = dmp.patch_make JSON.stringify(sorted_previous),
                            diff
     patch_text: dmp.patch_toText(patch)
     base: base

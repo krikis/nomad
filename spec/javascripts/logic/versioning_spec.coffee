@@ -207,19 +207,52 @@ describe 'Versioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('answer')
+      @previousAttributesStub = sinon.stub(@model, 'previousAttributes', 
+                                           -> 'previous_attributes')
+      @model.attributes = 'attributes'
+      @sortPropertiesInStub = sinon.stub(@model, '_sortPropertiesIn')
+      @sortPropertiesInStub.withArgs('previous_attributes').
+                            returns('sorted_previous')
+      @sortPropertiesInStub.withArgs('attributes').
+                            returns('sorted_attributes')
+      dmp =
+        diff_main: ->
+        patch_make: ->
+        patch_toText: ->
+      @diffStub        = sinon.stub(dmp, 'diff_main',    -> 'some_diff')
+      @patchStub       = sinon.stub(dmp, 'patch_make',   -> 'some_patch')
+      @patchToTextStub = sinon.stub(dmp, 'patch_toText', -> 'patch_text')
+      @dmpStub         = sinon.stub(window, 'diff_match_patch', -> dmp)
+      @stringifyStub   = sinon.stub(JSON, 'stringify', (input) -> input)
 
-    it 'creates a patch for the new model version', ->
-      @model.attributes.values =
-        v_1: "other_value_1"
-        v_2: "value_2"
-      out = @model._createPatch()
-      expect(out.patch_text).toContain 'other_'
-      expect(out.patch_text).not.toContain 'value_2'
-
-    it 'sets the model current version on the newly created patch', ->
-      @model.attributes.values =
-        v_1: "other_value_1"
-        v_2: "value_2"
+    afterEach ->
+      @dmpStub.restore()
+      @stringifyStub.restore()
+      
+    it 'sorts the model previous attributes', ->
+      @model._createPatch()
+      expect(@sortPropertiesInStub).
+        toHaveBeenCalledWith('previous_attributes')
+        
+    it 'sorts the model attributes', ->
+      @model._createPatch()
+      expect(@sortPropertiesInStub).
+        toHaveBeenCalledWith('attributes')
+        
+    it 'creates a diff of the previous attributes with the attributes', ->
+      @model._createPatch()
+      expect(@diffStub).toHaveBeenCalledWith('sorted_previous',
+                                             'sorted_attributes')
+                                             
+    it 'creates a patch of the diff based on the previous attributes', ->
+      @model._createPatch()
+      expect(@patchStub).toHaveBeenCalledWith('sorted_previous',
+                                              'some_diff')
+                                              
+    it 'sets the text representation of the patch', ->
+      expect(@model._createPatch().patch_text).toEqual('patch_text')
+      
+    it 'sets the model current version as patch base', ->
       out = @model._createPatch('local_clock')
       expect(out.base).toEqual('local_clock')
       
