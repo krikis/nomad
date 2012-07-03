@@ -343,14 +343,14 @@ describe 'Versioning', ->
       @model._versioning = {}
       @localClockStub = sinon.stub(@model, '_localClock', -> 'current_version')
       
-    it 'initializes the syncedVersions array', ->
-      expect(@model._versioning.syncedVersions).toBeUndefined()
+    it 'initializes the syncingVersions array', ->
+      expect(@model._versioning.syncingVersions).toBeUndefined()
       @model.markAsSynced()
-      expect(@model._versioning.syncedVersions).toBeDefined()
+      expect(@model._versioning.syncingVersions).toBeDefined()
       
     it 'adds the model version to the list of synced versions', ->
       @model.markAsSynced()
-      expect(@model._versioning.syncedVersions[0]).toEqual('current_version')
+      expect(@model._versioning.syncingVersions[0]).toEqual('current_version')
 
     it 'sets the synced property on the versioning object to true', ->
       @model.markAsSynced()
@@ -462,6 +462,8 @@ describe 'Versioning', ->
                  {patch_text: 'other_patch', base: 1}]
       @model._versioning =
         patches: _(patches)
+      @remoteVersion = sinon.stub()
+      @finishedSyncingStub = sinon.stub(@model, '_finishedSyncing')
       @patchesShiftSpy = sinon.spy(@model._versioning.patches, 'shift')
       @modelSaveStub = sinon.stub(@model, 'save')
 
@@ -472,6 +474,16 @@ describe 'Versioning', ->
       expect(@model._versioning.patches.first()).toEqual
         patch_text: 'other_patch'
         base: 1
+        
+    it 'finishes syncing the version', ->
+      @model._forwardTo(remote_version: @remoteVersion)
+      @expect(@finishedSyncingStub).toHaveBeenCalledWith(@remoteVersion)
+      
+    it 'finishes syncing after removing all old patches', ->
+      vector = {}
+      vector[@model.clientId] = 1
+      @model._forwardTo(remote_version: vector)
+      expect(@patchesShiftSpy).not.toHaveBeenCalledAfter(@finishedSyncingStub)
 
     it 'saves the model', ->
       @model._forwardTo(remote_version: {})
@@ -479,10 +491,23 @@ describe 'Versioning', ->
 
     it 'saves the model after forwarding it', ->
       @model._forwardTo(remote_version: {})
-      expect(@patchesShiftSpy).not.toHaveBeenCalledAfter(@modelSaveStub)
+      expect(@modelSaveStub).toHaveBeenCalledAfter(@finishedSyncingStub)
 
     it 'returns null', ->
       expect(@model._forwardTo(remote_version: {})).toBeNull()
+      
+  describe '#_finishedSyncing', ->
+    beforeEach ->
+      class TestModel extends Backbone.Model
+      @model = new TestModel
+      @model._versioning = 
+        syncingVersions: [1, 2, 1]
+      
+    it 'removes the local clock from the versions being synced', ->    
+      vector = {}
+      vector[@model.clientId] = 1
+      @model._finishedSyncing(vector)
+      expect(@model._versioning.syncingVersions).toEqual([2])
 
   describe '#_changeId', ->
     beforeEach ->

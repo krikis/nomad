@@ -64,8 +64,8 @@
     @_versioning?.patches?.size() > 0
 
   markAsSynced: ->
-    @_versioning.syncedVersions ||= []
-    @_versioning.syncedVersions.push @_localClock()
+    @_versioning.syncingVersions ||= []
+    @_versioning.syncingVersions.push @_localClock()
     @_versioning.synced = true
 
   isSynced: ->
@@ -96,8 +96,12 @@
     patches = @_versioning.patches
     while @hasPatches() and patches.first().base < vectorClock[@clientId]
       patches.shift()
+    @_finishedSyncing(vectorClock)
     @save()
     null
+    
+  _finishedSyncing: (vectorClock) ->
+    @_versioning.syncingVersions.delete(vectorClock[@clientId])
 
   _changeId: (attributes) ->
     # TODO :: implement changing the model id when it conflicts
