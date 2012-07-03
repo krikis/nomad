@@ -99,24 +99,15 @@ describe 'Patcher', ->
 
   describe '#_applyPatch', ->
     beforeEach ->
-      @createPatchForStub = sinon.stub(Patcher::,
-                                       '_createPatchFor',
-                                       -> 'new_patch')
-      @patcher = new Patcher
+      @patcher = new Patcher(sinon.stub())
       @patchAttributeStub = sinon.stub(@patcher, '_patchAttribute')
-      @originalValue = sinon.stub()
       @firstPatch =
-        attribute: @originalValue
-      @value = sinon.stub()
+        attribute: @originalValue = sinon.stub()
       @lastPatch =
-        attribute: @value
-      @currentValue = sinon.stub()
+        attribute: @value = sinon.stub()
       @current =
-        attribute: @currentValue
+        attribute: @currentValue = sinon.stub()
       @attributesToPatch = sinon.stub()
-
-    afterEach ->
-      @createPatchForStub.restore()
 
     it 'calls the _patchAttribute method for each attribute', ->
       @patcher._applyPatch(@lastPatch, @attributesToPatch,
