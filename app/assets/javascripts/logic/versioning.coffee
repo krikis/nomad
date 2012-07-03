@@ -23,15 +23,15 @@
       @initVersioning()
       @_versioning.patches ||= _([])
       if Nomad.versioning == 'structured_content_diff'
-        @_versioning.patches.push @_createPatch(@_localClock())
+        @_versioning.patches.push @_createPatch(@localClock())
       else
-        patch = new ModelPatch(@_localClock(),
+        patch = new ModelPatch(@localClock(),
                                @changedAttributes(),
                                @previousAttributes())
         @_versioning.patches.push patch                    
       @_tickVersion()    
 
-  _localClock: ->
+  localClock: ->
     @_versioning.vector[@clientId]
 
   _createPatch: (base) ->
@@ -65,7 +65,7 @@
 
   markAsSynced: ->
     @_versioning.syncingVersions ||= []
-    @_versioning.syncingVersions.push @_localClock()
+    @_versioning.syncingVersions.push @localClock()
     @_versioning.synced = true
 
   isSynced: ->

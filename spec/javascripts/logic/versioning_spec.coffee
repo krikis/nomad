@@ -103,7 +103,7 @@ describe 'Versioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
-      @model._localClock = -> 2
+      @model.localClock = -> 2
       @initVersioningSpy = sinon.spy(@model, 'initVersioning')
       @tickVersionStub = sinon.stub(@model, '_tickVersion')
       @patch = sinon.stub()
@@ -152,7 +152,7 @@ describe 'Versioning', ->
 
       it 'creates a patch providing it with the model\'s local clock', ->
         @model.addVersion()
-        expect(@createPatchStub).toHaveBeenCalledWith(@model._localClock())
+        expect(@createPatchStub).toHaveBeenCalledWith(@model.localClock())
 
       it 'saves a patch for the update to _versioning.patches', ->
         @model.addVersion()
@@ -180,7 +180,7 @@ describe 'Versioning', ->
 
       it 'creates a new modelPatch object', ->
         @model.addVersion()
-        expect(@newModelPatchStub).toHaveBeenCalledWith(@model._localClock(),
+        expect(@newModelPatchStub).toHaveBeenCalledWith(@model.localClock(),
                                                         @changedStub,
                                                         @previousStub)
 
@@ -192,7 +192,7 @@ describe 'Versioning', ->
         @model.addVersion()
         expect(@tickVersionStub).toHaveBeenCalledAfter(@newModelPatchStub)  
 
-  describe '#_localClock', ->
+  describe '#localClock', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
@@ -201,7 +201,7 @@ describe 'Versioning', ->
       @model._versioning = {vector: vector}
 
     it 'returns the local clock of the model\'s version', ->
-      expect(@model._localClock()).toEqual(1)
+      expect(@model.localClock()).toEqual(1)
 
   describe '#_createPatch', ->
     beforeEach ->
@@ -341,7 +341,7 @@ describe 'Versioning', ->
       class TestModel extends Backbone.Model
       @model = new TestModel
       @model._versioning = {}
-      @localClockStub = sinon.stub(@model, '_localClock', -> 'current_version')
+      @localClockStub = sinon.stub(@model, 'localClock', -> 'current_version')
       
     it 'initializes the syncingVersions array', ->
       expect(@model._versioning.syncingVersions).toBeUndefined()
