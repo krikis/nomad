@@ -33,7 +33,7 @@ describe 'versioning', ->
         @model.set Factory.build('answer')
 
       it 'adds a patch', ->
-        expect(@model._versioning.patches.size()).toEqual(2)
+        expect(@model._versioning.patches.length).toEqual(2)
         
       it 'updates the version hash', ->
         expect(@tickVersionSpy).toHaveBeenCalled()
