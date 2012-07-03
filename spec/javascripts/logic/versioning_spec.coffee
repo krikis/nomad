@@ -190,7 +190,7 @@ describe 'Versioning', ->
 
       it 'updates the model version after the patch has been created', ->
         @model.addVersion()
-        expect(@tickVersionStub).toHaveBeenCalledAfter(@newModelPatchStub)
+        expect(@tickVersionStub).toHaveBeenCalledAfter(@newModelPatchStub)  
 
   describe '#_localClock', ->
     beforeEach ->
