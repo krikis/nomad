@@ -1,6 +1,6 @@
 class BenchmarksController < ApplicationController
 
-  layout 'benchmarks'
+  layout 'bestiejs'
 
   def bestiejs
 
