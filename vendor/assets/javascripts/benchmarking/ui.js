@@ -236,19 +236,6 @@
         setHTML('user-agent', Benchmark.platform);
         setStatus(texts.status.ready);
 
-        // answer spammer question
-        $('question').value = 'no';
-
-        // prefill author details
-        if (has.localStorage) {
-          each([$('author'), $('author-email'), $('author-url')], function(element) {
-            element.value = localStorage[element.id] || '';
-            element.oninput = element.onkeydown = function(event) {
-              event && event.type < 'k' && (element.onkeydown = null);
-              localStorage[element.id] = element.value;
-            };
-          });
-        }
         // show warning when Firebug is enabled (avoids showing for Firebug Lite)
         try {
           // Firebug 1.9 no longer has `console.firebug`
