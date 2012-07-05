@@ -10,6 +10,7 @@
       # the odds of collisions when using the session id is presumably 
       # very small already.
       @clientId = '#{request.session_options[:id]}'
+    = javascript_include_tag "benchmarking/sinon.js"
     = javascript_include_tag "application"
     = csrf_meta_tags
     = favicon_link_tag
