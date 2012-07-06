@@ -6,10 +6,10 @@
 
 suite.add
   name:       "Sync Create"
-  setup:      Benches.beforeSyncCreate
-  fn:         Benches.syncCreate
-  teardown:   Benches.afterSyncCreate
-  onStart:    (event) -> 
+  setup:      'Benches.beforeSyncCreate()'
+  fn:         'Benches.syncCreate()'
+  teardown:   'Benches.afterSyncCreate()'
+  onStart:    (event) ->
     console.log "Starting #{event.target.name}"
   onComplete: (event) -> console.log String(event.target)
 
@@ -21,7 +21,7 @@ suite.add("String#indexOf", (->
 )
 
 suite.on("cycle", (event) ->
-  
+
 )
 
 suite.on("complete", ->
@@ -29,5 +29,5 @@ suite.on("complete", ->
 )
 
 # $('#run').click ->
-suite.run 
+suite.run
   async: true

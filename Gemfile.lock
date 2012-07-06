@@ -249,7 +249,7 @@ DEPENDENCIES
   backbone-support
   bootstrap-sass (~> 2.0.1)
   coffee-filter
-  coffee-rails (~> 3.2.1)
+  coffee-rails (~> 3.2.2)
   database_cleaner
   execjs
   fabrication
