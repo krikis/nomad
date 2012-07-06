@@ -40,9 +40,9 @@ Benches.afterSyncCreate = ->
   @secondCollection.leave()
   return
 
-Benches.syncCreate = ->  
+Benches.syncCreate = ->
   @collection.syncModels()
-  @waitsFor.waitsFor (->
+  @waitsFor (->
     @createSpy.callCount >= 1 and @secondCreateSpy.callCount >= 1
   ), 'create multicast', 1000
   return

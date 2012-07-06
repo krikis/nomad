@@ -3,6 +3,7 @@
 #= require_tree ./benches
 #= require_self
 
+
 @suite = suite  = new Benchmark.Suite
 
 suite.add
@@ -29,6 +30,6 @@ suite.on("complete", ->
   console.log "Fastest is " + @filter("fastest").pluck('name')
 )
 
-# $('#run').click ->
-suite.run
-  async: true
+$('#run').click ->
+  suite.run
+    async: true
