@@ -1,8 +1,10 @@
 Nomad::Application.routes.draw do
   match '/' => 'posts#index'
-  resource  :benchmark, :only => [] do
-    get :jslitmus
-    get :bestiejs
+  resources  :benchmarks, :only => [:index] do
+    collection do
+      get :jslitmus
+      get :bestiejs
+    end
   end
   resources :posts
   resources :answers, :only => [:index, :new, :show, :edit] do
