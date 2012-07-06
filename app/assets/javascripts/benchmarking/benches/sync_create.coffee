@@ -25,7 +25,7 @@ Benches.beforeSyncCreate = ->
   @secondCollection = new SecondCollection
   @secondCreateSpy  = sinon.spy(@secondCollection.fayeClient, 'create')
   @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
-  BenchTools.waitsFor (->
+  @waitsFor (->
     @secondCollection.fayeClient.client.getState() == 'CONNECTED'
   ), 'second client to connect', 1000, (->
     @model = new @Post
@@ -42,7 +42,7 @@ Benches.afterSyncCreate = ->
 
 Benches.syncCreate = ->  
   @collection.syncModels()
-  BenchTools.waitsFor.waitsFor (->
+  @waitsFor.waitsFor (->
     @createSpy.callCount >= 1 and @secondCreateSpy.callCount >= 1
   ), 'create multicast', 1000
   return

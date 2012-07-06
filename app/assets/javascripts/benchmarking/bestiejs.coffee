@@ -1,4 +1,5 @@
 #= require benchmarking/benchmark.js
+#= require_tree ./support
 #= require_tree ./benches
 #= require_self
 
