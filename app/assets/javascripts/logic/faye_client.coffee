@@ -73,7 +73,7 @@ class @BackboneSync.FayeClient
       @collection.syncProcessed(processed)
       
   _dbReset: () ->
-    console.log 'The server database was successfully reset!'
+    # console.log 'The server database was successfully reset!'
 
   resolve: (params, processed) ->
     # handle offline test mode

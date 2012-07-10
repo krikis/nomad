@@ -2,12 +2,22 @@
 #= require_tree ./benches
 #= require_self
 
-bench = new Bench
+preSyncCreateBench = new Bench
+  setup:   Benches.  setupPreSyncCreate
+  before:  Benches. beforePreSyncCreate
+  test:    Benches.       preSyncCreate
+  after:   Benches.  afterPreSyncCreate
+  cleanup: Benches.cleanupPreSyncCreate
+
+$('#preSyncCreate').click ->
+  preSyncCreateBench.run(@)
+
+syncCreateBench = new Bench
   setup:   Benches.  setupSyncCreate
   before:  Benches. beforeSyncCreate
   test:    Benches.       syncCreate
   after:   Benches.  afterSyncCreate
   cleanup: Benches.cleanupSyncCreate
 
-$('#run').click ->
-  bench.run()
+$('#syncCreate').click ->
+  syncCreateBench.run(@)

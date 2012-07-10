@@ -9,7 +9,9 @@ class @Bench
     @cleanup = options.cleanup || (next) -> next.call(@)
     @runs    = options.runs    || @DEFAULT_NR_OF_RUNS
     
-  run: ->
+  run: (button) ->
+    @button = button
+    $(@button).attr('disabled': true)
     @total = 0
     @count = @runs
     @setup.call(@, @testLoop)
@@ -31,6 +33,7 @@ class @Bench
     
   stop: ->
     console.log "#{@runs} runs in #{@total} ms"
+    $(@button).attr('disabled': false)
     
   TIMEOUT_INCREMENT: 10
 
