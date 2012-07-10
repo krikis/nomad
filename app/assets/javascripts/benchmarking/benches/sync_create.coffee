@@ -32,7 +32,7 @@ Benches.setupSyncCreate = (next) ->
   @secondCollection.syncModels()
   @waitsFor (->
     @secondCreateSpy.callCount >= 1
-  ), 'second client to connect', 1000, (->
+  ), 'second client to be in sync', 1000, (->
     @resolveSpy.reset()
     @createSpy.reset()
     @secondCreateSpy.reset()
