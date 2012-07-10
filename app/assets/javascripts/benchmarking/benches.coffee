@@ -4,7 +4,9 @@
 
 @barChart = new Highcharts.Chart @barChartConfig
 
-preSyncCreateBench = new Bench
+suite = @suite = new Suite
+
+suite.bench
   category: 'preSync'
   series:   'create'
   setup:    Benches.  setupPreSyncCreate
@@ -14,10 +16,7 @@ preSyncCreateBench = new Bench
   cleanup:  Benches.cleanupPreSyncCreate
   chart:    @barChart
 
-$('#preSyncCreate').click ->
-  preSyncCreateBench.run(@)
-
-syncCreateBench = new Bench  
+suite.bench 
   category: 'sync'
   series:   'create'
   setup:    Benches.  setupSyncCreate
@@ -27,7 +26,5 @@ syncCreateBench = new Bench
   cleanup:  Benches.cleanupSyncCreate
   chart:    @barChart
 
-$('#syncCreate').click ->
-  syncCreateBench.run(@)
-  
-# @barChart.container = '#barChart'
+$('#run').click ->
+  suite.run(@)

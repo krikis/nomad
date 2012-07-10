@@ -1,7 +1,7 @@
 class @Bench
   DEFAULT_NR_OF_RUNS: 10
   
-  constructor: (options) ->
+  constructor: (options = {}) ->
     @category = options.category || @uid()
     @series   = options.series   || @uid()
     @setup    = options.setup    || (next) -> next.call(@)
@@ -14,7 +14,8 @@ class @Bench
     @initStats()
     @initChart()
     
-  initStats: ->  
+  initStats: ->    
+    @mean = 0
     @key = "#{@series}_#{@category}"
     @stats = JSON.parse(localStorage[@key]    || "[]")
     @categories = JSON.parse(localStorage.categories || "[]")
@@ -42,9 +43,11 @@ class @Bench
     localStorage.categories = JSON.stringify @categories
     localStorage.allSeries = JSON.stringify @allSeries
     
-  run: (button) ->
-    @button = button
-    $(@button).attr('disabled': true)
+  run: (options = {}) ->
+    @next = options.next
+    @suite = options.context
+    @button = options.button
+    $(@button).attr('disabled': true) if @button?
     @timeout = false
     @total = 0
     @count = @runs
@@ -66,9 +69,11 @@ class @Bench
     @after.call(@, @testLoop)
     
   stop: ->
+    console.log "#{@key}: #{@runs} runs in #{@total} ms"
     if @count < 0 and not @timeout # all runs performed successfully
       @processResults()
-    $(@button).attr('disabled': false)
+    $(@button).attr('disabled': false) if @button?
+    @next.call(@suite)
     
   processResults: ->  
     runtime = if @runs > 0 then @total / @runs else 0
@@ -85,9 +90,11 @@ class @Bench
     else
       sum = _.reduce @stats, (memo, value) -> memo + value
       mean = sum / @stats.length
+    @previous = @mean
+    @mean = Math.round mean
     seriesIndex = _.indexOf(@allSeries, @series)
     categoryIndex = _.indexOf(@categories, @category)
-    @chart.series[seriesIndex].data[categoryIndex].update Math.round mean
+    @chart.series[seriesIndex].data[categoryIndex].update @mean
     
   TIMEOUT_INCREMENT: 10
 
