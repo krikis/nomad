@@ -36,9 +36,6 @@ Benches.setupSyncCreate = (next) ->
     @secondCreateSpy.reset()
     @secondUpdateSpy.reset()
     @dbResetSpy.reset()
-    # cleanup localStorage for collections
-    @collection._cleanup()
-    @secondCollection._cleanup()
     next.call(@)
   )
   return
@@ -71,5 +68,8 @@ Benches.afterSyncCreate = (next) ->
 Benches.cleanupSyncCreate = (next) ->
   @collection.leave()
   @secondCollection.leave()
+  # cleanup localStorage for collections
+  @collection._cleanup()
+  @secondCollection._cleanup()
   next.call(@)
   return

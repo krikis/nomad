@@ -3,6 +3,7 @@
 #= require_self
 
 preSyncCreateBench = new Bench
+  name:    'presync_create'
   setup:   Benches.  setupPreSyncCreate
   before:  Benches. beforePreSyncCreate
   test:    Benches.       preSyncCreate
@@ -13,6 +14,7 @@ $('#preSyncCreate').click ->
   preSyncCreateBench.run(@)
 
 syncCreateBench = new Bench
+  name:    'sync_create'
   setup:   Benches.  setupSyncCreate
   before:  Benches. beforeSyncCreate
   test:    Benches.       syncCreate
