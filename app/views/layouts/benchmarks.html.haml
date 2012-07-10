@@ -2,18 +2,19 @@
 %html
   %head
     %title Nomad Benchmarks
-    = stylesheet_link_tag "application", :media => "all"
+    = stylesheet_link_tag 'application', :media => 'all'
     -# set some environment variables
     :coffeescript
       # In future work the unicity of this client id could be guaranteed
-      # by keeping track of all ids ever used in the database. However 
-      # the odds of collisions when using the session id is presumably 
+      # by keeping track of all ids ever used in the database. However
+      # the odds of collisions when using the session id is presumably
       # very small already.
       @clientId = '#{request.session_options[:id]}'
-    = javascript_include_tag "benchmarking/sinon.js"
-    = javascript_include_tag "application"
+    = javascript_include_tag 'benchmarking/sinon.js'
+    = javascript_include_tag 'application'
+    = javascript_include_tag 'http://code.highcharts.com/highcharts.js'
     = csrf_meta_tags
     = favicon_link_tag
   %body
-      
+
     = yield
