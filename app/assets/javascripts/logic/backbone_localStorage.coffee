@@ -19,7 +19,7 @@
     @name = name
     store = @localStorage().getItem(@name)
     @records = (store and store.split(",")) or []
-    @lastSynced = @localStorage().getItem("#{@name}-lastSynced")
+    @lastSynced = JSON.parse @localStorage().getItem("#{@name}-lastSynced")
     return
 
   _.extend Backbone.LocalStorage::,
