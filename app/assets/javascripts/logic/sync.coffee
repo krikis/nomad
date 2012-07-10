@@ -84,7 +84,8 @@
         updated_at: model.updatedAt()
       if options.markSynced
         model.markAsSynced()
-        model.save()
+      model.updateSyncingVersions()
+      model.save()
       details
     ).value()
 
@@ -99,6 +100,11 @@
 
   leave: (channel) ->
     @fayeClient.unsubscribe(channel)
+   
+  # test convenience method for cleaning up localstorage 
+  _destroy_all: ->
+    _.each @models, (model) ->
+      model.destroy()
 
 # extend Backbone.Collection
 _.extend Backbone.Collection::, Sync

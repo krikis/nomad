@@ -68,9 +68,11 @@
     @_versioning?.syncingVersions || []
 
   markAsSynced: ->
+    @_versioning.synced = true
+    
+  updateSyncingVersions: ->
     @_versioning.syncingVersions ||= []
     @_versioning.syncingVersions.push @localClock()
-    @_versioning.synced = true
 
   isSynced: ->
     @_versioning?.synced
