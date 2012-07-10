@@ -7,10 +7,11 @@ class @Bench
     @test    = options.test    || (next) -> next.call(@)
     @after   = options.after   || (next) -> next.call(@)
     @cleanup = options.cleanup || (next) -> next.call(@)
-    @count = @runs = options.count || @DEFAULT_NR_OF_RUNS
+    @runs    = options.runs    || @DEFAULT_NR_OF_RUNS
     
   run: ->
     @total = 0
+    @count = @runs
     @setup.call(@, @testLoop)
     
   testLoop: () ->
