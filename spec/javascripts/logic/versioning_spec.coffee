@@ -1,6 +1,5 @@
 describe 'Versioning', ->
   beforeEach ->
-    window.localStorage.clear()
     @server = sinon.fakeServer.create()
 
   afterEach ->

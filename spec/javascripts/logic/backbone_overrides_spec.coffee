@@ -2,7 +2,6 @@ describe 'Overrides', ->
 
   describe 'Backbone.Model', ->
     beforeEach ->
-      window.localStorage.clear()
       @server = sinon.fakeServer.create()
       fayeClient = 
         publish: ->

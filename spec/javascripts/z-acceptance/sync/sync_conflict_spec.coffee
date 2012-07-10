@@ -4,7 +4,6 @@ describe 'sync_conflict', ->
   beforeEach ->
     # delete window.client to speed up tests
     delete window.client
-    window.localStorage.clear()
     # create first client
     class Post extends Backbone.Model
     class TestCollection extends Backbone.Collection
@@ -47,6 +46,8 @@ describe 'sync_conflict', ->
   afterEach ->
     @collection.leave()
     @secondCollection.leave()
+    @collection._cleanup()
+    @secondCollection._cleanup()
 
   context 'when a client updates a model and syncs it', ->
     beforeEach ->

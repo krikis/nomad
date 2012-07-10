@@ -109,6 +109,12 @@
       )
       @save()
       model
+      
+    # test convenience method for cleaning up all 
+    # localstorage data for one collection
+    _cleanup: ->
+      @localStorage().removeItem "#{@name}-lastSynced"
+      @localStorage().removeItem @name
 
     localStorage: ->
       localStorage

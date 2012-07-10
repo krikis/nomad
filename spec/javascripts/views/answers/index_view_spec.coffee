@@ -1,7 +1,6 @@
 describe "IndexViewSpec", ->
   
   beforeEach ->
-    window.localStorage.clear()
     fayeClient = 
       publish: ->
       subscribe: ->
@@ -39,6 +38,7 @@ describe "IndexViewSpec", ->
       @view.render()
       
     afterEach ->
+      @view.collection._cleanup()
       Nomad.Views.Answers.AnswerView.restore()
       
     it "creates an answer view for each answer in the collection", ->

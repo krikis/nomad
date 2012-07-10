@@ -14,6 +14,7 @@ describe 'versioning', ->
 
     afterEach ->
       @collection.leave()
+      @collection._cleanup()
 
     it 'adds versioning to it', ->
       expect(@initVersioningSpy).toHaveBeenCalled()
@@ -52,6 +53,7 @@ describe 'versioning', ->
 
     afterEach ->
       @collection.leave()
+      @collection._cleanup()
 
     it 'adds versioning to it', ->
       expect(@initVersioningSpy).toHaveBeenCalled()

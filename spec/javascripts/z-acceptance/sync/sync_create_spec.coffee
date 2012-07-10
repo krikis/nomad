@@ -4,7 +4,6 @@ describe 'sync_create', ->
   beforeEach ->
     # delete window.client to speed up tests
     delete window.client
-    window.localStorage.clear()
     class Post extends Backbone.Model
     class TestCollection extends Backbone.Collection
       model: Post
@@ -33,6 +32,8 @@ describe 'sync_create', ->
   afterEach ->
     @collection.leave()
     @secondCollection.leave()
+    @collection._cleanup()
+    @secondCollection._cleanup()
 
   context 'when a model is freshly created', ->
     beforeEach ->

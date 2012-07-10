@@ -4,7 +4,6 @@ describe 'presync_create', ->
   beforeEach ->
     # delete window.client to speed up tests
     delete window.client
-    window.localStorage.clear()
     class Post extends Backbone.Model
     class TestCollection extends Backbone.Collection
       model: Post
@@ -18,6 +17,7 @@ describe 'presync_create', ->
 
   afterEach ->
     @collection.leave()
+    @collection._cleanup()
 
   context 'when a model is freshly created', ->
     beforeEach ->

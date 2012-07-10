@@ -102,9 +102,11 @@
     @fayeClient.unsubscribe(channel)
    
   # test convenience method for cleaning up localstorage 
-  _destroy_all: ->
-    _.each @models, (model) ->
+  _cleanup: ->
+    @fetch()
+    _.each _.clone(@models), (model) ->
       model.destroy()
+    @localStorage._cleanup()
 
 # extend Backbone.Collection
 _.extend Backbone.Collection::, Sync

@@ -1,6 +1,5 @@
 describe "AnswersSpec", ->
   beforeEach ->
-    window.localStorage.clear()
     fayeClient = {}
     fayeClient.subscribe = ->
     fayeClient.publish = ->
@@ -13,6 +12,7 @@ describe "AnswersSpec", ->
 
   afterEach ->
     @clientConstructorStub.restore()
+    @answers._cleanup()
     # remove stub from window.client
     delete window.client
 

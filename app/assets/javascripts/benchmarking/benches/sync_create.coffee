@@ -27,7 +27,6 @@ Benches.setupSyncCreate = (next) ->
   @dbResetSpy       = sinon.spy(@secondCollection.fayeClient, '_dbReset')  
   # clear all data stores
   @secondCollection.fayeClient._resetDb()
-  window.localStorage.clear()
   @waitsFor (->
     @dbResetSpy.callCount >= 1
   ), 'second client to be in sync', 1000, (->
@@ -37,6 +36,9 @@ Benches.setupSyncCreate = (next) ->
     @secondCreateSpy.reset()
     @secondUpdateSpy.reset()
     @dbResetSpy.reset()
+    # cleanup localStorage for collections
+    @collection._cleanup()
+    @secondCollection._cleanup()
     next.call(@)
   )
   return

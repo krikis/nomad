@@ -1,11 +1,10 @@
 describe 'Bacbone.LocalStorage', ->
   beforeEach ->
-    window.localStorage.clear()
-    fayeClient = 
+    fayeClient =
       publish: ->
       subscribe: ->
     @clientConstructorStub = sinon.stub(Faye, 'Client', -> fayeClient)
-  
+
   afterEach ->
     @clientConstructorStub.restore()
     # remove stub from window.client
@@ -17,9 +16,11 @@ describe 'Bacbone.LocalStorage', ->
     collection = undefined
 
     beforeEach ->
-      window.localStorage.clear()
       TestCollection::localStorage = new Backbone.LocalStorage('TestCollection')
       collection = new TestCollection([], modelName: 'TestModel')
+
+    afterEach ->
+      collection._cleanup()
 
     it 'should be empty initially', ->
       expect(collection.length).toEqual 0 # 'empty initially'
@@ -73,7 +74,8 @@ describe 'Bacbone.LocalStorage', ->
 
     it 'should not try to load items from localstorage if they are not there anymore', ->
       collection.create Factory.build('post')
-      localStorage.clear()
+      storageKey = collection.localStorage.storageKeyFor collection.models[0]
+      localStorage.removeItem storageKey
       collection.fetch()
       expect(0).toEqual collection.length #
 
@@ -105,9 +107,12 @@ describe 'Bacbone.LocalStorage', ->
     model = undefined
 
     beforeEach ->
-      window.localStorage.clear()
       TestModel::localStorage = new Backbone.LocalStorage('TestModel')
       model = new TestModel()
+
+    afterEach ->
+      model.destroy()
+      model.localStorage._cleanup()
 
     it 'should overwrite unsaved changes when fetching', ->
       model.save()
@@ -136,19 +141,25 @@ describe 'Bacbone.LocalStorage', ->
       remoteModel = new MyRemoteModel()
       method = Backbone.getSyncMethod(remoteModel)
       expect(method).toEqual Backbone.ajaxSync #
-      
+
   describe '#constructor', ->
     beforeEach ->
       window.localStorage.setItem('TestCollection-lastSynced', JSON.stringify 'timestamp')
       @localStorage = new Backbone.LocalStorage('TestCollection')
-                        
+
+    afterEach ->
+      @localStorage._cleanup()
+
     it 'initializes lastSynced from the localStorage', ->
       expect(@localStorage.lastSynced).toEqual('timestamp')
-      
+
   describe '#save', ->
     beforeEach ->
       @localStorage = new Backbone.LocalStorage('TestCollection')
-      
+
+    afterEach ->
+      @localStorage._cleanup()
+
     it 'saves the last_synced timestamp to the localstorage', ->
       @localStorage.lastSynced = 'timestamp'
       @localStorage.save()
@@ -167,12 +178,15 @@ describe 'Bacbone.LocalStorage', ->
       @collection = new TestCollection
       @model = @collection.create Factory.build('answer', id: null)
 
+    afterEach ->
+      @collection._cleanup()
+
     it 'returns the storage key for the model appended with -versioning', ->
       expect(@collection.localStorage.versioningKeyFor(@model)).
         toEqual "#{@collection.localStorage.storageKeyFor(@model)}-versioning"
 
   describe '#create', ->
-    beforeEach ->      
+    beforeEach ->
       class TestCollection extends Backbone.Collection
       class OtherTestCollection extends Backbone.Collection
       TestCollection::localStorage = new Backbone.
@@ -181,7 +195,11 @@ describe 'Bacbone.LocalStorage', ->
                                             LocalStorage('OtherTestCollection')
       @collection = new TestCollection([], modelName: 'TestModel')
       @other_collection = new OtherTestCollection([], modelName: 'TestModel')
-      
+
+    afterEach ->
+      @collection._cleanup()
+      @other_collection._cleanup()
+
     it 'generates a unique object id within the scope of a collection', ->
       sinon.stub @collection.localStorage, 'guid', ->
         @ids ||= ['other_unique_id', 'unique_id', 'used_id']
@@ -193,7 +211,7 @@ describe 'Bacbone.LocalStorage', ->
       @collection.create Factory.build('answer', id: null)
       # last model has a unique id within collection scope
       expect(@collection.last().get('id')).toEqual 'unique_id'
-      
+
   describe '#update', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -203,6 +221,8 @@ describe 'Bacbone.LocalStorage', ->
 
     afterEach ->
       @saveVersioningForStub.restore()
+      @localStorage.destroy(@model)
+      @localStorage._cleanup()
 
     it 'saves the versioning of the model', ->
       @localStorage.update(@model)
@@ -212,10 +232,15 @@ describe 'Bacbone.LocalStorage', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
+        id: 'some_id'
       @model.localStorage = new Backbone.LocalStorage('TestModel')
       @model._versioning = {patches: ["some", "patches"]}
       @model.collection =
         url: '/collection' # stub the model's collection url
+
+    afterEach ->
+      @model.localStorage.destroy(@model)
+      @model.localStorage._cleanup()
 
     it 'saves the model\'s _versioning object to localStorage', ->
       @model.localStorage.saveVersioningFor(@model)
@@ -231,6 +256,10 @@ describe 'Bacbone.LocalStorage', ->
       @model.collection =
         url: '/collection' # stub the model's collection url
       @model.save()
+
+    afterEach ->
+      @model.destroy()
+      @model.localStorage._cleanup()
 
     it 'fetches _versioning from localStorage', ->
       versioning = {patches: ['some', 'patches']}
@@ -253,6 +282,7 @@ describe 'Bacbone.LocalStorage', ->
     afterEach ->
       @setAllVersioningStub.restore()
       @setVersioningStub.restore()
+      @collection._cleanup()
 
     it 'binds setAllVersioning to the collection reset event', ->
       @collection.fetch()
@@ -274,6 +304,7 @@ describe 'Bacbone.LocalStorage', ->
 
     afterEach ->
       @setVersioningStub.restore()
+      @collection._cleanup()
 
     it 'calls setVersioning for all models in a collection', ->
       @collection.fetch()
@@ -286,6 +317,9 @@ describe 'Bacbone.LocalStorage', ->
                                        LocalStorage('TestCollection')
       @collection = new TestCollection([], modelName: 'TestModel')
       @collection.create Factory.build('answer', id: 'test_id')
+
+    afterEach ->
+      @collection._cleanup()
 
     it 'fetches _versioning for a model being added to a collection', ->
       versioning = {patches: ['some', 'patches']}
@@ -303,6 +337,10 @@ describe 'Bacbone.LocalStorage', ->
       @model.localStorage = new Backbone.LocalStorage('TestModel')
       @model.collection =
         url: '/collection' # stub the model's collection url
+
+    afterEach ->
+      @model.destroy()
+      @model.localStorage._cleanup()
 
     it 'cleans up the versioning in localStorage after destroing', ->
       @model._versioning = {patches: ['some', 'patches']}
