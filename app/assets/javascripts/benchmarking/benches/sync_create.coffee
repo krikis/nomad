@@ -3,7 +3,6 @@ Benches = @Benches ||= {}
 Benches.setupSyncCreate = (next) ->
   # delete window.client to speed up tests
   delete window.client
-  window.localStorage.clear()
   class Post extends Backbone.Model
   class TestCollection extends Backbone.Collection
     model: Post
@@ -25,18 +24,19 @@ Benches.setupSyncCreate = (next) ->
   @secondCollection = new SecondCollection
   @secondCreateSpy  = sinon.spy(@secondCollection.fayeClient, 'create')
   @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
-  model = new SecondPost
-    title: 'some_title'
-    content: 'some_content'
-  @secondCollection.create model
-  @secondCollection.syncModels()
+  @dbResetSpy       = sinon.spy(@secondCollection.fayeClient, '_dbReset')  
+  # clear all data stores
+  @secondCollection.fayeClient._resetDb()
+  window.localStorage.clear()
   @waitsFor (->
-    @secondCreateSpy.callCount >= 1
+    @dbResetSpy.callCount >= 1
   ), 'second client to be in sync', 1000, (->
+    # reset all spies
     @resolveSpy.reset()
     @createSpy.reset()
     @secondCreateSpy.reset()
     @secondUpdateSpy.reset()
+    @dbResetSpy.reset()
     next.call(@)
   )
   return

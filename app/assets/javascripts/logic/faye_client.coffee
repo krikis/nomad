@@ -48,6 +48,11 @@ class @BackboneSync.FayeClient
   _online: () ->
     @isOffline = false
     
+  # convenience test method for resetting server db
+  _resetDb: () ->
+    @publish 
+      reset_db: true
+    
   receive: (message) ->
     # extract meta information
     meta = message.meta
@@ -59,13 +64,16 @@ class @BackboneSync.FayeClient
     # handle offline test mode
     return if @isOffline
     # update the collection sync state
-    @collection.setLastSynced(meta.timestamp)
+    @collection.setLastSynced(meta.timestamp) if meta?.timestamp?
     # sync all dirty models if this is presync feedback
     if meta?.preSync
       @collection.syncModels(afterPresync: true)
     # sync only resolved and rebased models
     else
       @collection.syncProcessed(processed)
+      
+  _dbReset: () ->
+    console.log 'The server database was successfully reset!'
 
   resolve: (params, processed) ->
     # handle offline test mode
