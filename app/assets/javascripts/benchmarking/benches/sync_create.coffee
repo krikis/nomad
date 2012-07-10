@@ -1,6 +1,6 @@
 Benches = @Benches ||= {}
 
-Benches.beforeSyncCreate = ->
+Benches.beforeSyncCreate = (next) ->
   # delete window.client to speed up tests
   delete window.client
   window.localStorage.clear()
@@ -32,17 +32,21 @@ Benches.beforeSyncCreate = ->
       title: 'some_title'
       content: 'some_content'
     @collection.create @model
+    next.call(@)
   )
   return
 
-Benches.afterSyncCreate = ->  
+Benches.afterSyncCreate = (next) ->  
   @collection.leave()
   @secondCollection.leave()
+  next.call(@)
   return
 
-Benches.syncCreate = ->
+Benches.syncCreate = (next) ->
   @collection.syncModels()
   @waitsFor (->
     @createSpy.callCount >= 1 and @secondCreateSpy.callCount >= 1
-  ), 'create multicast', 1000
+  ), 'create multicast', 1000, (->
+    next.call(@)
+  )
   return
