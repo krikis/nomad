@@ -139,7 +139,7 @@ describe 'Bacbone.LocalStorage', ->
       
   describe '#constructor', ->
     beforeEach ->
-      window.localStorage.setItem('TestCollection-lastSynced', 'timestamp')
+      window.localStorage.setItem('TestCollection-lastSynced', JSON.stringify 'timestamp')
       @localStorage = new Backbone.LocalStorage('TestCollection')
                         
     it 'initializes lastSynced from the localStorage', ->
@@ -153,7 +153,7 @@ describe 'Bacbone.LocalStorage', ->
       @localStorage.lastSynced = 'timestamp'
       @localStorage.save()
       expect(
-        window.localStorage.
+        JSON.parse window.localStorage.
           getItem("#{@localStorage.name}-lastSynced")
       ).toEqual('timestamp')
 

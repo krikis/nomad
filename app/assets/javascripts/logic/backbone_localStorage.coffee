@@ -27,7 +27,7 @@
     # Save the current state of the **Store** to *localStorage*.
     save: ->
       @localStorage().setItem @name, @records.join(",")
-      @localStorage().setItem "#{@name}-lastSynced", @lastSynced
+      @localStorage().setItem "#{@name}-lastSynced", JSON.stringify @lastSynced
       return
 
     # Generate a pseudo-GUID by concatenating random hexadecimal.
