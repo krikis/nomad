@@ -1,6 +1,6 @@
 Benches = @Benches ||= {}
 
-Benches.beforeSyncCreate = (next) ->
+Benches.setupSyncCreate = (next) ->
   # delete window.client to speed up tests
   delete window.client
   window.localStorage.clear()
@@ -25,20 +25,27 @@ Benches.beforeSyncCreate = (next) ->
   @secondCollection = new SecondCollection
   @secondCreateSpy  = sinon.spy(@secondCollection.fayeClient, 'create')
   @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
+  model = new SecondPost
+    title: 'some_title'
+    content: 'some_content'
+  @secondCollection.create model
+  @secondCollection.syncModels()
   @waitsFor (->
-    @secondCollection.fayeClient.client.getState() == 'CONNECTED'
+    @secondCreateSpy.callCount >= 1
   ), 'second client to connect', 1000, (->
-    @model = new @Post
-      title: 'some_title'
-      content: 'some_content'
-    @collection.create @model
+    @resolveSpy.reset()
+    @createSpy.reset()
+    @secondCreateSpy.reset()
+    @secondUpdateSpy.reset()
     next.call(@)
   )
   return
 
-Benches.afterSyncCreate = (next) ->  
-  @collection.leave()
-  @secondCollection.leave()
+Benches.beforeSyncCreate = (next) ->
+  @model = new @Post
+    title: 'some_title'
+    content: 'some_content'
+  @collection.create @model
   next.call(@)
   return
 
@@ -49,4 +56,18 @@ Benches.syncCreate = (next) ->
   ), 'create multicast', 1000, (->
     next.call(@)
   )
+  return
+
+Benches.afterSyncCreate = (next) ->
+  @resolveSpy.reset()
+  @createSpy.reset()
+  @secondCreateSpy.reset()
+  @secondUpdateSpy.reset()
+  next.call(@)
+  return
+
+Benches.cleanupSyncCreate = (next) ->
+  @collection.leave()
+  @secondCollection.leave()
+  next.call(@)
   return
