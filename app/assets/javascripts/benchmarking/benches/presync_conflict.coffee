@@ -63,7 +63,7 @@ Benches.beforePreSyncConflict = (next) ->
       # take the second client back online
       @secondCollection.fayeClient._online()
       # create a conflicting update
-      _.first(@secondCollection.models).save
+      _.last(@secondCollection.models).save
         content: 'other_content'
       next.call(@)
     )
