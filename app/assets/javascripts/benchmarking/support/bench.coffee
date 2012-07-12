@@ -42,10 +42,12 @@ class @Bench
         name: series.name
         data: []
       categoryIndex = 0
+      _.each @chart.xAxis[0].categories, (category) ->
+        allData[seriesIndex].data[categoryIndex] ||= 0
+        categoryIndex++
+      seriesIndex++
       while series.data.length < @categories.length
         series.addPoint 0
-        allData[seriesIndex].data[categoryIndex++] ||= 0
-      seriesIndex++
     localStorage.allData = JSON.stringify allData
     
   saveStats: ->
