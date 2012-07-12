@@ -62,13 +62,14 @@ Benches.preSyncUpdate = (next) ->
   @collection.preSync()
   @waitsFor (->
     @updateSpy.callCount >= 2 and @secondUpdateSpy.callCount >= 1
-  ), 'create multicast', 1000, (->
+  ), 'update multicast', 1000, (->
     next.call(@)
   )
   return
 
 Benches.afterPreSyncUpdate = (next) ->
   @createSpy.reset()
+  @updateSpy.reset()
   @secondCreateSpy.reset()
   @secondUpdateSpy.reset()
   next.call(@)
