@@ -1,5 +1,6 @@
 class @Suite
-  constructor: ->
+  constructor: (options={}) ->
+    @measure = options.measure
     @benches = []
     
   bench: (options) ->
@@ -22,11 +23,12 @@ class @Suite
       bench.run
         next: @nextBench
         context: @
+        measure: @measure
     
   nextBench: ->
     bench = @benches[@benchIndex]
     # let iteration converge when oscillations become smaller than 1%
-    if Math.abs(bench.previous - bench.median) > bench.median / 100
+    if Math.abs(bench.previous - bench[@measure]) > bench[@measure] / 100
       @rerunSuite = true
     @benchIndex++
     if @benchIndex < @benches.length

@@ -21,7 +21,6 @@ class @Bench
     @categories = JSON.parse(localStorage.categories || "[]")
     unless @category in @categories
       @categories.push @category 
-      @categories.push "#{@category}_median"
       @newCategory = true
     @allSeries = JSON.parse(localStorage.allSeries || "[]")
     unless @series in @allSeries
@@ -48,6 +47,7 @@ class @Bench
   run: (options = {}) ->
     @next = options.next
     @suite = options.context
+    @measure = options.measure
     @button = options.button
     $(@button).attr('disabled': true) if @button?
     @timeout = false
@@ -85,35 +85,30 @@ class @Bench
   updateStats: (runtime) ->   
     @stats.push runtime
     @saveStats()
-    if _.isEmpty(@stats)
-      mean = 0
-      median = 0
-    else
-      sum = _.reduce @stats, (memo, value) -> memo + value
-      mean = sum / @stats.length
-      stats = @stats.sort((a, b) -> a - b)
-      length = stats.length
-      if stats.length % 2 == 0
-        median = (stats[(length / 2) - 1] + stats[(length / 2)]) / 2
-      else
-        median = stats[Math.round(length / 2) - 1]
-    @previous = @median
-    @mean = Math.round mean    
-    @median = Math.round median
+    @previous = @[@measure] || 0
+    switch @measure
+      when 'mean' 
+        sum = _.reduce @stats, (memo, value) -> memo + value
+        @[@measure] = Math.round(sum / @stats.length)
+      when 'median'
+        stats = @stats.sort((a, b) -> a - b)
+        length = stats.length
+        if stats.length % 2 == 0
+          value = (stats[(length / 2) - 1] + stats[(length / 2)]) / 2
+        else
+          value = stats[Math.round(length / 2) - 1]
+        @[@measure] = Math.round(value)
     
   redrawChart: ->
     seriesIndex = _.indexOf(@allSeries, @series)
     categoryIndex = _.indexOf(@categories, @category)
-    @chart.series[seriesIndex].data[categoryIndex].update @mean
-    medianIndex = _.indexOf(@categories, "#{@category}_median")
-    @chart.series[seriesIndex].data[medianIndex].update @median
+    @chart.series[seriesIndex].data[categoryIndex].update @[@measure]
     # cache chart data
     @allData = JSON.parse(localStorage.allData || "[]")
     @allData[seriesIndex] ||=
       name: @series
       data: []
-    @allData[seriesIndex].data[categoryIndex] = @mean  
-    @allData[seriesIndex].data[medianIndex] = @median
+    @allData[seriesIndex].data[categoryIndex] = @[@measure]
     localStorage.allData = JSON.stringify @allData
     
   TIMEOUT_INCREMENT: 10
