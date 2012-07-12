@@ -103,6 +103,7 @@
    
   # test convenience method for cleaning up localstorage 
   _cleanup: ->
+    @fayeClient.client.disconnect()
     @fetch()
     _.each _.clone(@models), (model) ->
       model.destroy()
