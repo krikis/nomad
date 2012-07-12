@@ -39,7 +39,7 @@ Benches.setupSyncCreate = (next) ->
 Benches.beforeSyncCreate = (next) ->
   @model = new @Post
     title: 'some_title'
-    content: 'some_content'
+    content: Benches.loremIpsum70KB
   @collection.create @model
   next.call(@)
   return
