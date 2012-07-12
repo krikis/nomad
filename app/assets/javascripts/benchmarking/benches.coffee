@@ -45,6 +45,48 @@ suite.bench
   after:    Benches.  afterSyncUpdate
   cleanup:  Benches.cleanupSyncUpdate
   chart:    @barChart
+  
+suite.bench  
+  category: 'preSync'
+  series:   'conflict'
+  setup:    Benches.  setupPreSyncConflict
+  before:   Benches. beforePreSyncConflict
+  test:     Benches.       preSyncConflict
+  after:    Benches.  afterPreSyncConflict
+  cleanup:  Benches.cleanupPreSyncConflict
+  chart:    @barChart
+  
+suite.bench
+  category: 'sync'
+  series:   'conflict'
+  setup:    Benches.  setupSyncConflict
+  before:   Benches. beforeSyncConflict
+  test:     Benches.       syncConflict
+  after:    Benches.  afterSyncConflict
+  cleanup:  Benches.cleanupSyncConflict
+  chart:    @barChart
 
 $('#run').click ->
   suite.run(@)
+  
+@bench = new Bench
+  runs: 1
+  category: 'sync'
+  series:   'conflict'
+  setup:    Benches.  setupSyncConflict
+  before:   Benches. beforeSyncConflict
+  test:     Benches.       syncConflict
+  after:    Benches.  afterSyncConflict
+  cleanup:  Benches.cleanupSyncConflict
+  chart:    @barChart
+  
+
+fn = -> console.log 'success'
+fn2 = -> Benches.syncConflict.call(bench, fn)
+fn1 = -> Benches.beforeSyncConflict.call(bench, fn2)
+Benches.setupSyncConflict.call(bench, fn1)
+  
+  
+  
+  
+  
