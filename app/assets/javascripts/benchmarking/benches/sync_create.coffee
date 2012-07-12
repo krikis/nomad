@@ -7,7 +7,6 @@ Benches.setupSyncCreate = (next) ->
   class TestCollection extends Backbone.Collection
     model: Post
   @collection = new TestCollection
-  @resolveSpy = sinon.spy(@collection.fayeClient, 'resolve')
   @createSpy  = sinon.spy(@collection.fayeClient, 'create' )
   @Post = Post
   # create second client
@@ -23,7 +22,6 @@ Benches.setupSyncCreate = (next) ->
         client: new Faye.Client("http://nomad.dev:9292/faye")
   @secondCollection = new SecondCollection
   @secondCreateSpy  = sinon.spy(@secondCollection.fayeClient, 'create')
-  @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
   @dbResetSpy       = sinon.spy(@secondCollection.fayeClient, '_dbReset')  
   # clear all data stores
   @secondCollection.fayeClient._resetDb()
@@ -31,10 +29,8 @@ Benches.setupSyncCreate = (next) ->
     @dbResetSpy.callCount >= 1
   ), 'second client to be in sync', 1000, (->
     # reset all spies
-    @resolveSpy.reset()
     @createSpy.reset()
     @secondCreateSpy.reset()
-    @secondUpdateSpy.reset()
     @dbResetSpy.reset()
     next.call(@)
   )
@@ -58,10 +54,8 @@ Benches.syncCreate = (next) ->
   return
 
 Benches.afterSyncCreate = (next) ->
-  @resolveSpy.reset()
   @createSpy.reset()
   @secondCreateSpy.reset()
-  @secondUpdateSpy.reset()
   next.call(@)
   return
 
