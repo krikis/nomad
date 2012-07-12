@@ -26,5 +26,25 @@ suite.bench
   cleanup:  Benches.cleanupSyncCreate
   chart:    @barChart
 
+suite.bench
+  category: 'preSync'
+  series:   'update'
+  setup:    Benches.  setupPreSyncUpdate
+  before:   Benches. beforePreSyncUpdate
+  test:     Benches.       preSyncUpdate
+  after:    Benches.  afterPreSyncUpdate
+  cleanup:  Benches.cleanupPreSyncUpdate
+  chart:    @barChart
+
+suite.bench 
+  category: 'sync'
+  series:   'update'
+  setup:    Benches.  setupSyncUpdate
+  before:   Benches. beforeSyncUpdate
+  test:     Benches.       syncUpdate
+  after:    Benches.  afterSyncUpdate
+  cleanup:  Benches.cleanupSyncUpdate
+  chart:    @barChart
+
 $('#run').click ->
   suite.run(@)
