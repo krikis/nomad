@@ -72,7 +72,8 @@ class @Bench
     console.log "#{@key}: #{@runs} runs in #{@total} ms"
     @processResults()
     $(@button).attr('disabled': false) if @button?
-    @next.call(@suite)
+    # return control to suite if present
+    @next?.call(@suite)
     
   processResults: ->  
     runtime = if @runs > 0 then @total / @runs else 0
@@ -105,7 +106,9 @@ class @Bench
       callback.apply(@) if _.isFunction(callback)
     else if total >= timeout
       console.log "Timed out afer #{total} msec waiting for #{message}!"
-      @suite.finish(true)
+      # gracefully stop
+      $(@button).attr('disabled': false) if @button?
+      @suite?.finish(true)
       return
     else
       total += @TIMEOUT_INCREMENT
