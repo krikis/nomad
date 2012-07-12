@@ -35,9 +35,17 @@ class @Bench
         data: []
     if @newCategory
       @chart.xAxis[0].setCategories @categories
+    allData = []
+    seriesIndex = 0
     _.each @chart.series, (series) =>
+      allData[seriesIndex] = 
+        name: @series
+        data: []
       while series.data.length < @categories.length
         series.addPoint 0
+        allData[seriesIndex].data.push 0
+      seriesIndex++
+    localStorage.allData = JSON.stringify allData
     
   saveStats: ->
     localStorage[@key] = JSON.stringify @stats
