@@ -1,17 +1,6 @@
 @allSeries = JSON.parse localStorage.allSeries || "[]"
 @categories = JSON.parse localStorage.categories || "[]"
-@allData = _.map @allSeries, (series) =>
-  name: series
-  data: _.map(@categories, (category) ->
-    key = "#{series}_#{category}"
-    values = JSON.parse(localStorage[key] || "[]")
-    if _.isEmpty values
-      mean = 0
-    else
-      sum = _.reduce values, (memo, value) -> memo + value
-      mean = sum / values.length
-    Math.round(mean)
-  )
+@allData = JSON.parse(localStorage.allData || "[]")
 
 @barChartConfig =
   chart:

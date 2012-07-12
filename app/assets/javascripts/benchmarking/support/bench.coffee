@@ -17,10 +17,11 @@ class @Bench
   initStats: ->    
     @mean = 0
     @key = "#{@series}_#{@category}"
-    @stats = JSON.parse(localStorage[@key]    || "[]")
+    @stats = JSON.parse(localStorage[@key] || "[]")
     @categories = JSON.parse(localStorage.categories || "[]")
     unless @category in @categories
       @categories.push @category 
+      @categories.push "#{@category}_median"
       @newCategory = true
     @allSeries = JSON.parse(localStorage.allSeries || "[]")
     unless @series in @allSeries
@@ -84,18 +85,38 @@ class @Bench
   updateStats: (runtime) ->   
     @stats.push runtime
     @saveStats()
-    
-  redrawChart: ()->
     if _.isEmpty(@stats)
       mean = 0
+      median = 0
     else
       sum = _.reduce @stats, (memo, value) -> memo + value
       mean = sum / @stats.length
-    @previous = @mean
-    @mean = Math.round mean
+      stats = @stats.sort((a, b) -> a - b)
+      length = stats.length
+      if stats.length % 2 == 0
+        median = (stats[(length / 2) - 1] + stats[(length / 2)]) / 2
+      else
+        median = stats[Math.round(length / 2) - 1]
+    @previous = @median
+    @mean = Math.round mean    
+    @median = Math.round median
+    
+  redrawChart: ->
     seriesIndex = _.indexOf(@allSeries, @series)
     categoryIndex = _.indexOf(@categories, @category)
     @chart.series[seriesIndex].data[categoryIndex].update @mean
+    medianIndex = _.indexOf(@categories, "#{@category}_median")
+    @chart.series[seriesIndex].data[medianIndex].update @median
+    @cacheChartData()
+    
+  cacheChartData: ->
+    @allData = JSON.parse(localStorage.allData || "[]")
+    @allData[seriesIndex] ||=
+      name: @series
+      data: []
+    @allData[seriesIndex].data[categoryIndex] = @mean  
+    @allData[seriesIndex].data[medianIndex] = @median
+    localStorage.allData = JSON.stringify @allData
     
   TIMEOUT_INCREMENT: 10
 
