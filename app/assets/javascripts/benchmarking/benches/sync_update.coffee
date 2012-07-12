@@ -53,7 +53,7 @@ Benches.beforeSyncUpdate = (next) ->
     @secondUpdateSpy.reset()
     @model.save
       title: 'other_title'
-      content: Benches.loremIpsum70KB
+      content: @benchmarkData()
     next.call(@)
   )
   return

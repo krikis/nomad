@@ -5,7 +5,8 @@
 @barChart = new Highcharts.Chart @barChartConfig
 
 suite = @suite = new Suite
-  measure: 'median'
+  measure:   'median'
+  benchData: 'loremIpsum70KB'
 
 suite.bench
   category: 'preSync'

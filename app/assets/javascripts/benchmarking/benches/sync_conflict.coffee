@@ -64,7 +64,7 @@ Benches.beforeSyncConflict = (next) ->
       @secondCollection.fayeClient._online()
       # create a conflicting update
       _.last(@secondCollection.models).save
-        content: Benches.loremIpsum70KB
+        content: @benchmarkData()
       next.call(@)
     )
   )

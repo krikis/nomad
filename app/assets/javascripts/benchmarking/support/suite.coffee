@@ -1,6 +1,7 @@
 class @Suite
   constructor: (options={}) ->
     @measure = options.measure
+    @benchData = options.benchData
     @benches = []
     
   bench: (options) ->
@@ -24,6 +25,7 @@ class @Suite
         next: @nextBench
         context: @
         measure: @measure
+        benchData: @benchData
     
   nextBench: ->
     bench = @benches[@benchIndex]

@@ -59,6 +59,7 @@ class @Bench
     @next = options.next
     @suite = options.context
     @measure = options.measure
+    @benchData = options.benchData || 'loremIpsum70KB'
     @button = options.button
     $(@button).attr('disabled': true) if @button?
     @timeout = false
@@ -121,6 +122,9 @@ class @Bench
       data: []
     @allData[seriesIndex].data[categoryIndex] = @[@measure]
     localStorage.allData = JSON.stringify @allData
+    
+  benchmarkData: ->
+    Benches[@benchData]
     
   TIMEOUT_INCREMENT: 10
 
