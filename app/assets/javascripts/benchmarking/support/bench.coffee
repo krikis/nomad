@@ -35,20 +35,21 @@ class @Bench
         data: []
     if @newCategory
       @chart.xAxis[0].setCategories @categories
-    allData = []
+    allData = JSON.parse(localStorage.allData || "[]")
     seriesIndex = 0
     _.each @chart.series, (series) =>
-      allData[seriesIndex] = 
-        name: @series
+      allData[seriesIndex] ||= 
+        name: series.name
         data: []
+      categoryIndex = 0
       while series.data.length < @categories.length
         series.addPoint 0
-        allData[seriesIndex].data.push 0
+        allData[seriesIndex].data[categoryIndex++] ||= 0
       seriesIndex++
     localStorage.allData = JSON.stringify allData
     
   saveStats: ->
-    localStorage[@key] = JSON.stringify @stats
+    localStorage[@key] = JSON.stringify @stats.sort(@numerical)
     localStorage.categories = JSON.stringify @categories
     localStorage.allSeries = JSON.stringify @allSeries
     
@@ -99,7 +100,7 @@ class @Bench
         sum = _.reduce @stats, (memo, value) -> memo + value
         @[@measure] = Math.round(sum / @stats.length)
       when 'median'
-        stats = @stats.sort((a, b) -> a - b)
+        stats = @stats.sort(@numerical)
         length = stats.length
         if stats.length % 2 == 0
           value = (stats[(length / 2) - 1] + stats[(length / 2)]) / 2
@@ -146,6 +147,9 @@ class @Bench
   # Generate a pseudo-GUID by concatenating random hexadecimal.
   uid: ->
     S4() + S4()
+    
+  numerical: (a, b) ->
+    a - b
   
   
     
