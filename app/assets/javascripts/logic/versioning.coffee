@@ -107,7 +107,7 @@
     null
     
   _finishedSyncing: (vectorClock) ->
-    @_versioning.syncingVersions?.delete(vectorClock[@clientId])
+    @_versioning.syncingVersions.delete(vectorClock[@clientId])
 
   _changeId: (attributes) ->
     # TODO :: implement changing the model id when it conflicts
