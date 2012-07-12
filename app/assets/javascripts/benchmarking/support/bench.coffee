@@ -107,9 +107,7 @@ class @Bench
     @chart.series[seriesIndex].data[categoryIndex].update @mean
     medianIndex = _.indexOf(@categories, "#{@category}_median")
     @chart.series[seriesIndex].data[medianIndex].update @median
-    @cacheChartData()
-    
-  cacheChartData: ->
+    # cache chart data
     @allData = JSON.parse(localStorage.allData || "[]")
     @allData[seriesIndex] ||=
       name: @series
