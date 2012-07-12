@@ -47,5 +47,8 @@ class @Suite
     
   finish: (timeout = false)->
     unless timeout
-      console.log "converged after #{@runs} iterations"  
+      if @runs < @MAX_NR_OF_RUNS
+        console.log "converged after #{@runs} iterations"
+      else
+        console.log "maximum number of runs reached"
     $(@button).attr('disabled': false) if @button?  

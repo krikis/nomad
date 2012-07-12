@@ -35,7 +35,8 @@ class @Bench
         data: []
     if @newCategory
       @chart.xAxis[0].setCategories @categories
-      _.each @chart.series, (series) ->
+    _.each @chart.series, (series) =>
+      while series.data.length < @categories.length
         series.addPoint 0
     
   saveStats: ->
