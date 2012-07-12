@@ -45,6 +45,7 @@ class @Suite
     else
       @finish()
     
-  finish: ->
-    console.log "converged after #{@runs} iterations"  
+  finish: (timeout = false)->
+    unless timeout
+      console.log "converged after #{@runs} iterations"  
     $(@button).attr('disabled': false) if @button?  
