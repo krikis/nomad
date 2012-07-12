@@ -1,6 +1,6 @@
 Benches = @Benches ||= {}
 
-Benches.setupSyncUpdate = (next) ->
+Benches.setupPreSyncUpdate = (next) ->
   # delete window.client to speed up tests
   delete window.client
   class Post extends Backbone.Model
@@ -40,7 +40,7 @@ Benches.setupSyncUpdate = (next) ->
   )
   return
 
-Benches.beforeSyncUpdate = (next) ->
+Benches.beforePreSyncUpdate = (next) ->
   @model = new @Post
     title: 'some_title'
     content: 'some_content'
@@ -58,7 +58,7 @@ Benches.beforeSyncUpdate = (next) ->
   )
   return
 
-Benches.syncUpdate = (next) ->
+Benches.preSyncUpdate = (next) ->
   @collection.preSync()
   @waitsFor (->
     @updateSpy.callCount >= 2 and @secondUpdateSpy.callCount >= 1
@@ -67,14 +67,14 @@ Benches.syncUpdate = (next) ->
   )
   return
 
-Benches.afterSyncUpdate = (next) ->
+Benches.afterPreSyncUpdate = (next) ->
   @createSpy.reset()
   @secondCreateSpy.reset()
   @secondUpdateSpy.reset()
   next.call(@)
   return
 
-Benches.cleanupSyncUpdate = (next) ->
+Benches.cleanupPreSyncUpdate = (next) ->
   @collection.leave()
   @secondCollection.leave()
   # cleanup localStorage for collections
