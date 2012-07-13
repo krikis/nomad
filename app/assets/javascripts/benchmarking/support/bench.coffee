@@ -1,5 +1,6 @@
 class @Bench
   DEFAULT_NR_OF_RUNS: 10
+  DEFAULT_TIMEOUT: 1000
   
   constructor: (options = {}) ->
     @category = options.category || @uid()
@@ -10,6 +11,7 @@ class @Bench
     @after    = options.after    || (next) -> next.call(@)
     @cleanup  = options.cleanup  || (next) -> next.call(@)
     @runs     = options.runs     || @DEFAULT_NR_OF_RUNS
+    @timeout  = options.timeout  || @DEFAULT_TIMEOUT
     @chart    = options.chart
     @initStats()
     @initChart()
@@ -52,14 +54,14 @@ class @Bench
     localStorage.allData = JSON.stringify @allData
     
   run: (options = {}) ->
-    @next = options.next
-    @suite = options.context
-    @measure = options.measure
-    @benchData = options.data || 'data70KB'
-    @runs = options.runs if options.runs
-    @button = options.button
+    @next      = options.next
+    @suite     = options.context
+    @measure   = options.measure
+    @benchData = options.data    || 'data70KB'
+    @runs      = options.runs    if options.runs
+    @timeout   = options.timeout if options.timeout
+    @button    = options.button
     $(@button).attr('disabled': true) if @button?
-    @timeout = false
     @total = 0
     @count = @runs
     @setup.call(@, @testLoop)
@@ -131,16 +133,25 @@ class @Bench
         Benches['data70KB'] +
         Benches['data70KB'] +
         Benches['data70KB']
+      when 'data560KB'
+        Benches['data70KB'] + 
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] + 
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB']
     
   TIMEOUT_INCREMENT: 10
 
-  waitsFor: (check, message, timeout, callback) ->
-    @_waitFor(check, callback, message, timeout, 0)
+  waitsFor: (check, message, callback) ->
+    @_waitFor(check, callback, message, 0)
 
-  _waitFor: (check, callback, message, timeout, total) ->
+  _waitFor: (check, callback, message, total) ->
     if check.apply(@)
       callback.apply(@) if _.isFunction(callback)
-    else if total >= timeout
+    else if total >= @timeout
       console.log "Timed out afer #{total} msec waiting for #{message}!"
       # gracefully stop
       $(@button).attr('disabled': false) if @button?
@@ -149,7 +160,7 @@ class @Bench
     else
       total += @TIMEOUT_INCREMENT
       setTimeout (=>
-        @_waitFor.apply(@, [check, callback, message, timeout, total])
+        @_waitFor.apply(@, [check, callback, message, total])
       ), @TIMEOUT_INCREMENT
       
   # Generate four random hex digits.

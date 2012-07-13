@@ -1,9 +1,10 @@
 class @Suite
   constructor: (options={}) ->
-    @measure = options.measure
+    @measure   = options.measure
     @benchData = options.benchData
     @benchRuns = options.benchRuns
-    @benches = []
+    @timeout   = options.timeout
+    @benches   = []
     
   bench: (options) ->
     bench = new Bench options
@@ -23,11 +24,12 @@ class @Suite
   runBench: ->
     if bench = @benches[@benchIndex]
       bench.run
-        next: @nextBench
+        next:    @nextBench
         context: @
         measure: @measure
-        data: @benchData
-        runs: @benchRuns
+        data:    @benchData
+        runs:    @benchRuns
+        timout:  @timeout
     
   nextBench: ->
     bench = @benches[@benchIndex]
