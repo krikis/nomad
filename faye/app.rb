@@ -83,8 +83,14 @@ def highlight_array_attribute(string, attribute, color, content_color, container
                "\"#{color}#{attribute}#{reset}\"=>#{content_color}[#{reset if container_only}\\1#{content_color if container_only}]#{reset}"
 end
 
+def filter_out_blobs(string)
+  string.gsub! /\"=>\"([^"]{100}[^"]+)\"/,
+               "\"=>\"data_blob\""
+end
+
 App.bind(:publish) do |client_id, channel, data|
   output = data.inspect
+  filter_out_blobs(output)
   ['new_versions', 'create', 'creates',
    'versions',     'update', 'updates'].each do |keyword|
     highlight_key_with_content(output, keyword, azure_on(black))
