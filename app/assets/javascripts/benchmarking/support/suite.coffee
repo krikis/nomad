@@ -57,4 +57,7 @@ class @Suite
         console.log "converged after #{@runs} iterations"
       else
         console.log "maximum number of runs reached"
+      console.log new Date
+      console.log @benchData
+      console.log JSON.stringify localStorage
     $(@button).attr('disabled': false) if @button?  
