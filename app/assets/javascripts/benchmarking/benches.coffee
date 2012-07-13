@@ -6,9 +6,9 @@
 
 suite = @suite = new Suite
   measure:   'median'
-  benchData: 'data70KB'
-  # benchRuns: 1
-  timeout: 3000
+  benchData: 'data280KB'
+  benchRuns: 4
+  timeout: 10000
 
 suite.bench
   category: 'preSync'
