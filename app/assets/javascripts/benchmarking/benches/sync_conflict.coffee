@@ -63,7 +63,11 @@ Benches.beforeSyncConflict = (next) ->
       # take the second client back online
       @secondCollection.fayeClient._online()
       # stub out rebase logic to speed up bench
-      sinon.stub _.last(@secondCollection.models), '_applyPatchesTo', -> true
+      sinon.stub _.last(@secondCollection.models), '_rebase', (attributes) ->
+        [version, created_at, updated_at] =
+          @_extractVersioning(attributes)
+        @_updateVersionTo(version, updated_at)
+        @
       # create a conflicting update
       _.last(@secondCollection.models).save
         content: @benchmarkData()
