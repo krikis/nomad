@@ -25,7 +25,10 @@ Benches.setupPreSyncUpdate = (next) ->
   @secondCreateSpy  = sinon.spy(@secondCollection.fayeClient, 'create')
   @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
   @dbResetSpy       = sinon.spy(@secondCollection.fayeClient, '_dbReset')  
-  # clear all data stores
+  # cleanup localStorage
+  @collection._cleanLocalStorage()
+  @secondCollection._cleanLocalStorage()
+  # clear server data store
   @secondCollection.fayeClient._resetDb()
   @waitsFor (->
     @dbResetSpy.callCount >= 1
@@ -78,7 +81,7 @@ Benches.afterPreSyncUpdate = (next) ->
 Benches.cleanupPreSyncUpdate = (next) ->
   @collection.leave()
   @secondCollection.leave()
-  # cleanup localStorage for collections
+  # cleanup faye and localStorage for collections
   @collection._cleanup()
   @secondCollection._cleanup()
   next.call(@)

@@ -23,7 +23,10 @@ Benches.setupSyncCreate = (next) ->
   @secondCollection = new SecondCollection
   @secondCreateSpy  = sinon.spy(@secondCollection.fayeClient, 'create')
   @dbResetSpy       = sinon.spy(@secondCollection.fayeClient, '_dbReset')  
-  # clear all data stores
+  # cleanup localStorage
+  @collection._cleanLocalStorage()
+  @secondCollection._cleanLocalStorage()
+  # clear server data store
   @secondCollection.fayeClient._resetDb()
   @waitsFor (->
     @dbResetSpy.callCount >= 1
@@ -62,7 +65,7 @@ Benches.afterSyncCreate = (next) ->
 Benches.cleanupSyncCreate = (next) ->
   @collection.leave()
   @secondCollection.leave()
-  # cleanup localStorage for collections
+  # cleanup faye and localStorage for collections
   @collection._cleanup()
   @secondCollection._cleanup()
   next.call(@)
