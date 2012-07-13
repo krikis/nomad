@@ -94,7 +94,7 @@ class @Bench
     @saveStats()
     
   updateStats: (runtime) ->   
-    @stats.push runtime
+    @stats.push Math.round runtime
     @previous = @[@measure] || 0
     switch @measure
       when 'mean' 
