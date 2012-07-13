@@ -29,7 +29,7 @@ Benches.setupSyncUpdate = (next) ->
   @secondCollection.fayeClient._resetDb()
   @waitsFor (->
     @dbResetSpy.callCount >= 1
-  ), 'second client to be in sync', 1000, (->
+  ), 'second client to be in sync', (->
     # reset all spies
     @createSpy.reset()
     @updateSpy.reset()
@@ -48,7 +48,7 @@ Benches.beforeSyncUpdate = (next) ->
   @collection.syncModels()
   @waitsFor (->
     @createSpy.callCount >= 1 and @secondCreateSpy.callCount >= 1
-  ), 'create multicast', 1000, (->    
+  ), 'create multicast', (->    
     @updateSpy.reset()
     @secondUpdateSpy.reset()
     @model.save
@@ -62,7 +62,7 @@ Benches.syncUpdate = (next) ->
   @collection.syncModels()
   @waitsFor (->
     @updateSpy.callCount >= 1 and @secondUpdateSpy.callCount >= 1
-  ), 'update multicast', 1000, (->
+  ), 'update multicast', (->
     next.call(@)
   )
   return

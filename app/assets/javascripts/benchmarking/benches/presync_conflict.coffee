@@ -29,7 +29,7 @@ Benches.setupPreSyncConflict = (next) ->
   @secondCollection.fayeClient._resetDb()
   @waitsFor (->
     @dbResetSpy.callCount >= 1
-  ), 'second client to be in sync', 1000, (->
+  ), 'second client to be in sync', (->
     # reset all spies
     @createSpy.reset()
     @updateSpy.reset()
@@ -48,7 +48,7 @@ Benches.beforePreSyncConflict = (next) ->
   @collection.preSync()
   @waitsFor (->
     @createSpy.callCount >= 1 and @secondCreateSpy.callCount >= 1
-  ), 'create multicast', 1000, (->    
+  ), 'create multicast', (->    
     # make sure the second client misses the first client update
     @secondCollection.fayeClient._offline()
     # update the model and sync it
@@ -57,7 +57,7 @@ Benches.beforePreSyncConflict = (next) ->
     @collection.preSync()
     @waitsFor (->
       @updateSpy.callCount >= 4 and @secondUpdateSpy.callCount >= 2
-    ), 'update multicast', 1000, (->    
+    ), 'update multicast', (->    
       @updateSpy.reset()
       @secondUpdateSpy.reset()
       # take the second client back online
@@ -80,7 +80,7 @@ Benches.preSyncConflict = (next) ->
   @secondCollection.preSync()
   @waitsFor (->
     @updateSpy.callCount >= 1 and @secondUpdateSpy.callCount >= 2
-  ), 'final update multicast', 1000, (->
+  ), 'final update multicast', (->
     next.call(@)
   )
   return
