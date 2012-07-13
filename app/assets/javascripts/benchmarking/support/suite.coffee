@@ -29,7 +29,7 @@ class @Suite
         measure: @measure
         data:    @benchData
         runs:    @benchRuns
-        timout:  @timeout
+        timeout:  @timeout
     
   nextBench: ->
     bench = @benches[@benchIndex]
