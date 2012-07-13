@@ -53,7 +53,7 @@ Benches.beforePreSyncUpdate = (next) ->
     @secondUpdateSpy.reset()
     @model.save
       title: 'other_title'
-      content: 'other_data'
+      content: @benchmarkData()
     next.call(@)
   )
   return
