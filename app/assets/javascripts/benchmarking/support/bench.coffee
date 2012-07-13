@@ -38,7 +38,7 @@ class @Bench
         name: series.name
         data: []
       categoryIndex = 0
-      _.each @chart.xAxis[0].categories, (category) ->
+      _.each @chart.xAxis[0].categories, (category) =>
         @allData[seriesIndex].data[categoryIndex] ||= 0
         categoryIndex++
       seriesIndex++
