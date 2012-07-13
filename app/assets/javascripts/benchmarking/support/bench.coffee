@@ -159,6 +159,8 @@ class @Bench
         Benches['data70KB'] +
         Benches['data70KB'] +
         Benches['data70KB']
+      else
+        @benchData
     
   TIMEOUT_INCREMENT: 10
 

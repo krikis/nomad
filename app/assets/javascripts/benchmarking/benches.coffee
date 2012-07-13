@@ -6,8 +6,8 @@
 
 suite = @suite = new Suite
   measure:   'median'
-  benchData: 'data1120KB'
-  benchRuns: 1
+  benchData: 'data70KB'
+  # benchRuns: 1
   timeout: 3000
 
 suite.bench

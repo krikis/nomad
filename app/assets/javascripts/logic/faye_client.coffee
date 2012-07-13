@@ -1,12 +1,14 @@
 @BackboneSync ||= {}
 
+@FAYE_SERVER = "http://129.125.147.34:9292/faye"
+
 class @BackboneSync.FayeClient
   constructor: (collection, options = {}) ->
     @client = options.client
     @modelName = options.modelName
     @clientId = options.clientId
     unless @client?
-      window.client ||= new Faye.Client("http://nomad.dev:9292/faye")
+      window.client ||= new Faye.Client(FAYE_SERVER)
       @client = window.client
     @collection = collection
     @modelName ||= collection.modelName

@@ -22,7 +22,7 @@ describe 'presync_conflict', ->
         initialize: ->
           @fayeClient = new BackboneSync.FayeClient @,
             modelName: 'Post'
-            client: new Faye.Client("http://nomad.dev:9292/faye")
+            client: new Faye.Client(FAYE_SERVER)
       @secondCollection = new SecondCollection
       @secondCreateSpy  = sinon.spy(@secondCollection.fayeClient, 'create')
       @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
