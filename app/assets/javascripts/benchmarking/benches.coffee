@@ -48,7 +48,8 @@ suite.bench
   cleanup:  Benches.cleanupSyncUpdate
   chart:    @barChart
   
-suite.bench  
+suite.bench
+  # runs: 3
   category: 'preSync'
   series:   'conflict'
   setup:    Benches.  setupPreSyncConflict
@@ -59,6 +60,7 @@ suite.bench
   chart:    @barChart
   
 suite.bench
+  # runs: 3
   category: 'sync'
   series:   'conflict'
   setup:    Benches.  setupSyncConflict

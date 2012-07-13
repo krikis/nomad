@@ -59,7 +59,8 @@ class @Bench
     @next = options.next
     @suite = options.context
     @measure = options.measure
-    @benchData = options.benchData || 'loremIpsum70KB'
+    @benchData = options.data || 'data70KB'
+    @runs = options.runs if options.runs
     @button = options.button
     $(@button).attr('disabled': true) if @button?
     @timeout = false
@@ -124,7 +125,17 @@ class @Bench
     localStorage.allData = JSON.stringify @allData
     
   benchmarkData: ->
-    Benches[@benchData]
+    switch @benchData
+      when 'data70KB'
+        Benches['data70KB']
+      when 'data140KB'
+        Benches['data70KB'] + 
+        Benches['data70KB']
+      when 'data280KB'
+        Benches['data70KB'] + 
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB']
     
   TIMEOUT_INCREMENT: 10
 
