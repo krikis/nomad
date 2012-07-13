@@ -142,6 +142,23 @@ class @Bench
         Benches['data70KB'] +
         Benches['data70KB'] +
         Benches['data70KB']
+      when 'data1120KB'
+        Benches['data70KB'] + 
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] + 
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] + 
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] + 
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB']
     
   TIMEOUT_INCREMENT: 10
 
