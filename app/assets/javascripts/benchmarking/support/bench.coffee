@@ -13,47 +13,43 @@ class @Bench
     @chart    = options.chart
     @initStats()
     @initChart()
+    @saveStats()
     
   initStats: ->    
     @mean = 0
     @key = "#{@series}_#{@category}"
     @stats = JSON.parse(localStorage[@key] || "[]")
     @categories = JSON.parse(localStorage.categories || "[]")
-    unless @category in @categories
-      @categories.push @category 
-      @newCategory = true
     @allSeries = JSON.parse(localStorage.allSeries || "[]")
+    @allData = JSON.parse(localStorage.allData || "[]")
+    
+  initChart: ->  
     unless @series in @allSeries
       @allSeries.push @series
-      @newSeries = true
-    @saveStats()
-    
-  initChart: ->
-    if @newSeries
       @chart.addSeries
         name: @series  
         data: []
-    if @newCategory
+    unless @category in @categories
+      @categories.push @category 
       @chart.xAxis[0].setCategories @categories
-    allData = JSON.parse(localStorage.allData || "[]")
     seriesIndex = 0
     _.each @chart.series, (series) =>
-      allData[seriesIndex] ||= 
+      @allData[seriesIndex] ||= 
         name: series.name
         data: []
       categoryIndex = 0
       _.each @chart.xAxis[0].categories, (category) ->
-        allData[seriesIndex].data[categoryIndex] ||= 0
+        @allData[seriesIndex].data[categoryIndex] ||= 0
         categoryIndex++
       seriesIndex++
       while series.data.length < @categories.length
         series.addPoint 0
-    localStorage.allData = JSON.stringify allData
     
   saveStats: ->
     localStorage[@key] = JSON.stringify @stats.sort(@numerical)
     localStorage.categories = JSON.stringify @categories
     localStorage.allSeries = JSON.stringify @allSeries
+    localStorage.allData = JSON.stringify @allData
     
   run: (options = {}) ->
     @next = options.next
@@ -92,12 +88,13 @@ class @Bench
     
   processResults: ->  
     runtime = if @runs > 0 then @total / @runs else 0
+    @initStats()
     @updateStats(runtime)
     @redrawChart()   
+    @saveStats()
     
   updateStats: (runtime) ->   
     @stats.push runtime
-    @saveStats()
     @previous = @[@measure] || 0
     switch @measure
       when 'mean' 
@@ -117,12 +114,10 @@ class @Bench
     categoryIndex = _.indexOf(@categories, @category)
     @chart.series[seriesIndex].data[categoryIndex].update @[@measure]
     # cache chart data
-    @allData = JSON.parse(localStorage.allData || "[]")
     @allData[seriesIndex] ||=
       name: @series
       data: []
     @allData[seriesIndex].data[categoryIndex] = @[@measure]
-    localStorage.allData = JSON.stringify @allData
     
   benchmarkData: ->
     switch @benchData
