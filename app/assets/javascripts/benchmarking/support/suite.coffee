@@ -1,5 +1,6 @@
 class @Suite
   constructor: (options={}) ->
+    @chart     = options.chart
     @measure   = options.measure
     @benchData = options.benchData
     @benchRuns = options.benchRuns
@@ -7,6 +8,7 @@ class @Suite
     @benches   = []
     
   bench: (options) ->
+    options.chart ||= @chart
     bench = new Bench options
     @benches.push bench
     

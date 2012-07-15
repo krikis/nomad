@@ -2,13 +2,14 @@
 #= require_tree ./benches
 #= require_self
 
-@barChart = new Highcharts.Chart @barChartConfig
+
 
 suite = @suite = new Suite
+  chart:     @barChart = new Highcharts.Chart(@barChartConfig)
   measure:   'median'
   benchData: 'data280KB'
   benchRuns: 4
-  timeout: 10000
+  timeout:   10000
 
 suite.bench
   category: 'preSync'
@@ -18,7 +19,6 @@ suite.bench
   test:     Benches.       preSyncCreate
   after:    Benches.  afterPreSyncCreate
   cleanup:  Benches.cleanupPreSyncCreate
-  chart:    @barChart
 
 suite.bench 
   category: 'sync'
@@ -28,7 +28,6 @@ suite.bench
   test:     Benches.       syncCreate
   after:    Benches.  afterSyncCreate
   cleanup:  Benches.cleanupSyncCreate
-  chart:    @barChart
 
 suite.bench
   category: 'preSync'
@@ -38,7 +37,6 @@ suite.bench
   test:     Benches.       preSyncUpdate
   after:    Benches.  afterPreSyncUpdate
   cleanup:  Benches.cleanupPreSyncUpdate
-  chart:    @barChart
 
 suite.bench 
   category: 'sync'
@@ -48,7 +46,6 @@ suite.bench
   test:     Benches.       syncUpdate
   after:    Benches.  afterSyncUpdate
   cleanup:  Benches.cleanupSyncUpdate
-  chart:    @barChart
   
 suite.bench
   category: 'preSync'
@@ -58,7 +55,6 @@ suite.bench
   test:     Benches.       preSyncConflict
   after:    Benches.  afterPreSyncConflict
   cleanup:  Benches.cleanupPreSyncConflict
-  chart:    @barChart
   
 suite.bench
   category: 'sync'
@@ -68,7 +64,6 @@ suite.bench
   test:     Benches.       syncConflict
   after:    Benches.  afterSyncConflict
   cleanup:  Benches.cleanupSyncConflict
-  chart:    @barChart
 
 $('#run').click ->
   suite.run(@)
