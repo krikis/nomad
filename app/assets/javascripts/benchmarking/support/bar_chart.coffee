@@ -7,9 +7,6 @@
     renderTo: "barChart"
     type: "bar"
 
-  title:
-    text: "Duration of Sync Operation"
-
   xAxis:
     categories: @categories
     title:

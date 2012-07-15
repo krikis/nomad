@@ -1,6 +1,10 @@
 class @Suite
   constructor: (options={}) ->
     @chart     = options.chart
+    @chart?.setTitle(
+      {text: options.title},
+      {text: options.subtitle}
+    )
     @measure   = options.measure
     @benchData = options.benchData
     @benchRuns = options.benchRuns
