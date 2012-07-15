@@ -61,5 +61,5 @@ suite.bench
   after:    Benches.  afterSyncConflict
   cleanup:  Benches.cleanupSyncConflict
 
-$('#preSync').click ->
+$('#run').click ->
   suite.run(@)
