@@ -1,8 +1,7 @@
 suite = @suite = new Suite
+  name:      'presync'
   title:     'Preventive Reconciliation vs. Traditional Synchronization'
   subtitle:  'Duration of different sync operations in milliseconds'
-  chart:     @barChart = new Highcharts.Chart(@barChartConfig)
-  measure:   'median'
   benchData: 'data280KB'
   benchRuns: 4
   timeout:   10000

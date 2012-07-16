@@ -1,17 +1,62 @@
 class @Suite
   constructor: (options={}) ->
+    @name      = options.name
     @chart     = options.chart
-    @chart?.setTitle(
-      {text: options.title},
-      {text: options.subtitle}
-    )
-    @measure   = options.measure
+    @chart?.setTitle({text: options.title},
+                     {text: options.subtitle})
+    @measure   = options.measure || 'median'
     @benchData = options.benchData
     @benchRuns = options.benchRuns
     @timeout   = options.timeout
     @benches   = []
+    @initChart()
+
+  initChart: () ->
+    @categories = JSON.parse(localStorage["#{@name}_categories"] || "[]")
+    @allSeries  = JSON.parse(localStorage["#{@name}_allSeries" ] || "[]")
+    @chart = new Highcharts.Chart @chartConfig()
+
+  chartConfig: ->
+    chart:
+      renderTo: "chartContainer"
+      type: "bar"
+    xAxis:
+      categories: @categories
+      title:
+        text: null
+    yAxis:
+      min: 0
+      title:
+        text: "ms (Milliseconds)"
+        align: "high"
+      labels:
+        overflow: "justify"
+    tooltip:
+      formatter: ->
+        "#{@x} #{@series.name}: #{@y} milliseconds"
+    plotOptions:
+      bar:
+        dataLabels:
+          enabled: true
+    credits:
+      enabled: false
+    series: @chartData()
+
+  chartData: ->
+    allData = []
+    _.each @allSeries, (series) =>
+      currentSeries = 
+        name: series
+        data: []
+      allData.push currentSeries
+      _.each @categories, (category) =>
+        currentSeries.data.push(
+          JSON.parse(localStorage["#{@name}_#{series}_#{category}_#{@measure}"] || 0)
+        )
+    allData
     
   bench: (options) ->
+    options.suite = @
     options.chart ||= @chart
     bench = new Bench options
     @benches.push bench
@@ -22,10 +67,15 @@ class @Suite
   run: (button) ->
     @button = button
     $(@button).attr('disabled': true) if @button?
+    @saveChartSetup()
     @runs = 1
     @stableRuns = 0
     @benchIndex = 0
     @runBench()
+    
+  saveChartSetup: ->
+    localStorage["#{@name}_categories"] = JSON.stringify @categories
+    localStorage["#{@name}_allSeries" ] = JSON.stringify @allSeries
     
   runBench: ->
     if bench = @benches[@benchIndex]

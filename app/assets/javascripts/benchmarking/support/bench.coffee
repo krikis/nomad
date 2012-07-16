@@ -3,6 +3,8 @@ class @Bench
   DEFAULT_TIMEOUT: 1000
   
   constructor: (options = {}) ->
+    @suite    = options.suite
+    @measure  = options.measure  || @suite.measure
     @category = options.category || @uid()
     @series   = options.series   || @uid()
     @setup    = options.setup    || (next) -> next.call(@)
@@ -18,12 +20,12 @@ class @Bench
     @saveStats()
     
   initStats: ->    
-    @mean = 0
-    @key = "#{@series}_#{@category}"
-    @stats = JSON.parse(localStorage[@key] || "[]")
-    @categories = JSON.parse(localStorage.categories || "[]")
-    @allSeries = JSON.parse(localStorage.allSeries || "[]")
-    @allData = JSON.parse(localStorage.allData || "[]")
+    @key        = "#{@series}_#{@category}"
+    @namespace  = @suite?.name || ""
+    @stats      = JSON.parse(localStorage["#{@namespace}_#{@key}_stats"] || "[]")
+    @[@measure] = JSON.parse(localStorage["#{@namespace}_#{@key}_#{@measure}"] || 0)
+    @categories = @suite?.categories || []
+    @allSeries  = @suite?.allSeries  || []
     
   initChart: ->  
     unless @series in @allSeries
@@ -36,27 +38,19 @@ class @Bench
       @chart.xAxis[0].setCategories @categories
     seriesIndex = 0
     _.each @chart.series, (series) =>
-      @allData[seriesIndex] ||= 
-        name: series.name
-        data: []
-      categoryIndex = 0
-      _.each @chart.xAxis[0].categories, (category) =>
-        @allData[seriesIndex].data[categoryIndex] ||= 0
-        categoryIndex++
-      seriesIndex++
       while series.data.length < @categories.length
         series.addPoint 0
     
   saveStats: ->
-    localStorage[@key] = JSON.stringify @stats.sort(@numerical)
-    localStorage.categories = JSON.stringify @categories
-    localStorage.allSeries = JSON.stringify @allSeries
-    localStorage.allData = JSON.stringify @allData
+    localStorage["#{@namespace}_#{@key}_stats"] = JSON.stringify @stats.sort(@numerical)
+    localStorage["#{@namespace}_#{@key}_#{@measure}"] = JSON.stringify @[@measure]
+    if @suite?
+      @suite.categories = @categories
+      @suite.allSeries  = @allSeries
     
   run: (options = {}) ->
     @next      = options.next
-    @suite     = options.context
-    @measure   = options.measure
+    @context   = options.context
     @benchData = options.data    || 'data70KB'
     @runs      = options.runs    if options.runs
     @timeout   = options.timeout if options.timeout
@@ -85,8 +79,8 @@ class @Bench
     console.log "#{@key}: #{@runs} runs in #{@total} ms"
     @processResults()
     $(@button).attr('disabled': false) if @button?
-    # return control to suite if present
-    @next?.call(@suite)
+    # return control to next bench if present
+    @next?.call(@context)
     
   processResults: ->  
     runtime = if @runs > 0 then @total / @runs else 0
@@ -115,11 +109,6 @@ class @Bench
     seriesIndex = _.indexOf(@allSeries, @series)
     categoryIndex = _.indexOf(@categories, @category)
     @chart.series[seriesIndex].data[categoryIndex].update @[@measure]
-    # cache chart data
-    @allData[seriesIndex] ||=
-      name: @series
-      data: []
-    @allData[seriesIndex].data[categoryIndex] = @[@measure]
     
   benchmarkData: ->
     switch @benchData
