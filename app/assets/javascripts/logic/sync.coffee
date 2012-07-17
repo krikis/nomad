@@ -103,8 +103,8 @@
    
   # test convenience method for cleaning up localstorage 
   _cleanup: ->
-    @fayeClient.client.disconnect()
     @_cleanLocalStorage()
+    @fayeClient.client.disconnect?()
     
   _cleanLocalStorage: ->
     @fetch()
