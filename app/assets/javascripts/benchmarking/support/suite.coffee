@@ -24,6 +24,7 @@ class @Suite
   chartConfig: (options = {}) ->
     chart:
       renderTo: "#{options.container}_chartContainer"
+      backgroundColor: 'whiteSmoke'
       type: "bar"
     title: 
       text: options.title

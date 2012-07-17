@@ -7,16 +7,18 @@
 
   .tab-content
     #tab1.tab-pane.active
-      .well
+      .box
         %form
           #run.btn.btn-primary Run Suite
-        #tab1_chartContainer
+        .well
+          #tab1_chartContainer
 
     #tab2.tab-pane
-      .well
+      .box
         %form
           #run.btn.btn-primary Run Suite
-        #tab2_chartContainer
+        .well
+          #tab2_chartContainer
 
 :coffeescript
   # record active tab in localStorage
