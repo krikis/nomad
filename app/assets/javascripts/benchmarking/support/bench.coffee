@@ -151,6 +151,18 @@ class @Bench
         Benches['data70KB']
       else
         @benchData
+        
+  randomBoolean: ->
+    @randomFrom [true, false]    
+        
+  randomNumber: (decimals) ->
+    decimals ||= @randomFrom(1, 5)
+    numberSet = '0123456789'
+    nonzeroSet = '123456789'
+    randomNumbers = [@randomFrom(nonzeroSet)]
+    while randomNumbers.length < decimals
+      randomNumbers.push @randomFrom(numberSet)
+    parseInt randomNumbers.join('')
 
   randomString: (stringSize) ->
     stringSize ||= @randomFrom(5, 15)
@@ -166,7 +178,7 @@ class @Bench
       arguments[0][index]
     else
       begin = arguments[0]
-      end = arguments[1]
+      end = arguments[1] + 1
       Math.floor(Math.random() * (end - begin)) + begin
 
   loremIpsum: (textSize) ->
