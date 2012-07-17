@@ -14,5 +14,5 @@ Benches.beforeStructAddVersion = (next) ->
 
 Benches.structAddVersion = (next) ->
   @answer.set Benches.fixedAnswerV1
-  console.log @answer.changedAttributes()
+  console.log JSON.stringify @answer._versioning
   next.call @

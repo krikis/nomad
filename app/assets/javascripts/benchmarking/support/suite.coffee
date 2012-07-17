@@ -104,7 +104,7 @@ class @Suite
           data:    @benchData
           runs:    @benchRuns
           timeout:  @timeout
-      ), 50
+      ), 500
     
   nextBench: ->
     bench = @benches[@benchIndex]
@@ -136,6 +136,7 @@ class @Suite
       else
         console.log "maximum number of runs reached"
       console.log new Date
-      console.log @benchData
-      console.log JSON.stringify localStorage
+      console.log @benchData if @benchData?
+      console.log JSON.stringify @categories
+      console.log JSON.stringify @chartData()
     $(@button).attr('disabled': false) if @button?  

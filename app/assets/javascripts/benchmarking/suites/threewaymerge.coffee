@@ -5,6 +5,13 @@ suite = @threeWayMerge = new Suite
   benchRuns: 1
 
 suite.bench
+  category: 'merge'
+  series:   'addversion'
+  setup:    Benches.  setupMergeAddVersion
+  before:   Benches. beforeMergeAddVersion
+  test:     Benches.       mergeAddVersion
+
+suite.bench
   category: 'struct'
   series:   'addversion'
   setup:    Benches.  setupStructAddVersion

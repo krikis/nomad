@@ -1,11 +1,17 @@
 Benches = @Benches ||= {}
 
 Benches.setupMergeAddVersion = (next) ->
+  class Answer extends Backbone.Model
+    collection:
+      url: '/some/url'
+  @Answer = Answer
+  next.call @
 
 Benches.beforeMergeAddVersion = (next) ->
+  @answer = new @Answer Benches.fixedAnswer
+  next.call @
 
 Benches.mergeAddVersion = (next) ->
-
-Benches.afterMergeAddVersion = (next) ->
-
-Benches.cleanupMergeAddVersion = (next) ->
+  @answer.set Benches.fixedAnswerV1
+  console.log JSON.stringify @answer._versioning
+  next.call @
