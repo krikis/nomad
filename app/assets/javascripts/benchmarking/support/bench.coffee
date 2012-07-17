@@ -1,5 +1,5 @@
 class @Bench
-  DEFAULT_NR_OF_RUNS: 30
+  DEFAULT_NR_OF_RUNS: 10
   DEFAULT_TIMEOUT: 1000
 
   constructor: (options = {}) ->

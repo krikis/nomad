@@ -66,6 +66,7 @@ class @Suite
     allData
     
   initButton: (options = {}) ->
+    suite = @
     $("##{options.container} #run").click ->
       suite.run(@)
     
