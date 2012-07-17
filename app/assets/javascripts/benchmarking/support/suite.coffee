@@ -12,7 +12,7 @@ class @Suite
   initChart: (options = {}) ->
     @categories = JSON.parse(localStorage["#{@name}_categories"] || "[]")
     @allSeries  = JSON.parse(localStorage["#{@name}_allSeries" ] || "[]")
-    if $("a[href='##{options.container}']").parent().hasClass('active')
+    if "##{options.container}" == localStorage.current
       @chart = new Highcharts.Chart @chartConfig(options)
     $("a[href='##{options.container}']").click =>
       unless @running
@@ -69,7 +69,7 @@ class @Suite
     $("##{options.container} #run").click ->
       suite.run(@)
     
-  bench: (options) ->
+  bench: (options = {}) ->
     options.suite = @
     options.chart ||= @chart
     bench = new Bench options

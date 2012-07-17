@@ -1,5 +1,5 @@
 class @Bench
-  DEFAULT_NR_OF_RUNS: 10
+  DEFAULT_NR_OF_RUNS: 30
   DEFAULT_TIMEOUT: 1000
 
   constructor: (options = {}) ->
@@ -16,7 +16,7 @@ class @Bench
     @timeout  = options.timeout  || @DEFAULT_TIMEOUT
     @chart    = options.chart
     @initStats()
-    @initChart() if @chart?
+    @initChart()
     @saveStats()
 
   initStats: ->
@@ -30,16 +30,17 @@ class @Bench
   initChart: ->
     unless @series in @allSeries
       @allSeries.push @series
-      @chart.addSeries
+      @chart?.addSeries
         name: @series
         data: []
     unless @category in @categories
       @categories.push @category
-      @chart.xAxis[0].setCategories @categories
-    seriesIndex = 0
-    _.each @chart.series, (series) =>
-      while series.data.length < @categories.length
-        series.addPoint 0
+      @chart.xAxis[0].setCategories @categories if @chart?
+    if @chart?
+      seriesIndex = 0
+      _.each @chart.series, (series) =>
+        while series.data.length < @categories.length
+          series.addPoint 0
 
   saveStats: ->
     localStorage["#{@namespace}_#{@key}_stats"] = JSON.stringify @stats.sort(@numerical)
@@ -173,9 +174,14 @@ class @Bench
     randomString.join('')
 
   randomFrom: ->
+    # select random entry from array or string
     if _.isArray(arguments[0]) or _.isString(arguments[0])
       index = Math.floor(Math.random() * arguments[0].length)
       arguments[0][index]
+    # generate random float
+    else if arguments.length == 1 and _.isNumber(arguments[0])
+      Math.random() * arguments[0]
+    # generate random integer within range
     else
       begin = arguments[0]
       end = arguments[1] + 1
