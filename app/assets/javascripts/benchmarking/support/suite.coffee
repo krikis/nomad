@@ -12,7 +12,7 @@ class @Suite
   initChart: (options = {}) ->
     @categories = JSON.parse(localStorage["#{@name}_categories"] || "[]")
     @allSeries  = JSON.parse(localStorage["#{@name}_allSeries" ] || "[]")
-    if "##{options.container}" == localStorage.current
+    if "##{options.container}" == localStorage.current or not localStorage.current?
       @chart = new Highcharts.Chart @chartConfig(options)
     $("a[href='##{options.container}']").click =>
       unless @running
@@ -95,14 +95,16 @@ class @Suite
     
   runBench: ->
     if bench = @benches[@benchIndex]
-      bench.run
-        next:    @nextBench
-        context: @
-        chart: @chart
-        measure: @measure
-        data:    @benchData
-        runs:    @benchRuns
-        timeout:  @timeout
+      setTimeout (=>
+        bench.run
+          next:    @nextBench
+          context: @
+          chart: @chart
+          measure: @measure
+          data:    @benchData
+          runs:    @benchRuns
+          timeout:  @timeout
+      ), 50
     
   nextBench: ->
     bench = @benches[@benchIndex]
