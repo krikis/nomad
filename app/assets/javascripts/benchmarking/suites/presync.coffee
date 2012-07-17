@@ -1,4 +1,4 @@
-suite = @suite = new Suite
+suite = @preSync = new Suite
   name:      'presync'
   container: 'tab1'
   title:     'Preventive Reconciliation vs. Traditional Synchronization'
