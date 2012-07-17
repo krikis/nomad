@@ -1,11 +1,29 @@
-.navbar
+.tabbable.tabs-below
+  %ul.nav.nav-tabs
+    %li.active
+      %a{:href => '#tab1', :'data-toggle' => 'tab'} Preventive Reconciliation
+    %li
+      %a{:href => '#tab2', :'data-toggle' => 'tab'} Object Reverse-merge
 
-.container-fluid
-  .row-fluid
-    .well
-      #chartContainer
-  .row-fluid
-    .well
-      #run.btn.btn-primary Run Suite
-      
-= javascript_include_tag "benchmarking/benches"
+  .tab-content
+    #tab1.tab-pane.active
+      .well
+        %form
+          #run.btn.btn-primary Run Suite
+        #tab1_chartContainer
+
+    #tab2.tab-pane
+      .well
+        %form
+          #run.btn.btn-primary Run Suite
+        #tab2_chartContainer
+
+:coffeescript
+  # record active tab in localStorage
+  $('.nav-tabs a').click ->
+    localStorage.current = $(@).attr('href')
+  # set active tab from localStorage
+  $ ->
+    $("a[href='\#{localStorage.current}']").click()
+
+= javascript_include_tag 'benchmarking/benches'

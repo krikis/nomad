@@ -1,5 +1,5 @@
 !!!
-%html
+%html{:lang => "en"}
   %head
     %title Nomad Benchmarks
     = stylesheet_link_tag 'application', :media => 'all'
@@ -16,5 +16,10 @@
     = csrf_meta_tags
     = favicon_link_tag
   %body
-
-    = yield
+    .navbar.navbar-fixed-top
+      .navbar-inner
+        .container
+          %a.brand.dark{:href => '#'} Nomad Benchmarks
+          
+    .container
+      = yield

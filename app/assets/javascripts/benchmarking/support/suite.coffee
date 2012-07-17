@@ -1,25 +1,34 @@
 class @Suite
-  constructor: (options={}) ->
+  constructor: (options = {}) ->
     @name      = options.name
-    @chart     = options.chart
-    @chart?.setTitle({text: options.title},
-                     {text: options.subtitle})
     @measure   = options.measure || 'median'
     @benchData = options.benchData
     @benchRuns = options.benchRuns
     @timeout   = options.timeout
     @benches   = []
-    @initChart()
+    @initChart(options)
+    @initButton(options)
 
-  initChart: () ->
+  initChart: (options = {}) ->
     @categories = JSON.parse(localStorage["#{@name}_categories"] || "[]")
     @allSeries  = JSON.parse(localStorage["#{@name}_allSeries" ] || "[]")
-    @chart = new Highcharts.Chart @chartConfig()
+    if $("a[href='##{options.container}']").parent().hasClass('active')
+      @chart = new Highcharts.Chart @chartConfig(options)
+    $("a[href='##{options.container}']").click =>
+      unless @running
+        @chart?.destroy()
+        setTimeout (=> 
+          @chart = new Highcharts.Chart @chartConfig(options)
+        ), 200
 
-  chartConfig: ->
+  chartConfig: (options = {}) ->
     chart:
-      renderTo: "chartContainer"
+      renderTo: "#{options.container}_chartContainer"
       type: "bar"
+    title: 
+      text: options.title
+    subtitle:
+      text: options.subtitle
     xAxis:
       categories: @categories
       title:
@@ -55,6 +64,10 @@ class @Suite
         )
     allData
     
+  initButton: (options = {}) ->
+    $("##{options.container} #run").click ->
+      suite.run(@)
+    
   bench: (options) ->
     options.suite = @
     options.chart ||= @chart
@@ -65,6 +78,7 @@ class @Suite
   MIN_STABLE_RUNS: 3
     
   run: (button) ->
+    @running = true
     @button = button
     $(@button).attr('disabled': true) if @button?
     @saveChartSetup()
@@ -82,6 +96,7 @@ class @Suite
       bench.run
         next:    @nextBench
         context: @
+        chart: @chart
         measure: @measure
         data:    @benchData
         runs:    @benchRuns
@@ -110,6 +125,7 @@ class @Suite
       @finish()
     
   finish: (timeout = false)->
+    @running = false
     unless timeout
       if @runs < @MAX_NR_OF_RUNS
         console.log "converged after #{@runs} iterations"

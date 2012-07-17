@@ -1,0 +1,28 @@
+//
+// This is a manifest file that'll be compiled into application.css, which will include all the files
+// listed below.
+//
+// Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+// or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
+//
+// You're free to add application-wide styles to this file and they'll appear at the top of the
+// compiled file, but it's generally better to create a new file per style scope.
+//
+//= require_self
+//= require backbone-forms
+//= require_tree .
+//
+
+@import "bootstrap"
+@import "bootstrap-responsive"
+
+body
+  padding-top: 70px
+  position: relative
+
+.navbar
+  a.brand.dark
+    font-weight: bold
+    color: black
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .1), 0 0 30px rgba(255, 255, 255, .125)
+

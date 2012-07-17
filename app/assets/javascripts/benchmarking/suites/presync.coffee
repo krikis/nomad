@@ -1,5 +1,6 @@
 suite = @suite = new Suite
   name:      'presync'
+  container: 'tab1'
   title:     'Preventive Reconciliation vs. Traditional Synchronization'
   subtitle:  'Duration of different sync operations in milliseconds'
   benchData: 'data280KB'
@@ -59,6 +60,3 @@ suite.bench
   test:     Benches.       syncConflict
   after:    Benches.  afterSyncConflict
   cleanup:  Benches.cleanupSyncConflict
-
-$('#run').click ->
-  suite.run(@)

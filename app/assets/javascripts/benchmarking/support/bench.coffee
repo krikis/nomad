@@ -16,7 +16,7 @@ class @Bench
     @timeout  = options.timeout  || @DEFAULT_TIMEOUT
     @chart    = options.chart
     @initStats()
-    @initChart()
+    @initChart() if @chart?
     @saveStats()
     
   initStats: ->    
@@ -51,6 +51,7 @@ class @Bench
   run: (options = {}) ->
     @next      = options.next
     @context   = options.context
+    @chart     = options.chart if options.chart
     @benchData = options.data    || 'data70KB'
     @runs      = options.runs    if options.runs
     @timeout   = options.timeout if options.timeout
