@@ -22,7 +22,7 @@
     unless options.skipPatch?
       @initVersioning()
       @_versioning.patches ||= []
-      if Nomad.versioning == 'structured_content_diff'
+      if @versioning == 'structured_content_diff'
         @_versioning.patches.push @_createPatch(@localClock())
       else
         patcher = new Patcher(@)
@@ -149,7 +149,7 @@
     [version, created_at, updated_at]
 
   _applyPatchesTo: (dummy) ->
-    if Nomad.versioning == 'structured_content_diff'
+    if @versioning == 'structured_content_diff'
       patches = _(@_versioning.patches)
       patches.all (patch) =>
         dummy._applyPatch(patch.patch_text)

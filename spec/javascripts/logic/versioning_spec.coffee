@@ -105,15 +105,6 @@ describe 'Versioning', ->
       @model.localClock = -> 2
       @initVersioningSpy = sinon.spy(@model, 'initVersioning')
       @tickVersionStub = sinon.stub(@model, '_tickVersion')
-      @patch = sinon.stub()
-      @createPatchStub = sinon.stub(@model, '_createPatch', =>
-        @patch
-      )
-
-    afterEach ->
-      @initVersioningSpy.restore()
-      @tickVersionStub.restore()
-      @createPatchStub.restore()
 
     it 'initializes versioning', ->
       @model.addVersion()
@@ -141,11 +132,14 @@ describe 'Versioning', ->
 
     context 'when a structured content diff is used for versioning', ->
       beforeEach ->
-        @previousVersioning = Nomad.versioning
-        Nomad.versioning = 'structured_content_diff'
-
-      afterEach ->
-        Nomad.versioning = @previousVersioning
+        class TestModel extends Backbone.Model
+          versioning: 'structured_content_diff'
+        @model = new TestModel
+        @tickVersionStub = sinon.stub(@model, '_tickVersion')
+        @patch = sinon.stub()
+        @createPatchStub = sinon.stub(@model, '_createPatch', =>
+          @patch
+        )
 
       it 'creates a patch providing it with the model\'s local clock', ->
         @model.addVersion()
@@ -161,8 +155,6 @@ describe 'Versioning', ->
 
     context 'when a per attribute diff is used for versioning', ->
       beforeEach ->
-        @previousVersioning = Nomad.versioning
-        Nomad.versioning = 'per_attribute_diff'
         @patcher =
           updatePatches: ->
         @updatePatchesStub = sinon.stub(@patcher, 'updatePatches')
@@ -172,7 +164,6 @@ describe 'Versioning', ->
 
       afterEach ->
         @newPatcherStub.restore()
-        Nomad.versioning = @previousVersioning
 
       it 'creates a new patcher object', ->
         @model.addVersion()
@@ -706,14 +697,13 @@ describe 'Versioning', ->
 
   describe '#_applyPatchesTo', ->
     beforeEach ->
-      class TestModel extends Backbone.Model
-      @model = new TestModel
-      @dummy = new TestModel
       
     context 'when a structured content diff is used for versioning', ->
       beforeEach ->
-        @origVersioning = Nomad.versioning
-        Nomad.versioning = 'structured_content_diff'
+        class TestModel extends Backbone.Model
+          versioning: 'structured_content_diff'
+        @model = new TestModel
+        @dummy = new TestModel
         @applyPatchStub = sinon.stub(@dummy, '_applyPatch', ->
           @results ||= [true, true]
           @results.pop()
@@ -721,9 +711,6 @@ describe 'Versioning', ->
         @model._versioning = {}
         @model._versioning.patches = [{patch_text: 'some'},
                                       {patch_text: 'patches'}]
-        
-      afterEach ->
-        Nomad.versioning = @origVersioning
 
       it 'applies each patch to the dummy', ->
         @model._applyPatchesTo(@dummy)
@@ -746,8 +733,9 @@ describe 'Versioning', ->
           
     context 'when a per attribute diff is used for versioning', ->
       beforeEach ->
-        @origVersioning = Nomad.versioning
-        Nomad.versioning = 'per_attribute_diff'
+        class TestModel extends Backbone.Model
+        @model = new TestModel
+        @dummy = new TestModel
         @patcher = 
           applyPatchesTo: ->
         @applyPatchesToStub = sinon.stub(@patcher, 'applyPatchesTo', 
@@ -758,7 +746,6 @@ describe 'Versioning', ->
 
       afterEach ->
         @newPatcherStub.restore()
-        Nomad.versioning = @origVersioning
         
       it 'creates a new patcher instance', ->
         @model._applyPatchesTo(@dummy)
