@@ -90,15 +90,59 @@ describe 'Patcher', ->
       beforeEach ->
         @changedAttributes =
           object:
-            number: 1234.5
-            text: 'some_text'
+            all: 'attributes'
+        @previousAttributes =
+          object:
+            previous: 'attributes'
         @createPatchForSpy = sinon.spy(@patcher, '_createPatchFor')
+        @changedAttributesStub = sinon.stub(@patcher, '_changedAttributes', ->
+          changed: 'attributes'  
+        )
+        
+      it 'filters out the changed attributes for the object', ->
+        patch = @patcher._createPatchFor(@changedAttributes,
+                                         @previousAttributes)
+        expect(@changedAttributesStub).
+          toHaveBeenCalledWith({all: 'attributes'}, {previous: 'attributes'})
 
       it 'recursively updates the patch for this object', ->
         patch = @patcher._createPatchFor(@changedAttributes,
                                          @previousAttributes)
         expect(@createPatchForSpy).
-          toHaveBeenCalledWith(number: 1234.5, text: 'some_text', undefined)
+          toHaveBeenCalledWith({changed: 'attributes'}, {previous: 'attributes'})
+          
+  describe '#_changedAttributes', ->
+    beforeEach ->
+      @patcher = new Patcher
+      @attributes = 
+        changed: 'attribute'
+        unchanged: 'attribute'
+        created: 'attribute'
+      @previousAttributes = 
+        previous: 'attribute'
+        unchanged: 'attribute'
+        removed: 'attribute'
+      
+    it 'returns all attributes that changed', ->
+      changedAttributes = @patcher._changedAttributes(@attributes, 
+                                                      @previousAttributes)
+      expect(changedAttributes.changed).toEqual 'attribute'
+
+    it 'returns all attributes that were removed', ->
+      changedAttributes = @patcher._changedAttributes(@attributes, 
+                                                      @previousAttributes)
+      expect(_.has changedAttributes, 'removed').toBeTruthy()
+      expect(changedAttributes.removed).toEqual undefined
+      
+    it 'returns all attributes that were created', ->
+      changedAttributes = @patcher._changedAttributes(@attributes, 
+                                                      @previousAttributes)
+      expect(changedAttributes.created).toEqual 'attribute'
+      
+    it 'does not return attributes that were left unchanged', ->
+      changedAttributes = @patcher._changedAttributes(@attributes, 
+                                                      @previousAttributes)
+      expect(_.has changedAttributes, 'unchanged').toBeFalsy()
 
   describe '#applyPatchesTo', ->
     beforeEach ->
@@ -343,6 +387,18 @@ describe 'Patcher', ->
                                 @originalValue, @currentValue)
         ).toBeFalsy()
 
-
+    context 'and original and current value are equal', ->
+      beforeEach ->
+        @currentValue = @originalValue
+        @patchApplyStub.restore()
+        @patchApplyStub = sinon.stub(@dmp, 'patch_apply',
+                                     -> ['patched_value', []])
+        
+      it 'returns true', ->
+        expect(
+          @patcher._patchString(@attribute, @attributesToPatch,
+                                @originalValue, @currentValue)
+        ).toBeTruthy()
+        
 
 

@@ -24,12 +24,22 @@ class @Patcher
       if _.isString(value)
         patch[attribute] = previous[attribute]
       else if _.isObject(value)
-        patch[attribute] = @_createPatchFor(changed[attribute],
+        changedAttributes = @_changedAttributes(changed[attribute],
+                                                previous[attribute])
+        patch[attribute] = @_createPatchFor(changedAttributes,
                                             previous[attribute])
       else
         patch[attribute] = null
     patch
     
+  _changedAttributes: (now, previous) ->
+    changed = {}
+    attributes = _.union(_.keys(now), _.keys(previous))
+    _.each attributes, (attribute) ->
+      unless _.isEqual(previous[attribute], now[attribute])
+        changed[attribute] = now[attribute]
+    changed
+      
   applyPatchesTo: (dummy) ->
     @dmp = new diff_match_patch
     patches = _(@model.patches())
@@ -69,11 +79,12 @@ class @Patcher
                             diff
     [patched_value, results] = @dmp.patch_apply patch, 
                                                 attributesToPatch[attribute]
-    if not false in results
+    if false not in results
       attributesToPatch[attribute] = patched_value
       true
     else
       # TODO: handle failed patch
+      console.log 'Patching failed!!!'
       false
     
     
