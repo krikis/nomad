@@ -69,8 +69,10 @@ class @Bench
       @cleanup.call(@, @stop)
 
   testFunction: ->
-    @start = new Date
-    @test.call(@, @afterFunction)
+    setTimeout (=>
+      @start = new Date
+      @test.call(@, @afterFunction)
+    ), 100
 
   afterFunction: ->
     @time = new Date - @start

@@ -1,6 +1,6 @@
 Benches = @Benches ||= {}
 
-Benches.setupStructAddVersion = (next) ->
+Benches.setupStructRebase = (next) ->
   class Answer extends Backbone.Model
     versioning: 'structured_content_diff'
     collection:
@@ -8,10 +8,12 @@ Benches.setupStructAddVersion = (next) ->
   @Answer = Answer
   next.call @
 
-Benches.beforeStructAddVersion = (next) ->
+Benches.beforeStructRebase = (next) ->
   @answer = new @Answer Benches.fixedAnswer
+  @answer.set Benches.fixedAnswerV1
+  @dummy = new @Answer Benches.fixedAnswerV2
   next.call @
 
-Benches.structAddVersion = (next) ->
-  @answer.set Benches.fixedAnswerV1
+Benches.structRebase = (next) ->
+  @answer._applyPatchesTo @dummy
   next.call @

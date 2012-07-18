@@ -13,5 +13,4 @@ Benches.beforeMergeAddVersion = (next) ->
 
 Benches.mergeAddVersion = (next) ->
   @answer.set Benches.fixedAnswerV1
-  console.log JSON.stringify @answer._versioning
   next.call @
