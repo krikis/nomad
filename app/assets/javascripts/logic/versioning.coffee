@@ -125,7 +125,8 @@
       when 'conflictsWith' then '_rebase'
       when 'precedes' then '_update'
 
-  _rebase: (attributes) ->
+  _rebase: (attributes) ->    
+    @_forwardTo(attributes)
     [version, created_at, updated_at] =
       @_extractVersioning(attributes)
     dummy = new @constructor

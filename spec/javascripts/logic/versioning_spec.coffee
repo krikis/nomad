@@ -175,7 +175,7 @@ describe 'Versioning', ->
 
       it 'updates the model version after the patch has been created', ->
         @model.addVersion()
-        expect(@tickVersionStub).toHaveBeenCalledAfter(@updatePatchesStub)  
+        expect(@tickVersionStub).toHaveBeenCalledAfter(@updatePatchesStub)
 
   describe '#localClock', ->
     beforeEach ->
@@ -192,7 +192,7 @@ describe 'Versioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel Factory.build('answer')
-      @previousAttributesStub = sinon.stub(@model, 'previousAttributes', 
+      @previousAttributesStub = sinon.stub(@model, 'previousAttributes',
                                            -> 'previous_attributes')
       @model.attributes = 'attributes'
       @sortPropertiesInStub = sinon.stub(@model, '_sortPropertiesIn')
@@ -213,48 +213,48 @@ describe 'Versioning', ->
     afterEach ->
       @dmpStub.restore()
       @stringifyStub.restore()
-      
+
     it 'sorts the model previous attributes', ->
       @model._createPatch()
       expect(@sortPropertiesInStub).
         toHaveBeenCalledWith('previous_attributes')
-        
+
     it 'sorts the model attributes', ->
       @model._createPatch()
       expect(@sortPropertiesInStub).
         toHaveBeenCalledWith('attributes')
-        
+
     it 'creates a diff of the previous attributes with the attributes', ->
       @model._createPatch()
       expect(@diffStub).toHaveBeenCalledWith('sorted_previous',
                                              'sorted_attributes')
-                                             
+
     it 'creates a patch of the diff based on the previous attributes', ->
       @model._createPatch()
       expect(@patchStub).toHaveBeenCalledWith('sorted_previous',
                                               'some_diff')
-                                              
+
     it 'sets the text representation of the patch', ->
       expect(@model._createPatch().patch_text).toEqual('patch_text')
-      
+
     it 'sets the model current version as patch base', ->
       out = @model._createPatch('local_clock')
       expect(out.base).toEqual('local_clock')
-      
+
   describe '#_sortPropertiesIn', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
-      
+
     it 'creates a clone with sorted attributes', ->
       object =
         last: 'value'
         first: 'value'
       ordered = @model._sortPropertiesIn(object)
       expect(_.keys(ordered)[0]).toEqual('first')
-      
+
     it 'sorts the attributes of nested objects', ->
-      object = 
+      object =
         nested:
           last: 'value'
           first: 'value'
@@ -297,7 +297,7 @@ describe 'Versioning', ->
       @model._versioning = {}
       @model._versioning.createdAt = 'created_at'
       expect(@model.updatedAt()).toEqual('created_at')
-      
+
   describe '#patches', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -305,7 +305,7 @@ describe 'Versioning', ->
       @patches = sinon.stub()
       @model._versioning =
         patches: @patches
-        
+
     it 'returns the model patches', ->
       expect(@model.patches()).toEqual(@patches)
 
@@ -331,21 +331,21 @@ describe 'Versioning', ->
 
       it 'returns true', ->
         expect(@model.hasPatches()).toBeTruthy()
-        
+
   describe '#syncingVersions', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
       @model._versioning =
         syncingVersions: @syncingVersions = sinon.stub()
-  
+
     it 'returns the versions the model is currently syncing', ->
       expect(@model.syncingVersions()).toEqual(@syncingVersions)
-      
+
     context 'when there are no versions being synced', ->
       beforeEach ->
         @model._versioning = {}
-        
+
       it 'returns an empty array', ->
         expect(@model.syncingVersions()).toEqual([])
 
@@ -358,23 +358,23 @@ describe 'Versioning', ->
     it 'sets the synced property on the versioning object to true', ->
       @model.markAsSynced()
       expect(@model._versioning.synced).toBeTruthy()
-      
-  describe '#updateSyncingVersions', ->  
+
+  describe '#updateSyncingVersions', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
       @model._versioning = {}
-      @localClockStub = sinon.stub(@model, 'localClock', -> 'current_version')  
-      
+      @localClockStub = sinon.stub(@model, 'localClock', -> 'current_version')
+
     it 'initializes the syncingVersions array', ->
       expect(@model._versioning.syncingVersions).toBeUndefined()
       @model.updateSyncingVersions()
       expect(@model._versioning.syncingVersions).toBeDefined()
-      
+
     it 'adds the model version to the list of synced versions', ->
       @model.updateSyncingVersions()
       expect(@model._versioning.syncingVersions[0]).toEqual('current_version')
-    
+
   describe '#isSynced', ->
     beforeEach ->
       class TestModel extends Backbone.Model
@@ -493,11 +493,11 @@ describe 'Versioning', ->
       expect(@model._versioning.patches[0]).toEqual
         patch_text: 'other_patch'
         base: 1
-        
+
     it 'finishes syncing the version', ->
       @model._forwardTo(remote_version: @remoteVersion)
       @expect(@finishedSyncingStub).toHaveBeenCalledWith(@remoteVersion)
-      
+
     it 'finishes syncing after removing all old patches', ->
       vector = {}
       vector[@model.clientId] = 1
@@ -514,15 +514,15 @@ describe 'Versioning', ->
 
     it 'returns null', ->
       expect(@model._forwardTo(remote_version: {})).toBeNull()
-      
+
   describe '#_finishedSyncing', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
-      @model._versioning = 
+      @model._versioning =
         syncingVersions: [1, 2, 1]
-      
-    it 'removes the local clock from the versions being synced', ->    
+
+    it 'removes the local clock from the versions being synced', ->
       vector = {}
       vector[@model.clientId] = 1
       @model._finishedSyncing(vector)
@@ -593,6 +593,7 @@ describe 'Versioning', ->
       @patches = sinon.stub
       @model._versioning = {patches: @patches}
       @dummy = new TestModel
+      @forwardToStub = sinon.stub(@model, '_forwardTo')
       @extractVersioningSpy = sinon.spy(@model, '_extractVersioning')
       @newModelStub = sinon.stub(TestModel::, 'constructor', => @dummy)
       @dummySetStub = sinon.stub(@dummy, 'set')
@@ -602,6 +603,16 @@ describe 'Versioning', ->
 
     afterEach ->
       @newModelStub.restore()
+
+    it 'forwards the model to the remote version', ->
+      attributes = sinon.stub()
+      @model._rebase attributes
+      expect(@forwardToStub).toHaveBeenCalledWith(attributes)
+
+    it 'forwards the model before extracting versioning attributes', ->
+      attributes = sinon.stub()
+      @model._rebase attributes
+      expect(@forwardToStub).toHaveBeenCalledBefore(@extractVersioningSpy)
 
     it 'extracts the versioning attributes', ->
       attributes =
@@ -697,7 +708,7 @@ describe 'Versioning', ->
 
   describe '#_applyPatchesTo', ->
     beforeEach ->
-      
+
     context 'when a structured content diff is used for versioning', ->
       beforeEach ->
         class TestModel extends Backbone.Model
@@ -730,15 +741,15 @@ describe 'Versioning', ->
 
         it 'returns false', ->
           expect(@model._applyPatchesTo(@dummy)).toBeFalsy()
-          
+
     context 'when a per attribute diff is used for versioning', ->
       beforeEach ->
         class TestModel extends Backbone.Model
         @model = new TestModel
         @dummy = new TestModel
-        @patcher = 
+        @patcher =
           applyPatchesTo: ->
-        @applyPatchesToStub = sinon.stub(@patcher, 'applyPatchesTo', 
+        @applyPatchesToStub = sinon.stub(@patcher, 'applyPatchesTo',
                                          -> 'patcher_result')
         @newPatcherStub = sinon.stub(window,
                                      'Patcher',
@@ -746,16 +757,16 @@ describe 'Versioning', ->
 
       afterEach ->
         @newPatcherStub.restore()
-        
+
       it 'creates a new patcher instance', ->
         @model._applyPatchesTo(@dummy)
         expect(@newPatcherStub).toHaveBeenCalledWith(@model)
-        
+
       it 'calls the patcher applyPatchesTo method', ->
         @model._applyPatchesTo(@dummy)
         expect(@applyPatchesToStub).
           toHaveBeenCalledWith(@dummy)
-          
+
       it 'propagates the applyPatchesTo return value', ->
         expect(@model._applyPatchesTo(@dummy)).toEqual('patcher_result')
 
@@ -788,7 +799,7 @@ describe 'Versioning', ->
       patch_text = sinon.stub()
       @model._applyPatch(patch_text)
       expect(@patchFromTextStub).toHaveBeenCalledWith(patch_text)
-      
+
     it 'sorts the model attributes recursively', ->
       @model._applyPatch()
       expect(@sortPropertiesStub).toHaveBeenCalledWith('modelAttributes')
