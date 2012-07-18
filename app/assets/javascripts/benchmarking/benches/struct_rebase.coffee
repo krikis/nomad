@@ -9,12 +9,12 @@ Benches.setupStructRebase = (next) ->
   next.call @
 
 Benches.beforeStructRebase = (next) ->
-  @answer = new @Answer Benches.fixedAnswer
-  @answer.set Benches.fixedAnswerV1
-  @dummy = new @Answer Benches.fixedAnswerV2
+  @answer = new @Answer Benches.fixedAnswer()
+  @answer.set Benches.fixedAnswerV1()
+  @dummy = new @Answer Benches.fixedAnswerV2()
   next.call @
 
 Benches.structRebase = (next) ->
   @answer._applyPatchesTo @dummy
-  console.log JSON.stringify @dummy.attributes
+  window.struct JSON.stringify @dummy._sortPropertiesIn @dummy.attributes
   next.call @

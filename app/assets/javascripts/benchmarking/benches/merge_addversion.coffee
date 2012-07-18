@@ -8,9 +8,9 @@ Benches.setupMergeAddVersion = (next) ->
   next.call @
 
 Benches.beforeMergeAddVersion = (next) ->
-  @answer = new @Answer Benches.fixedAnswer
+  @answer = new @Answer Benches.fixedAnswer()
   next.call @
 
 Benches.mergeAddVersion = (next) ->
-  @answer.set Benches.fixedAnswerV1
+  @answer.set Benches.fixedAnswerV1()
   next.call @

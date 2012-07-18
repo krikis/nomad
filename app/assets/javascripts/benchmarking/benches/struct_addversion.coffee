@@ -9,9 +9,9 @@ Benches.setupStructAddVersion = (next) ->
   next.call @
 
 Benches.beforeStructAddVersion = (next) ->
-  @answer = new @Answer Benches.fixedAnswer
+  @answer = new @Answer Benches.fixedAnswer()
   next.call @
 
 Benches.structAddVersion = (next) ->
-  @answer.set Benches.fixedAnswerV1
+  @answer.set Benches.fixedAnswerV1()
   next.call @
