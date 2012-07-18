@@ -1,10 +1,16 @@
 class @Suite
+  
+  MIN_STABLE_RUNS: 3
+  MAX_NR_OF_RUNS: 20
+  
   constructor: (options = {}) ->
     @name      = options.name
-    @measure   = options.measure || 'median'
+    @measure   = options.measure   || 'median'
     @benchData = options.benchData
     @benchRuns = options.benchRuns
     @timeout   = options.timeout
+    @minStable = options.minStable || @MIN_STABLE_RUNS
+    @maxRuns   = options.maxRuns   || @MAX_NR_OF_RUNS
     @benches   = []
     @initChart(options)
     @initButton(options)
@@ -76,9 +82,6 @@ class @Suite
     bench = new Bench options
     @benches.push bench
     
-  MAX_NR_OF_RUNS: 20
-  MIN_STABLE_RUNS: 3
-    
   run: (button) ->
     @running = true
     @button = button
@@ -119,8 +122,8 @@ class @Suite
       
   runSuite: ->
     @stableRuns++ unless @rerunSuite
-    @rerunSuite = true if @stableRuns < @MIN_STABLE_RUNS
-    if @rerunSuite and @runs < @MAX_NR_OF_RUNS
+    @rerunSuite = true if @stableRuns < @minStable
+    if @rerunSuite and @runs < @maxRuns
       @rerunSuite = false
       @runs++
       @benchIndex = 0
@@ -131,7 +134,7 @@ class @Suite
   finish: (timeout = false)->
     @running = false
     unless timeout
-      if @runs < @MAX_NR_OF_RUNS
+      if @runs < @maxRuns
         console.log "converged after #{@runs} iterations"
       else
         console.log "maximum number of runs reached"

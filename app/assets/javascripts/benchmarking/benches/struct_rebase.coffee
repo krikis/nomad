@@ -16,4 +16,5 @@ Benches.beforeStructRebase = (next) ->
 
 Benches.structRebase = (next) ->
   @answer._applyPatchesTo @dummy
+  console.log JSON.stringify @dummy.attributes
   next.call @
