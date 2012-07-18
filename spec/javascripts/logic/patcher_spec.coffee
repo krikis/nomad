@@ -41,6 +41,15 @@ describe 'Patcher', ->
       expect(@model.patches()[0]).toEqual
         _patch: @patch
         base: @base
+        
+    context 'when the local clock is undefined', ->
+      beforeEach ->
+        @model.localClock = -> undefined
+        
+      it 'sets the patch base to zero', ->
+        @patcher.updatePatches()
+        expect(@model.patches()[0].base).toEqual 0
+        
 
   describe '#_cleanupPatches', ->
     beforeEach ->

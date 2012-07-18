@@ -8,7 +8,7 @@ class @Patcher
     @model.patches().push
       _patch: @_createPatchFor(@model.changedAttributes(), 
                                @model.previousAttributes())
-      base: @model.localClock()
+      base: @model.localClock() || 0
 
   _cleanupPatches: () ->
     patches = _.clone @model.patches()
