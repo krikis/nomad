@@ -763,10 +763,12 @@ describe 'Versioning', ->
     beforeEach ->
       class TestModel extends Backbone.Model
       @model = new TestModel
+      @model.attributes = 'modelAttributes'
       @dmp = new diff_match_patch
       @dmpStub = sinon.stub(window, 'diff_match_patch', => @dmp)
       @patch = sinon.stub()
       @patchFromTextStub = sinon.stub(@dmp, 'patch_fromText', => @patch)
+      @sortPropertiesStub = sinon.stub(@model, '_sortPropertiesIn', -> 'sortedProperties')
       @json = sinon.stub()
       @stringifyStub = sinon.stub(JSON, 'stringify', => @json)
       @new_json = sinon.stub()
@@ -786,10 +788,14 @@ describe 'Versioning', ->
       patch_text = sinon.stub()
       @model._applyPatch(patch_text)
       expect(@patchFromTextStub).toHaveBeenCalledWith(patch_text)
-
-    it 'converts the model object to json', ->
+      
+    it 'sorts the model attributes recursively', ->
       @model._applyPatch()
-      expect(@stringifyStub).toHaveBeenCalledWith(@model)
+      expect(@sortPropertiesStub).toHaveBeenCalledWith('modelAttributes')
+
+    it 'converts the sorted attributes to json', ->
+      @model._applyPatch()
+      expect(@stringifyStub).toHaveBeenCalledWith('sortedProperties')
 
     it 'applies the patch to the json', ->
       @model._applyPatch()

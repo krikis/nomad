@@ -160,7 +160,8 @@
   _applyPatch: (patch_text) ->
     dmp = new diff_match_patch
     patch = dmp.patch_fromText(patch_text)
-    json = JSON.stringify(@)
+    sorted_attributes = @_sortPropertiesIn @attributes
+    json = JSON.stringify(sorted_attributes)
     [new_json, results] = dmp.patch_apply(patch, json)
     if not false in results
       patched_attributes = JSON.parse(new_json)
