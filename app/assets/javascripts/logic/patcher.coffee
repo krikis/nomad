@@ -17,9 +17,8 @@ class @Patcher
              patch.base in @model.syncingVersions()
         @model.patches().delete patch
     
-  _createPatchFor: (changed, previous) ->
+  _createPatchFor: (changed, previous = {}) ->
     patch = {}
-    previous ||= {}
     _.each changed, (value, attribute) =>
       if _.isString(value)
         patch[attribute] = previous[attribute]
@@ -32,7 +31,7 @@ class @Patcher
         patch[attribute] = null
     patch
     
-  _changedAttributes: (now, previous) ->
+  _changedAttributes: (now, previous = {}) ->
     changed = {}
     attributes = _.union(_.keys(now), _.keys(previous))
     _.each attributes, (attribute) ->
