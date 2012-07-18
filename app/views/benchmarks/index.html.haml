@@ -1,21 +1,21 @@
 .tabbable.tabs-below
   %ul.nav.nav-tabs
-    %li.active
+    %li
       %a{:href => '#tab1', :'data-toggle' => 'tab'}
         Preventive Reconciliation
-    %li
+    %li.active
       %a{:href => '#tab2', :'data-toggle' => 'tab'}
         Object Reverse Merge
 
   .tab-content
-    #tab1.tab-pane.active
+    #tab1.tab-pane
       .box
         %form
           #run.btn.btn-primary Run Suite
         .well
           #tab1_chartContainer
 
-    #tab2.tab-pane
+    #tab2.tab-pane.active
       .box
         %form
           #run.btn.btn-primary Run Suite

@@ -9,7 +9,9 @@ Benches.setupMergeRebase = (next) ->
 
 Benches.beforeMergeRebase = (next) ->
   @answer = new @Answer Benches.fixedAnswer()
-  @answer.set Benches.fixedAnswerV1()
+  @answer.set Benches.fixedAnswerV1u1()
+  @answer.set Benches.fixedAnswerV1u2()
+  @answer.set Benches.fixedAnswerV1u3()
   @dummy = new @Answer Benches.fixedAnswerV2()
   next.call @
 
