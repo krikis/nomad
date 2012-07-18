@@ -275,6 +275,26 @@ describe 'Patcher', ->
           toHaveBeenCalledWith(@value, @objectToPatch,
                                @originalValue, @currentValue)
 
+      context 'and the patch value is not an object', ->
+        beforeEach ->
+          @value = undefined
+      
+        it 'does not go into recursion', ->
+          @patcher._patchAttribute(@attribute, @value, @attributesToPatch,
+                                   @originalValue, @currentValue)
+          expect(@applyPatchStub).not.toHaveBeenCalled()
+      
+        it 'sets the attribute to the current value', ->
+          @patcher._patchAttribute(@attribute, @value, @attributesToPatch,
+                                   @originalValue, @currentValue)
+          expect(@attributesToPatch[@attribute]).toEqual(@currentValue)
+      
+        it 'returns true', ->
+          expect(
+            @patcher._patchAttribute(@attribute, @value, @attributesToPatch,
+                                     @originalValue, @currentValue)
+          ).toBeTruthy()
+      
       context 'and the value to patch is not an object', ->
         beforeEach ->
           @attributesToPatch =

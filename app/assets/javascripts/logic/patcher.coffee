@@ -47,22 +47,26 @@ class @Patcher
                  patches.first()._patch, 
                  @model.attributes)
     
-  _applyPatch: (patch, attributesToPatch, firstAttributes, currentAttributes) ->
+  _applyPatch: (patch, attributesToPatch, 
+                firstAttributes, currentAttributes) ->
     _.all patch, (value, attribute) =>
       originalValue =   firstAttributes[attribute]
       currentValue  = currentAttributes[attribute]
-      @_patchAttribute(attribute, value, attributesToPatch, originalValue, currentValue)
+      @_patchAttribute(attribute, value, attributesToPatch, 
+                       originalValue, currentValue)
     
-  _patchAttribute: (attribute, value, attributesToPatch, originalValue, currentValue) ->
+  _patchAttribute: (attribute, value, attributesToPatch, 
+                    originalValue, currentValue) ->
     if _.isString(currentValue)
       if _.isString(originalValue)
-        @_patchString(attribute, attributesToPatch, originalValue, currentValue)
+        @_patchString(attribute, attributesToPatch, 
+                      originalValue, currentValue)
       else
         attributesToPatch[attribute] = currentValue
         true
     else if _.isObject(currentValue)
       objectToPatch = attributesToPatch[attribute]
-      if _.isObject(objectToPatch)
+      if _.isObject(value) and _.isObject(objectToPatch)
         @_applyPatch(value, objectToPatch, originalValue, currentValue)
       else
         attributesToPatch[attribute] = currentValue
