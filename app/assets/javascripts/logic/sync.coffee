@@ -75,6 +75,7 @@
   _dataForSync: (models, options = {}) ->
     _(models).chain().map((model) ->
       json = model.toJSON()
+      model.updateSyncingVersions()
       delete json.id
       details =
         id: model.id
@@ -84,7 +85,6 @@
         updated_at: model.updatedAt()
       if options.markSynced
         model.markAsSynced()
-      model.updateSyncingVersions()
       model.save()
       details
     ).value()
