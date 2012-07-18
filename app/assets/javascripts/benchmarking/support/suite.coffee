@@ -74,7 +74,8 @@ class @Suite
   initButton: (options = {}) ->
     suite = @
     $("##{options.container} #run").click ->
-      suite.run(@)
+      unless $(@).attr('disabled')?
+        suite.run(@)
     
   bench: (options = {}) ->
     options.suite = @
