@@ -68,7 +68,7 @@ describe 'sync_conflict', ->
         @secondCollection.fayeClient._online()
         # create a conflicting update and sync it
         _.first(@secondCollection.models).save
-          content: 'other_content'
+          title: 'some_header'
         @secondCollection.syncModels()
         waitsFor (->
           @updateSpy.callCount >= 3 and @secondUpdateSpy.callCount >= 4
@@ -78,5 +78,5 @@ describe 'sync_conflict', ->
       #   expect(@model.get('title')).toEqual('other_title')
 
       it 'reflects the second update', ->
-        expect(@model.get('content')).toEqual('other_content')
+        expect(@model.get('title')).toEqual('other_header')
 
