@@ -4,20 +4,15 @@ class @Patcher
     @model = model
     
   updatePatches: ->
-    @_cleanupPatches()
-    @model.patches().push
-      _patch: @_createPatchFor(@model.changedAttributes(), 
-                               @model.previousAttributes())
-      base: @model.localClock() || 0
-
-  _cleanupPatches: () ->
-    patches = _.clone @model.patches()
-    _.each patches, (patch) =>
-      unless patch == @model.patches()[0] or
-             patch.base in @model.syncingVersions()
-        @model.patches().delete patch
+    if not (patch = @model.patches()[0]) or
+       patch.base in @model.syncingVersions()
+      @model.patches().push
+        _patch: {}
+        base: @model.localClock() || 0
+    @_updatePatchFor(@model.changedAttributes(), 
+                     @model.previousAttributes())
     
-  _createPatchFor: (changed, previous = {}) ->
+  _updatePatchFor: (changed, previous = {}) ->
     patch = {}
     _.each changed, (value, attribute) =>
       if _.isString(value)
@@ -25,7 +20,7 @@ class @Patcher
       else if _.isObject(value)
         changedAttributes = @_changedAttributes(changed[attribute],
                                                 previous[attribute])
-        patch[attribute] = @_createPatchFor(changedAttributes,
+        patch[attribute] = @_updatePatchFor(changedAttributes,
                                             previous[attribute])
       else
         patch[attribute] = null

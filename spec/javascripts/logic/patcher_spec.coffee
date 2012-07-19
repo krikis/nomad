@@ -10,72 +10,51 @@ describe 'Patcher', ->
 
   describe '#updatePatches', ->
     beforeEach ->
-      @base               = sinon.stub()
-      @changedAttributes  = sinon.stub()
-      @previousAttributes = sinon.stub()
-      @patches = []
       @model =
-        patches: => @patches
-        localClock: => @base
-        changedAttributes: => @changedAttributes
-        previousAttributes: => @previousAttributes
+        patches:            => @patches            ||= []
+        localClock:         => @base               ||= sinon.stub()
+        changedAttributes:  => @changedAttributes  ||= sinon.stub()
+        previousAttributes: => @previousAttributes ||= sinon.stub()
+        syncingVersions:    => @syncingVersions    ||= []
       @patcher = new Patcher(@model)
-      @cleanupPatchesStub = sinon.stub(@patcher, '_cleanupPatches')
-      @patch = {}
-      @createPatchForStub = sinon.stub(@patcher,
-                                       '_createPatchFor',
-                                       => @patch)
+      @updatePatchForStub = sinon.stub(@patcher,
+                                       '_updatePatchFor')
+                                       
+    context 'when there are no patches present', ->
+      it 'appends a new patch to the list of patches', ->
+        @patcher.updatePatches()
+        expect(@model.patches()[0]).toEqual
+          _patch: {}
+          base: @base
 
-    it 'cleans up the model patches', ->
-      @patcher.updatePatches()
-      expect(@cleanupPatchesStub).toHaveBeenCalled()
+      context 'and the local clock is undefined', ->
+        beforeEach ->
+          @model.localClock = -> undefined
 
-    it 'calls the _createPatchFor method', ->
+        it 'sets the patch base to zero', ->
+          @patcher.updatePatches()
+          expect(@model.patches()[0].base).toEqual 0
+          
+    context 'when the last patch is currently being synced', ->
+      beforeEach ->
+        @patches = [
+          base: 0
+        ]
+        @syncingVersions = [0]
+      
+      it 'appends a new patch to the list of patches', ->
+        @patcher.updatePatches()
+        expect(_.last @model.patches()).toEqual
+          _patch: {}
+          base: @base
+
+    it 'calls the _updatePatchFor method', ->
       @patcher.updatePatches()
-      expect(@createPatchForStub).
+      expect(@updatePatchForStub).
         toHaveBeenCalledWith(@changedAttributes,
                              @previousAttributes)
 
-    it 'appends the patch to the list of patches', ->
-      @patcher.updatePatches()
-      expect(@model.patches()[0]).toEqual
-        _patch: @patch
-        base: @base
-        
-    context 'when the local clock is undefined', ->
-      beforeEach ->
-        @model.localClock = -> undefined
-        
-      it 'sets the patch base to zero', ->
-        @patcher.updatePatches()
-        expect(@model.patches()[0].base).toEqual 0
-        
-
-  describe '#_cleanupPatches', ->
-    beforeEach ->
-      @patches = [
-        @first = {base: 1}
-        @second = {base: 2}
-        @last = {base: 3}
-      ]
-      @model =
-        patches: => @patches
-        syncingVersions: -> []
-      @patcher = new Patcher(@model)
-
-    it 'retains the first patch', ->
-      @patcher._cleanupPatches()
-      expect(@model.patches()).toEqual([@first])
-
-    context 'when there are versions currently being synced', ->
-      beforeEach ->
-        @model.syncingVersions = -> [2]
-
-      it 'retains all patches based on these versions', ->
-        @patcher._cleanupPatches()
-        expect(@model.patches()).toEqual([@first, @second])
-
-  describe '#_createPatchFor', ->
+  describe '#_updatePatchFor', ->
     beforeEach ->
       @changedAttributes =
         number: 1234.5
@@ -86,12 +65,12 @@ describe 'Patcher', ->
       @patcher = new Patcher(sinon.stub())
 
     it 'saves all keys of no-text attributes', ->
-      patch = @patcher._createPatchFor(@changedAttributes,
+      patch = @patcher._updatePatchFor(@changedAttributes,
                                        @previousAttributes)
       expect(_.keys(patch)).toContain('number')
 
     it 'retains the previous version of all text attributes', ->
-      patch = @patcher._createPatchFor(@changedAttributes,
+      patch = @patcher._updatePatchFor(@changedAttributes,
                                        @previousAttributes)
       expect(patch.text).toEqual('previous_text')
 
@@ -103,21 +82,21 @@ describe 'Patcher', ->
         @previousAttributes =
           object:
             previous: 'attributes'
-        @createPatchForSpy = sinon.spy(@patcher, '_createPatchFor')
+        @updatePatchForSpy = sinon.spy(@patcher, '_updatePatchFor')
         @changedAttributesStub = sinon.stub(@patcher, '_changedAttributes', ->
           changed: 'attributes'  
         )
         
       it 'filters out the changed attributes for the object', ->
-        patch = @patcher._createPatchFor(@changedAttributes,
+        patch = @patcher._updatePatchFor(@changedAttributes,
                                          @previousAttributes)
         expect(@changedAttributesStub).
           toHaveBeenCalledWith({all: 'attributes'}, {previous: 'attributes'})
 
       it 'recursively updates the patch for this object', ->
-        patch = @patcher._createPatchFor(@changedAttributes,
+        patch = @patcher._updatePatchFor(@changedAttributes,
                                          @previousAttributes)
-        expect(@createPatchForSpy).
+        expect(@updatePatchForSpy).
           toHaveBeenCalledWith({changed: 'attributes'}, {previous: 'attributes'})
           
   describe '#_changedAttributes', ->
@@ -229,13 +208,13 @@ describe 'Patcher', ->
 
   describe '_patchAttribute', ->
     beforeEach ->
-      @createPatchForStub = sinon.stub(Patcher::,
-                                       '_createPatchFor',
+      @updatePatchForStub = sinon.stub(Patcher::,
+                                       '_updatePatchFor',
                                        -> 'new_patch')
       @patcher = new Patcher
 
     afterEach ->
-      @createPatchForStub.restore()
+      @updatePatchForStub.restore()
 
     context 'when it concerns a non-text attribute', ->
       beforeEach ->
@@ -350,8 +329,8 @@ describe 'Patcher', ->
 
   describe '#_patchString', ->
     beforeEach ->
-      @createPatchForStub = sinon.stub(Patcher::,
-                                       '_createPatchFor',
+      @updatePatchForStub = sinon.stub(Patcher::,
+                                       '_updatePatchFor',
                                        -> 'new_patch')
       @patcher = new Patcher
       @attribute = 'text'
@@ -367,7 +346,7 @@ describe 'Patcher', ->
                                    -> ['patched_value', [true]])
 
     afterEach ->
-      @createPatchForStub.restore()
+      @updatePatchForStub.restore()
       @dmpStub.restore()
 
     it 'generates a diff for the attribute', ->
