@@ -16,6 +16,8 @@ class @Bench
     @record   = options.record   || -> new Date - @start
     @round    = true
     @round    = options.round    if options.round?
+    @unit     = options.unit
+    @unitLong = options.unitLong
     @runs     = options.runs     || @DEFAULT_NR_OF_RUNS
     @timeout  = options.timeout  || @DEFAULT_TIMEOUT
     @chart    = options.chart
@@ -76,14 +78,14 @@ class @Bench
     setTimeout (=>
       @baseline.call(@)
       @test.call(@, @afterFunction)
-    ), 100
+    ), 500
 
   afterFunction: ->
     @total += @record.call(@)
     @after.call(@, @testLoop)
 
   stop: ->
-    console.log "#{@key}: #{@runs} runs in #{@total} ms"
+    console.log "#{@key} (#{@runs} runs): #{@total} #{@unit}"
     @processResults()
     $(@button).attr('disabled': false) if @button?
     # return control to next bench if present

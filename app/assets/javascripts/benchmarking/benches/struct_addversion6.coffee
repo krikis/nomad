@@ -1,6 +1,6 @@
 Benches = @Benches ||= {}
 
-Benches.setupStructAddVersion = (next) ->
+Benches.setupStructAddVersion6 = (next) ->
   class Answer extends Backbone.Model
     versioning: 'structured_content_diff'
     collection:
@@ -8,11 +8,14 @@ Benches.setupStructAddVersion = (next) ->
   @Answer = Answer
   next.call @
 
-Benches.beforeStructAddVersion = (next) ->
+Benches.beforeStructAddVersion6 = (next) ->
   @answer = new @Answer Benches.fixedAnswer()
   next.call @
 
-Benches.structAddVersion = (next) ->
+Benches.structAddVersion6 = (next) ->
+  @answer.set Benches.fixedAnswerV1u1()
+  @answer.set Benches.fixedAnswerV1u2()
+  @answer.set Benches.fixedAnswerV1u3()
   @answer.set Benches.fixedAnswerV1u1()
   @answer.set Benches.fixedAnswerV1u2()
   @answer.set Benches.fixedAnswerV1u3()

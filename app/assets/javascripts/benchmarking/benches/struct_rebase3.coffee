@@ -1,6 +1,6 @@
 Benches = @Benches ||= {}
 
-Benches.setupPatch = (next) ->
+Benches.setupStructRebase3 = (next) ->
   class Answer extends Backbone.Model
     versioning: 'structured_content_diff'
     collection:
@@ -8,12 +8,15 @@ Benches.setupPatch = (next) ->
   @Answer = Answer
   next.call @
 
-Benches.beforePatch = (next) ->
+Benches.beforeStructRebase3 = (next) ->
   @answer = new @Answer Benches.fixedAnswer()
-  next.call @
-
-Benches.patch = (next) ->
   @answer.set Benches.fixedAnswerV1u1()
   @answer.set Benches.fixedAnswerV1u2()
   @answer.set Benches.fixedAnswerV1u3()
+  @dummy = new @Answer Benches.fixedAnswerV2()
+  next.call @
+
+Benches.structRebase3 = (next) ->
+  @answer._applyPatchesTo @dummy
+  window.struct = JSON.stringify @dummy._sortPropertiesIn @dummy.attributes
   next.call @

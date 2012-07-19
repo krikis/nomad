@@ -14,7 +14,8 @@ class @Suite
     @baseline  = options.baseline
     @record    = options.record
     @round     = options.round
-    @unit      = options.unit      || 'ms (Milliseconds)'
+    @unit      = options.unit      || 'ms'
+    @unitLong  = options.unitLong  || 'Milliseconds'
     @benches   = []
     @initChart(options)
     @initButton(options)
@@ -47,13 +48,13 @@ class @Suite
     yAxis:
       min: 0
       title:
-        text: @unit
+        text: "#{@unit} (#{@unitLong})"
         align: "high"
       labels:
         overflow: "justify"
     tooltip:
       formatter: ->
-        "#{@x} #{@series.name}: #{@y} milliseconds"
+        "#{@x} #{@series.name}: #{@y} #{@unitLong}"
     plotOptions:
       bar:
         dataLabels:
@@ -87,6 +88,8 @@ class @Suite
     options.baseline ||= @baseline
     options.record   ||= @record
     options.round    ||= @round
+    options.unit     ||= @unit
+    options.unitLong ||= @unitLong
     bench = new Bench options
     @benches.push bench
     
