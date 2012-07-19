@@ -2,13 +2,16 @@
   %ul.nav.nav-tabs
     %li
       %a{:href => '#tab1', :'data-toggle' => 'tab'}
-        Preventive Reconciliation
+        Network Performance
     %li
       %a{:href => '#tab2', :'data-toggle' => 'tab'}
-        Object Reverse Merge
-    %li.active
+        Client Performance
+    %li
       %a{:href => '#tab3', :'data-toggle' => 'tab'}
-        Content Duplication
+        Memory Footprint
+    %li.active
+      %a{:href => '#tab4', :'data-toggle' => 'tab'}
+        Conflict Resolution
 
   .tab-content
     #tab1.tab-pane
@@ -25,12 +28,19 @@
         .well
           #tab2_chartContainer
 
-    #tab3.tab-pane.active
+    #tab3.tab-pane
       .box
         %form
           #run.btn.btn-primary Run Suite
         .well
           #tab3_chartContainer
+
+    #tab4.tab-pane.active
+      .box
+        %form
+          #run.btn.btn-primary Run Suite
+        .well
+          #tab4_chartContainer
 
 :coffeescript
   # record active tab in localStorage
