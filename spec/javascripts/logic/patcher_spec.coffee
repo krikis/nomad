@@ -189,30 +189,28 @@ describe 'Patcher', ->
 
   describe '#applyPatchesTo', ->
     beforeEach ->
-      @first =
-        _patch: @firstPatch = sinon.stub()
-      @last =
-        _patch: @lastPatch = sinon.stub()
       @model =
-        patches: => [@first, @last]
+        patches: => @patches ||= []
         attributes: @currentAttributes = sinon.stub()
       @patcher = new Patcher(@model)
+      @mergePatchesStub = sinon.stub(@patcher, '_mergePatches', -> 'merged_patch')
       @applyPatchStub = sinon.stub(@patcher, '_applyPatch')
       @dummy =
         attributes: @attributesToPatch = sinon.stub()
+        
+    it 'creates a merge of the model patches', ->
+      @patcher.applyPatchesTo(@dummy)
+      expect(@mergePatchesStub).toHaveBeenCalledWith(@patches)
 
     it 'calls _applyPatch', ->
       @patcher.applyPatchesTo(@dummy)
-      expect(@applyPatchStub).toHaveBeenCalledWith(@lastPatch,
+      expect(@applyPatchStub).toHaveBeenCalledWith('merged_patch',
                                                    @attributesToPatch,
-                                                   @firstPatch,
                                                    @currentAttributes)
                                                    
   describe '#_mergePatches', ->
     beforeEach ->
-      @model =
-        patches: ->
-      @patchesStub = sinon.stub(@model, 'patches', => @patches ||= [])
+      @patches = []
       @patcher = new Patcher(@model)
       @mergeIntoStub = sinon.stub(@patcher, '_mergeInto')
       @deepCloneStub = sinon.stub(_, 'deepClone', => @firstClone ||= sinon.stub() )
@@ -220,27 +218,21 @@ describe 'Patcher', ->
     afterEach ->
       @deepCloneStub.restore()
       
-    it 'fetches the model patches', ->
-      @patcher._mergePatches()
-      expect(@patchesStub).toHaveBeenCalled()
-      
     it 'creates a clone of the first patch', ->
-      @patches = [(first = sinon.stub())]
-      @patcher._mergePatches()
-      expect(@deepCloneStub).toHaveBeenCalledWith(first)
+      @patches = [(first = _patch :sinon.stub())]
+      @patcher._mergePatches(@patches)
+      expect(@deepCloneStub).toHaveBeenCalledWith(first._patch)
       
     it 'merges the remaining patches into the clone', ->
-      @patches = [sinon.stub(), (last = sinon.stub())]
-      @patcher._mergePatches()
-      expect(@mergeIntoStub).toHaveBeenCalledWith(@firstClone, last)
+      @patches = [sinon.stub(), (last = _patch: sinon.stub())]
+      @patcher._mergePatches(@patches)
+      expect(@mergeIntoStub).toHaveBeenCalledWith(@firstClone, last._patch)
       
     it 'returns the merged patch', ->
-      expect(@patcher._mergePatches()).toEqual(@firstClone)
+      expect(@patcher._mergePatches(@patches)).toEqual(@firstClone)
       
     context 'when no patches are defined', ->
       beforeEach ->
-        @model = {}
-        @patchesStub.restore()
         @deepCloneStub.restore()
         
       it 'returns undefined', ->

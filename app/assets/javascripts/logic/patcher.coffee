@@ -38,17 +38,16 @@ class @Patcher
       
   applyPatchesTo: (dummy) ->
     @dmp = new diff_match_patch
-    patches = _(@model.patches())
-    @_applyPatch(patches.last()._patch, 
-                 dummy.attributes, 
-                 patches.first()._patch, 
+    mergedPatch = @_mergePatches @model.patches()
+    @_applyPatch(mergedPatch,
+                 dummy.attributes,
                  @model.attributes)
   
-  _mergePatches: ->
-    patches = _.clone(@model.patches()) || []
-    merged = _.deepClone patches.shift()
+  _mergePatches: (patches = []) ->
+    patches = _.clone patches
+    merged = _.deepClone patches.shift()?._patch
     _.each patches, (patch) =>
-      @_mergeInto merged, patch
+      @_mergeInto merged, patch._patch
     merged
     
   _mergeInto: (patch, source) ->
