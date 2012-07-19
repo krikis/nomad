@@ -41,6 +41,15 @@ class @Patcher
                  dummy.attributes, 
                  patches.first()._patch, 
                  @model.attributes)
+  
+  _mergePatches: ->
+    patches = _.clone @model.patches()
+    merged = _.deepClone patches.shift()
+    _.each patches, (patch) =>
+      @_mergeInto merged, patch
+    merged
+    
+  _mergeInto: (patch, source) ->
     
   _applyPatch: (patch, attributesToPatch, 
                 firstAttributes, currentAttributes) ->

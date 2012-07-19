@@ -186,6 +186,35 @@ describe 'Patcher', ->
                                                    @attributesToPatch,
                                                    @firstPatch,
                                                    @currentAttributes)
+                                                   
+  describe '#_mergePatches', ->
+    beforeEach ->
+      @model =
+        patches: ->
+      @patchesStub = sinon.stub(@model, 'patches', => @patches ||= [])
+      @patcher = new Patcher(@model)
+      @mergeIntoStub = sinon.stub(@patcher, '_mergeInto')
+      @deepCloneStub = sinon.stub(_, 'deepClone', => @firstClone ||= sinon.stub() )
+      
+    afterEach ->
+      @deepCloneStub.restore()
+      
+    it 'fetches the model patches', ->
+      @patcher._mergePatches()
+      expect(@patchesStub).toHaveBeenCalled()
+      
+    it 'creates a clone of the first patch', ->
+      @patches = [(first = sinon.stub())]
+      @patcher._mergePatches()
+      expect(@deepCloneStub).toHaveBeenCalledWith(first)
+      
+    it 'merges the remaining patches into the clone', ->
+      @patches = [sinon.stub(), (last = sinon.stub())]
+      @patcher._mergePatches()
+      expect(@mergeIntoStub).toHaveBeenCalledWith(@firstClone, last)
+      
+    it 'returns the merged patch', ->
+      expect(@patcher._mergePatches()).toEqual(@firstClone)
 
   describe '#_applyPatch', ->
     beforeEach ->

@@ -21,7 +21,9 @@ class @BackboneSync.FayeClient
     # client.disable('cross-origin-long-polling');
     # client.disable('callback-polling');
 
-  publish: (message)->
+  publish: (message)->  
+    # handle offline test mode
+    return if @isOffline
     message.client_id ||= @clientId
     message.model_name ||= @modelName
     message.last_synced ||= @collection.lastSynced()

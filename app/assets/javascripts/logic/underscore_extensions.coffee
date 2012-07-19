@@ -5,6 +5,8 @@ _.properties ||= (obj) ->
     properties[properties.length] = key  if _.has(obj, key) and not _.isFunction(obj[key])
   properties
   
+# note that this clone function only goes into recursion 
+# for objects and not for arrays!!!
 _.deepClone ||= (obj) ->
   return obj  unless _.isObject(obj)
   (if _.isArray(obj) then obj.slice() else _.deepExtend({}, obj))
