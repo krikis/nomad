@@ -165,6 +165,65 @@ class @Bench
       else
         @benchData
         
+  randomObject: ->
+    object = {}
+    propCount = @randomFrom(10, 30)
+    for prop in [1..propCount]
+      do (prop) =>
+        object[@randomString()] = @randomValue()
+    object
+    
+  randomVersion: (object) ->
+    version = _.deepClone object
+    delPropCount = @randomFrom(1, 3)
+    for prop in [1..delPropCount]
+      do (prop) =>
+        delete version[@randomFrom(_.keys(version))]
+    changePropCount = @randomFrom(4, 7)
+    for prop in [1..changePropCount]
+      do (prop) =>
+        property = @randomFrom(_.keys(version))
+        original = version[property]
+        if _.isNumber original
+          version[property] = @randomNumber()
+        else if _.isBoolean original
+          version[property] = @randomBoolean()
+        else if _.isString original
+          if ' ' in original
+            version[property] = @loremIpsum()
+          else
+            version[property] = @randomString()
+    newPropCount = @randomFrom(1, 3)
+    for prop in [1..newPropCount]
+      do (prop) =>
+        version[@randomString()] = @randomValue()
+    version
+
+  chaosVersion: (object) ->
+    version = _.deepClone object
+    delPropCount = @randomFrom(1, 3)
+    for prop in [1..delPropCount]
+      do (prop) =>
+        delete version[@randomFrom(_.keys(version))]
+    changePropCount = @randomFrom(4, 7)
+    for prop in [1..changePropCount]
+      do (prop) =>
+        version[@randomFrom(_.keys(version))] = @randomValue()
+    newPropCount = @randomFrom(1, 3)
+    for prop in [1..newPropCount]
+      do (prop) =>
+        version[@randomString()] = @randomValue()
+    version
+      
+  randomValue: ->
+    values = [
+      @randomBoolean,
+      @randomNumber,
+      @randomString,
+      @loremIpsum
+    ]
+    @randomFrom(values).call(@)
+        
   randomBoolean: ->
     @randomFrom [true, false]    
         
