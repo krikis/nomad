@@ -23,7 +23,7 @@ describe 'Patcher', ->
     context 'when there are no patches present', ->
       it 'appends a new patch to the list of patches', ->
         @patcher.updatePatches()
-        expect(@model.patches()[0]).toEqual
+        expect(_.last @model.patches()).toEqual
           _patch: {}
           base: @base
 
@@ -49,9 +49,11 @@ describe 'Patcher', ->
           base: @base
 
     it 'calls the _updatePatchFor method', ->
+      @patches = [(patch = sinon.stub())]
       @patcher.updatePatches()
       expect(@updatePatchForStub).
-        toHaveBeenCalledWith(@changedAttributes,
+        toHaveBeenCalledWith(patch,
+                             @changedAttributes,
                              @previousAttributes)
 
   describe '#_updatePatchFor', ->
@@ -65,23 +67,17 @@ describe 'Patcher', ->
       @model =
         patches: => @patches ||= sinon.stub()
       @patcher = new Patcher(@model)
-      @lastStub = sinon.stub(_, 'last', => @patch ||= {})
-
-    afterEach ->
-      @lastStub.restore()
-
-    it 'fechtes the last model patch', ->
-      @patcher._updatePatchFor(@changedAttributes,
-                               @previousAttributes)
-      expect(@lastStub).toHaveBeenCalledWith(@patches)
+      @patch = {}
 
     it 'saves all keys of no-text attributes', ->
-      @patcher._updatePatchFor(@changedAttributes,
+      @patcher._updatePatchFor(@patch, 
+                               @changedAttributes,
                                @previousAttributes)
       expect(_.keys(@patch)).toContain('number')
 
     it 'retains the previous version of all text attributes', ->
-      @patcher._updatePatchFor(@changedAttributes,
+      @patcher._updatePatchFor(@patch, 
+                               @changedAttributes,
                                @previousAttributes)
       expect(@patch.text).toEqual('previous_text')
 
@@ -90,15 +86,24 @@ describe 'Patcher', ->
         @patch =
           text: 'original_text'
           number: 'was_text_previously'
+          object: {}
+          other_object: {}
+        @changedAttributes.object = 'some_text'  
+        @changedAttributes.other_object = 5
 
       it 'leaves the patch attribute unchanged', ->
-        @patcher._updatePatchFor(@changedAttributes,
+        @patcher._updatePatchFor(@patch, 
+                                 @changedAttributes,
                                  @previousAttributes)
         expect(@patch.text).toEqual('original_text')
         expect(@patch.number).toEqual('was_text_previously')
+        expect(@patch.object).toEqual({})
+        expect(@patch.other_object).toEqual({})
 
     context 'when the changed attributes contain an object', ->
       beforeEach ->
+        @patch = 
+          object: @patchObject = sinon.stub()
         @changedAttributes =
           object:
             all: 'attributes'
@@ -111,17 +116,32 @@ describe 'Patcher', ->
         )
 
       it 'filters out the changed attributes for the object', ->
-        @patcher._updatePatchFor(@changedAttributes,
+        @patcher._updatePatchFor(@patch, 
+                                 @changedAttributes,
                                  @previousAttributes)
         expect(@changedAttributesStub).
           toHaveBeenCalledWith({all: 'attributes'}, {previous: 'attributes'})
 
       it 'recursively updates the patch for this object', ->
-        @patcher._updatePatchFor(@changedAttributes,
+        @patcher._updatePatchFor(@patch, 
+                                 @changedAttributes,
                                  @previousAttributes)
         expect(@updatePatchForSpy).
-          toHaveBeenCalledWith({changed: 'attributes'}, 
+          toHaveBeenCalledWith(@patchObject,
+                               {changed: 'attributes'}, 
                                {previous: 'attributes'})
+                               
+      context 'and the object is not defined in the patch', ->
+        beforeEach ->
+          @patch = {}
+        
+        it 'initializes the object on the patch as an empty object', ->
+          @patcher._updatePatchFor(@patch, 
+                                   @changedAttributes,
+                                   @previousAttributes)
+          expect(
+            _.isObject(@updatePatchForSpy.getCall(1).args[0])
+          ).toBeTruthy()
 
       context 'and the patch already recorded this object', ->
         beforeEach ->
@@ -129,7 +149,8 @@ describe 'Patcher', ->
             object: null
 
         it 'does not recursively update the patch for this object', ->
-          @patcher._updatePatchFor(@changedAttributes,
+          @patcher._updatePatchFor(@patch, 
+                                   @changedAttributes,
                                    @previousAttributes)
           expect(@updatePatchForSpy).not.toHaveBeenCalledTwice()
 
@@ -229,9 +250,11 @@ describe 'Patcher', ->
     beforeEach ->
       @patch =
         some: 'attribute'
+        object: {}
       @source =
         source: 'attribute'
         some: 'other_attribute'
+        object: 'test'
       @patcher = new Patcher  
       @_mergeIntoSpy = sinon.spy(@patcher, '_mergeInto')
       
@@ -242,6 +265,7 @@ describe 'Patcher', ->
     it 'retains attributes that are already set', ->
       @patcher._mergeInto(@patch, @source)
       expect(@patch.some).toEqual('attribute')
+      expect(@patch.object).toEqual({})
       
     context 'when the attribute is an object', ->
       beforeEach ->

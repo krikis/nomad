@@ -9,21 +9,23 @@ class @Patcher
       @model.patches().push
         _patch: {}
         base: @model.localClock() || 0
-    @_updatePatchFor(@model.changedAttributes(), 
+    @_updatePatchFor(_.last(@model.patches()),
+                     @model.changedAttributes(), 
                      @model.previousAttributes())
     
-  _updatePatchFor: (changed, previous = {}) ->
-    patch = _.last @model.patches()
+  _updatePatchFor: (patch, changed, previous = {}) ->
     _.each changed, (value, attribute) =>
-      unless _.has(patch, attribute)
-        if _.isString(value)
+      if not _.has(patch, attribute) or _.isObject(patch[attribute])
+        if _.isString(value) and not _.isObject(patch[attribute])
           patch[attribute] = previous[attribute]
         else if _.isObject(value)
           changedAttributes = @_changedAttributes(changed[attribute],
                                                   previous[attribute])
-          patch[attribute] = @_updatePatchFor(changedAttributes,
+          patch[attribute] ||= {}                                      
+          patch[attribute] = @_updatePatchFor(patch[attribute],
+                                              changedAttributes,
                                               previous[attribute])
-        else
+        else if not _.isObject(patch[attribute])
           patch[attribute] = null
     
   _changedAttributes: (now, previous = {}) ->
@@ -55,7 +57,7 @@ class @Patcher
         if _.isObject(value)
           patch[attribute] ||= {}
           @_mergeInto(patch[attribute], value)
-        else
+        else if not _.isObject(patch[attribute])
           patch[attribute] = value
     
   _applyPatch: (patch, attributesToPatch, 
