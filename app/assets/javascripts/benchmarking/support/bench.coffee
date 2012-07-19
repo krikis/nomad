@@ -12,6 +12,10 @@ class @Bench
     @test     = options.test     || (next) -> next.call(@)
     @after    = options.after    || (next) -> next.call(@)
     @cleanup  = options.cleanup  || (next) -> next.call(@)
+    @baseline = options.baseline || -> @start = new Date
+    @record   = options.record   || -> new Date - @start
+    @round    = true
+    @round    = options.round    if options.round?
     @runs     = options.runs     || @DEFAULT_NR_OF_RUNS
     @timeout  = options.timeout  || @DEFAULT_TIMEOUT
     @chart    = options.chart
@@ -70,13 +74,12 @@ class @Bench
 
   testFunction: ->
     setTimeout (=>
-      @start = new Date
+      @baseline.call(@)
       @test.call(@, @afterFunction)
     ), 100
 
   afterFunction: ->
-    @time = new Date - @start
-    @total += @time
+    @total += @record.call(@)
     @after.call(@, @testLoop)
 
   stop: ->
@@ -94,12 +97,15 @@ class @Bench
     @saveStats()
 
   updateStats: (runtime) ->
-    @stats.push Math.round runtime
+    if @round
+      @stats.push Math.round runtime
+    else
+      @stats.push runtime
     @previous = @[@measure] || 0
     switch @measure
       when 'mean'
         sum = _.reduce @stats, (memo, value) -> memo + value
-        @[@measure] = Math.round(sum / @stats.length)
+        value = sum / @stats.length
       when 'median'
         stats = @stats.sort(@numerical)
         length = stats.length
@@ -107,8 +113,10 @@ class @Bench
           value = (stats[(length / 2) - 1] + stats[(length / 2)]) / 2
         else
           value = stats[Math.round(length / 2) - 1]
-        @[@measure] = Math.round(value)
-
+    if @round
+      @[@measure] = Math.round(value)
+    else
+      @[@measure] = value
   redrawChart: ->
     seriesIndex = _.indexOf(@allSeries, @series)
     categoryIndex = _.indexOf(@categories, @category)

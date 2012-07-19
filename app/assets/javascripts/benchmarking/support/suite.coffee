@@ -11,6 +11,10 @@ class @Suite
     @timeout   = options.timeout
     @minStable = options.minStable || @MIN_STABLE_RUNS
     @maxRuns   = options.maxRuns   || @MAX_NR_OF_RUNS
+    @baseline  = options.baseline
+    @record    = options.record
+    @round     = options.round
+    @unit      = options.unit      || 'ms (Milliseconds)'
     @benches   = []
     @initChart(options)
     @initButton(options)
@@ -43,7 +47,7 @@ class @Suite
     yAxis:
       min: 0
       title:
-        text: "ms (Milliseconds)"
+        text: @unit
         align: "high"
       labels:
         overflow: "justify"
@@ -78,8 +82,11 @@ class @Suite
         suite.run(@)
     
   bench: (options = {}) ->
-    options.suite = @
-    options.chart ||= @chart
+    options.suite    = @
+    options.chart    ||= @chart
+    options.baseline ||= @baseline
+    options.record   ||= @record
+    options.round    ||= @round
     bench = new Bench options
     @benches.push bench
     

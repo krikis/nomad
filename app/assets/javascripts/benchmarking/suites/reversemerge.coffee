@@ -2,6 +2,7 @@ suite = @reverseMerge = new Suite
   name:      'reversemerge'
   container: 'tab2'
   title:     'Object Reverse Merge vs. Structured Content Diff'
+  subtitle:  'Duration of object versioning and conflict resolution'
   # benchRuns: 1
   # maxRuns:   1
 
