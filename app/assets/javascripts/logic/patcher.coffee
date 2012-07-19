@@ -38,6 +38,7 @@ class @Patcher
       
   applyPatchesTo: (dummy) ->
     @dmp = new diff_match_patch
+    @dmp.Diff_Timeout = 0
     mergedPatch = @_mergePatches @model.patches()
     @_applyPatch(mergedPatch,
                  dummy.attributes,
