@@ -215,6 +215,65 @@ describe 'Patcher', ->
       
     it 'returns the merged patch', ->
       expect(@patcher._mergePatches()).toEqual(@firstClone)
+      
+    context 'when no patches are defined', ->
+      beforeEach ->
+        @model = {}
+        @patchesStub.restore()
+        @deepCloneStub.restore()
+        
+      it 'returns undefined', ->
+        expect(@patcher._mergePatches()).toEqual(undefined)
+      
+  describe '#_mergeInto', ->
+    beforeEach ->
+      @patch =
+        some: 'attribute'
+      @source =
+        source: 'attribute'
+        some: 'other_attribute'
+      @patcher = new Patcher  
+      @_mergeIntoSpy = sinon.spy(@patcher, '_mergeInto')
+      
+    it 'sets the source attributes on the patch', ->
+      @patcher._mergeInto(@patch, @source)
+      expect(@patch.source).toEqual('attribute')
+        
+    it 'retains attributes that are already set', ->
+      @patcher._mergeInto(@patch, @source)
+      expect(@patch.some).toEqual('attribute')
+      
+    context 'when the attribute is an object', ->
+      beforeEach ->
+        @patch =
+          object: @patchObject  = sinon.stub()
+        @source =
+          object: @sourceObject = sinon.stub()
+          
+      it 'recursively merges the patch objects', ->
+        @patcher._mergeInto(@patch, @source)
+        expect(@_mergeIntoSpy).
+          toHaveBeenCalledWith(@patchObject, @sourceObject)
+          
+      context 'and it is undefined in the patch', ->
+        beforeEach ->
+          @patch = {}
+        
+        it 'is initializes as an empty object', ->
+          @patcher._mergeInto(@patch, @source)
+          expect(@_mergeIntoSpy).
+            toHaveBeenCalledWith({}, @sourceObject)
+            
+      context 'and it is null in the patch', ->
+        beforeEach ->
+          @patch =
+            object: null
+          
+        it 'does not go into recursion', ->
+          @patcher._mergeInto(@patch, @source)
+          expect(@_mergeIntoSpy).not.toHaveBeenCalledTwice()
+          
+          
 
   describe '#_applyPatch', ->
     beforeEach ->

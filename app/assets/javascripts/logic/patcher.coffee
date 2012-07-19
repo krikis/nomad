@@ -43,13 +43,20 @@ class @Patcher
                  @model.attributes)
   
   _mergePatches: ->
-    patches = _.clone @model.patches()
+    patches = _.clone(@model.patches()) || []
     merged = _.deepClone patches.shift()
     _.each patches, (patch) =>
       @_mergeInto merged, patch
     merged
     
   _mergeInto: (patch, source) ->
+    _.each source, (value, attribute) =>
+      if not _.has(patch, attribute) or _.isObject(patch[attribute])
+        if _.isObject(value)
+          patch[attribute] ||= {}
+          @_mergeInto(patch[attribute], value)
+        else
+          patch[attribute] = value
     
   _applyPatch: (patch, attributesToPatch, 
                 firstAttributes, currentAttributes) ->
