@@ -12,7 +12,7 @@ Benches.fixedAnswer = ->
       v_3: 0
       v_4: 1
       v_5: 5
-      # v_6: Benches.dataV0
+      v_6: Benches.dataV0
     outcome:
       score_1:
         value: 34.5
@@ -33,7 +33,7 @@ Benches.fixedAnswerV1u1 = ->
       v_3: 4
       v_4: 1
       v_5: 5
-      # v_6: Benches.dataV1u1
+      v_6: Benches.dataV1u1
     outcome:
       score_1:
         value: 21
@@ -54,7 +54,7 @@ Benches.fixedAnswerV1u2 = ->
       v_3: 7
       v_4: 1
       v_5: 5
-      # v_6: Benches.dataV1u2
+      v_6: Benches.dataV1u2
     outcome:
       score_1:
         value: 23
@@ -75,7 +75,7 @@ Benches.fixedAnswerV1u3 = ->
       v_3: 7
       v_4: 1
       v_5: 5
-      # v_6: Benches.dataV1u3
+      v_6: Benches.dataV1u3
     outcome:
       score_1:
         value: 23
@@ -96,7 +96,7 @@ Benches.fixedAnswerV2 = ->
       v_3: 0
       v_4: 3
       v_5: 5
-      # v_6: Benches.dataV2
+      v_6: Benches.dataV2
     outcome:
       score_1:
         value: 34.5
