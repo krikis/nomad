@@ -1,6 +1,6 @@
 @BackboneSync ||= {}
 
-@FAYE_SERVER = "http://nomad.dev:9292/faye"
+@FAYE_SERVER = "http://195.240.7.166:9292/faye"
 
 class @BackboneSync.FayeClient
   constructor: (collection, options = {}) ->
