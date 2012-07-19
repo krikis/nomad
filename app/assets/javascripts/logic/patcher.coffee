@@ -9,7 +9,7 @@ class @Patcher
       @model.patches().push
         _patch: {}
         base: @model.localClock() || 0
-    @_updatePatchFor(_.last(@model.patches()),
+    @_updatePatchFor(_.last(@model.patches())._patch,
                      @model.changedAttributes(), 
                      @model.previousAttributes())
     

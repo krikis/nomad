@@ -49,10 +49,10 @@ describe 'Patcher', ->
           base: @base
 
     it 'calls the _updatePatchFor method', ->
-      @patches = [(patch = sinon.stub())]
+      @patches = [(patch = _patch: sinon.stub())]
       @patcher.updatePatches()
       expect(@updatePatchForStub).
-        toHaveBeenCalledWith(patch,
+        toHaveBeenCalledWith(patch._patch,
                              @changedAttributes,
                              @previousAttributes)
 
