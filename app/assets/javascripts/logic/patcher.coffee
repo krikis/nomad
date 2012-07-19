@@ -22,9 +22,9 @@ class @Patcher
           changedAttributes = @_changedAttributes(changed[attribute],
                                                   previous[attribute])
           patch[attribute] ||= {}                                      
-          patch[attribute] = @_updatePatchFor(patch[attribute],
-                                              changedAttributes,
-                                              previous[attribute])
+          @_updatePatchFor(patch[attribute],
+                           changedAttributes,
+                           previous[attribute])
         else if not _.isObject(patch[attribute])
           patch[attribute] = null
     
