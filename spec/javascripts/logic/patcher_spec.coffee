@@ -62,17 +62,28 @@ describe 'Patcher', ->
       @previousAttributes =
         number: 1001.1
         text: 'previous_text'
-      @patcher = new Patcher(sinon.stub())
+      @model =
+        patches: => @patches ||= sinon.stub()
+      @patcher = new Patcher(@model)
+      @lastStub = sinon.stub(_, 'last', => @patch ||= {})
+      
+    afterEach ->
+      @lastStub.restore()
+      
+    it 'fechtes the last model patch', ->
+      @patcher._updatePatchFor(@changedAttributes,
+                               @previousAttributes)
+      expect(@lastStub).toHaveBeenCalledWith(@patches)
 
     it 'saves all keys of no-text attributes', ->
-      patch = @patcher._updatePatchFor(@changedAttributes,
-                                       @previousAttributes)
-      expect(_.keys(patch)).toContain('number')
+      @patcher._updatePatchFor(@changedAttributes,
+                               @previousAttributes)
+      expect(_.keys(@patch)).toContain('number')
 
     it 'retains the previous version of all text attributes', ->
-      patch = @patcher._updatePatchFor(@changedAttributes,
-                                       @previousAttributes)
-      expect(patch.text).toEqual('previous_text')
+      @patcher._updatePatchFor(@changedAttributes,
+                               @previousAttributes)
+      expect(@patch.text).toEqual('previous_text')
 
     context 'when the changed attributes contain an object', ->
       beforeEach ->
@@ -88,14 +99,14 @@ describe 'Patcher', ->
         )
         
       it 'filters out the changed attributes for the object', ->
-        patch = @patcher._updatePatchFor(@changedAttributes,
-                                         @previousAttributes)
+        @patcher._updatePatchFor(@changedAttributes,
+                                 @previousAttributes)
         expect(@changedAttributesStub).
           toHaveBeenCalledWith({all: 'attributes'}, {previous: 'attributes'})
 
       it 'recursively updates the patch for this object', ->
-        patch = @patcher._updatePatchFor(@changedAttributes,
-                                         @previousAttributes)
+        @patcher._updatePatchFor(@changedAttributes,
+                                 @previousAttributes)
         expect(@updatePatchForSpy).
           toHaveBeenCalledWith({changed: 'attributes'}, {previous: 'attributes'})
           

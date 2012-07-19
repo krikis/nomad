@@ -13,7 +13,7 @@ class @Patcher
                      @model.previousAttributes())
     
   _updatePatchFor: (changed, previous = {}) ->
-    patch = {}
+    patch = _.last @model.patches()
     _.each changed, (value, attribute) =>
       if _.isString(value)
         patch[attribute] = previous[attribute]
@@ -24,7 +24,6 @@ class @Patcher
                                             previous[attribute])
       else
         patch[attribute] = null
-    patch
     
   _changedAttributes: (now, previous = {}) ->
     changed = {}
