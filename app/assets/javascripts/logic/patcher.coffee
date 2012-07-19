@@ -59,15 +59,13 @@ class @Patcher
         else if not _.isObject(patch[attribute])
           patch[attribute] = value
     
-  _applyPatch: (patch, attributesToPatch, 
-                firstAttributes, currentAttributes) ->
-    _.all patch, (value, attribute) =>
-      originalValue =   firstAttributes[attribute]
+  _applyPatch: (patch, attributesToPatch, currentAttributes) ->
+    _.all patch, (originalValue, attribute) =>
       currentValue  = currentAttributes[attribute]
-      @_patchAttribute(attribute, value, attributesToPatch, 
+      @_patchAttribute(attribute, attributesToPatch, 
                        originalValue, currentValue)
     
-  _patchAttribute: (attribute, value, attributesToPatch, 
+  _patchAttribute: (attribute, attributesToPatch, 
                     originalValue, currentValue) ->
     if _.isString(currentValue)
       if _.isString(originalValue)
@@ -78,8 +76,8 @@ class @Patcher
         true
     else if _.isObject(currentValue)
       objectToPatch = attributesToPatch[attribute]
-      if _.isObject(value) and _.isObject(objectToPatch)
-        @_applyPatch(value, objectToPatch, originalValue, currentValue)
+      if _.isObject(originalValue) and _.isObject(objectToPatch)
+        @_applyPatch(originalValue, objectToPatch, currentValue)
       else
         attributesToPatch[attribute] = currentValue
         true
