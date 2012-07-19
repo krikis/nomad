@@ -15,15 +15,16 @@ class @Patcher
   _updatePatchFor: (changed, previous = {}) ->
     patch = _.last @model.patches()
     _.each changed, (value, attribute) =>
-      if _.isString(value)
-        patch[attribute] = previous[attribute]
-      else if _.isObject(value)
-        changedAttributes = @_changedAttributes(changed[attribute],
-                                                previous[attribute])
-        patch[attribute] = @_updatePatchFor(changedAttributes,
-                                            previous[attribute])
-      else
-        patch[attribute] = null
+      unless _.has(patch, attribute)
+        if _.isString(value)
+          patch[attribute] = previous[attribute]
+        else if _.isObject(value)
+          changedAttributes = @_changedAttributes(changed[attribute],
+                                                  previous[attribute])
+          patch[attribute] = @_updatePatchFor(changedAttributes,
+                                              previous[attribute])
+        else
+          patch[attribute] = null
     
   _changedAttributes: (now, previous = {}) ->
     changed = {}
