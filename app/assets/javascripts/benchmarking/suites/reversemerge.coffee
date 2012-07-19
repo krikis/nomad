@@ -2,8 +2,8 @@ suite = @reverseMerge = new Suite
   name:      'reversemerge'
   container: 'tab2'
   title:     'Object Reverse Merge vs. Structured Content Diff'
-  benchRuns: 1
-  maxRuns:   1
+  # benchRuns: 1
+  # maxRuns:   1
 
 suite.bench
   category: 'merge'
