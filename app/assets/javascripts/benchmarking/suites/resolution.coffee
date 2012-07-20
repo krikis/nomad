@@ -8,8 +8,8 @@ suite = @resolution = new Suite
     @success * 100
   unit:      '%'
   unitLong:  'Success rate'
-  benchRuns: 1
-  maxRuns:   1
+  # benchRuns: 1
+  # maxRuns:   1
   
 suite.bench
   category: 'attribute'
