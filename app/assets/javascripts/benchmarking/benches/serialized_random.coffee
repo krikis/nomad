@@ -23,9 +23,16 @@ Benches.serializedRandom = (next) ->
       _.each _.union(_.keys(@answerOriginal),
                      _.keys(@dummyOriginal),
                      _.keys(@answer.attributes)), (key) =>
-        if @answer.attributes[key] isnt @answerOriginal[key] or
-           @dummyOriginal[key] isnt @answerOriginal[key]
-          console.warn "--#{key}:"
+        if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) or
+           not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
+          if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
+             not _.isEqual(@answer.attributes[key], @dummy.attributes[key])
+            console.error "--#{key}:"
+          else if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
+                  not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
+            console.warn "--#{key}:"
+          else
+            console.log "--#{key}:"
           if _.isString(@answerOriginal[key]) and ' ' in @answerOriginal[key]
             console.log "#{@answerOriginal[key]}"
             console.log "-ans-> #{@answer.attributes[key]}"

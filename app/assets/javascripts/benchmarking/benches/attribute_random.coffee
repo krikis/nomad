@@ -18,6 +18,24 @@ Benches.beforeAttributeRandom = (next) ->
 Benches.attributeRandom = (next) ->
   try
     if @answer._applyPatchesTo @dummy
+      console.log '================================= Changes ================================='
+      _.each _.union(_.keys(@answerOriginal),
+                     _.keys(@dummyOriginal),
+                     _.keys(@answer.attributes)), (key) =>
+        if @answer.attributes[key] isnt @answerOriginal[key] or
+           @dummyOriginal[key] isnt @answerOriginal[key]
+          console.warn "--#{key}:"
+          if _.isString(@answerOriginal[key]) and ' ' in @answerOriginal[key]
+            console.log "#{@answerOriginal[key]}"
+            console.log "-ans-> #{@answer.attributes[key]}"
+            console.log "-dum-> #{@dummyOriginal[key]}"
+            console.log "=mrg=> #{@dummy.attributes[key]}"
+          else
+            original = @answerOriginal[key]
+            padding = Array("#{original}".length + 1).join(' ')
+            console.log "#{original} -ans-> #{@answer.attributes[key]}"
+            console.log "#{padding } -dum-> #{@dummyOriginal[key]    }"
+            console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
       @success = 1
     else
       @success = 0
