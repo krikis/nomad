@@ -155,5 +155,7 @@ class @Suite
       console.log JSON.stringify @categories
       console.log JSON.stringify @chartData()
       _.each @benches, (bench) =>
-        console.log localStorage["#{bench.namespace}_#{bench.key}_stats"]
+        key = "#{bench.namespace}_#{bench.key}_stats"
+        console.log key
+        console.log localStorage[key]
     $(@button).attr('disabled': false) if @button?  
