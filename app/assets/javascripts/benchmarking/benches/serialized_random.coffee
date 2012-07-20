@@ -37,10 +37,27 @@ Benches.serializedRandom = (next) ->
           else
             console.log "--#{key}:"
           if _.isString(@answerOriginal[key]) and ' ' in @answerOriginal[key]
-            console.log "#{@answerOriginal[key]}"
-            console.log "-ans-> #{@answer.attributes[key]}"
-            console.log "-dum-> #{@dummyOriginal[key]}"
-            console.log "=mrg=> #{@dummy.attributes[key]}"
+            if _.isString(@answer.attributes[key]) and ' ' in @answer.attributes[key] and
+               _.isString(@dummyOriginal[key]    ) and ' ' in @dummyOriginal[key]
+              dmp = new diff_match_patch 
+              diff1 = dmp.diff_main @answerOriginal[key], @answer.attributes[key]
+              dmp.diff_cleanupSemantic diff1
+              diff2 = dmp.diff_main @answerOriginal[key], @dummyOriginal[key]
+              dmp.diff_cleanupSemantic diff2
+              diff3 = dmp.diff_main @dummyOriginal[key], @dummy.attributes[key]
+              dmp.diff_cleanupSemantic diff3
+              console.log '------------ ans ------------'
+              console.log dmp.diff_prettyHtml diff1
+              console.log '------------ dum ------------'
+              console.log dmp.diff_prettyHtml diff2
+              console.log '------------ mrg ------------'
+              console.log dmp.diff_prettyHtml diff3
+              console.log '-----------------------------'
+            else
+              console.log "#{@answerOriginal[key]}"
+              console.log "-ans-> #{@answer.attributes[key]}"
+              console.log "-dum-> #{@dummyOriginal[key]}"
+              console.log "=mrg=> #{@dummy.attributes[key]}"
           else
             original = @answerOriginal[key]
             padding = Array("#{original}".length + 1).join(' ')
@@ -52,7 +69,9 @@ Benches.serializedRandom = (next) ->
       @success = 0
     window.struct = JSON.stringify @dummy._sortPropertiesIn @dummy.attributes
   catch error
-    console.log error
+    console.log error.stack
+    window.errors ||= []
+    window.errors.push error
     @success = 0
   finally
     next.call @
