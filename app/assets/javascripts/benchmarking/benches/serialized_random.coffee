@@ -19,22 +19,24 @@ Benches.beforeSerializedRandom = (next) ->
 Benches.serializedRandom = (next) ->
   try
     if @answer._applyPatchesTo @dummy
-      console.log '================================= Answer ================================='
-      _.each _.union(_.keys(@answerOriginal), _.keys(@answer.attributes)), (key) =>
-        if @answer.attributes[key] isnt @answerOriginal[key]
-          console.log "--@answer.#{key}:"
-          console.log @answer.attributes[key]
-          console.log "=> #{@dummy.attributes[key]}"
-      console.log '================================= Dummy  ================================='
-      _.each _.union(_.keys(@answerOriginal), _.keys(@dummyOriginal)), (value, key) =>
-        if @dummyOriginal[key] isnt @answerOriginal[key]
-          console.log "--@dummy.#{key}:"
-          console.log @dummyOriginal[key]
-          console.log "=> #{@dummy.attributes[key]}"
-      # console.log JSON.parse JSON.stringify @answerOriginal
-      # console.log JSON.parse JSON.stringify @answer.attributes
-      # console.log JSON.parse JSON.stringify @dummyOriginal
-      # console.log JSON.parse JSON.stringify @dummy.attributes
+      console.log '================================= Changes ================================='
+      _.each _.union(_.keys(@answerOriginal),
+                     _.keys(@dummyOriginal),
+                     _.keys(@answer.attributes)), (key) =>
+        if @answer.attributes[key] isnt @answerOriginal[key] or
+           @dummyOriginal[key] isnt @answerOriginal[key]
+          console.warn "--#{key}:"
+          if _.isString(@answerOriginal[key]) and ' ' in @answerOriginal[key]
+            console.log "#{@answerOriginal[key]}"
+            console.log "-ans-> #{@answer.attributes[key]}"
+            console.log "-dum-> #{@dummyOriginal[key]}"
+            console.log "=mrg=> #{@dummy.attributes[key]}"
+          else
+            original = @answerOriginal[key]
+            padding = Array("#{original}".length + 1).join(' ')
+            console.log "#{original} -ans-> #{@answer.attributes[key]}"
+            console.log "#{padding } -dum-> #{@dummyOriginal[key]    }"
+            console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
       @success = 1
     else
       @success = 0
