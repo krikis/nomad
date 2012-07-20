@@ -19,6 +19,7 @@ Benches.beforeSerializedRandom = (next) ->
 Benches.serializedRandom = (next) ->
   try
     if @answer._applyPatchesTo @dummy
+      @success = 1
       console.log '================================= Serialized ================================='
       _.each _.union(_.keys(@answerOriginal),
                      _.keys(@dummyOriginal),
@@ -26,7 +27,9 @@ Benches.serializedRandom = (next) ->
         if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) or
            not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
           if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
+             not _.isEqual(@answer.attributes[key], @dummyOriginal[key]) and
              _.isEqual(@dummyOriginal[key], @dummy.attributes[key])
+            @success = 0
             console.error "--#{key}:"
           else if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
                   not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
@@ -44,7 +47,6 @@ Benches.serializedRandom = (next) ->
             console.log "#{original} -ans-> #{@answer.attributes[key]}"
             console.log "#{padding } -dum-> #{@dummyOriginal[key]    }"
             console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
-      @success = 1
     else  
       console.log 'Patching failed!!!'
       @success = 0
