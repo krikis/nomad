@@ -25,7 +25,7 @@ Benches.attributeRandom = (next) ->
         if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) or
            not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
           if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
-             not _.isEqual(@answer.attributes[key], @dummy.attributes[key])
+             _.isEqual(@dummyOriginal[key], @dummy.attributes[key])
             console.error "--#{key}:"
           else if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
                   not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
