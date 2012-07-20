@@ -57,11 +57,10 @@ Benches.attributeRandom = (next) ->
             box = $("<div class='box'>")
             box.append well
             $('#tab4 #attr').append box
-          else
-            console.log "#{@answerOriginal[key]}"
-            console.log "-ans-> #{@answer.attributes[key]}"
-            console.log "-dum-> #{@dummyOriginal[key]}"
-            console.log "=mrg=> #{@dummy.attributes[key]}"
+          console.log "#{@answerOriginal[key]}"
+          console.log "-ans-> #{@answer.attributes[key]}"
+          console.log "-dum-> #{@dummyOriginal[key]}"
+          console.log "=mrg=> #{@dummy.attributes[key]}"
         else
           original = @answerOriginal[key]
           padding = Array("#{original}".length + 1).join(' ')
