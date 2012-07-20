@@ -35,26 +35,28 @@ Benches.attributeRandom = (next) ->
           @success = 0
         else if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
                 not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
+          merge = true
           console.warn "--#{key}:"
         else
           console.log "--#{key}:"
         if _.isString(@answerOriginal[key]) and ' ' in @answerOriginal[key]
-          if _.isString(@answer.attributes[key]) and ' ' in @answer.attributes[key] and
+          if merge and
+             _.isString(@answer.attributes[key]) and ' ' in @answer.attributes[key] and
              _.isString(@dummyOriginal[key]    ) and ' ' in @dummyOriginal[key]
             dmp = new diff_match_patch 
             diff1 = dmp.diff_main @answerOriginal[key], @answer.attributes[key]
             dmp.diff_cleanupSemantic diff1
             diff2 = dmp.diff_main @answerOriginal[key], @dummyOriginal[key]
             dmp.diff_cleanupSemantic diff2
-            diff3 = dmp.diff_main @dummyOriginal[key], @dummy.attributes[key]
+            diff3 = dmp.diff_main @answerOriginal[key], @dummy.attributes[key]
             dmp.diff_cleanupSemantic diff3
-            console.log '------------ ans ------------'
-            console.log dmp.diff_prettyHtml diff1
-            console.log '------------ dum ------------'
-            console.log dmp.diff_prettyHtml diff2
-            console.log '------------ mrg ------------'
-            console.log dmp.diff_prettyHtml diff3
-            console.log '-----------------------------'
+            well = $("<div class='well'>")
+            well.append $("#{dmp.diff_prettyHtml diff1}<hr />")
+            well.append $("#{dmp.diff_prettyHtml diff2}<hr />")
+            well.append $("#{dmp.diff_prettyHtml diff3}")
+            box = $("<div class='box'>")
+            box.append well
+            $('#tab4 #attr').append box
           else
             console.log "#{@answerOriginal[key]}"
             console.log "-ans-> #{@answer.attributes[key]}"

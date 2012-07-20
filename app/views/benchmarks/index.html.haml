@@ -36,11 +36,17 @@
           #tab3_chartContainer
 
     #tab4.tab-pane.active
-      .box
-        %form
-          #run.btn.btn-primary Run Suite
-        .well
-          #tab4_chartContainer
+      .container
+        .row
+          .span12
+            .box
+              %form
+                #run.btn.btn-primary Run Suite
+              .well
+                #tab4_chartContainer
+        .row
+          #attr.span6            
+          #seri.span6
 
 :coffeescript
   # record active tab in localStorage
