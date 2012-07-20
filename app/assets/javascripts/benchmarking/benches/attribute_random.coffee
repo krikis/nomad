@@ -8,9 +8,11 @@ Benches.setupAttributeRandom = (next) ->
   next.call @
 
 Benches.beforeAttributeRandom = (next) ->
-  @answer = new @Answer @randomObject()
-  @answer.set @randomVersion(@answer.attributes)
-  @dummy = new @Answer @randomVersion(@answer.attributes)
+  @answerOriginal = @randomObject()
+  @answer = new @Answer _.deepClone @answerOriginal
+  @answer.set @randomVersion(@answerOriginal)
+  @dummyOriginal = @randomVersion(@answerOriginal)
+  @dummy = new @Answer @dummyOriginal
   next.call @
 
 Benches.attributeRandom = (next) ->

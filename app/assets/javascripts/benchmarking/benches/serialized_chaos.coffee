@@ -9,9 +9,11 @@ Benches.setupSerializedChaos = (next) ->
   next.call @
 
 Benches.beforeSerializedChaos = (next) ->
-  @answer = new @Answer @randomObject()
-  @answer.set @chaosVersion(@answer.attributes)
-  @dummy = new @Answer @chaosVersion(@answer.attributes)
+  @answerOriginal = @randomObject()
+  @answer = new @Answer _.deepClone @answerOriginal
+  @answer.set @chaosVersion(@answerOriginal)
+  @dummyOriginal = @chaosVersion(@answerOriginal)
+  @dummy = new @Answer @dummyOriginal
   next.call @
 
 Benches.serializedChaos = (next) ->

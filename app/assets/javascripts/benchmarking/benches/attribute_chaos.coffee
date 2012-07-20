@@ -8,9 +8,11 @@ Benches.setupAttributeChaos = (next) ->
   next.call @
 
 Benches.beforeAttributeChaos = (next) ->
-  @answer = new @Answer @randomObject()
-  @answer.set @chaosVersion(@answer.attributes)
-  @dummy = new @Answer @chaosVersion(@answer.attributes)
+  @answerOriginal = @randomObject()
+  @answer = new @Answer _.deepClone @answerOriginal
+  @answer.set @chaosVersion(@answerOriginal)
+  @dummyOriginal = @chaosVersion(@answerOriginal)
+  @dummy = new @Answer @dummyOriginal
   next.call @
 
 Benches.attributeChaos = (next) ->

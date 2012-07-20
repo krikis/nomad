@@ -8,6 +8,8 @@ suite = @resolution = new Suite
     @success * 100
   unit:      '%'
   unitLong:  'Success rate'
+  benchRuns: 1
+  maxRuns:   1
   
 suite.bench
   category: 'attribute'
@@ -23,16 +25,16 @@ suite.bench
   before:   Benches. beforeSerializedRandom
   test:     Benches.       serializedRandom
   
-suite.bench
-  category: 'attribute'
-  series:   'chaos'
-  setup:    Benches.  setupAttributeChaos
-  before:   Benches. beforeAttributeChaos
-  test:     Benches.       attributeChaos
-  
-suite.bench
-  category: 'serialized'
-  series:   'chaos'
-  setup:    Benches.  setupSerializedChaos
-  before:   Benches. beforeSerializedChaos
-  test:     Benches.       serializedChaos
+# suite.bench
+#   category: 'attribute'
+#   series:   'chaos'
+#   setup:    Benches.  setupAttributeChaos
+#   before:   Benches. beforeAttributeChaos
+#   test:     Benches.       attributeChaos
+#   
+# suite.bench
+#   category: 'serialized'
+#   series:   'chaos'
+#   setup:    Benches.  setupSerializedChaos
+#   before:   Benches. beforeSerializedChaos
+#   test:     Benches.       serializedChaos
