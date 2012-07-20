@@ -452,6 +452,22 @@ describe 'Patcher', ->
                                      @originalValue, @currentValue)
           ).toBeTruthy()
 
+      context 'and the value to patch is not text', ->
+        beforeEach ->
+          @attributesToPatch = 
+            text: sinon.stub()
+      
+        it 'sets the current value on the model', ->
+          @patcher._patchAttribute(@attribute, @attributesToPatch,
+                                   @originalValue, @currentValue)
+          expect(@attributesToPatch.text).toEqual(@currentValue)
+      
+        it 'returns true', ->
+          expect(
+            @patcher._patchAttribute(@attribute, @attributesToPatch,
+                                     @originalValue, @currentValue)
+          ).toBeTruthy()
+
   describe '#_patchString', ->
     beforeEach ->
       @updatePatchForStub = sinon.stub(Patcher::,

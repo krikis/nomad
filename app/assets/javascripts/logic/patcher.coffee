@@ -70,7 +70,7 @@ class @Patcher
   _patchAttribute: (attribute, attributesToPatch,
                     originalValue, currentValue) ->
     if _.isString(currentValue)
-      if _.isString(originalValue)
+      if _.isString(originalValue) and _.isString(attributesToPatch[attribute])
         @_patchString(attribute, attributesToPatch,
                       originalValue, currentValue)
       else
