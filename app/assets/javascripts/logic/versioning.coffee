@@ -170,7 +170,6 @@
       @set patched_attributes
       true
     else
-      console.log 'Patching failed!!!'
       false
 
   _updateVersionTo: (version, updated_at) ->

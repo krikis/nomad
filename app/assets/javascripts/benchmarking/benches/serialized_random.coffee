@@ -45,7 +45,8 @@ Benches.serializedRandom = (next) ->
             console.log "#{padding } -dum-> #{@dummyOriginal[key]    }"
             console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
       @success = 1
-    else
+    else  
+      console.log 'Patching failed!!!'
       @success = 0
     window.struct = JSON.stringify @dummy._sortPropertiesIn @dummy.attributes
   catch error

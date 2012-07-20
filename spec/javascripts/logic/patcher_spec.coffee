@@ -509,10 +509,10 @@ describe 'Patcher', ->
                                      'patch_apply',
                                      -> ['patched_value', [false]])
 
-      it 'does not set the patched attribute on the model', ->
+      it 'sets the current value on the model', ->
         @patcher._patchString(@attribute, @attributesToPatch,
                               @originalValue, @currentValue)
-        expect(@attributesToPatch.text).toEqual('model_text')
+        expect(@attributesToPatch.text).toEqual('current_text')
 
       it 'returns false', ->
         expect(

@@ -61,10 +61,11 @@ class @Patcher
           patch[attribute] = value
 
   _applyPatch: (patch, attributesToPatch, currentAttributes) ->
-    _.all patch, (originalValue, attribute) =>
+    result = _.map patch, (originalValue, attribute) =>
       currentValue  = currentAttributes[attribute]
       @_patchAttribute(attribute, attributesToPatch,
                        originalValue, currentValue)
+    false not in result
 
   _patchAttribute: (attribute, attributesToPatch,
                     originalValue, currentValue) ->
@@ -97,8 +98,8 @@ class @Patcher
       attributesToPatch[attribute] = patched_value
       true
     else
+      attributesToPatch[attribute] = currentValue
       # TODO: handle failed patch
-      console.log 'Patching failed!!!'
       false
 
 
