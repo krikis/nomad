@@ -18,7 +18,7 @@ Benches.beforeAttributeRandom = (next) ->
 Benches.attributeRandom = (next) ->
   try
     if @answer._applyPatchesTo @dummy
-      console.log '================================= Changes ================================='
+      console.log '================================= Attribute  ================================='
       _.each _.union(_.keys(@answerOriginal),
                      _.keys(@dummyOriginal),
                      _.keys(@answer.attributes)), (key) =>

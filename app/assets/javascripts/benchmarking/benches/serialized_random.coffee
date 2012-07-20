@@ -19,7 +19,7 @@ Benches.beforeSerializedRandom = (next) ->
 Benches.serializedRandom = (next) ->
   try
     if @answer._applyPatchesTo @dummy
-      console.log '================================= Changes ================================='
+      console.log '================================= Serialized ================================='
       _.each _.union(_.keys(@answerOriginal),
                      _.keys(@dummyOriginal),
                      _.keys(@answer.attributes)), (key) =>
