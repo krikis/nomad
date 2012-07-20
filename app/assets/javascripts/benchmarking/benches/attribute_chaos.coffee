@@ -12,7 +12,7 @@ Benches.beforeAttributeChaos = (next) ->
   @answer = new @Answer _.deepClone @answerOriginal
   @answer.set @chaosVersion(@answerOriginal)
   @dummyOriginal = @chaosVersion(@answerOriginal)
-  @dummy = new @Answer @dummyOriginal
+  @dummy = new @Answer _.deepClone @dummyOriginal
   next.call @
 
 Benches.attributeChaos = (next) ->

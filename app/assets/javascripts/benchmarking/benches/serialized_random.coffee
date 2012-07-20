@@ -13,7 +13,7 @@ Benches.beforeSerializedRandom = (next) ->
   @answer = new @Answer _.deepClone @answerOriginal
   @answer.set @randomVersion(@answerOriginal)
   @dummyOriginal = @randomVersion(@answerOriginal)
-  @dummy = new @Answer @dummyOriginal
+  @dummy = new @Answer _.deepClone @dummyOriginal
   next.call @
 
 Benches.serializedRandom = (next) ->
