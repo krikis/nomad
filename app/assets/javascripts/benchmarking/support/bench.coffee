@@ -190,9 +190,9 @@ class @Bench
           version[property] = @randomBoolean()
         else if _.isString original
           if ' ' in original
-            version[property] = @loremIpsum()
+            version[property] = @loremIpsumVersion version[property]
           else
-            version[property] = @randomString()
+            version[property] = @stringVersion version[property]
     newPropCount = @randomFrom(1, 3)
     for prop in [1..newPropCount]
       do (prop) =>
@@ -227,6 +227,14 @@ class @Bench
     while randomString.length < stringSize
       randomString.push @randomFrom(charSet)
     randomString.join('')
+
+  stringVersion: (string) ->
+    begin = @randomFrom(0, string.length)
+    end = Math.min(begin + @randomFrom(0, 5), string.length)
+    prefix = string.substring(0, begin)
+    postfix = string.substring(end)
+    infix = @randomString @randomFrom(0, 5)
+    prefix + infix + postfix
 
   randomFrom: ->
     # select random entry from array or string
@@ -275,6 +283,20 @@ class @Bench
           subSentence = 0
         out.push word
     out.join(' ')
+    
+  loremIpsumVersion: (text) ->
+    out = text.split(' ')
+    begin = @randomFrom(0, out.length)
+    end = Math.min(begin + @randomFrom(0, 15), out.length)
+    first = out.slice(0, begin).join(' ')
+    last = out.slice(end).join(' ')
+    middle = @loremIpsum @randomFrom(0, 15)
+    unless _.isEmpty middle
+      unless (_.last(first) == '.') or _.isEmpty(first)
+        middle = middle[0].toLowerCase() + middle.substring(1)
+      unless /[A-Z]/.test(_.first(last)) or _.isEmpty(last)
+        middle = middle.substring(0, middle.length - 1)
+    [first, middle, last].join(' ')
 
   loremIpsumWordBank: [
     "lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipisicing",
