@@ -11,8 +11,10 @@ describe 'versioning', ->
       @tickVersionSpy = sinon.spy(@model, '_tickVersion')
       @collection.add @model
       @model.save()
+      @updatePatchesSpy = sinon.spy(Patcher::, 'updatePatches')
 
-    afterEach ->
+    afterEach -> 
+      @updatePatchesSpy.restore()
       @collection.leave()
       @collection._cleanup()
 
@@ -33,8 +35,8 @@ describe 'versioning', ->
         @tickVersionSpy.reset()
         @model.set Factory.build('answer')
 
-      it 'adds a patch', ->
-        expect(@model._versioning.patches.length).toEqual(2)
+      it 'updates the patches', ->
+        expect(@updatePatchesSpy).toHaveBeenCalled()
         
       it 'updates the version hash', ->
         expect(@tickVersionSpy).toHaveBeenCalled()
