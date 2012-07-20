@@ -24,17 +24,3 @@ suite.bench
   setup:    Benches.  setupSerializedRandom
   before:   Benches. beforeSerializedRandom
   test:     Benches.       serializedRandom
-  
-# suite.bench
-#   category: 'attribute'
-#   series:   'chaos'
-#   setup:    Benches.  setupAttributeChaos
-#   before:   Benches. beforeAttributeChaos
-#   test:     Benches.       attributeChaos
-#   
-# suite.bench
-#   category: 'serialized'
-#   series:   'chaos'
-#   setup:    Benches.  setupSerializedChaos
-#   before:   Benches. beforeSerializedChaos
-#   test:     Benches.       serializedChaos

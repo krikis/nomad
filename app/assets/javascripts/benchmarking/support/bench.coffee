@@ -198,22 +198,6 @@ class @Bench
       do (prop) =>
         version[@randomString()] = @randomValue()
     version
-
-  chaosVersion: (object) ->
-    version = _.deepClone object
-    delPropCount = @randomFrom(1, 3)
-    for prop in [1..delPropCount]
-      do (prop) =>
-        delete version[@randomFrom(_.keys(version))]
-    changePropCount = @randomFrom(4, 7)
-    for prop in [1..changePropCount]
-      do (prop) =>
-        version[@randomFrom(_.keys(version))] = @randomValue()
-    newPropCount = @randomFrom(1, 3)
-    for prop in [1..newPropCount]
-      do (prop) =>
-        version[@randomString()] = @randomValue()
-    version
       
   randomValue: ->
     values = [
