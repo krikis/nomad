@@ -1,6 +1,6 @@
 Benches = @Benches ||= {}
 
-Benches.setupSerializedRandom = (next) ->
+Benches.setupSerializedStrictChaos = (next) ->
   class Answer extends Backbone.Model
     versioning: 'structured_content_diff'
     collection:
@@ -8,7 +8,7 @@ Benches.setupSerializedRandom = (next) ->
   @Answer = Answer
   next.call @
 
-Benches.beforeSerializedRandom = (next) ->
+Benches.beforeSerializedStrictChaos = (next) ->
   @answerOriginal = @randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
   @answer.set @randomVersion(@answerOriginal)
@@ -16,7 +16,7 @@ Benches.beforeSerializedRandom = (next) ->
   @dummy = new @Answer _.deepClone @dummyOriginal
   next.call @
 
-Benches.serializedRandom = (next) ->
+Benches.serializedStrictChaos = (next) ->
   try
     if @answer._applyPatchesTo @dummy
       @success = 1

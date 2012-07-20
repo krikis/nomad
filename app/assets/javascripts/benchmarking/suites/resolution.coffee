@@ -14,16 +14,16 @@ suite = @resolution = new Suite
 suite.bench
   category: 'attribute'
   series:   'strict_chaos'
-  setup:    Benches.  setupAttributeRandom
-  before:   Benches. beforeAttributeRandom
-  test:     Benches.       attributeRandom
+  setup:    Benches.  setupAttributeStrictChaos
+  before:   Benches. beforeAttributeStrictChaos
+  test:     Benches.       attributeStrictChaos
   
 suite.bench
   category: 'serialized'
   series:   'strict_chaos'
-  setup:    Benches.  setupSerializedRandom
-  before:   Benches. beforeSerializedRandom
-  test:     Benches.       serializedRandom
+  setup:    Benches.  setupSerializedStrictChaos
+  before:   Benches. beforeSerializedStrictChaos
+  test:     Benches.       serializedStrictChaos
   
 suite.bench
   category: 'attribute'

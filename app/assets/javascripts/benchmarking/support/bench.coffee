@@ -173,13 +173,13 @@ class @Bench
         object[@randomString()] = @randomValue()
     object
     
-  randomVersion: (object) ->
+  randomVersion: (object, delPropCount, changePropCount, newPropCount, loremChange, stringChange) ->
     version = _.deepClone object
-    delPropCount = @randomFrom(1, 3)
+    delPropCount ||= @randomFrom(1, 3)
     for prop in [1..delPropCount]
       do (prop) =>
         delete version[@randomFrom(_.keys(version))]
-    changePropCount = @randomFrom(4, 7)
+    changePropCount ||= @randomFrom(4, 7)
     for prop in [1..changePropCount]
       do (prop) =>
         property = @randomFrom(_.keys(version))
@@ -190,10 +190,10 @@ class @Bench
           version[property] = @randomBoolean()
         else if _.isString original
           if ' ' in original
-            version[property] = @loremIpsumVersion version[property]
+            version[property] = @loremIpsumVersion version[property], loremChange
           else
-            version[property] = @stringVersion version[property]
-    newPropCount = @randomFrom(1, 3)
+            version[property] = @stringVersion version[property], stringChange
+    newPropCount ||= @randomFrom(1, 3)
     for prop in [1..newPropCount]
       do (prop) =>
         version[@randomString()] = @randomValue()
@@ -228,12 +228,12 @@ class @Bench
       randomString.push @randomFrom(charSet)
     randomString.join('')
 
-  stringVersion: (string) ->
+  stringVersion: (string, change = 5) ->
     begin = @randomFrom(0, string.length)
-    end = Math.min(begin + @randomFrom(0, 5), string.length)
+    end = Math.min(begin + @randomFrom(0, change), string.length)
     prefix = string.substring(0, begin)
     postfix = string.substring(end)
-    infix = @randomString @randomFrom(0, 5)
+    infix = @randomString @randomFrom(0, change)
     prefix + infix + postfix
 
   randomFrom: ->
@@ -284,13 +284,13 @@ class @Bench
         out.push word
     out.join(' ')
     
-  loremIpsumVersion: (text) ->
+  loremIpsumVersion: (text, change = 15) ->
     out = text.split(' ')
     begin = @randomFrom(0, out.length)
-    end = Math.min(begin + @randomFrom(0, 15), out.length)
+    end = Math.min(begin + @randomFrom(0, change), out.length)
     first = out.slice(0, begin).join(' ')
     last = out.slice(end).join(' ')
-    middle = @loremIpsum @randomFrom(0, 15)
+    middle = @loremIpsum @randomFrom(0, change)
     unless _.isEmpty middle
       unless (_.last(first) == '.') or _.isEmpty(first)
         middle = middle[0].toLowerCase() + middle.substring(1)

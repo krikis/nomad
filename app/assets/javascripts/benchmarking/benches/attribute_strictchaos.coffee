@@ -1,13 +1,13 @@
 Benches = @Benches ||= {}
 
-Benches.setupAttributeRandom = (next) ->
+Benches.setupAttributeStrictChaos = (next) ->
   class Answer extends Backbone.Model
     collection:
       url: '/some/url'
   @Answer = Answer
   next.call @
 
-Benches.beforeAttributeRandom = (next) ->
+Benches.beforeAttributeStrictChaos = (next) ->
   @answerOriginal = @randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
   @answer.set @randomVersion(@answerOriginal)
@@ -15,7 +15,7 @@ Benches.beforeAttributeRandom = (next) ->
   @dummy = new @Answer _.deepClone @dummyOriginal
   next.call @
 
-Benches.attributeRandom = (next) ->
+Benches.attributeStrictChaos = (next) ->
   try
     if @answer._applyPatchesTo @dummy
       @success = 1
