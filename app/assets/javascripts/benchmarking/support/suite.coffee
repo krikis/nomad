@@ -33,6 +33,7 @@ class @Suite
         ), 200
 
   chartConfig: (options = {}) ->
+    unit = @unit
     chart:
       renderTo: "#{options.container}_chartContainer"
       backgroundColor: 'whiteSmoke'
@@ -54,7 +55,7 @@ class @Suite
         overflow: "justify"
     tooltip:
       formatter: ->
-        "#{@x} #{@series.name}: #{@y} #{@unitLong}"
+        "#{@x} #{@series.name}: #{@y} #{unit}"
     plotOptions:
       bar:
         dataLabels:
