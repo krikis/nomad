@@ -1,18 +1,17 @@
 Benches = @Benches ||= {}
 
-Benches.setupSerializedLooseChaos = (next) ->
+Benches.setupAttribute50 = (next) ->
   class Answer extends Backbone.Model
-    versioning: 'structured_content_diff'
     collection:
       url: '/some/url'
   @Answer = Answer
   next.call @
 
-Benches.beforeSerializedLooseChaos = (next) ->
+Benches.beforeAttribute50 = (next) ->
   @answerOriginal = @randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
   deleteCount  = @randomFrom(1, 3)
-  changeCount  = @randomFrom(4, 7)
+  changeCount  = @randomFrom(4, 8)
   createCount  = @randomFrom(1, 3)
   textChange   = 15
   stringChange = 5
@@ -31,11 +30,11 @@ Benches.beforeSerializedLooseChaos = (next) ->
   @dummy = new @Answer _.deepClone @dummyOriginal
   next.call @
 
-Benches.serializedLooseChaos = (next) ->
+Benches.attribute50 = (next) ->
   try
     if @answer._applyPatchesTo @dummy
       @success = 1
-      # console.log '================================= Serialized ================================='
+      # console.log '================================= Attribute  ================================='
       _.each _.union(_.keys(@answerOriginal),
                      _.keys(@dummyOriginal),
                      _.keys(@answer.attributes)), (key) =>
@@ -71,7 +70,7 @@ Benches.serializedLooseChaos = (next) ->
               well.append $("#{dmp.diff_prettyHtml diff3}")
               box = $("<div class='box'>")
               box.append well
-              $('#tab4 #seri').append box
+              $('#tab4 #attr').append box
             # console.log "#{@answerOriginal[key]}"
             # console.log "-dum-> #{@dummyOriginal[key]}"
             # console.log "-ans-> #{@answer.attributes[key]}"

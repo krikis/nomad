@@ -1,20 +1,20 @@
 Benches = @Benches ||= {}
 
-Benches.setupAttributeLooseChaos = (next) ->
+Benches.setupAttribute12 = (next) ->
   class Answer extends Backbone.Model
     collection:
       url: '/some/url'
   @Answer = Answer
   next.call @
 
-Benches.beforeAttributeLooseChaos = (next) ->
+Benches.beforeAttribute12 = (next) ->
   @answerOriginal = @randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
-  deleteCount  = @randomFrom(1, 3)
-  changeCount  = @randomFrom(4, 7)
-  createCount  = @randomFrom(1, 3)
-  textChange   = 15
-  stringChange = 5
+  deleteCount  = @randomFrom(0, 1)
+  changeCount  = @randomFrom(1, 2)
+  createCount  = @randomFrom(0, 1)
+  textChange   = 4
+  stringChange = 1
   @answer.set @randomVersion(@answerOriginal,
                              deleteCount,   
                              changeCount,   
@@ -30,7 +30,7 @@ Benches.beforeAttributeLooseChaos = (next) ->
   @dummy = new @Answer _.deepClone @dummyOriginal
   next.call @
 
-Benches.attributeLooseChaos = (next) ->
+Benches.attribute12 = (next) ->
   try
     if @answer._applyPatchesTo @dummy
       @success = 1

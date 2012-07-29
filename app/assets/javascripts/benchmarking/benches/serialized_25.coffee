@@ -1,6 +1,6 @@
 Benches = @Benches ||= {}
 
-Benches.setupSerializedLooseQuiet = (next) ->
+Benches.setupSerialized25 = (next) ->
   class Answer extends Backbone.Model
     versioning: 'structured_content_diff'
     collection:
@@ -8,10 +8,10 @@ Benches.setupSerializedLooseQuiet = (next) ->
   @Answer = Answer
   next.call @
 
-Benches.beforeSerializedLooseQuiet = (next) ->
+Benches.beforeSerialized25 = (next) ->
   @answerOriginal = @randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
-  deleteCount  = @randomFrom(1, 2)
+  deleteCount  = @randomFrom(0, 2)
   changeCount  = @randomFrom(1, 4)
   createCount  = @randomFrom(1, 2)
   textChange   = 8
@@ -31,7 +31,7 @@ Benches.beforeSerializedLooseQuiet = (next) ->
   @dummy = new @Answer _.deepClone @dummyOriginal
   next.call @
 
-Benches.serializedLooseQuiet = (next) ->
+Benches.serialized25 = (next) ->
   try
     if @answer._applyPatchesTo @dummy
       @success = 1

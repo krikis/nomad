@@ -1,20 +1,21 @@
 Benches = @Benches ||= {}
 
-Benches.setupAttributeLooseQuiet = (next) ->
+Benches.setupSerialized50 = (next) ->
   class Answer extends Backbone.Model
+    versioning: 'structured_content_diff'
     collection:
       url: '/some/url'
   @Answer = Answer
   next.call @
 
-Benches.beforeAttributeLooseQuiet = (next) ->
+Benches.beforeSerialized50 = (next) ->
   @answerOriginal = @randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
-  deleteCount  = @randomFrom(1, 2)
-  changeCount  = @randomFrom(1, 4)
-  createCount  = @randomFrom(1, 2)
-  textChange   = 8
-  stringChange = 3
+  deleteCount  = @randomFrom(1, 3)
+  changeCount  = @randomFrom(4, 8)
+  createCount  = @randomFrom(1, 3)
+  textChange   = 15
+  stringChange = 5
   @answer.set @randomVersion(@answerOriginal,
                              deleteCount,   
                              changeCount,   
@@ -30,11 +31,11 @@ Benches.beforeAttributeLooseQuiet = (next) ->
   @dummy = new @Answer _.deepClone @dummyOriginal
   next.call @
 
-Benches.attributeLooseQuiet = (next) ->
+Benches.serialized50 = (next) ->
   try
     if @answer._applyPatchesTo @dummy
       @success = 1
-      # console.log '================================= Attribute  ================================='
+      # console.log '================================= Serialized ================================='
       _.each _.union(_.keys(@answerOriginal),
                      _.keys(@dummyOriginal),
                      _.keys(@answer.attributes)), (key) =>
@@ -70,7 +71,7 @@ Benches.attributeLooseQuiet = (next) ->
               well.append $("#{dmp.diff_prettyHtml diff3}")
               box = $("<div class='box'>")
               box.append well
-              $('#tab4 #attr').append box
+              $('#tab4 #seri').append box
             # console.log "#{@answerOriginal[key]}"
             # console.log "-dum-> #{@dummyOriginal[key]}"
             # console.log "-ans-> #{@answer.attributes[key]}"
