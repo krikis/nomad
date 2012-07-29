@@ -7,7 +7,7 @@ suite = @memory = new Suite
   record:    ->
     (JSON.stringify(@answer._versioning.patches).length / JSON.stringify(@answer.attributes).length) * 100
   unit:      '%'
-  unitLong:  'Portion of data'
+  unitLong:  'Portion of original data'
   
 suite.bench
   category: 'content'
