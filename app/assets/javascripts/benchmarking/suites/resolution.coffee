@@ -13,28 +13,42 @@ suite = @resolution = new Suite
   
 suite.bench
   category: 'attribute'
-  series:   'quiet'
-  setup:    Benches.  setupAttributeLooseQuiet
-  before:   Benches. beforeAttributeLooseQuiet
-  test:     Benches.       attributeLooseQuiet
+  series:   '12% change'
+  setup:    Benches.  setupAttribute12
+  before:   Benches. beforeAttribute12
+  test:     Benches.       attribute12
   
 suite.bench
   category: 'serialized'
-  series:   'quiet'
-  setup:    Benches.  setupSerializedLooseQuiet
-  before:   Benches. beforeSerializedLooseQuiet
-  test:     Benches.       serializedLooseQuiet
+  series:   '12% change'
+  setup:    Benches.  setupSerialized12
+  before:   Benches. beforeSerialized12
+  test:     Benches.       serialized12
   
 suite.bench
   category: 'attribute'
-  series:   'chaos'
-  setup:    Benches.  setupAttributeLooseChaos
-  before:   Benches. beforeAttributeLooseChaos
-  test:     Benches.       attributeLooseChaos
+  series:   '25% change'
+  setup:    Benches.  setupAttribute25
+  before:   Benches. beforeAttribute25
+  test:     Benches.       attribute25
   
 suite.bench
   category: 'serialized'
-  series:   'chaos'
-  setup:    Benches.  setupSerializedLooseChaos
-  before:   Benches. beforeSerializedLooseChaos
-  test:     Benches.       serializedLooseChaos
+  series:   '25% change'
+  setup:    Benches.  setupSerialized25
+  before:   Benches. beforeSerialized25
+  test:     Benches.       serialized25
+  
+suite.bench
+  category: 'attribute'
+  series:   '50% change'
+  setup:    Benches.  setupAttribute50
+  before:   Benches. beforeAttribute50
+  test:     Benches.       attribute50
+  
+suite.bench
+  category: 'serialized'
+  series:   '50% change'
+  setup:    Benches.  setupSerialized50
+  before:   Benches. beforeSerialized50
+  test:     Benches.       serialized50
