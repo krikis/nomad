@@ -43,7 +43,7 @@ Benches.attributeStrictQuiet = (next) ->
           if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
              not _.isEqual(@answer.attributes[key], @dummyOriginal[key]) and
              _.isEqual(@dummyOriginal[key], @dummy.attributes[key])
-            # console.error "--#{key}:"
+            console.error "--#{key}:"
             @success = 0
           else if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
                   not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
@@ -83,9 +83,10 @@ Benches.attributeStrictQuiet = (next) ->
             # console.log "#{original} -ans-> #{@answer.attributes[key]}"
             # console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
     else  
-      # console.log 'Patching failed!!!'
+      console.log 'Patching failed!!!'
       @success = 0
   catch error
+    console.log error.message
     # console.log error.stack
     @success = 0
   finally
