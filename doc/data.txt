@@ -15,9 +15,6 @@ presync_conflict_preSync_stats
 presync_conflict_sync_stats
 [6187,6203,6210,6230,6232,6240,6242,6257,6264,6267,6282,6316,6321,6328,6330,7036,7036,7037,7040,7045,7046,7047,7048,7097]
 
-Thu Jul 19 2012 16:23:25 GMT+0200 (CEST)
-["merge","struct"]
-[{"name":"version","data":[2,824]},{"name":"rebase","data":[1641,857]}]
 Fri Jul 20 2012 21:26:57 GMT+0200 (CEST)
 ["merge","struct"]
 [{"name":"version(3)","data":[1,90]},{"name":"rebase(3)","data":[159,170]},{"name":"version(6)","data":[2,215]},{"name":"rebase(6)","data":[157,434]}]
