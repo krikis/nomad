@@ -71,7 +71,7 @@ Benches.attributeStrictChaos = (next) ->
       console.log 'Patching failed!!!'
       @success = 0
   catch error
-    console.log error.message
+    console.error error.message
     # console.log error.stack
     @success = 0
   finally
