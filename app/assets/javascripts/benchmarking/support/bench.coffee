@@ -85,8 +85,8 @@ class @Bench
     ), 50
 
   afterFunction: ->
+    @total += @record.call(@)
     setTimeout (=>
-      @total += @record.call(@)
       @after.call(@, @testLoop)
     ), 50
 
