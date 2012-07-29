@@ -827,7 +827,7 @@ describe 'Versioning', ->
     context 'when patching fails', ->
       beforeEach ->
         @patchApplyStub.restore()
-        @patchApplyStub = sinon.stub(@dmp, 'patch_apply', => [@new_json, [false]])
+        @patchApplyStub = sinon.stub(@dmp, 'patch_apply', => [@new_json, [true, false]])
 
       afterEach ->
         @patchApplyStub.restore()
