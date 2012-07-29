@@ -39,6 +39,7 @@ class @Patcher
   applyPatchesTo: (dummy) ->
     @dmp = new diff_match_patch
     @dmp.Diff_Timeout = 0
+    @dmp.Match_Threshold = 0.2
     mergedPatch = @_mergePatches @model.patches()
     @_applyPatch(mergedPatch,
                  dummy.attributes,

@@ -66,13 +66,17 @@ class @Bench
     $(@button).attr('disabled': true) if @button?
     @total = 0
     @count = @runs
-    @setup.call(@, @testLoop)
+    setTimeout (=>
+      @setup.call(@, @testLoop)  
+    ), 500
 
   testLoop: () ->
-    if @count--
-      @before.call(@, @testFunction)
-    else
-      @cleanup.call(@, @stop)
+    setTimeout (=>
+      if @count--
+        @before.call(@, @testFunction)
+      else
+        @cleanup.call(@, @stop)
+    ), 500
 
   testFunction: ->
     setTimeout (=>
@@ -81,15 +85,19 @@ class @Bench
     ), 500
 
   afterFunction: ->
-    @total += @record.call(@)
-    @after.call(@, @testLoop)
+    setTimeout (=>
+      @total += @record.call(@)
+      @after.call(@, @testLoop)
+    ), 500
 
   stop: ->
-    console.log "#{@key} (#{@runs} runs): #{@total} #{@unit}"
-    @processResults()
-    $(@button).attr('disabled': false) if @button?
-    # return control to next bench if present
-    @next?.call(@context)
+    setTimeout (=>
+      console.log "#{@key} (#{@runs} runs): #{@total} #{@unit}"
+      @processResults()
+      $(@button).attr('disabled': false) if @button?
+      # return control to next bench if present
+      @next?.call(@context)
+    ), 500
 
   processResults: ->
     runtime = if @runs > 0 then @total / @runs else 0
