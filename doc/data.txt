@@ -38,21 +38,41 @@ reversemerge_rebase(6)_merge_stats
 reversemerge_rebase(6)_struct_stats
 [418,428,430,431,432,436,443,445,445,446]
 
-Fri Jul 20 2012 21:12:26 GMT+0200 (CEST)
+Mon Jul 30 2012 00:13:37 GMT+0200 (CEST)
+["merge","struct"]
+[{"name":"version(3)","data":[1,90]},{"name":"rebase(3)","data":[159,172]},{"name":"version(6)","data":[2,216]},{"name":"rebase(6)","data":[158,431]}]
+reversemerge_version(3)_merge_stats
+[1,1,1,1,1,1,1,1,2,2,52,53,55]
+reversemerge_version(3)_struct_stats
+[84,84,85,86,90,90,90,93,93,93,861,883,884]
+reversemerge_rebase(3)_merge_stats
+[154,154,156,156,159,159,159,159,159,167,1667,1702,1739]
+reversemerge_rebase(3)_struct_stats
+[164,165,168,169,169,171,172,175,176,176,297,300,303]
+reversemerge_version(6)_merge_stats
+[2,2,2,2,2,2,2,2,2,3,53,53,54]
+reversemerge_version(6)_struct_stats
+[209,210,213,214,215,215,216,220,226,261,2369,2375,2458]
+reversemerge_rebase(6)_merge_stats
+[154,154,154,155,157,157,158,168,172,172,1682,1687,1706]
+reversemerge_rebase(6)_struct_stats
+[291,317,322,418,428,430,431,432,436,443,445,445,446]
+
+Mon Jul 30 2012 00:22:42 GMT+0200 (CEST)
 ["content","patch"]
 [{"name":"3 versions","data":[93,64]},{"name":"6 versions","data":[93,153]},{"name":"12 versions","data":[93,331]}]
 memory_3 versions_content_stats
-[93,93,93,93]
+[93,93,93,93,93,93,93]
 memory_3 versions_patch_stats
-[64,64,64,64]
+[64,64,64,64,64,64,64]
 memory_6 versions_content_stats
-[93,93,93,93]
+[93,93,93,93,93,93,93]
 memory_6 versions_patch_stats
-[153,153,153,153]
+[153,153,153,153,153,153,153]
 memory_12 versions_content_stats
-[93,93,93,93]
+[93,93,93,93,93,93,93]
 memory_12 versions_patch_stats
-[331,331,331,331]
+[331,331,331,331,331,331,331]
 
 Sun Jul 29 2012 23:51:49 GMT+0200 (CEST)
 ["attribute","serialized"]
