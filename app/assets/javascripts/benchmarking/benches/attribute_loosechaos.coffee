@@ -67,7 +67,7 @@ Benches.attributeLooseChaos = (next) ->
             # console.log "#{original} -ans-> #{@answer.attributes[key]}"
             # console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
     else  
-      console.log 'Patching failed!!!'
+      # console.log 'Patching failed!!!'
       @success = 0
   catch error
     console.error error.message
