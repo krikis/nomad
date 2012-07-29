@@ -45,6 +45,7 @@ Benches.serializedLooseQuiet = (next) ->
              not _.isEqual(@answer.attributes[key], @dummyOriginal[key]) and
              _.isEqual(@dummyOriginal[key], @dummy.attributes[key])
             # console.error "--#{key}:"
+            console.error window.j
           else if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
                   not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
             merge = true

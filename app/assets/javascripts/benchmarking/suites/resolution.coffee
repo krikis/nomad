@@ -13,20 +13,6 @@ suite = @resolution = new Suite
   
 suite.bench
   category: 'attribute'
-  series:   'strict_quiet'
-  setup:    Benches.  setupAttributeStrictQuiet
-  before:   Benches. beforeAttributeStrictQuiet
-  test:     Benches.       attributeStrictQuiet
-  
-suite.bench
-  category: 'serialized'
-  series:   'strict_quiet'
-  setup:    Benches.  setupSerializedStrictQuiet
-  before:   Benches. beforeSerializedStrictQuiet
-  test:     Benches.       serializedStrictQuiet
-  
-suite.bench
-  category: 'attribute'
   series:   'loose_quiet'
   setup:    Benches.  setupAttributeLooseQuiet
   before:   Benches. beforeAttributeLooseQuiet
@@ -41,20 +27,6 @@ suite.bench
   
 suite.bench
   category: 'attribute'
-  series:   'strict_chaos'
-  setup:    Benches.  setupAttributeStrictChaos
-  before:   Benches. beforeAttributeStrictChaos
-  test:     Benches.       attributeStrictChaos
-  
-suite.bench
-  category: 'serialized'
-  series:   'strict_chaos'
-  setup:    Benches.  setupSerializedStrictChaos
-  before:   Benches. beforeSerializedStrictChaos
-  test:     Benches.       serializedStrictChaos
-  
-suite.bench
-  category: 'attribute'
   series:   'loose_chaos'
   setup:    Benches.  setupAttributeLooseChaos
   before:   Benches. beforeAttributeLooseChaos
@@ -66,3 +38,31 @@ suite.bench
   setup:    Benches.  setupSerializedLooseChaos
   before:   Benches. beforeSerializedLooseChaos
   test:     Benches.       serializedLooseChaos
+  
+suite.bench
+  category: 'attribute'
+  series:   'strict_quiet'
+  setup:    Benches.  setupAttributeStrictQuiet
+  before:   Benches. beforeAttributeStrictQuiet
+  test:     Benches.       attributeStrictQuiet
+  
+suite.bench
+  category: 'serialized'
+  series:   'strict_quiet'
+  setup:    Benches.  setupSerializedStrictQuiet
+  before:   Benches. beforeSerializedStrictQuiet
+  test:     Benches.       serializedStrictQuiet
+  
+suite.bench
+  category: 'attribute'
+  series:   'strict_chaos'
+  setup:    Benches.  setupAttributeStrictChaos
+  before:   Benches. beforeAttributeStrictChaos
+  test:     Benches.       attributeStrictChaos
+  
+suite.bench
+  category: 'serialized'
+  series:   'strict_chaos'
+  setup:    Benches.  setupSerializedStrictChaos
+  before:   Benches. beforeSerializedStrictChaos
+  test:     Benches.       serializedStrictChaos

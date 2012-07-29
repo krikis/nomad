@@ -31,6 +31,7 @@ Benches.serializedStrictChaos = (next) ->
              _.isEqual(@dummyOriginal[key], @dummy.attributes[key])
             @success = 0
             # console.error "--#{key}:"
+            console.error window.j
           else if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
                   not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
             merge = true

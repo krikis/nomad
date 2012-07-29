@@ -167,6 +167,7 @@
     json = JSON.stringify(sorted_attributes)
     [new_json, results] = dmp.patch_apply(patch, json)
     if not false in results
+      window.j = new_json
       patched_attributes = JSON.parse(new_json)
       @set patched_attributes
       true
