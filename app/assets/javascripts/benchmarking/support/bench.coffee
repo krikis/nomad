@@ -178,8 +178,11 @@ class @Bench
     propCount = @randomFrom(10, 30)
     for prop in [1..propCount]
       do (prop) =>
-        object[@randomString()] = @randomValue()
+        object[@randomProp()] = @randomValue()
     object
+    
+  randomProp: ->
+    @randomString(5, 'abcdefghijklmnopqrstuvwxyz')
     
   randomVersion: (object, delPropCount, changePropCount, newPropCount, loremChange, stringChange) ->
     version = _.deepClone object
@@ -204,7 +207,7 @@ class @Bench
     newPropCount ||= @randomFrom(1, 3)
     for prop in [1..newPropCount]
       do (prop) =>
-        version[@randomString()] = @randomValue()
+        version[@randomProp()] = @randomValue()
     version
       
   randomValue: ->
@@ -228,9 +231,9 @@ class @Bench
       randomNumbers.push @randomFrom(numberSet)
     parseInt randomNumbers.join('')
 
-  randomString: (stringSize) ->
+  randomString: (stringSize, charSet) ->
     stringSize ||= @randomFrom(5, 15)
-    charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+    charSet ||= 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
     randomString = []
     while randomString.length < stringSize
       randomString.push @randomFrom(charSet)
