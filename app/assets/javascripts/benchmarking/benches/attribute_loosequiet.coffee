@@ -65,21 +65,21 @@ Benches.attributeLooseQuiet = (next) ->
             diff3 = dmp.diff_main @answerOriginal[key], @dummy.attributes[key]
             dmp.diff_cleanupSemantic diff3
             well = $("<div class='well'>")
-            well.append $("#{dmp.diff_prettyHtml diff1}<hr />")
             well.append $("#{dmp.diff_prettyHtml diff2}<hr />")
+            well.append $("#{dmp.diff_prettyHtml diff1}<hr />")
             well.append $("#{dmp.diff_prettyHtml diff3}")
             box = $("<div class='box'>")
             box.append well
             $('#tab4 #attr').append box
           console.log "#{@answerOriginal[key]}"
-          console.log "-ans-> #{@answer.attributes[key]}"
           console.log "-dum-> #{@dummyOriginal[key]}"
+          console.log "-ans-> #{@answer.attributes[key]}"
           console.log "=mrg=> #{@dummy.attributes[key]}"
         else
           original = @answerOriginal[key]
           padding = Array("#{original}".length + 1).join(' ')
-          console.log "#{original} -ans-> #{@answer.attributes[key]}"
           console.log "#{padding } -dum-> #{@dummyOriginal[key]    }"
+          console.log "#{original} -ans-> #{@answer.attributes[key]}"
           console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
     window.merge = JSON.stringify @dummy._sortPropertiesIn @dummy.attributes
   catch error
