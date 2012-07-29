@@ -50,9 +50,9 @@ Benches.serializedStrictChaos = (next) ->
               dmp.diff_cleanupSemantic diff3
               well = $("<div class='well'>")
               well.append $("<h3><small>Remote Changes</small></h3>")
-              well.append $("#{dmp.diff_prettyHtml diff2}<hr />")
+              well.append $("#{dmp.diff_prettyHtml diff2}")
               well.append $("<h3><small>Local Changes</small></h3>")
-              well.append $("#{dmp.diff_prettyHtml diff1}<hr />")
+              well.append $("#{dmp.diff_prettyHtml diff1}")
               well.append $("<h3><small>Merged Changes</small></h3>")
               well.append $("#{dmp.diff_prettyHtml diff3}")
               box = $("<div class='box'>")
