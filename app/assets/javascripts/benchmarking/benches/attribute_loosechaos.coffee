@@ -43,7 +43,7 @@ Benches.attributeLooseChaos = (next) ->
           if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
              not _.isEqual(@answer.attributes[key], @dummyOriginal[key]) and
              _.isEqual(@dummyOriginal[key], @dummy.attributes[key])
-            console.error "--#{key}:"
+            # console.error "--#{key}:"
           else if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
                   not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
             merge = true
@@ -85,7 +85,7 @@ Benches.attributeLooseChaos = (next) ->
       # console.log 'Patching failed!!!'
       @success = 0
   catch error
-    console.error error.message
+    # console.error error.message
     # console.log error.stack
     @success = 0
   finally
