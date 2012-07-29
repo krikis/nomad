@@ -111,16 +111,14 @@ class @Suite
     
   runBench: ->
     if bench = @benches[@benchIndex]
-      setTimeout (=>
-        bench.run
-          next:    @nextBench
-          context: @
-          chart: @chart
-          measure: @measure
-          data:    @benchData
-          runs:    @benchRuns
-          timeout:  @timeout
-      ), 500
+      bench.run
+        next:    @nextBench
+        context: @
+        chart: @chart
+        measure: @measure
+        data:    @benchData
+        runs:    @benchRuns
+        timeout:  @timeout
     
   nextBench: ->
     bench = @benches[@benchIndex]
