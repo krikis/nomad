@@ -20,9 +20,9 @@ Benches.attributeLooseChaos = (next) ->
     if @answer._applyPatchesTo @dummy
       @success = 1
     else  
-      console.log 'Patching failed!!!'
+      # console.log 'Patching failed!!!'
       @success = 0
-    console.log '================================= Attribute  ================================='
+    # console.log '================================= Attribute  ================================='
     _.each _.union(_.keys(@answerOriginal),
                    _.keys(@dummyOriginal),
                    _.keys(@answer.attributes)), (key) =>
@@ -31,13 +31,13 @@ Benches.attributeLooseChaos = (next) ->
         if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
            not _.isEqual(@answer.attributes[key], @dummyOriginal[key]) and
            _.isEqual(@dummyOriginal[key], @dummy.attributes[key])
-          console.error "--#{key}:"
+          # console.error "--#{key}:"
         else if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
                 not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
           merge = true
-          console.warn "--#{key}:"
+          # console.warn "--#{key}:"
         else
-          console.log "--#{key}:"
+          # console.log "--#{key}:"
         if _.isString(@answerOriginal[key]) and ' ' in @answerOriginal[key]
           if merge and
              _.isString(@answer.attributes[key]) and ' ' in @answer.attributes[key] and
@@ -59,21 +59,18 @@ Benches.attributeLooseChaos = (next) ->
             box = $("<div class='box'>")
             box.append well
             $('#tab4 #attr').append box
-          console.log "#{@answerOriginal[key]}"
-          console.log "-dum-> #{@dummyOriginal[key]}"
-          console.log "-ans-> #{@answer.attributes[key]}"
-          console.log "=mrg=> #{@dummy.attributes[key]}"
+          # console.log "#{@answerOriginal[key]}"
+          # console.log "-dum-> #{@dummyOriginal[key]}"
+          # console.log "-ans-> #{@answer.attributes[key]}"
+          # console.log "=mrg=> #{@dummy.attributes[key]}"
         else
           original = @answerOriginal[key]
           padding = Array("#{original}".length + 1).join(' ')
-          console.log "#{padding } -dum-> #{@dummyOriginal[key]    }"
-          console.log "#{original} -ans-> #{@answer.attributes[key]}"
-          console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
-    window.merge = JSON.stringify @dummy._sortPropertiesIn @dummy.attributes
+          # console.log "#{padding } -dum-> #{@dummyOriginal[key]    }"
+          # console.log "#{original} -ans-> #{@answer.attributes[key]}"
+          # console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
   catch error
-    console.log error.stack
-    window.errors ||= []
-    window.errors.push error
+    # console.log error.stack
     @success = 0
   finally
     next.call @

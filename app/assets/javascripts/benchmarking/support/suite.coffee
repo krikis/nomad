@@ -102,7 +102,7 @@ class @Suite
     @runs = 1
     @stableRuns = 0
     @benchIndex = 0
-    console.log '================================= Suite      ================================='
+    # console.log '================================= Suite      ================================='
     @runBench()
     
   saveChartSetup: ->
