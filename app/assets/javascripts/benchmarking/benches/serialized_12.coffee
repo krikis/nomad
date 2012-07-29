@@ -11,9 +11,9 @@ Benches.setupSerialized12 = (next) ->
 Benches.beforeSerialized12 = (next) ->
   @answerOriginal = @randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
-  deleteCount  = @randomFrom(0, 2)
-  changeCount  = @randomFrom(1, 4)
-  createCount  = @randomFrom(1, 2)
+  deleteCount  = @randomFrom(0, 1)
+  changeCount  = @randomFrom(1, 2)
+  createCount  = @randomFrom(0, 1)
   textChange   = 4
   stringChange = 1
   @answer.set @randomVersion(@answerOriginal,
