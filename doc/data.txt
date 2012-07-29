@@ -35,21 +35,21 @@ reversemerge_rebase(6)_merge_stats
 reversemerge_rebase(6)_struct_stats
 [388,389,389,390,391,392,393,393,395,395,407,412,426,440]
 
-Mon Jul 30 2012 00:22:42 GMT+0200 (CEST)
+Mon Jul 30 2012 01:42:21 GMT+0200 (CEST)
 ["content","patch"]
-[{"name":"3 versions","data":[93,64]},{"name":"6 versions","data":[93,153]},{"name":"12 versions","data":[93,331]}]
+[{"name":"3 versions","data":[98,40]},{"name":"6 versions","data":[98,85]},{"name":"12 versions","data":[98,176]}]
 memory_3 versions_content_stats
-[93,93,93,93,93,93,93]
+[98,98,98,98,98,98,98,98]
 memory_3 versions_patch_stats
-[64,64,64,64,64,64,64]
+[40,40,40,40,40,40,40,40]
 memory_6 versions_content_stats
-[93,93,93,93,93,93,93]
+[98,98,98,98,98,98,98,98]
 memory_6 versions_patch_stats
-[153,153,153,153,153,153,153]
+[85,85,85,85,85,85,85,85]
 memory_12 versions_content_stats
-[93,93,93,93,93,93,93]
+[98,98,98,98,98,98,98,98]
 memory_12 versions_patch_stats
-[331,331,331,331,331,331,331]
+[176,176,176,176,176,176,176,176]
 
 Sun Jul 29 2012 23:51:49 GMT+0200 (CEST)
 ["attribute","serialized"]
