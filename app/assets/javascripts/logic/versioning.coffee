@@ -26,8 +26,8 @@
         @_versioning.patches.push @_createPatch(@localClock())
       else
         patcher = new Patcher(@)
-        patcher.updatePatches()                   
-      @_tickVersion()    
+        patcher.updatePatches()
+      @_tickVersion()
 
   localClock: ->
     @_versioning.vector[@clientId]
@@ -43,7 +43,7 @@
                            diff
     patch_text: dmp.patch_toText(patch)
     base: base
-    
+
   _sortPropertiesIn: (object) ->
     return object unless _.isObject(object)
     sorted = {}
@@ -58,19 +58,19 @@
 
   updatedAt: ->
     @_versioning?.updatedAt || @_versioning?.createdAt
-    
+
   patches: ->
     @_versioning?.patches
 
   hasPatches: ->
     @_versioning?.patches?.length > 0
-    
+
   syncingVersions: ->
     @_versioning?.syncingVersions || []
 
   markAsSynced: ->
     @_versioning.synced = true
-    
+
   updateSyncingVersions: ->
     @_versioning.syncingVersions ||= []
     @_versioning.syncingVersions.push @localClock()
@@ -106,7 +106,7 @@
     @_finishedSyncing(vectorClock)
     @save()
     null
-    
+
   _finishedSyncing: (vectorClock) ->
     @_versioning.syncingVersions?.delete(vectorClock[@clientId])
 
@@ -126,7 +126,7 @@
       when 'conflictsWith' then '_rebase'
       when 'precedes' then '_update'
 
-  _rebase: (attributes) ->    
+  _rebase: (attributes) ->
     @_forwardTo(attributes)
     [version, created_at, updated_at] =
       @_extractVersioning(attributes)
@@ -161,7 +161,7 @@
 
   _applyPatch: (patch_text) ->
     dmp = new diff_match_patch
-    dmp.Match_Threshold = 0.2
+    dmp.Match_Threshold = 0.3
     patch = dmp.patch_fromText(patch_text)
     sorted_attributes = @_sortPropertiesIn @attributes
     json = JSON.stringify(sorted_attributes)
