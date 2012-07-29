@@ -11,8 +11,23 @@ Benches.setupSerializedLooseChaos = (next) ->
 Benches.beforeSerializedLooseChaos = (next) ->
   @answerOriginal = @randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
-  @answer.set @randomVersion(@answerOriginal)
-  @dummyOriginal = @randomVersion(@answerOriginal)
+  deleteCount  = @randomFrom(1, 3)
+  changeCount  = @randomFrom(4, 7)
+  createCount  = @randomFrom(1, 3)
+  textChange   = 15
+  stringChange = 5
+  @answer.set @randomVersion(@answerOriginal,
+                             deleteCount,   
+                             changeCount,   
+                             createCount,   
+                             textChange,   
+                             stringChange)
+  @dummyOriginal = @randomVersion(@answerOriginal,
+                                  deleteCount,   
+                                  changeCount,   
+                                  createCount,   
+                                  textChange,   
+                                  stringChange)
   @dummy = new @Answer _.deepClone @dummyOriginal
   next.call @
 
