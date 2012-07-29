@@ -161,6 +161,7 @@
 
   _applyPatch: (patch_text) ->
     dmp = new diff_match_patch
+    dmp.Match_Threshold = 0.2
     patch = dmp.patch_fromText(patch_text)
     sorted_attributes = @_sortPropertiesIn @attributes
     json = JSON.stringify(sorted_attributes)
