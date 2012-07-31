@@ -180,6 +180,7 @@ class @Suite
     @stableRuns = 0
     @benchIndex = 0
     # console.log '================================= Suite      ================================='
+    @log "Suite Running..."
     @runBench()
 
   saveChartSetup: ->
@@ -227,11 +228,11 @@ class @Suite
   finish: (timeout = false) ->
     unless timeout
       if not @running
-        console.log "Suite stopped"
+        @log "Suite stopped"
       else if @runs < @maxRuns
-        console.log "Converged after #{@runs} iterations"
+        @log "Converged after #{@runs} iterations"
       else
-        console.log "Maximum number of runs reached"
+        @log "Maximum number of runs reached"
       console.log new Date
       console.log @benchData if @benchData?
       console.log JSON.stringify @categories
@@ -261,7 +262,7 @@ class @Suite
         @currentLog.html(message)
       }      
     )
-    return
+    console.log message
 
 
 
