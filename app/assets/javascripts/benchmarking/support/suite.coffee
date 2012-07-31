@@ -40,7 +40,7 @@ class @Suite
     $("a[href='##{@container}']").click =>
       unless @running
         @resetChart(options)
-        
+
   resetChart: (options = {}) ->
     if @chart?
       seriesIndex = 0
@@ -57,7 +57,7 @@ class @Suite
             chart: @chart
             animation:
               duration: 1000
-              easing: 'swing'        
+              easing: 'swing'
       else
         @chart = new Highcharts.Chart @chartConfig(options)
     ), 200
@@ -139,13 +139,13 @@ class @Suite
     $('.run').attr('disabled': false)
     @clearButton?.attr('disabled': false)
     @seedButton?.attr('disabled': false)
-        
+
   stop: (button) ->
     @running = false
     @setButtons button
     @buttonsForIdle()
-    
-  clear: (button) ->  
+
+  clear: (button) ->
     @setButtons button
     @clearButton?.attr('disabled': true)
     seriesIndex = 0
@@ -162,7 +162,7 @@ class @Suite
       seriesIndex++
     @clearButton?.attr('disabled': false)
 
-  seed: (button) ->  
+  seed: (button) ->
     @setButtons button
     @seedButton?.attr('disabled': true)
     @saveChartSetup()
@@ -233,34 +233,28 @@ class @Suite
         @log "Converged after #{@runs} iterations"
       else
         @log "Maximum number of runs reached"
-      console.log new Date
-      console.log @benchData if @benchData?
-      console.log JSON.stringify @categories
-      console.log JSON.stringify @chartData()
-      _.each @benches, (bench) =>
-        key = "#{bench.namespace}_#{bench.key}_stats"
-        console.log key
-        console.log localStorage[key]
+      # console.log new Date
+      # console.log @benchData if @benchData?
+      # console.log JSON.stringify @categories
+      # console.log JSON.stringify @chartData()
+      # _.each @benches, (bench) =>
+      #   key = "#{bench.namespace}_#{bench.key}_stats"
+      #   console.log key
+      #   console.log localStorage[key]
     @running = false
     @buttonsForIdle()
-    
+
   log: (message) ->
-    @currentLog ||= $("##{@container}").find('.current')
-    @nextLog ||= $("##{@container}").find('.next')
-    @nextLog.html(message)
-    @nextLog.animate(
-      {top: '0'},
-      {complete: =>
-        @nextLog.attr('style', '')
-        @nextLog.html('')
-      }      
-    )
-    @currentLog.animate(
-      {top: '-28px'},
-      {complete: =>
-        @currentLog.attr('style', '')
-        @currentLog.html(message)
-      }      
+    @logTop ||= 38
+    @logTop -= 28
+    @logging ||= $("##{@container}").find('.log')
+    last = @logging.children(':last')
+    @logging.append $("<span>#{message}</span>")
+    @logging.animate(
+      {top: "#{@logTop}px"},
+      {complete: ->
+          last.css('color', 'white')
+      }
     )
     console.log message
 

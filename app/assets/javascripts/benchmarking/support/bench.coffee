@@ -93,7 +93,7 @@ class @Bench
 
   stop: ->
     setTimeout (=>
-      @suite?.log "#{@category} #{@series} (#{@runs} runs): #{@total}"
+      @suite?.log "[#{@category}] [#{@series}] [#{@runs} runs]: #{@total}"
       @processResults()
       $(@button).attr('disabled': false) if @button?
       # return control to next bench if present

@@ -5,12 +5,10 @@
       #stop.btn{:disabled => true} Stop Suite
       #clear.btn Clear Chart
       #seed.btn Seed Chart
-    .logcontainer  
+    .logcontainer
       .fadetop
       .faderight
       .fadebottom
-      .log
-        %span.current
-        %span.next
+      .log{:'data-popover' => true, :'data-content' => '', :title => 'Logging'}
   .well
     %div{:id => "#{tab}_chartContainer"}
