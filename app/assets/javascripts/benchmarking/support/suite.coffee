@@ -38,10 +38,13 @@ class @Suite
       @chart = new Highcharts.Chart @chartConfig(options)
     $("a[href='##{options.container}']").click =>
       unless @running
-        @chart?.destroy()
-        setTimeout (=>
-          @chart = new Highcharts.Chart @chartConfig(options)
-        ), 200
+        @resetChart(options)
+        
+  resetChart: (options = {})->    
+    @chart?.destroy()
+    setTimeout (=>
+      @chart = new Highcharts.Chart @chartConfig(options)
+    ), 200
 
   chartConfig: (options = {}) ->
     unit = @unit
@@ -96,11 +99,39 @@ class @Suite
     $("##{options.container} #stop").click ->
       unless $(@).attr('disabled')?
         suite.stop(@)
+    $("##{options.container} #clear").click ->
+      unless $(@).attr('disabled')?
+        suite.clear(@)
+
+  setButtons: (button) ->
+    container    = $(button).parent()
+    @stopButton  ||= container.children('#stop')
+    @clearButton ||= container.children('#clear')
+
+  buttonsForRunning: ->
+    $('.run').attr('disabled': true)
+    @stopButton?.attr('disabled': false)
         
   stop: (button) ->
     @running = false
     @setButtons button
     @buttonsForIdle()
+    
+  clear: (button) ->  
+    @setButtons button
+    @clearButton?.attr('disabled': true)
+    @categories = JSON.parse(localStorage["#{@name}_categories"] || "[]")
+    @allSeries  = JSON.parse(localStorage["#{@name}_allSeries" ] || "[]")
+    seriesIndex = 0
+    _.each @allSeries, (series) =>
+      categoryIndex = 0
+      _.each @categories, (category) =>
+        localStorage["#{@name}_#{series}_#{category}_#{@measure}"] = 0
+        localStorage["#{@name}_#{series}_#{category}_stats"] = "[]"
+        @chart.series[seriesIndex].data[categoryIndex].update 0
+        categoryIndex++
+      seriesIndex++
+    @clearButton?.attr('disabled': false)
 
   run: (button) ->
     @running = true
@@ -112,15 +143,6 @@ class @Suite
     @benchIndex = 0
     # console.log '================================= Suite      ================================='
     @runBench()
-    
-  setButtons: (button) ->
-    container   = $(button).parent()
-    @runButton  ||= container.children('#run')
-    @stopButton ||= container.children('#stop')
-
-  buttonsForRunning: ->
-    $('.run').attr('disabled': true)
-    @stopButton?.attr('disabled': false)
 
   saveChartSetup: ->
     localStorage["#{@name}_categories"] = JSON.stringify @categories
