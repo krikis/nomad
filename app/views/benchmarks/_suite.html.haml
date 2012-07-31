@@ -1,9 +1,16 @@
 .box
   %form
-    #buttons
+    .buttons
       .run.btn.btn-primary Run Suite
       #stop.btn{:disabled => true} Stop Suite
       #clear.btn Clear Chart
       #seed.btn Seed Chart
+    .logcontainer  
+      .fadetop
+      .faderight
+      .fadebottom
+      .log
+        %span.current
+        %span.next
   .well
     %div{:id => "#{tab}_chartContainer"}

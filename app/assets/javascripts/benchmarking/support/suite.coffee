@@ -32,12 +32,12 @@ class @Suite
     @benches.push bench
 
   initChart: (options = {}) ->
-    container = options.container
+    @container = options.container
     @categories = JSON.parse(localStorage["#{@name}_categories"] || "[]")
     @allSeries  = JSON.parse(localStorage["#{@name}_allSeries" ] || "[]")
-    if not localStorage.current? and $("##{container}").hasClass('active')
+    if not localStorage.current? and $("##{@container}").hasClass('active')
       @chart = new Highcharts.Chart @chartConfig(options)
-    $("a[href='##{container}']").click =>
+    $("a[href='##{@container}']").click =>
       unless @running
         @resetChart(options)
         
@@ -242,6 +242,26 @@ class @Suite
         console.log localStorage[key]
     @running = false
     @buttonsForIdle()
+    
+  log: (message) ->
+    @currentLog ||= $("##{@container}").find('.current')
+    @nextLog ||= $("##{@container}").find('.next')
+    @nextLog.html(message)
+    @nextLog.animate(
+      {top: '0'},
+      {complete: =>
+        @nextLog.attr('style', '')
+        @nextLog.html('')
+      }      
+    )
+    @currentLog.animate(
+      {top: '-28px'},
+      {complete: =>
+        @currentLog.attr('style', '')
+        @currentLog.html(message)
+      }      
+    )
+    return
 
 
 

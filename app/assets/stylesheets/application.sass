@@ -39,4 +39,76 @@ body
   
   .well
     margin-bottom: auto
+    
+.buttons
+  padding-left: 10px
+  float: right
+    
+.logcontainer
+  position: relative
+  overflow: hidden
+  padding: 4px 0 4px 0
+  height: 20px
+  vertical-align: bottom
+  
+  .fadetop
+    z-index: 50
+    position: absolute
+    right: 0
+    top: 0
+    left: 0
+    height: 12px
+    background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 255, 1)), to(rgba(255, 255, 255, 0)))
+    background: -moz-linear-gradient(top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0))
+  
+  .faderight
+    z-index: 50
+    position: absolute
+    right: 0
+    top: 0
+    bottom: 0
+    width: 100px
+    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), to(rgba(255, 255, 255, 1)))
+    background: -moz-linear-gradient(left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))
+
+  .fadebottom
+    z-index: 50
+    position: absolute
+    right: 0
+    left: 0
+    bottom: 0
+    height: 12px
+    background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 255, 0)), to(rgba(255, 255, 255, 1)))
+    background: -moz-linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))
+
+  .log
+    display: inline-block
+    white-space: nowrap
+    position: relative
+    margin-bottom: 0
+    font-size: 13px
+    line-height: 18px
+    color: #333
+    height: 20px
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75)
+    vertical-align: middle
+    width: 100%
+    
+    .current
+      position: absolute
+      top: 0
+      left: 0
+      height: 20px
+      display: inline-block
+      float: left
+    
+    .next
+      position: absolute
+      top: 28px
+      left: 0
+      height: 20px
+      display: inline-block
+      float: left
+    
+
 
