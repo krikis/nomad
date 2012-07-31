@@ -69,7 +69,7 @@ class @Bench
     @count = @runs
     setTimeout (=>
       @setup.call(@, @testLoop)  
-    ), 50
+    ), 100
 
   testLoop: () ->
     setTimeout (=>
@@ -77,19 +77,19 @@ class @Bench
         @before.call(@, @testFunction)
       else
         @cleanup.call(@, @stop)
-    ), 50
+    ), 100
 
   testFunction: ->
     setTimeout (=>
       @baseline.call(@)
       @test.call(@, @afterFunction)
-    ), 50
+    ), 100
 
   afterFunction: ->
     @total += @record.call(@)
     setTimeout (=>
       @after.call(@, @testLoop)
-    ), 50
+    ), 100
 
   stop: ->
     setTimeout (=>
@@ -98,7 +98,7 @@ class @Bench
       $(@button).attr('disabled': false) if @button?
       # return control to next bench if present
       @next?.call(@context)
-    ), 50
+    ), 100
 
   processResults: ->
     runtime = if @runs > 0 then @total / @runs else 0
