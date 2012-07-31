@@ -9,6 +9,15 @@
       .fadetop
       .faderight
       .fadebottom
-      .log{:'data-popover' => true, :'data-content' => '', :title => 'Logging'}
+      .log{:'data-toggle' => 'modal', :href => "##{tab}_logModal"}
+
+    .modal.hide.fade{:id => "#{tab}_logModal"}
+      .modal-header
+        %button.close{:'data-dismiss' => 'modal'} x
+        %h3 Logging
+      .modal-body
+      .modal-footer
+        %a.btn{:href => '#', :'data-dismiss' => 'modal'} Close  
+
   .well
     %div{:id => "#{tab}_chartContainer"}

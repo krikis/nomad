@@ -180,7 +180,7 @@ class @Suite
     @stableRuns = 0
     @benchIndex = 0
     # console.log '================================= Suite      ================================='
-    @log "Suite Running..."
+    @log "Suite started..."
     @runBench()
 
   saveChartSetup: ->
@@ -247,8 +247,10 @@ class @Suite
   log: (message) ->
     @logTop ||= 38
     @logTop -= 28
-    @logging ||= $("##{@container}").find('.log')
+    @modal ||= $("##{@container}_logModal .modal-body")
+    @logging ||= $("##{@container} .log")
     last = @logging.children(':last')
+    @modal.prepend $("<span>#{message}</span>")
     @logging.append $("<span>#{message}</span>")
     @logging.animate(
       {top: "#{@logTop}px"},
