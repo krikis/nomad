@@ -1,8 +1,8 @@
 class @Suite
-  
+
   MIN_STABLE_RUNS: 3
   MAX_NR_OF_RUNS: 20
-  
+
   constructor: (options = {}) ->
     @name      = options.name
     @measure   = options.measure   || 'median'
@@ -18,7 +18,18 @@ class @Suite
     @unitLong  = options.unitLong  || 'Milliseconds'
     @benches   = []
     @initChart(options)
-    @initButton(options)
+    @initButtons(options)
+
+  bench: (options = {}) ->
+    options.suite    = @
+    options.chart    ||= @chart
+    options.baseline ||= @baseline
+    options.record   ||= @record
+    options.round    ||= @round
+    options.unit     ||= @unit
+    options.unitLong ||= @unitLong
+    bench = new Bench options
+    @benches.push bench
 
   initChart: (options = {}) ->
     @categories = JSON.parse(localStorage["#{@name}_categories"] || "[]")
@@ -28,7 +39,7 @@ class @Suite
     $("a[href='##{options.container}']").click =>
       unless @running
         @chart?.destroy()
-        setTimeout (=> 
+        setTimeout (=>
           @chart = new Highcharts.Chart @chartConfig(options)
         ), 200
 
@@ -38,7 +49,7 @@ class @Suite
       renderTo: "#{options.container}_chartContainer"
       backgroundColor: 'whiteSmoke'
       type: "bar"
-    title: 
+    title:
       text: options.title
     subtitle:
       text: options.subtitle
@@ -67,7 +78,7 @@ class @Suite
   chartData: ->
     allData = []
     _.each @allSeries, (series) =>
-      currentSeries = 
+      currentSeries =
         name: series
         data: []
       allData.push currentSeries
@@ -76,55 +87,59 @@ class @Suite
           JSON.parse(localStorage["#{@name}_#{series}_#{category}_#{@measure}"] || 0)
         )
     allData
-    
-  initButton: (options = {}) ->
+
+  initButtons: (options = {}) ->
     suite = @
     $("##{options.container} #run").click ->
       unless $(@).attr('disabled')?
         suite.run(@)
-    
-  bench: (options = {}) ->
-    options.suite    = @
-    options.chart    ||= @chart
-    options.baseline ||= @baseline
-    options.record   ||= @record
-    options.round    ||= @round
-    options.unit     ||= @unit
-    options.unitLong ||= @unitLong
-    bench = new Bench options
-    @benches.push bench
-    
+    $("##{options.container} #stop").click ->
+      unless $(@).attr('disabled')?
+        suite.stop(@)
+        
+  stop: (button) ->
+    @running = false
+    @setButtons button
+    @buttonsForIdle()
+
   run: (button) ->
     @running = true
-    @button = button
-    @buttonsForRunning() if @button?
+    @setButtons button
+    @buttonsForRunning()
     @saveChartSetup()
     @runs = 1
     @stableRuns = 0
     @benchIndex = 0
     # console.log '================================= Suite      ================================='
     @runBench()
-  
-  buttonsForRunning: ->
-    button = $(@button)
-    container = button.parent()
-    button.attr('disabled': true)    
     
+  setButtons: (button) ->
+    container   = $(button).parent()
+    @runButton  ||= container.children('#run')
+    @stopButton ||= container.children('#stop')
+
+  buttonsForRunning: ->
+    @runButton?.attr('disabled': true)
+    @stopButton?.attr('disabled': false)
+
   saveChartSetup: ->
     localStorage["#{@name}_categories"] = JSON.stringify @categories
     localStorage["#{@name}_allSeries" ] = JSON.stringify @allSeries
-    
+
   runBench: ->
-    if bench = @benches[@benchIndex]
-      bench.run
-        next:    @nextBench
-        context: @
-        chart: @chart
-        measure: @measure
-        data:    @benchData
-        runs:    @benchRuns
-        timeout:  @timeout
-    
+    if @running
+      if bench = @benches[@benchIndex]
+        bench.run
+          next:    @nextBench
+          context: @
+          chart:   @chart
+          measure: @measure
+          data:    @benchData
+          runs:    @benchRuns
+          timeout: @timeout
+    else
+      @finish()
+
   nextBench: ->
     bench = @benches[@benchIndex]
     # let iteration converge when oscillations become smaller than 1%
@@ -135,7 +150,7 @@ class @Suite
       @runBench()
     else
       @runSuite()
-      
+
   runSuite: ->
     @stableRuns++ unless @rerunSuite
     @rerunSuite = true if @stableRuns < @minStable
@@ -146,14 +161,15 @@ class @Suite
       @runBench()
     else
       @finish()
-    
+
   finish: (timeout = false) ->
-    @running = false
     unless timeout
-      if @runs < @maxRuns
-        console.log "converged after #{@runs} iterations"
+      if not @running
+        console.log "Suite stopped"
+      else if @runs < @maxRuns
+        console.log "Converged after #{@runs} iterations"
       else
-        console.log "maximum number of runs reached"
+        console.log "Maximum number of runs reached"
       console.log new Date
       console.log @benchData if @benchData?
       console.log JSON.stringify @categories
@@ -162,11 +178,12 @@ class @Suite
         key = "#{bench.namespace}_#{bench.key}_stats"
         console.log key
         console.log localStorage[key]
-    @buttonsForIdle() if @button?  
-    
+    @running = false
+    @buttonsForIdle()
+
   buttonsForIdle: ->
-    $(@button).attr('disabled': false)
-    
-    
-    
-    
+    @stopButton?.attr('disabled': true)
+    @runButton?.attr('disabled': false)
+
+
+
