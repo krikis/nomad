@@ -21,6 +21,7 @@ class @Bench
     @runs     = options.runs     || @DEFAULT_NR_OF_RUNS
     @timeout  = options.timeout  || @DEFAULT_TIMEOUT
     @chart    = options.chart
+    @seeds    = options.seeds
     @initStats()
     @initChart()
     @saveStats()
@@ -58,7 +59,7 @@ class @Bench
   run: (options = {}) ->
     @next      = options.next
     @context   = options.context
-    @chart     = options.chart if options.chart
+    @chart     = options.chart   if options.chart
     @benchData = options.data    || 'data70KB'
     @runs      = options.runs    if options.runs
     @timeout   = options.timeout if options.timeout
@@ -103,6 +104,7 @@ class @Bench
     runtime = if @runs > 0 then @total / @runs else 0
     @initStats()
     @updateStats(runtime)
+    @calculateMeasure()
     @redrawChart()
     @saveStats()
 
@@ -111,6 +113,8 @@ class @Bench
       @stats.push Math.round runtime
     else
       @stats.push runtime
+      
+  calculateMeasure: ->
     @previous = @[@measure] || 0
     switch @measure
       when 'mean'
@@ -127,10 +131,19 @@ class @Bench
       @[@measure] = Math.round(value)
     else
       @[@measure] = value
+      
   redrawChart: ->
     seriesIndex = _.indexOf(@allSeries, @series)
     categoryIndex = _.indexOf(@categories, @category)
     @chart.series[seriesIndex].data[categoryIndex].update @[@measure]
+    
+  seed: (options = {}) ->
+    @chart = options.chart
+    @initStats()
+    @stats = @seeds
+    @calculateMeasure()
+    @redrawChart()
+    @saveStats()    
 
   benchmarkData: ->
     switch @benchData

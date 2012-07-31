@@ -32,16 +32,16 @@ class @Suite
     @benches.push bench
 
   initChart: (options = {}) ->
+    container = options.container
     @categories = JSON.parse(localStorage["#{@name}_categories"] || "[]")
     @allSeries  = JSON.parse(localStorage["#{@name}_allSeries" ] || "[]")
-    if "##{options.container}" == localStorage.current or not localStorage.current?
+    if not localStorage.current? and $("##{container}").hasClass('active')
       @chart = new Highcharts.Chart @chartConfig(options)
-    $("a[href='##{options.container}']").click =>
-      unless @running
+    $("a[href='##{container}']").click =>
+      unless @running or @chart?
         @resetChart(options)
         
-  resetChart: (options = {})->    
-    @chart?.destroy()
+  resetChart: (options = {}) ->
     setTimeout (=>
       @chart = new Highcharts.Chart @chartConfig(options)
     ), 200
@@ -124,8 +124,6 @@ class @Suite
   clear: (button) ->  
     @setButtons button
     @clearButton?.attr('disabled': true)
-    @categories = JSON.parse(localStorage["#{@name}_categories"] || "[]")
-    @allSeries  = JSON.parse(localStorage["#{@name}_allSeries" ] || "[]")
     seriesIndex = 0
     _.each @allSeries, (series) =>
       categoryIndex = 0
@@ -140,8 +138,10 @@ class @Suite
   seed: (button) ->  
     @setButtons button
     @seedButton?.attr('disabled': true)
-    _.each @benches, (bench) ->
-      bench.seed()
+    @saveChartSetup()
+    _.each @benches, (bench) =>
+      bench.seed
+        chart: @chart
     @seedButton?.attr('disabled': false)
 
   run: (button) ->

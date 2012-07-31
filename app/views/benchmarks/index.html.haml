@@ -1,6 +1,6 @@
 .tabbable.tabs-below
   %ul.nav.nav-tabs
-    %li
+    %li.active
       %a{:href => '#tab1', :'data-toggle' => 'tab'}
         Network Performance
     %li
@@ -9,12 +9,12 @@
     %li
       %a{:href => '#tab3', :'data-toggle' => 'tab'}
         Memory Footprint
-    %li.active
+    %li
       %a{:href => '#tab4', :'data-toggle' => 'tab'}
         Conflict Resolution
 
   .tab-content
-    #tab1.tab-pane
+    #tab1.tab-pane.active
       = render :partial => 'suite', :locals => {:tab => 'tab1'}
 
     #tab2.tab-pane
@@ -23,7 +23,7 @@
     #tab3.tab-pane
       = render :partial => 'suite', :locals => {:tab => 'tab3'}
 
-    #tab4.tab-pane.active
+    #tab4.tab-pane
       .container
         .row
           .span12
