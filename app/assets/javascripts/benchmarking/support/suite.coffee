@@ -102,11 +102,15 @@ class @Suite
     $("##{options.container} #clear").click ->
       unless $(@).attr('disabled')?
         suite.clear(@)
+    $("##{options.container} #seed").click ->
+      unless $(@).attr('disabled')?
+        suite.seed(@)
 
   setButtons: (button) ->
     container    = $(button).parent()
     @stopButton  ||= container.children('#stop')
     @clearButton ||= container.children('#clear')
+    @seedButton  ||= container.children('#seed')
 
   buttonsForRunning: ->
     $('.run').attr('disabled': true)
@@ -132,6 +136,13 @@ class @Suite
         categoryIndex++
       seriesIndex++
     @clearButton?.attr('disabled': false)
+
+  seed: (button) ->  
+    @setButtons button
+    @seedButton?.attr('disabled': true)
+    _.each @benches, (bench) ->
+      bench.seed()
+    @seedButton?.attr('disabled': false)
 
   run: (button) ->
     @running = true
