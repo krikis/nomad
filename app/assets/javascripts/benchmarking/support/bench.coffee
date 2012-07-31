@@ -20,7 +20,7 @@ class @Bench
     @unitLong = options.unitLong
     @runs     = options.runs     || @DEFAULT_NR_OF_RUNS
     @timeout  = options.timeout  || @DEFAULT_TIMEOUT
-    @chart    = options.chart
+    @chart    = options.chart    if options.chart?
     @seeds    = options.seeds
     @initStats()
     @initChart()
@@ -59,7 +59,7 @@ class @Bench
   run: (options = {}) ->
     @next      = options.next
     @context   = options.context
-    @chart     = options.chart   if options.chart
+    @chart     = options.chart   if options.chart?
     @benchData = options.data    || 'data70KB'
     @runs      = options.runs    if options.runs
     @timeout   = options.timeout if options.timeout
@@ -132,17 +132,22 @@ class @Bench
     else
       @[@measure] = value
       
-  redrawChart: ->
+  redrawChart: (options = {}) ->
+    @chart = options.chart if options.chart?
     seriesIndex = _.indexOf(@allSeries, @series)
     categoryIndex = _.indexOf(@categories, @category)
-    @chart.series[seriesIndex].data[categoryIndex].update @[@measure]
+    animation = options.animation || true
+    @chart.series[seriesIndex].data[categoryIndex].update @[@measure], true, animation
     
   seed: (options = {}) ->
-    @chart = options.chart
+    @chart = options.chart if options.chart?
     @initStats()
     @stats = @seeds
     @calculateMeasure()
-    @redrawChart()
+    @redrawChart
+      animation:
+        duration: 1000
+        easing: 'swing'
     @saveStats()    
 
   benchmarkData: ->

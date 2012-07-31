@@ -38,12 +38,28 @@ class @Suite
     if not localStorage.current? and $("##{container}").hasClass('active')
       @chart = new Highcharts.Chart @chartConfig(options)
     $("a[href='##{container}']").click =>
-      unless @running or @chart?
+      unless @running
         @resetChart(options)
         
   resetChart: (options = {}) ->
+    if @chart?
+      seriesIndex = 0
+      _.each @allSeries, (series) =>
+        categoryIndex = 0
+        _.each @categories, (category) =>
+          @chart.series[seriesIndex].data[categoryIndex].update 0, true, false
+          categoryIndex++
+        seriesIndex++
     setTimeout (=>
-      @chart = new Highcharts.Chart @chartConfig(options)
+      if @chart?
+        _.each @benches, (bench) =>
+          bench.redrawChart
+            chart: @chart
+            animation:
+              duration: 1000
+              easing: 'swing'        
+      else
+        @chart = new Highcharts.Chart @chartConfig(options)
     ), 200
 
   chartConfig: (options = {}) ->
@@ -114,7 +130,15 @@ class @Suite
 
   buttonsForRunning: ->
     $('.run').attr('disabled': true)
+    @clearButton?.attr('disabled': true)
+    @seedButton?.attr('disabled': true)
     @stopButton?.attr('disabled': false)
+
+  buttonsForIdle: ->
+    @stopButton?.attr('disabled': true)
+    $('.run').attr('disabled': false)
+    @clearButton?.attr('disabled': false)
+    @seedButton?.attr('disabled': false)
         
   stop: (button) ->
     @running = false
@@ -130,7 +154,10 @@ class @Suite
       _.each @categories, (category) =>
         localStorage["#{@name}_#{series}_#{category}_#{@measure}"] = 0
         localStorage["#{@name}_#{series}_#{category}_stats"] = "[]"
-        @chart.series[seriesIndex].data[categoryIndex].update 0
+        @chart.series[seriesIndex].data[categoryIndex].update 0, true
+          animation:
+            duration: 1000
+            easing: 'swing'
         categoryIndex++
       seriesIndex++
     @clearButton?.attr('disabled': false)
@@ -215,10 +242,6 @@ class @Suite
         console.log localStorage[key]
     @running = false
     @buttonsForIdle()
-
-  buttonsForIdle: ->
-    @stopButton?.attr('disabled': true)
-    $('.run').attr('disabled': false)
 
 
 
