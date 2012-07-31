@@ -97,13 +97,18 @@ class @Suite
   run: (button) ->
     @running = true
     @button = button
-    $(@button).attr('disabled': true) if @button?
+    @buttonsForRunning() if @button?
     @saveChartSetup()
     @runs = 1
     @stableRuns = 0
     @benchIndex = 0
     # console.log '================================= Suite      ================================='
     @runBench()
+  
+  buttonsForRunning: ->
+    button = $(@button)
+    container = button.parent()
+    button.attr('disabled': true)    
     
   saveChartSetup: ->
     localStorage["#{@name}_categories"] = JSON.stringify @categories
@@ -142,7 +147,7 @@ class @Suite
     else
       @finish()
     
-  finish: (timeout = false)->
+  finish: (timeout = false) ->
     @running = false
     unless timeout
       if @runs < @maxRuns
@@ -157,4 +162,11 @@ class @Suite
         key = "#{bench.namespace}_#{bench.key}_stats"
         console.log key
         console.log localStorage[key]
-    $(@button).attr('disabled': false) if @button?  
+    @buttonsForIdle() if @button?  
+    
+  buttonsForIdle: ->
+    $(@button).attr('disabled': false)
+    
+    
+    
+    
