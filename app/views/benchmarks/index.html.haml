@@ -15,43 +15,19 @@
 
   .tab-content
     #tab1.tab-pane
-      .box
-        %form
-          #buttons
-            #run.btn.btn-primary Run Suite
-            #stop.btn.btn-primary{:disabled => true} Stop Suite
-        .well
-          #tab1_chartContainer
+      = render :partial => 'suite', :locals => {:tab => 'tab1'}
 
     #tab2.tab-pane
-      .box
-        %form
-          #buttons
-            #run.btn.btn-primary Run Suite
-            #stop.btn.btn-primary{:disabled => true} Stop Suite
-        .well
-          #tab2_chartContainer
+      = render :partial => 'suite', :locals => {:tab => 'tab2'}
 
     #tab3.tab-pane
-      .box
-        %form
-          #buttons
-            #run.btn.btn-primary Run Suite
-            #stop.btn.btn-primary{:disabled => true} Stop Suite
-        .well
-          #tab3_chartContainer
+      = render :partial => 'suite', :locals => {:tab => 'tab3'}
 
     #tab4.tab-pane.active
       .container
         .row
           .span12
-            .box
-              %form
-                #buttons
-                  #run.btn.btn-primary Run Suite
-                  #stop.btn.btn-primary{:disabled => true} Stop Suite
-              .well
-                #tab4_chartContainer
+            = render :partial => 'suite', :locals => {:tab => 'tab4'}
         .row
           #attr.span6
             %h1

@@ -90,7 +90,7 @@ class @Suite
 
   initButtons: (options = {}) ->
     suite = @
-    $("##{options.container} #run").click ->
+    $("##{options.container} .run").click ->
       unless $(@).attr('disabled')?
         suite.run(@)
     $("##{options.container} #stop").click ->
@@ -119,7 +119,7 @@ class @Suite
     @stopButton ||= container.children('#stop')
 
   buttonsForRunning: ->
-    @runButton?.attr('disabled': true)
+    $('.run').attr('disabled': true)
     @stopButton?.attr('disabled': false)
 
   saveChartSetup: ->
@@ -138,7 +138,9 @@ class @Suite
           runs:    @benchRuns
           timeout: @timeout
     else
-      @finish()
+      setTimeout (=>
+        @finish()
+      ), 50
 
   nextBench: ->
     bench = @benches[@benchIndex]
@@ -183,7 +185,7 @@ class @Suite
 
   buttonsForIdle: ->
     @stopButton?.attr('disabled': true)
-    @runButton?.attr('disabled': false)
+    $('.run').attr('disabled': false)
 
 
 

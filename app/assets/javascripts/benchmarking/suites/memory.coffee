@@ -8,8 +8,8 @@ suite = @memory = new Suite
     (JSON.stringify(@answer._versioning.patches).length / JSON.stringify(@answer.attributes).length) * 100
   unit:      '%'
   unitLong:  'Portion of original data'
-  benchRuns: 1
-  maxRuns:   1
+  # benchRuns: 1
+  # maxRuns:   1
   
 suite.bench
   category: 'content'
