@@ -1,10 +1,11 @@
 # Override the Backbone.Model constructor and add the
-# on change @addVersion versioning callback to it
+# on change #addVersion versioning callback to it
 Backbone.Model = ((Model) ->
   # Define the new constructor
   Backbone.Model = (attributes, options) ->
     @clientId ||= Nomad.clientId
     Model.apply @, arguments
+    # Bind the versioning callback to the change event
     @on 'change', @addVersion, @
     return
   # Clone static properties
