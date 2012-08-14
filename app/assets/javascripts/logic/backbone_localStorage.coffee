@@ -63,21 +63,28 @@
       @save()
       model
 
-    # Update a model by replacing its copy in `@data`.
+    # Model update (it already has a GUID)
     update: (model) ->
+      # Save model data to localStorage
       @localStorage().setItem @storageKeyFor(model), JSON.stringify(model)
+      # Save the model's versioning record
       @saveVersioningFor(model)
+      # Register the model's id with the collection
       unless _.include(@records, model.id.toString())
         @records.push model.id.toString()
+      # Save the collection
       @save()
       model
 
+    # Persist the model's versioning record
     saveVersioningFor: (model) ->
+      # Initialize versioning if it does not exist
       model.initVersioning()
+      # Store versioning in localStorage
       @localStorage().setItem @versioningKeyFor(model),
                               JSON.stringify(model._versioning)
 
-    # Retrieve a model from `@data` by id.
+    # Retrieve a model by id.
     find: (model) ->
       @setVersioning(model)
       JSON.parse @localStorage().getItem(@storageKeyFor model)
@@ -90,11 +97,13 @@
         JSON.parse @localStorage().getItem(@storageKeyFor id)
       , @).compact().value()
 
+    # revive the versioning records for all models
     setAllVersioning: (collection, options) ->
       _.each(collection.models, (model) =>
         @setVersioning model
       )
 
+    # revive the model's versioning record
     setVersioning: (model) ->
       versioning = JSON.parse @localStorage().
                      getItem(@versioningKeyFor model)
