@@ -23,9 +23,9 @@
     unless options.skipPatch?
       # initialize data version
       @initVersioning()
+      @_versioning.patches ||= []
       if @versioning == 'structured_content_diff'
         # append structured content diff to incremental browser log
-        @_versioning.patches ||= []
         @_versioning.patches.push @_createPatch(@localClock())
       else
         # update existing merged log entry
