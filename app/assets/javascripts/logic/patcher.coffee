@@ -3,12 +3,15 @@ class @Patcher
   constructor: (model) ->
     @model = model
 
+  # update the merged patch object o reflect the latest data change
   updatePatches: ->
+    # initialize patch object should fail to exist
     if not (patch = @model.patches()[0]) or
        patch.base in @model.syncingVersions()
       @model.patches().push
         _patch: {}
         base: @model.localClock() || 0
+    # update the patch object to reflect the latest changes
     @_updatePatchFor(_.last(@model.patches())._patch,
                      @model.changedAttributes(),
                      @model.previousAttributes())

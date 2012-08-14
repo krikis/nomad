@@ -37,15 +37,19 @@
   localClock: ->
     @_versioning.vector[@clientId]
 
+  # create a patch based on a structured content diff
   _createPatch: (base) ->
+    # sort properties to prevent artificial conflicts
     sorted_previous = @_sortPropertiesIn @previousAttributes()
     sorted_attributes = @_sortPropertiesIn @attributes
     dmp = new diff_match_patch
     dmp.Diff_Timeout = 0
+    # create a diff between two versions of the model
     diff = dmp.diff_main JSON.stringify(sorted_previous),
                          JSON.stringify(sorted_attributes)
     patch = dmp.patch_make JSON.stringify(sorted_previous),
                            diff
+    # return a persistence friendly version of the diff and the update base
     patch_text: dmp.patch_toText(patch)
     base: base
 
