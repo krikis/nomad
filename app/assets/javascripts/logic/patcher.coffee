@@ -3,32 +3,42 @@ class @Patcher
   constructor: (model) ->
     @model = model
 
-  # update the merged patch object o reflect the latest data change
+  # update the merged diff object o reflect the latest data change
   updatePatches: ->
-    # initialize patch object should fail to exist
+    # initialize diff object should fail to exist
     if not (patch = @model.patches()[0]) or
        patch.base in @model.syncingVersions()
       @model.patches().push
         _patch: {}
         base: @model.localClock() || 0
-    # update the patch object to reflect the latest changes
+    # update the diff object to reflect the latest changes
     @_updatePatchFor(_.last(@model.patches())._patch,
                      @model.changedAttributes(),
                      @model.previousAttributes())
 
+  # update diff object to reflect current change
   _updatePatchFor: (patch, changed, previous = {}) ->
     _.each changed, (value, attribute) =>
+      # if the property change has not been recorded before
+      # or we have to go into recursion
       if not _.has(patch, attribute) or _.isObject(patch[attribute])
+        # if a data diff rather than the data change itself is needed
         if _.isString(value) and not _.isObject(patch[attribute])
+          # record the original value
           patch[attribute] = previous[attribute]
+        # if the data is an object
         else if _.isObject(value)
+          # calculate the set of changed properties
           changedAttributes = @_changedAttributes(changed[attribute],
                                                   previous[attribute])
           patch[attribute] ||= {}
+          # go into recursion
           @_updatePatchFor(patch[attribute],
                            changedAttributes,
                            previous[attribute])
+        # if only the data change has to be recorded
         else if not _.isObject(patch[attribute])
+          # just store the property key
           patch[attribute] = null
 
   _changedAttributes: (now, previous = {}) ->
