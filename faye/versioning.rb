@@ -30,14 +30,14 @@ module Faye::Versioning
     object = model.find_by_remote_id(version['id'])
     # if the data object already exists on the server
     if object
-      # is the update obsolete?
+      # is the update obsolete? -> discard it
       if object.remote_version.obsoletes? version['version'], client_id
         false
-      # does the update conflict?
+      # does the update conflict? -> report it
       elsif object.remote_version.supersedes? version['version']
         add_update_for(object, results)
         false
-      # persist the update!
+      # else -> persist the update!
       else
         [true, object]
       end
