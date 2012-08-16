@@ -133,7 +133,7 @@
     # process the update
     @[method] attributes
 
-  # determine which update strategy has to be used
+  # determine which update strategy to use
   _updateMethod: (remoteVersion) ->
     switch @_checkVersion(remoteVersion)
       when 'supersedes' then '_forwardTo'
