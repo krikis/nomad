@@ -1,20 +1,24 @@
 @Sync =
+  # compile a message for preventive reconciliation and publish it
   preSync: ->
     message =
       new_versions: @_versionDetails(@_newModels())
       versions: @_versionDetails(@_dirtyModels())
     @fayeClient.publish message
 
+  # collect a model's guid and vector clock
   _versionDetails: (models) ->
     _(models).chain().map((model) ->
       id: model.id
       version: model.version()
     ).value()
 
+  # fetch all models that have never been synced before
   _newModels: () ->
     _(@models).filter (model) ->
       model.hasPatches() and not model.isSynced()
 
+  # fetch all models that have local changes
   _dirtyModels: () ->
     _(@models).filter (model) ->
       model.hasPatches() and model.isSynced()
