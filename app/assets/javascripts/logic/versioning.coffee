@@ -107,6 +107,7 @@
     else
       'precedes'
 
+  # clean up all recorded changes preceding the received data version
   _forwardTo: (attributes) ->
     vectorClock = attributes.remote_version
     patches = _(@_versioning.patches)
@@ -125,10 +126,14 @@
     # think about what to do with the user interface when this happens
     # return @
 
+  # process update received from the server
   processUpdate: (attributes) ->
+    # fetch update method
     method = @_updateMethod(attributes['remote_version'])
+    # process the update
     @[method] attributes
 
+  # determine which update strategy has to be used
   _updateMethod: (remoteVersion) ->
     switch @_checkVersion(remoteVersion)
       when 'supersedes' then '_forwardTo'
@@ -189,10 +194,12 @@
       if not vector[clock]? or value > vector[clock]
         vector[clock] = value
 
+  # update the model to reflect the update pushed from the server
   _update: (attributes) ->
     [version, created_at, updated_at] =
       @_extractVersioning(attributes)
     @set attributes, skipPatch: true
+    # update vector clock to contain remote clock updates
     @_updateVersionTo(version, updated_at)
     @save()
     null
