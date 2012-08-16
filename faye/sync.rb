@@ -1,15 +1,19 @@
 module Faye::Sync
 
+  # collect all updates since the last synchronization phase
   def add_missed_updates(model, timestamp)
     results = init_results
+    # query all updates since the timestamp if present
     objects = if timestamp
       # make sure to skip previous updates that supersede 
       # the timestamp because of rounding errors
       tick_timestamp = Time.zone.parse(timestamp) + 0.001
       model.where(['last_update > ?', tick_timestamp])
+    # else query all models
     else
       model.all
     end
+    # file all updates for unicast
     objects.each do |object|
       add_update_for(object, results['unicast'])
     end
