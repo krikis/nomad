@@ -29,11 +29,14 @@ class @BackboneSync.FayeClient
     message.last_synced ||= @collection.lastSynced()
     @client.publish "/server/" + @modelName, message
 
+  # subscribe collection to synchronization channels
   subscribe: ->
+    # subscribe to multicast channel
     global_channel = "/sync/#{@modelName}"
-    private_channel = "/sync/#{@modelName}/#{@clientId}"
     @client.subscribe global_channel, @receive, @
     @subscriptions.push(global_channel)
+    # subscribe to unicast channel
+    private_channel = "/sync/#{@modelName}/#{@clientId}"
     @client.subscribe private_channel, @receive, @
     @subscriptions.push(private_channel)
     
