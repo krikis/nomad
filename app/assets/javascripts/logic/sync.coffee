@@ -66,27 +66,33 @@
         @_processCreate id, attributes
     ).compact().value()
 
-  # sync all dirty models
+  # sync the data of all models containing local changes
   syncModels: (options = {}) ->
     message =
       updates: @_dataForSync(@_dirtyModels())
       creates: @_dataForSync(@_newModels(), markSynced: true)
+    # if there are any local changes or 
+    # remote changes have not been fetched recently
     unless options['afterPresync']? and
            _.isEmpty(message.updates) and
            _.isEmpty(message.creates)
       @fayeClient.publish message
 
+  # collect all data that has to be synced to the server
   _dataForSync: (models, options = {}) ->
     _(models).chain().map((model) ->
       json = model.toJSON()
+      # mark data version as being synced
       model.updateSyncingVersions()
       delete json.id
+      # collect data for sync
       details =
         id: model.id
         attributes: json
         version: model.version()
         created_at: model.createdAt()
         updated_at: model.updatedAt()
+      # mark object as synced
       if options.markSynced
         model.markAsSynced()
       model.save()

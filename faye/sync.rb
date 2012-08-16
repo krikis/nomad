@@ -73,13 +73,18 @@ module Faye::Sync
     end
   end
 
+  # persist the local update on the master data copy
   def set_attributes(object, attributes, last_update = nil)
+    # persist the GUID
     unless object.remote_id.present?
       object.update_attribute(:remote_id, attributes['id'])
     end
+    # persist the actual data
     object.update_attributes(attributes['attributes'])
+    # persist the data version
     object.update_attribute(:remote_version, attributes['version'])
     object.update_attribute(:last_update, last_update) if last_update
+    # persist the lifecycle timestamps
     object.update_attribute(:created_at, attributes['created_at'])
     object.update_attribute(:updated_at, attributes['updated_at'])
   end
