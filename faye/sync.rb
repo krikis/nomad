@@ -6,7 +6,7 @@ module Faye::Sync
     # query all updates since the timestamp if present
     objects = if timestamp
       # make sure to skip previous updates that supersede 
-      # the timestamp because of rounding errors
+      # the timestamp due to rounding errors
       tick_timestamp = Time.zone.parse(timestamp) + 0.001
       model.where(['last_update > ?', tick_timestamp])
     # else query all models
@@ -85,7 +85,7 @@ module Faye::Sync
     end
     # persist the actual data
     object.update_attributes(attributes['attributes'])
-    # persist the data version
+    # persist the data version and last_update timestamp
     object.update_attribute(:remote_version, attributes['version'])
     object.update_attribute(:last_update, last_update) if last_update
     # persist the lifecycle timestamps
