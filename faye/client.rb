@@ -7,18 +7,22 @@ class ServerSideClient
     @client = client
   end
 
+  # subscribe server-side client to all server synchronization channels
   def subscribe
     @client.subscribe('/server/*') do |message|
+      # hook in the message processing callback 
       on_server_message(message)
     end
   end
 
+  # process synchronization message from browser
   def on_server_message(message)
     # reset db for test purposes
     if message['reset_db']
       error 'Resetting sqlite3 test db...'
       `cp db/test.sqlite3.clean db/test.sqlite3`
       publish_results(message, 'unicast'=> {'_dbReset' => true})
+    # process the synchronized data in the message
     elsif model = message['model_name'].safe_constantize
       if model.respond_to? :find_by_remote_id
         results = add_missed_updates(model, message['last_synced'])
