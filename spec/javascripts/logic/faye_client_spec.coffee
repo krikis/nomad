@@ -203,6 +203,7 @@ describe 'FayeClient', ->
     it 'updates the collection sync state', ->
       @backboneClient.receive
         meta:
+          client: @clientId
           timestamp: 'timestamp'
       expect(@setLastSyncedStub).toHaveBeenCalledWith('timestamp')
 

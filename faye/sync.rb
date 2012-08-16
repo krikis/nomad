@@ -1,8 +1,9 @@
 module Faye::Sync
 
   # collect all updates since the last synchronization phase
-  def add_missed_updates(model, timestamp)
-    results = init_results
+  def add_missed_updates(model, message)
+    timestamp = message['last_synced']
+    results = init_results(message)
     # query all updates since the timestamp if present
     objects = if timestamp
       # make sure to skip previous updates that supersede 
@@ -20,13 +21,15 @@ module Faye::Sync
     results
   end
 
-  def init_results
+  def init_results(message = {})
     time = Time.zone.now
-    {'unicast'   => {'meta'    => {'timestamp' => time,
+    {'unicast'   => {'meta'    => {'client' => message['client_id'],
+                                   'timestamp' => time,
                                    'unicast' => true},
                      'resolve' => [],
                      'update'  => {}},
-     'multicast' => {'meta'    => {'timestamp' => time},
+     'multicast' => {'meta'    => {'client' => message['client_id'],
+                                   'timestamp' => time},
                      'create'  => {},
                      'update'  => {}}}
   end

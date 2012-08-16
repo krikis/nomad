@@ -49,7 +49,7 @@ describe ServerSideClient do
 
         it 'collects all missed updates' do
           message['last_synced'] = 'timestamp'
-          subject.should_receive(:add_missed_updates).with(model, 'timestamp')
+          subject.should_receive(:add_missed_updates).with(model, message)
           subject.on_server_message(message)
         end
 

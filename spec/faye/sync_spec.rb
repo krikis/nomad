@@ -36,25 +36,26 @@ describe Faye::Sync do
 
     it 'queries the model for all recently updated/created objects' do
       model.should_receive(:where).with(['last_update > ?', timestamp + 0.001])
-      subject.add_missed_updates(model, 'timestamp')
+      subject.add_missed_updates(model, {'last_synced' => 'timestamp'})
     end
 
     it 'files each object for sync' do
       unicast = stub
       subject.stub(:init_results => {'unicast' => unicast})
       subject.should_receive(:add_update_for).with(object, unicast)
-      subject.add_missed_updates(model, 'timestamp')
+      subject.add_missed_updates(model, {'last_synced' => 'timestamp'})
     end
 
     context 'when no timestamp is given' do
       it 'queries the model for all objects' do
         model.should_receive(:all)
-        subject.add_missed_updates(model, nil)
+        subject.add_missed_updates(model, {})
       end
     end
 
     it 'returns the results' do
-      subject.add_missed_updates(model, 'timestamp').should eq(results)
+      subject.add_missed_updates(model, {'last_synced' => 'timestamp'}).
+        should eq(results)
     end
   end
 
@@ -69,8 +70,10 @@ describe Faye::Sync do
     end
 
     it 'initializes the unicast meta tag' do
-      subject.init_results['unicast']['meta'].
-        should eq({'timestamp' => time, 'unicast' => true})
+      subject.init_results({'client_id' => 'some_id'})['unicast']['meta'].
+        should eq({'client' => 'some_id',
+                   'timestamp' => time,
+                   'unicast' => true})
     end
 
     it 'initializes the resolve list' do
@@ -86,8 +89,9 @@ describe Faye::Sync do
     end
 
     it 'initializes the multicast meta tag' do
-      subject.init_results['multicast']['meta'].
-        should eq({'timestamp' => time})
+      subject.init_results({'client_id' => 'some_id'})['multicast']['meta'].
+        should eq({'client' => 'some_id',
+                   'timestamp' => time})
     end
 
     it 'initializes the create list' do

@@ -25,7 +25,7 @@ class ServerSideClient
     elsif model = message['model_name'].safe_constantize
       if model.respond_to? :find_by_remote_id
         # collect updates since last synchronization phase
-        results = add_missed_updates(model, message['last_synced'])
+        results = add_missed_updates(model, message)
         # process the synchronization message
         process_message(model, message, results)
         # publish collected updates and synchronization results
