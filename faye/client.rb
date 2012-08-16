@@ -34,12 +34,15 @@ class ServerSideClient
     end
   end
 
+  # publish the results of a synchronization session
   def publish_results(message, results)
+    # publish successfully saved changes to all nodes in the network
     multicast_channel = "/sync/#{message['model_name']}"
     if results['multicast'].andand['create'].present? or
        results['multicast'].andand['update'].present?
       @client.publish(multicast_channel, results['multicast'])
     end
+    # publish detected conflicts or missed updates to the current client only
     if message['client_id'].present?
       unicast_channel = "#{multicast_channel}/#{message['client_id']}"
       if message['new_versions'].present? or
