@@ -105,8 +105,10 @@
 
     # revive the model's versioning record
     setVersioning: (model) ->
+      # parse the serialized versioning record
       versioning = JSON.parse @localStorage().
                      getItem(@versioningKeyFor model)
+      # assign versioning record to model
       model._versioning = versioning if versioning?
 
     # Delete a model from `@data`, returning it.
