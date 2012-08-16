@@ -25,20 +25,23 @@ module Faye::Versioning
     results['unicast']['meta']['preSync'] = true
   end
 
+  # compare the local data version with the version in the master data copy
   def check_version(model, version, client_id, results)
     object = model.find_by_remote_id(version['id'])
+    # if the data object already exists on the server
     if object
-      # Discard update if obsolete
+      # is the update obsolete?
       if object.remote_version.obsoletes? version['version'], client_id
         false
-      # File update for rebase if server version supersedes client version
+      # does the update conflict?
       elsif object.remote_version.supersedes? version['version']
         add_update_for(object, results)
         false
-      # Process the update
+      # persist the update!
       else
         [true, object]
       end
+    # apparently the data object does not (yet) exist in the master copy
     else
       true
     end
