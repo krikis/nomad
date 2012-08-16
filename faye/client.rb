@@ -22,11 +22,13 @@ class ServerSideClient
       error 'Resetting sqlite3 test db...'
       `cp db/test.sqlite3.clean db/test.sqlite3`
       publish_results(message, 'unicast'=> {'_dbReset' => true})
-    # process the synchronized data in the message
     elsif model = message['model_name'].safe_constantize
       if model.respond_to? :find_by_remote_id
+        # collect updates since last synchronization phase
         results = add_missed_updates(model, message['last_synced'])
+        # process the synchronization message
         process_message(model, message, results)
+        # publish collected updates and synchronization results
         publish_results(message, results)
       end
     end

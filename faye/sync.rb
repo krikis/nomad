@@ -27,19 +27,24 @@ module Faye::Sync
                      'update'  => {}}}
   end
 
+  # process a synchronization message
   def process_message(model, message, results)
+    # detect guid conflicts for models that were never synced before
     if message['new_versions'].present?
       handle_new_versions(model, message['new_versions'], results)
     end
+    # detect update conflicts for previously synced models
     if message['versions'].present?
       handle_versions(model,
                       message['versions'],
                       message['client_id'],
                       results)
     end
+    # add newly created model to master data copy
     if message['creates'].present?
       handle_creates(model, message['creates'], results)
     end
+    # add local update of model to master data copy
     if message['updates'].present?
       handle_updates(model,
                      message['updates'],
