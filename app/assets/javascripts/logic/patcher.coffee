@@ -89,7 +89,8 @@ class @Patcher
                     originalValue, currentValue) ->
     if _.isString(currentValue)
       # when a diff can be generated
-      if _.isString(originalValue) and _.isString(attributesToPatch[attribute])
+      if _.isString(originalValue) and 
+         _.isString(attributesToPatch[attribute])
         # patch attribute with diff between original and current
         @_patchString(attribute, attributesToPatch,
                       originalValue, currentValue)
@@ -111,17 +112,25 @@ class @Patcher
       attributesToPatch[attribute] = currentValue
       true
 
-  _patchString: (attribute, attributesToPatch, originalValue, currentValue) ->
+  # patch a string value using the diff 
+  # between the original and current value
+  _patchString: (attribute, attributesToPatch, 
+                 originalValue, currentValue) ->
     diff = @dmp.diff_main originalValue,
                           currentValue
     patch = @dmp.patch_make originalValue,
                             diff
-    [patched_value, results] = @dmp.patch_apply patch,
-                                                attributesToPatch[attribute]
+    # apply the patch
+    [patched_value, results] = @dmp.patch_apply(
+      patch,
+      attributesToPatch[attribute]
+    )
     if false not in results
+      # set the new value on success
       attributesToPatch[attribute] = patched_value
       true
     else
+      # keep the current value when patching fails
       attributesToPatch[attribute] = currentValue
       # TODO: handle failed patch
       false
