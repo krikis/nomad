@@ -164,13 +164,18 @@
     delete attributes.updated_at
     [version, created_at, updated_at]
 
+  # apply recorded patches to new version of the data
   _applyPatchesTo: (dummy) ->
+    # if the incremental log is used
     if @versioning == 'structured_content_diff'
       patches = _(@_versioning.patches)
+      # apply all patches to the new data
       patches.all (patch) =>
         dummy._applyPatch(patch.patch_text)
+    # if a merged diff object is used
     else
       patcher = new Patcher @
+      # apply it to the data
       patcher.applyPatchesTo(dummy)
 
   _applyPatch: (patch_text) ->
