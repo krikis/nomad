@@ -140,14 +140,19 @@
       when 'conflictsWith' then '_rebase'
       when 'precedes' then '_update'
 
+  # resolve a conflicting update by rebasing it on a new data version
   _rebase: (attributes) ->
+    # remove all obsolete entries from the browser log
     @_forwardTo(attributes)
     [version, created_at, updated_at] =
       @_extractVersioning(attributes)
     dummy = new @constructor
     dummy.set attributes
+    # attempt to apply all recorded patches to the new data
     if @_applyPatchesTo dummy
+      # persist the result of re-executing the local update
       @set dummy, skipPatch: true
+      # update the local data version to include the new data version
       @_updateVersionTo(version, updated_at)
       @save()
       return @
@@ -178,15 +183,20 @@
       # apply it to the data
       patcher.applyPatchesTo(dummy)
 
+  # apply a patch to the model
   _applyPatch: (patch_text) ->
     dmp = new diff_match_patch
     dmp.Match_Threshold = 0.3
+    # deserialize the patch
     patch = dmp.patch_fromText(patch_text)
+    # sort the model data properties to prevent artificial conflicts
     sorted_attributes = @_sortPropertiesIn @attributes
     json = JSON.stringify(sorted_attributes)
+    # apply the patch
     [new_json, results] = dmp.patch_apply(patch, json)
     if false not in results
       patched_attributes = JSON.parse(new_json)
+      # save the re-executed update
       @set patched_attributes
       true
     else
