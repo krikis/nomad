@@ -81,7 +81,7 @@ describe 'Patcher', ->
                                @previousAttributes)
       expect(@patch.text).toEqual('previous_text')
 
-    context 'when the patch has the attribute already', ->
+    context 'when the patch already recorded the attribute', ->
       beforeEach ->
         @patch =
           text: 'original_text'
@@ -100,7 +100,7 @@ describe 'Patcher', ->
         expect(@patch.object).toEqual({})
         expect(@patch.other_object).toEqual({})
 
-    context 'when the changed attributes contain an object', ->
+    context 'when the changed attributes concerns an object', ->
       beforeEach ->
         @patch = 
           object: @patchObject = sinon.stub()
@@ -131,7 +131,7 @@ describe 'Patcher', ->
                                {changed: 'attributes'}, 
                                {previous: 'attributes'})
                                
-      context 'and the object is not defined in the patch', ->
+      context 'and the attribute is not recorded in the patch', ->
         beforeEach ->
           @patch = {}
         
@@ -142,12 +142,12 @@ describe 'Patcher', ->
           expect(
             _.isObject(@updatePatchForSpy.getCall(1).args[0])
           ).toBeTruthy()
-
-      context 'and the patch already recorded this object', ->
+          
+      context 'and the patch already recorded this attribute', ->
         beforeEach ->
           @patch =
             object: null
-
+      
         it 'does not recursively update the patch for this object', ->
           @patcher._updatePatchFor(@patch, 
                                    @changedAttributes,

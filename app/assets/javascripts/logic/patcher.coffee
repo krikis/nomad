@@ -19,25 +19,30 @@ class @Patcher
   # update diff object to reflect current change
   _updatePatchFor: (patch, changed, previous = {}) ->
     _.each changed, (value, attribute) =>
+      previousValue = previous[attribute]
+      # when the original value contains a nested object
+      if not _.has(patch, attribute) and _.isObject(previousValue) 
+        # record an empty object
+        patch[attribute] = {}
+      # when recursion is indicated
+      if _.isObject(patch[attribute]) and 
+         _.isObject(previousValue) and 
+         _.isObject(value)
+        # calculate the set of changed properties in the nested object
+        changedAttributes = @_changedAttributes(changed[attribute],
+                                                previousValue)
+        # update the patch for the nested object
+        @_updatePatchFor(patch[attribute],
+                         changedAttributes,
+                         previousValue)
       # when the property change has not been recorded before
-      # or recursion is indicated
-      if not _.has(patch, attribute) or _.isObject(patch[attribute])
-        # when a data diff rather than the data change itself is needed
-        if _.isString(value) and not _.isObject(patch[attribute])
+      if not _.has(patch, attribute)
+        # when a data diff is preferred
+        if _.isString(previousValue)
           # record the original value
-          patch[attribute] = previous[attribute]
-        # when recursion is indicated
-        else if _.isObject(value)
-          # calculate the set of changed properties in the nested object
-          changedAttributes = @_changedAttributes(changed[attribute],
-                                                  previous[attribute])
-          patch[attribute] ||= {}
-          # update the patch for the nested object
-          @_updatePatchFor(patch[attribute],
-                           changedAttributes,
-                           previous[attribute])
-        # if only the data change has to be recorded
-        else if not _.isObject(patch[attribute])
+          patch[attribute] = previousValue
+        # when only the change is relevant
+        else
           # just store the property key
           patch[attribute] = null
 
