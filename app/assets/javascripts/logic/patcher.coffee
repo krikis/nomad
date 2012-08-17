@@ -20,10 +20,20 @@ class @Patcher
   _updatePatchFor: (patch, changed, previous = {}) ->
     _.each changed, (value, attribute) =>
       previousValue = previous[attribute]
-      # when the original value contains a nested object
-      if not _.has(patch, attribute) and _.isObject(previousValue) 
-        # record an empty object
-        patch[attribute] = {}
+      # when the property change has not been recorded before
+      if not _.has(patch, attribute)
+        # when the original value was a nested object
+        if _.isObject(previousValue)
+          # record an empty object
+          patch[attribute] = {}
+        # when a data diff is required
+        else if _.isString(previousValue)
+          # record the original value
+          patch[attribute] = previousValue
+        # when only the change is relevant
+        else
+          # just store the property key
+          patch[attribute] = null
       # when recursion is indicated
       if _.isObject(patch[attribute]) and 
          _.isObject(previousValue) and 
@@ -35,16 +45,6 @@ class @Patcher
         @_updatePatchFor(patch[attribute],
                          changedAttributes,
                          previousValue)
-      # when the property change has not been recorded before
-      if not _.has(patch, attribute)
-        # when a data diff is preferred
-        if _.isString(previousValue)
-          # record the original value
-          patch[attribute] = previousValue
-        # when only the change is relevant
-        else
-          # just store the property key
-          patch[attribute] = null
 
   _changedAttributes: (now, previous = {}) ->
     changed = {}
