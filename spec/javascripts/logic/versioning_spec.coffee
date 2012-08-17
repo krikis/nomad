@@ -520,13 +520,14 @@ describe 'Versioning', ->
       class TestModel extends Backbone.Model
       @model = new TestModel
       @model._versioning =
-        syncingVersions: [1, 2, 1]
+        syncingVersions: [1, 2, 1, 3]
 
-    it 'removes the local clock from the versions being synced', ->
+    it 'removes all entries smaller than or equal to 
+        the local clock from the versions being synced', ->
       vector = {}
-      vector[@model.clientId] = 1
+      vector[@model.clientId] = 2
       @model._finishedSyncing(vector)
-      expect(@model._versioning.syncingVersions).toEqual([2])
+      expect(@model._versioning.syncingVersions).toEqual([3])
 
   describe '#_changeId', ->
     beforeEach ->
