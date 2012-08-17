@@ -117,10 +117,11 @@ class @Patcher
       attributesToPatch[attribute] = currentValue
       true
 
-  # patch a string value using the diff 
-  # between the original and current value
+  # patch a new string value using the diff 
+  # of the original and current value
   _patchString: (attribute, attributesToPatch, 
                  originalValue, currentValue) ->
+    # calculate the diff and patch
     diff = @dmp.diff_main originalValue,
                           currentValue
     patch = @dmp.patch_make originalValue,
