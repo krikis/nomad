@@ -30,7 +30,7 @@ class @Patcher
         else if _.isString(previousValue)
           # record the original value
           patch[attribute] = previousValue
-        # and only the change itself is relevant
+        # and only the fact a change occurred is relevant
         else
           # just record the property key
           patch[attribute] = null
