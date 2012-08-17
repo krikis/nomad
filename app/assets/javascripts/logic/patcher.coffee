@@ -16,23 +16,23 @@ class @Patcher
                      @model.changedAttributes(),
                      @model.previousAttributes())
 
-  # update diff object to reflect current change
+  # update merged diff object to reflect current change
   _updatePatchFor: (patch, changed, previous = {}) ->
     _.each changed, (value, attribute) =>
       previousValue = previous[attribute]
-      # when the property change has not been recorded before
+      # when the property did not change before
       if not _.has(patch, attribute)
-        # when the original value was a nested object
+        # and the original value was a nested object
         if _.isObject(previousValue)
           # record an empty object
           patch[attribute] = {}
-        # when a data diff is required
+        # and a data diff is required
         else if _.isString(previousValue)
           # record the original value
           patch[attribute] = previousValue
-        # when only the change is relevant
+        # and only the change itself is relevant
         else
-          # just store the property key
+          # just record the property key
           patch[attribute] = null
       # when recursion is indicated
       if _.isObject(patch[attribute]) and 
@@ -41,7 +41,7 @@ class @Patcher
         # calculate the set of changed properties in the nested object
         changedAttributes = @_changedAttributes(changed[attribute],
                                                 previousValue)
-        # update the patch for the nested object
+        # and update the merged diff object for these changes
         @_updatePatchFor(patch[attribute],
                          changedAttributes,
                          previousValue)
