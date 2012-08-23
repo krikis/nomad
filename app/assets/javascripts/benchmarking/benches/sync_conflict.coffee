@@ -1,16 +1,20 @@
 Benches = @Benches ||= {}
 
+# setup the environment for benchmarking the synchronization 
+# of a conflicting update
 Benches.setupSyncConflict = (next) ->
-  # delete window.client to speed up tests
+  # delete window.client to speed up benchmark setup
   delete window.client
+  # setup first client
   class Post extends Backbone.Model
   class TestCollection extends Backbone.Collection
     model: Post
   @collection = new TestCollection
+  # instantiate first client event spies
   @createSpy  = sinon.spy(@collection.fayeClient, 'create' )
   @updateSpy  = sinon.spy(@collection.fayeClient, 'update' )
   @Post = Post
-  # create second client
+  # setup second client
   class SecondPost extends Backbone.Model
     clientId: 'second_client'
   class SecondCollection extends Backbone.Collection
@@ -21,33 +25,40 @@ Benches.setupSyncConflict = (next) ->
       @fayeClient = new BackboneSync.FayeClient @,
         modelName: 'Post'
         client: new Faye.Client(FAYE_SERVER)
-  @secondCollection = new SecondCollection
+  @secondCollection = new SecondCollection  
+  # instantiate second client event spies
   @secondCreateSpy  = sinon.spy(@secondCollection.fayeClient, 'create')
   @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
   @dbResetSpy       = sinon.spy(@secondCollection.fayeClient, '_dbReset')  
-  # cleanup localStorage
+  # cleanup browser localStorage for both clients
   @collection._cleanLocalStorage()
   @secondCollection._cleanLocalStorage()
   # clear server data store
   @secondCollection.fayeClient._resetDb()
+  # wait for the second client to be successfully subscribed at the server 
   @waitsFor (->
     @dbResetSpy.callCount >= 1
-  ), 'second client to be in sync', (->
+  ), 'second client to be subscribed', (->
     # reset all spies
     @createSpy.reset()
     @updateSpy.reset()
     @secondCreateSpy.reset()
     @secondUpdateSpy.reset()
     @dbResetSpy.reset()
+    # call the asynchronous benchmark callback
     next.call(@)
   )
   return
 
+# setup conflicting data objects
 Benches.beforeSyncConflict = (next) ->
+  # create data object
   @model = new @Post
     title: 'some_title'
     content: 'some_content'
+  # save it
   @collection.create @model
+  # sync it to the other node in the network
   @collection.syncModels()
   @waitsFor (->
     @createSpy.callCount >= 1 and @secondCreateSpy.callCount >= 1
@@ -65,7 +76,7 @@ Benches.beforeSyncConflict = (next) ->
       @secondUpdateSpy.reset()
       # take the second client back online
       @secondCollection.fayeClient._online()
-      # stub out rebase logic to speed up bench
+      # stub out rebase logic for cleaner measure of network latency
       sinon.stub _.last(@secondCollection.models), '_rebase', (attributes) ->
         [version, created_at, updated_at] =
           @_extractVersioning(attributes)
