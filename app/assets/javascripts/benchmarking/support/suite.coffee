@@ -78,6 +78,7 @@ class @Suite
         text: null
     yAxis:
       min: 0
+      max: options.yMax
       title:
         text: "#{@unit} (#{@unitLong})"
         align: "high"

@@ -91,7 +91,9 @@ Benches.beforeSyncConflict = (next) ->
   return
 
 Benches.syncConflict = (next) ->  
+  # synchronize conflicting update
   @secondCollection.syncModels()
+  # wait for synchronization and conflict resolution completes
   @waitsFor (->
     @updateSpy.callCount >= 1 and @secondUpdateSpy.callCount >= 2
   ), 'final update multicast', (->
