@@ -1,6 +1,7 @@
 Benches = @Benches ||= {}
 
 Benches.setupAttribute50 = (next) ->
+  # define model
   class Answer extends Backbone.Model
     collection:
       url: '/some/url'
@@ -8,19 +9,16 @@ Benches.setupAttribute50 = (next) ->
   next.call @
 
 Benches.beforeAttribute50 = (next) ->
+  # create the original data object
   @answerOriginal = @randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
+  # specify the amount of random change
   deleteCount  = @randomFrom(1, 3)
   changeCount  = @randomFrom(4, 8)
   createCount  = @randomFrom(1, 3)
   textChange   = 15
   stringChange = 5
-  @answer.set @randomVersion(@answerOriginal,
-                             deleteCount,   
-                             changeCount,   
-                             createCount,   
-                             textChange,   
-                             stringChange)
+  # perform the winning data update
   @dummyOriginal = @randomVersion(@answerOriginal,
                                   deleteCount,   
                                   changeCount,   
@@ -28,10 +26,18 @@ Benches.beforeAttribute50 = (next) ->
                                   textChange,   
                                   stringChange)
   @dummy = new @Answer _.deepClone @dummyOriginal
+  # perform the losing data update
+  @answer.set @randomVersion(@answerOriginal,
+                             deleteCount,   
+                             changeCount,   
+                             createCount,   
+                             textChange,   
+                             stringChange)
   next.call @
 
 Benches.attribute50 = (next) ->
   try
+    # resolve the conflict
     if @answer._applyPatchesTo @dummy
       @success = 1
       # console.log '================================= Attribute  ================================='

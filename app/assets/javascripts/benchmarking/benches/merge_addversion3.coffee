@@ -1,5 +1,6 @@
 Benches = @Benches ||= {}
 
+# setup data model
 Benches.setupMergeAddVersion3 = (next) ->
   class Answer extends Backbone.Model
     collection:
@@ -7,10 +8,12 @@ Benches.setupMergeAddVersion3 = (next) ->
   @Answer = Answer
   next.call @
 
+# create data object
 Benches.beforeMergeAddVersion3 = (next) ->
   @answer = new @Answer Benches.fixedAnswer()
   next.call @
 
+# perform three updates on data object 
 Benches.mergeAddVersion3 = (next) ->
   @answer.set Benches.fixedAnswerV1u1()
   @answer.set Benches.fixedAnswerV1u2()

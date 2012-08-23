@@ -1,6 +1,7 @@
 Benches = @Benches ||= {}
 
 Benches.setupAttribute12 = (next) ->
+  # define model
   class Answer extends Backbone.Model
     collection:
       url: '/some/url'
@@ -8,19 +9,16 @@ Benches.setupAttribute12 = (next) ->
   next.call @
 
 Benches.beforeAttribute12 = (next) ->
+  # create the original data version
   @answerOriginal = @randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
+  # specify the amount of random change
   deleteCount  = @randomFrom(0, 1)
   changeCount  = @randomFrom(1, 2)
   createCount  = @randomFrom(0, 1)
   textChange   = 4
   stringChange = 1
-  @answer.set @randomVersion(@answerOriginal,
-                             deleteCount,   
-                             changeCount,   
-                             createCount,   
-                             textChange,   
-                             stringChange)
+  # perform the winning update
   @dummyOriginal = @randomVersion(@answerOriginal,
                                   deleteCount,   
                                   changeCount,   
@@ -28,6 +26,13 @@ Benches.beforeAttribute12 = (next) ->
                                   textChange,   
                                   stringChange)
   @dummy = new @Answer _.deepClone @dummyOriginal
+  # perform the losing update
+  @answer.set @randomVersion(@answerOriginal,
+                             deleteCount,   
+                             changeCount,   
+                             createCount,   
+                             textChange,   
+                             stringChange)
   next.call @
 
 Benches.attribute12 = (next) ->
