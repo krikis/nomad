@@ -12,7 +12,8 @@
       @clientId = '#{request.session_options[:id]}'
     = javascript_include_tag 'benchmarking/sinon.js'
     = javascript_include_tag 'application'
-    = javascript_include_tag 'http://code.highcharts.com/highcharts.js'
+    = javascript_include_tag 'benchmarking/highcharts.js'
+    = javascript_include_tag 'benchmarking/exporting.js'
     = csrf_meta_tags
     = favicon_link_tag
   %body

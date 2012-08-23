@@ -94,6 +94,8 @@ class @Suite
     credits:
       enabled: false
     series: @chartData()
+    exporting:
+      width: 2048
 
   chartData: ->
     allData = []
