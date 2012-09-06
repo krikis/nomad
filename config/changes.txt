@@ -1,0 +1,18 @@
+Abstract: 
+  - what shortcomings?/which issues? 
+    => elaborated on the issues in existing data replication solutions proposed in the literature.
+
+Introduction: 
+  - Please define optimistic replica control. 
+    => elaborated on this in the sentence itself.
+  - "the proposed algorithms" usually refers to your own algorithms 
+    => changed text.
+  - These two conflict resolving algorithms are essentially the core of your work, but neither here nor in the abstract does it become clear to the reader which algorithm is to be preferred and what the main difference is between the two algorithms./I think you should more clearly indicate which parts of your proposed approach are algorithms that existed already, and which parts are the novel additions. Also, clearly indicate the extent of the difference between your two proposed algorithms. 
+    => elaborated on the difference of the two algoritms with existing work, their mutual differences and the outcome of their benchmarks.
+  - Here I would introduce the other chapters as well.
+    => introduced all sections
+
+Related Work:
+  
+  - What does serializable mean in this context? 
+    => elaborated on this in the text.
