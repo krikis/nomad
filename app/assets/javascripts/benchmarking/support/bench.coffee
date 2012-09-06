@@ -384,7 +384,7 @@ class @Bench
     if check.apply(@)
       callback.apply(@) if _.isFunction(callback)
     else if total >= @timeout
-      console.log "Timed out afer #{total} msec waiting for #{message}!"
+      @suite?.log "Timed out afer #{total} msec waiting for #{message}!"
       # gracefully stop
       $(@button).attr('disabled': false) if @button?
       @suite?.finish(true)
