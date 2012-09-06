@@ -70,5 +70,21 @@ Results
   - Assuming that they both fall under preventive reconciliation, do structured content diffs and merged diff objects incur the same network latency?
     => the conflict resolution algorithms have the same network latency. they work the same for traditional and preventive reconciliation
   - Over how many runs did you average? What is the variance of these results?
+    => added footnotes specifying these things
+  - Am I correct in assuming that the structured content diffs use incremental logging and the merged diff object does merged logging?
+    => clarified this in the text
+    
+    
+  - Is this comparison fair? When two things differ too much, a diff/patch approach will fail because it doesn't know what to patch. In your approach for rebasing merged diff objects, you simply overwrite the outdated attributes. In general, you can resolve 100% of the conflicts between two versions by always picking one of them, but this is not always the best result. I think this issue needs to be addressed in the Discussion section.
+    
+    
+  - Does the type of data used in the comparison influence the results? In the previous chapter you mentioned that only for Strings do the merged diff objects use patching, for other values it simply overwrites the outdated data. Since your test data here consists of numbers, there is no patching going on. What if your data here would consist of Strings instead, with a few characters in each String changed randomly so as to simulate updates that could be patched. Would that put the two approaches closer together in terms of performance?
+    
+    
+    
+Discussion
+  - that
+    => fixed
+
 
 
