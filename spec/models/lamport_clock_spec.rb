@@ -2,6 +2,10 @@ require 'spec_helper'
 
 describe LamportClock do
 
+  subject { Fabricate :lamport_clock }
+
+  it { should validate_uniqueness_of(:key) }
+
   describe '.tick_sync_session' do
     it 'creates a new clock with the given key when it does not exist' do
       LamportClock.tick 'sync_session'

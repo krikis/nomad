@@ -1,5 +1,6 @@
 class LamportClock < ActiveRecord::Base
-  # attr_accessible :title, :body
+  attr_accessible :key, :clock
+  validates_uniqueness_of :key
 
   def self.tick(lamport_key)
     lamport = nil
