@@ -13,6 +13,17 @@ Introduction:
     => introduced all sections
 
 Related Work:
-  
+  - This makes more sense if you introduce both approaches at the start. "There are two approaches for …"
+    => rewrote first part of paragraph
   - What does serializable mean in this context? 
     => elaborated on this in the text.
+  - knows = has?
+    => fixed
+  - made/have made
+    => fixed
+  - A lot
+    => fixed
+  - Are you introducing two approaches in this thesis, or is one of the approaches an implementation of an existing approach from the literature?
+    => rewrote paragraph - made difference with existing approaches more explicit
+  - sometimes
+    => fixed
