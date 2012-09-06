@@ -74,7 +74,9 @@ module Faye::Sync
 
   def process_create(model, create, successful_creates)
     object = model.new
-    set_attributes(object, create, successful_creates['meta']['timestamp'])
+    model.transaction do
+      set_attributes(object, create, successful_creates['meta']['timestamp'])
+    end
     if object.valid?
       add_create_for(object, successful_creates)
     end
@@ -102,9 +104,12 @@ module Faye::Sync
 
   def handle_updates(model, updates, client_id, results)
     updates.each do |update|
-      success, object = check_version(model, update, client_id, results['unicast'])
-      if success
-        process_update(model, object, update, results['multicast'])
+      model.transaction do
+        success, object = check_version(model, update,
+                                        client_id, results['unicast'])
+        if success
+          process_update(model, object, update, results['multicast'])
+        end
       end
     end
   end

@@ -7,6 +7,9 @@ class TestModel
 
   def self.where
   end
+
+  def self.transaction
+  end
 end
 
 class KlassWithFayeSync
