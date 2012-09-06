@@ -11,7 +11,12 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120224104216) do
+  create_table "lamport_clocks", :force => true do |t|
+    t.string   "key"
+    t.integer  "clock"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "posts", :force => true do |t|
     t.string   "title"
