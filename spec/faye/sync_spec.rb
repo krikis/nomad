@@ -8,7 +8,8 @@ class TestModel
   def self.where
   end
 
-  def self.transaction
+  def self.transaction(&block)
+    block.call
   end
 end
 
