@@ -37,7 +37,11 @@ Concept:
     => fixed
   - whether
     => fixed
-  - 
-
+  - At this point, I'm not sure which algorithms are part of your proposed approach and which are part of existing approaches.
+    => both are new, this should now be clear in the introduction and related work section
+  - Sentence lacks a verb.
+    => fixed sentence
+  - Why are some URLs included as references and others as footnotes?
+    =>
 
 
