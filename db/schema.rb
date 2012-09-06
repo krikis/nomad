@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120224104216) do
+ActiveRecord::Schema.define(:version => 20120906111018) do
 
   create_table "lamport_clocks", :force => true do |t|
     t.string   "key"
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(:version => 20120224104216) do
     t.string   "content"
     t.string   "remote_id"
     t.text     "remote_version"
-    t.datetime "last_update"
+    t.integer  "last_update"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
   end
