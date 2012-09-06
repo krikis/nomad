@@ -27,3 +27,17 @@ Related Work:
     => rewrote paragraph - made difference with existing approaches more explicit
   - sometimes
     => fixed
+    
+Concept:
+  - built
+    => fixed
+  - Add reference?
+    => reference added for vector clocks
+  - conflict
+    => fixed
+  - whether
+    => fixed
+  - 
+
+
+
