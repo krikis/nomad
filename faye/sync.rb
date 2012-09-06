@@ -19,7 +19,7 @@ module Faye::Sync
   end
 
   def init_results(message = {})
-    lamport_clock = LamportClock.tick 'synchronization_session'
+    lamport_clock = LamportClock.tick message['model_name']
     {'unicast'   => {'meta'    => {'client' => message['client_id'],
                                    'timestamp' => lamport_clock,
                                    'unicast' => true},

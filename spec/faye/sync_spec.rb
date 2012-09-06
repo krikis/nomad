@@ -34,7 +34,7 @@ describe Faye::Sync do
 
     it 'initializes the results hash' do
       subject.should_receive(:init_results)
-      subject.add_missed_updates(model, 'lamport_clock')
+      subject.add_missed_updates(model, {'last_synced' => 'lamport_clock'})
     end
 
     it 'queries the model for all recently updated/created objects' do
@@ -65,6 +65,11 @@ describe Faye::Sync do
   describe '#initresults' do
     let(:time) { stub }
     before { LamportClock.stub(:tick).and_return(time) }
+
+    it 'increments the lamport clock for the message model' do
+      LamportClock.should_receive(:tick).with('Model')
+      subject.init_results 'model_name' => 'Model'
+    end
 
     it 'initializes the unicast message' do
       subject.init_results['unicast'].should be
