@@ -21,33 +21,32 @@ describe Faye::Sync do
   subject { KlassWithFayeSync.new }
 
   describe '#add_missing_updates' do
-    let(:model)     { TestModel }
-    let(:object)    { stub }
-    let(:results)   { stub(:[] => nil) }
-    let(:timestamp) { Time.zone.now }
+    let(:model)         { TestModel }
+    let(:object)        { stub }
+    let(:results)       { stub(:[] => nil) }
+    let(:lamport_clock) { 5 }
     before do
       model.stub(:where => [object])
       model.stub(:all => [])
       subject.stub(:init_results => results,
                    :add_update_for => nil)
-      Time.stub_chain(:zone, :parse => timestamp)
     end
 
     it 'initializes the results hash' do
       subject.should_receive(:init_results)
-      subject.add_missed_updates(model, 'timestamp')
+      subject.add_missed_updates(model, 'lamport_clock')
     end
 
     it 'queries the model for all recently updated/created objects' do
-      model.should_receive(:where).with(['last_update > ?', timestamp + 0.001])
-      subject.add_missed_updates(model, {'last_synced' => 'timestamp'})
+      model.should_receive(:where).with(['last_update > ?', 'lamport_clock'])
+      subject.add_missed_updates(model, {'last_synced' => 'lamport_clock'})
     end
 
     it 'files each object for sync' do
       unicast = stub
       subject.stub(:init_results => {'unicast' => unicast})
       subject.should_receive(:add_update_for).with(object, unicast)
-      subject.add_missed_updates(model, {'last_synced' => 'timestamp'})
+      subject.add_missed_updates(model, {'last_synced' => 'lamport_clock'})
     end
 
     context 'when no timestamp is given' do
@@ -58,16 +57,14 @@ describe Faye::Sync do
     end
 
     it 'returns the results' do
-      subject.add_missed_updates(model, {'last_synced' => 'timestamp'}).
+      subject.add_missed_updates(model, {'last_synced' => 'lamport_clock'}).
         should eq(results)
     end
   end
 
   describe '#initresults' do
     let(:time) { stub }
-    before do
-      Time.stub_chain(:zone, :now => time)
-    end
+    before { LamportClock.stub(:tick).and_return(time) }
 
     it 'initializes the unicast message' do
       subject.init_results['unicast'].should be

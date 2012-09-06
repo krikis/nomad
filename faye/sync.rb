@@ -2,14 +2,11 @@ module Faye::Sync
 
   # collect all updates since the last synchronization phase
   def add_missed_updates(model, message)
-    timestamp = message['last_synced']
+    lamport_clock = message['last_synced']
     results = init_results(message)
     # query all updates since the timestamp if present
-    objects = if timestamp
-      # make sure to skip previous updates that supersede 
-      # the timestamp due to rounding errors
-      tick_timestamp = Time.zone.parse(timestamp) + 0.001
-      model.where(['last_update > ?', tick_timestamp])
+    objects = if lamport_clock
+      model.where(['last_update > ?', lamport_clock])
     # else query all models
     else
       model.all
@@ -22,14 +19,14 @@ module Faye::Sync
   end
 
   def init_results(message = {})
-    time = Time.zone.now
+    lamport_clock = LamportClock.tick 'synchronization_session'
     {'unicast'   => {'meta'    => {'client' => message['client_id'],
-                                   'timestamp' => time,
+                                   'timestamp' => lamport_clock,
                                    'unicast' => true},
                      'resolve' => [],
                      'update'  => {}},
      'multicast' => {'meta'    => {'client' => message['client_id'],
-                                   'timestamp' => time},
+                                   'timestamp' => lamport_clock},
                      'create'  => {},
                      'update'  => {}}}
   end
