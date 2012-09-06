@@ -39,9 +39,36 @@ Concept:
     => fixed
   - At this point, I'm not sure which algorithms are part of your proposed approach and which are part of existing approaches.
     => both are new, this should now be clear in the introduction and related work section
+    
+Realization
   - Sentence lacks a verb.
     => fixed sentence
   - Why are some URLs included as references and others as footnotes?
-    =>
+    => moved to references section
+  - Is @ like 'this' in JavaScript?
+    => yes, added footnote
+  - its
+    => fixed twice
+  - Doesn't this defeat the purpose of using vector clocks?
+    => implemented lamport timestamps for this as previously described in the future work section
+  - Did you mean to highlight this line?
+    => highlight added
+  - It may be important to note here that if there is an update of a client A that was multicasted and caused some conflicts of a client B, whether those conflicts are resolved immediately, or whether the resolving is done lazily. In the former case, one update could lead to a landslide of updates from other clients. This poses the greater question: when does a client initiate the synchronisation process? Is it only initiated manually?
+    => the conflicts are reconciled immediately - changed text to make this clear
+  - finishedSyncing cleans up remaining patches?
+    => the line just above it does - highlight added
+  - Does a diff make sense for anything other than Strings? E.g., if you have a number 404, and you changed it locally to 401 while the server changed it to 500, would a diff on numbers consider the difference and change it to 497? And what do you mean by a diff for booleans?
+    => moved this to the future work section as it required more elaboration
+  - What can cause the application of a patch to fail?
+    => elaborated on this in the text
+  
+Results
+  - The
+    => fixed
+  - to
+    => fixed
+  - Assuming that they both fall under preventive reconciliation, do structured content diffs and merged diff objects incur the same network latency?
+    => the conflict resolution algorithms have the same network latency. they work the same for traditional and preventive reconciliation
+  - Over how many runs did you average? What is the variance of these results?
 
 
