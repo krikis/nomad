@@ -12,6 +12,9 @@
     %li
       %a{:href => '#tab4', :'data-toggle' => 'tab'}
         Conflict Resolution
+    %li
+      %a{:href => '#tab5', :'data-toggle' => 'tab'}
+        Dashboard
 
   .tab-content
     #tab1.tab-pane.active
@@ -35,6 +38,9 @@
           #seri.span6
             %h1
               %small Serialized Object
+
+    #tab5.tab-pane
+      = render :partial => 'dashboard'
 
 :coffeescript
   # record active tab in localStorage

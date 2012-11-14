@@ -157,6 +157,10 @@ class @Bench
       when 'data140KB'
         Benches['data70KB'] +
         Benches['data70KB']
+      when 'data210KB'
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB']
       when 'data280KB'
         Benches['data70KB'] +
         Benches['data70KB'] +
