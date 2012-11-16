@@ -73,8 +73,9 @@ class @Bench
 
   testLoop: () ->
     setTimeout (=>
-      if ++@count <= @runs and not @suite?.stopped()
+      if @count < @runs and not @suite?.stopped()        
         @before.call(@, @testFunction)
+        @count++
       else
         @cleanup.call(@, @stop)
     ), 100
