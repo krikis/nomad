@@ -242,7 +242,7 @@ class @Suite
       @log JSON.stringify @categories
       @log JSON.stringify @chartData()
       _.each @benches, (bench) =>
-        key = "#{bench.namespace}_#{bench.key}_stats"
+        key = "system_#{bench.namespace}_#{bench.key}_stats"
         @log key
         @log localStorage[key]
     @running = false

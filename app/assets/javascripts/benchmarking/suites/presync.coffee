@@ -15,7 +15,7 @@ suite.bench
   test:     Benches.       syncConflict
   after:    Benches.  afterSyncConflict
   cleanup:  Benches.cleanupSyncConflict
-  seeds:    [6187,6203,6210,6230,6232,6240,6242,6257,6264,6267,6282,6316,6321,6328,6330,7036,7036,7037,7040,7045,7046,7047,7048,7097]
+  seeds:    [4653,4655,4683,4696,4700,4709,4728,4735,4737,4737,4748,4774,4818,4862,4977,5016,5021,5027,5272,5272,5340,5531]
 
 suite.bench
   category: 'preventive'
@@ -25,7 +25,7 @@ suite.bench
   test:     Benches.       preSyncConflict
   after:    Benches.  afterPreSyncConflict
   cleanup:  Benches.cleanupPreSyncConflict
-  seeds:    [3398,3420,3420,3426,3428,3429,3438,3447,3459,3461,3466,3492,3494,3496,3502,3757,3881,4004,4005,4005,4005,4005,4005,4255]
+  seeds:    [2654,2680,2680,2701,2704,2711,2713,2719,2720,2722,2730,2735,2736,2736,2753,2762,2828,3004,3004,3004,3018,3022]
 
 suite.bench
   category: 'traditional'
@@ -35,7 +35,7 @@ suite.bench
   test:     Benches.       syncUpdate
   after:    Benches.  afterSyncUpdate
   cleanup:  Benches.cleanupSyncUpdate
-  seeds:    [3527,3549,3581,3604,3612,3615,3615,3624,3625,3653,3667,3707,3766,3836,3889,3942,4036,4037,4037,4038,4286,4291,4299,4308]
+  seeds:    [2556,2570,2579,2587,2597,2600,2600,2606,2612,2613,2613,2628,2642,2646,2737,3015,3019,3020,3021,3023,3034,3128]
 
 suite.bench
   category: 'preventive'
@@ -45,7 +45,7 @@ suite.bench
   test:     Benches.       preSyncUpdate
   after:    Benches.  afterPreSyncUpdate
   cleanup:  Benches.cleanupPreSyncUpdate
-  seeds:    [3501,3547,3629,3640,3647,3650,3652,3684,3686,3695,3707,3733,3741,3746,3914,3920,4083,4255,4255,4255,4255,4255,4263,4505]
+  seeds:    [2623,2624,2631,2642,2646,2658,2659,2665,2675,2696,2696,2711,2723,2735,2989,3004,3005,3005,3013,3077,3505,3507]
 
 suite.bench
   category: 'traditional'
@@ -55,7 +55,7 @@ suite.bench
   test:     Benches.       syncCreate
   after:    Benches.  afterSyncCreate
   cleanup:  Benches.cleanupSyncCreate
-  seeds:    [3387,3389,3394,3403,3410,3412,3412,3416,3427,3428,3430,3430,3432,3434,3455,3459,3482,3774,4030,4032,4037,4043,4046,4046]
+  seeds:    [2594,2613,2614,2615,2617,2624,2628,2628,2633,2636,2638,2653,2658,2708,2721,3020,3020,3020,3022,3040,3129]
 
 suite.bench
   category: 'preventive'
@@ -65,4 +65,4 @@ suite.bench
   test:     Benches.       preSyncCreate
   after:    Benches.  afterPreSyncCreate
   cleanup:  Benches.cleanupPreSyncCreate
-  seeds:    [3656,3657,3662,3665,3730,3738,3739,3742,3746,3756,3844,3850,3853,3920,4214,4254,4254,4255,4255,4255,4255,4257,4367,4409]
+  seeds:    [2597,2637,2651,2652,2655,2655,2661,2665,2668,2682,2686,2695,2779,2844,3004,3004,3004,3006,3009,3015]
