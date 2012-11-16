@@ -3,8 +3,12 @@
   #clearObjects.btn.btn-warning Clear Test Data
   %br/
   %br/
-  #localStorageSize
-  %br/
-  #fayeServer
-  %br/
-  #fayeStatus
+  %p
+    Storage Used:
+    %span.label.label-success#localStorageSize 0%
+  %p
+    FAYE Server Address:
+    %span.label#fayeServer
+  %p
+    FAYE Client Status:
+    %span.label#fayeStatus UNKNOWN
