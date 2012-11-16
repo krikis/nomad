@@ -147,6 +147,9 @@ class @Suite
     @running = false
     @setButtons button
     @buttonsForIdle()
+    
+  stopped: ->
+    not @running
 
   clear: (button) ->
     @setButtons button

@@ -66,14 +66,14 @@ class @Bench
     @button    = options.button
     $(@button).attr('disabled': true) if @button?
     @total = 0
-    @count = @runs
+    @count = 0
     setTimeout (=>
       @setup.call(@, @testLoop)  
     ), 100
 
   testLoop: () ->
     setTimeout (=>
-      if @count--
+      if ++@count <= @runs and not @suite?.stopped()
         @before.call(@, @testFunction)
       else
         @cleanup.call(@, @stop)
@@ -93,7 +93,7 @@ class @Bench
 
   stop: ->
     setTimeout (=>
-      @suite?.log "[#{@category}] [#{@series}] [#{@runs} runs]: #{@total}"
+      @suite?.log "[#{@category}] [#{@series}] [#{@count} runs]: #{@total}"
       @processResults()
       $(@button).attr('disabled': false) if @button?
       # return control to next bench if present
@@ -101,7 +101,7 @@ class @Bench
     ), 100
 
   processResults: ->
-    runtime = if @runs > 0 then @total / @runs else 0
+    runtime = if @count > 0 then @total / @count else 0
     @initStats()
     @updateStats(runtime)
     @calculateMeasure()
@@ -121,7 +121,7 @@ class @Bench
         sum = _.reduce @stats, (memo, value) -> memo + value
         value = sum / @stats.length
       when 'median'
-        stats = @stats.sort(@numerical)
+        stats = @stats.slice().sort(@numerical)
         length = stats.length
         if stats.length % 2 == 0
           value = (stats[(length / 2) - 1] + stats[(length / 2)]) / 2
