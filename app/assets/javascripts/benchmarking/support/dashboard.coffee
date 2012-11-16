@@ -1,5 +1,11 @@
 $('#clearStorage').click ->
   localStorage.clear()
+  
+$('#clearObjects').click ->
+  _.each _.properties(localStorage), (property) ->
+    unless /^system_/.test property
+      localStorage.removeItem(property)
+  
 $('#fayeServer').html(FAYE_SERVER)
 
 $('a').click ->
