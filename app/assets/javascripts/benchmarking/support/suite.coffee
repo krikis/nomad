@@ -178,7 +178,6 @@ class @Suite
     @seedButton?.attr('disabled': false)
 
   run: (button) ->
-    @clearStorage()
     @running = true
     @setButtons button
     @buttonsForRunning()
@@ -195,6 +194,7 @@ class @Suite
     localStorage["system_#{@name}_allSeries" ] = JSON.stringify @allSeries
 
   runBench: ->
+    @clearStorage()
     if @running
       if bench = @benches[@benchIndex]
         bench.run
@@ -230,7 +230,9 @@ class @Suite
       @benchIndex = 0
       @runBench()
     else
-      @finish()
+      setTimeout (->
+          @finish()
+        ), 1000
 
   finish: (timeout = false) ->
     unless timeout
@@ -240,14 +242,17 @@ class @Suite
         @log "Converged after #{@runs} iterations"
       else
         @log "Maximum number of runs reached"
-      @log new Date
-      @log @benchData if @benchData?
-      @log JSON.stringify @categories
-      @log JSON.stringify @chartData()
-      _.each @benches, (bench) =>
-        key = "system_#{bench.namespace}_#{bench.key}_stats"
-        @log key
-        @log localStorage[key]
+      setTimeout (=>  
+          @log "=================== Results ========================"
+          @log new Date
+          @log @benchData if @benchData?
+          @log JSON.stringify @categories
+          @log JSON.stringify @chartData()
+          _.each @benches, (bench) =>
+            key = "system_#{bench.namespace}_#{bench.key}_stats"
+            @log key
+            @log localStorage[key]
+        ), 2000
     @running = false
     @buttonsForIdle()
     

@@ -73,7 +73,9 @@ class @Bench
 
   testLoop: () ->
     setTimeout (=>
-      if @count < @runs and not @suite?.stopped()        
+      if @suite?.stopped() 
+        @stop()
+      else if @count < @runs        
         @before.call(@, @testFunction)
         @count++
       else
@@ -82,14 +84,20 @@ class @Bench
 
   testFunction: ->
     setTimeout (=>
-      @baseline.call(@)
-      @test.call(@, @afterFunction)
+      if @suite?.stopped() 
+        @stop()
+      else  
+        @baseline.call(@)
+        @test.call(@, @afterFunction)
     ), 100
 
   afterFunction: ->
     @total += @record.call(@)
     setTimeout (=>
-      @after.call(@, @testLoop)
+      if @suite?.stopped()
+        @stop()
+      else  
+        @after.call(@, @testLoop)
     ), 100
 
   stop: ->
@@ -390,9 +398,8 @@ class @Bench
       callback.apply(@) if _.isFunction(callback)
     else if total >= @timeout
       @suite?.log "Timed out afer #{total} msec waiting for #{message}!"
-      # gracefully stop
-      $(@button).attr('disabled': false) if @button?
-      @suite?.finish(true)
+      # gracefully restart benchmark
+      @suite?.runBench()
       return
     else
       total += @TIMEOUT_INCREMENT

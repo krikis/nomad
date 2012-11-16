@@ -5,7 +5,7 @@ suite = @preSync = new Suite
   subtitle:  'Network latency during different sync operations'
   benchData: 'data210KB'
   benchRuns: 4
-  timeout:   60000
+  timeout:   1000
 
 suite.bench
   category: 'traditional'
