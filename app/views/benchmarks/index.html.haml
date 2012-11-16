@@ -45,9 +45,9 @@
 :coffeescript
   # record active tab in localStorage
   $('.nav-tabs a').click ->
-    localStorage.current = $(@).attr('href')
+    localStorage.system_current = $(@).attr('href')
   # set active tab from localStorage
   $ ->
-    $("a[href='\#{localStorage.current}']").click()
+    $("a[href='\#{localStorage.system_current}']").click()
 
 = javascript_include_tag 'benchmarking/benches'

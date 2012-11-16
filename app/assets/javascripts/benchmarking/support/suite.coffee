@@ -33,9 +33,9 @@ class @Suite
 
   initChart: (options = {}) ->
     @container = options.container
-    @categories = JSON.parse(localStorage["#{@name}_categories"] || "[]")
-    @allSeries  = JSON.parse(localStorage["#{@name}_allSeries" ] || "[]")
-    if not localStorage.current? and $("##{@container}").hasClass('active')
+    @categories = JSON.parse(localStorage["system_#{@name}_categories"] || "[]")
+    @allSeries  = JSON.parse(localStorage["system_#{@name}_allSeries" ] || "[]")
+    if not localStorage.system_current? and $("##{@container}").hasClass('active')
       @chart = new Highcharts.Chart @chartConfig(options)
     $("a[href='##{@container}']").click =>
       unless @running
@@ -106,7 +106,7 @@ class @Suite
       allData.push currentSeries
       _.each @categories, (category) =>
         currentSeries.data.push(
-          JSON.parse(localStorage["#{@name}_#{series}_#{category}_#{@measure}"] || 0)
+          JSON.parse(localStorage["system_#{@name}_#{series}_#{category}_#{@measure}"] || 0)
         )
     allData
 
@@ -155,8 +155,8 @@ class @Suite
     _.each @allSeries, (series) =>
       categoryIndex = 0
       _.each @categories, (category) =>
-        localStorage["#{@name}_#{series}_#{category}_#{@measure}"] = 0
-        localStorage["#{@name}_#{series}_#{category}_stats"] = "[]"
+        localStorage["system_#{@name}_#{series}_#{category}_#{@measure}"] = 0
+        localStorage["system_#{@name}_#{series}_#{category}_stats"] = "[]"
         @chart.series[seriesIndex].data[categoryIndex].update 0, true
           animation:
             duration: 1000
@@ -175,6 +175,7 @@ class @Suite
     @seedButton?.attr('disabled': false)
 
   run: (button) ->
+    @clearStorage()
     @running = true
     @setButtons button
     @buttonsForRunning()
@@ -187,8 +188,8 @@ class @Suite
     @runBench()
 
   saveChartSetup: ->
-    localStorage["#{@name}_categories"] = JSON.stringify @categories
-    localStorage["#{@name}_allSeries" ] = JSON.stringify @allSeries
+    localStorage["system_#{@name}_categories"] = JSON.stringify @categories
+    localStorage["system_#{@name}_allSeries" ] = JSON.stringify @allSeries
 
   runBench: ->
     if @running
@@ -236,16 +237,21 @@ class @Suite
         @log "Converged after #{@runs} iterations"
       else
         @log "Maximum number of runs reached"
-      # console.log new Date
-      # console.log @benchData if @benchData?
-      # console.log JSON.stringify @categories
-      # console.log JSON.stringify @chartData()
-      # _.each @benches, (bench) =>
-      #   key = "#{bench.namespace}_#{bench.key}_stats"
-      #   console.log key
-      #   console.log localStorage[key]
+      @log new Date
+      @log @benchData if @benchData?
+      @log JSON.stringify @categories
+      @log JSON.stringify @chartData()
+      _.each @benches, (bench) =>
+        key = "#{bench.namespace}_#{bench.key}_stats"
+        @log key
+        @log localStorage[key]
     @running = false
     @buttonsForIdle()
+    
+  clearStorage: ->
+    _.each _.properties(localStorage), (property) ->
+      unless /^system_/.test property
+        localStorage.removeItem(property)
 
   log: (message) ->
     @logTop ||= 38

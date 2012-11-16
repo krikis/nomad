@@ -1,3 +1,4 @@
+# returns all properties owned by an object that are not functions
 _.properties ||= (obj) ->
   throw new TypeError("Invalid object")  if obj isnt Object(obj)
   properties = []

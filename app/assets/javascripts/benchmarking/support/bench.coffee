@@ -29,8 +29,8 @@ class @Bench
   initStats: ->
     @key        = "#{@series}_#{@category}"
     @namespace  = @suite?.name || ""
-    @stats      = JSON.parse(localStorage["#{@namespace}_#{@key}_stats"] || "[]")
-    @[@measure] = JSON.parse(localStorage["#{@namespace}_#{@key}_#{@measure}"] || 0)
+    @stats      = JSON.parse(localStorage["system_#{@namespace}_#{@key}_stats"] || "[]")
+    @[@measure] = JSON.parse(localStorage["system_#{@namespace}_#{@key}_#{@measure}"] || 0)
     @categories = @suite?.categories || []
     @allSeries  = @suite?.allSeries  || []
 
@@ -50,8 +50,8 @@ class @Bench
           series.addPoint 0
 
   saveStats: ->
-    localStorage["#{@namespace}_#{@key}_stats"] = JSON.stringify @stats.sort(@numerical)
-    localStorage["#{@namespace}_#{@key}_#{@measure}"] = JSON.stringify @[@measure]
+    localStorage["system_#{@namespace}_#{@key}_stats"] = JSON.stringify @stats
+    localStorage["system_#{@namespace}_#{@key}_#{@measure}"] = JSON.stringify @[@measure]
     if @suite?
       @suite.categories = @categories
       @suite.allSeries  = @allSeries
