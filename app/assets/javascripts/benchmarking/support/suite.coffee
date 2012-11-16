@@ -195,16 +195,15 @@ class @Suite
 
   runBench: ->
     @clearStorage()
-    if @running
-      if bench = @benches[@benchIndex]
-        bench.run
-          next:    @nextBench
-          context: @
-          chart:   @chart
-          measure: @measure
-          data:    @benchData
-          runs:    @benchRuns
-          timeout: @timeout
+    if @running and bench = @benches[@benchIndex]
+      bench.run
+        next:    @nextBench
+        context: @
+        chart:   @chart
+        measure: @measure
+        data:    @benchData
+        runs:    @benchRuns
+        timeout: @timeout
     else
       setTimeout (=>
         @finish()
@@ -234,25 +233,25 @@ class @Suite
           @finish()
         ), 1000
 
-  finish: (timeout = false) ->
-    unless timeout
-      if not @running
-        @log "Suite stopped"
-      else if @runs < @maxRuns
-        @log "Converged after #{@runs} iterations"
-      else
-        @log "Maximum number of runs reached"
-      setTimeout (=>  
-          @log "=================== Results ========================"
-          @log new Date
-          @log @benchData if @benchData?
-          @log JSON.stringify @categories
-          @log JSON.stringify @chartData()
-          _.each @benches, (bench) =>
-            key = "system_#{bench.namespace}_#{bench.key}_stats"
-            @log key
-            @log localStorage[key]
-        ), 2000
+  finish: (error = undefined) ->
+    if error?
+      @log(error)
+    else if not @running
+      @log "Suite stopped"
+    else if @runs < @maxRuns
+      @log "Converged after #{@runs} iterations"
+    else
+      @log "Maximum number of runs reached"
+    setTimeout (=>  
+        @log "=================== Results ========================"
+        @log new Date
+        @log @benchData if @benchData?
+        @log JSON.stringify @categories
+        @log JSON.stringify @chartData()
+        _.each @benches, (bench) =>
+          key = "system_#{bench.namespace}_#{bench.key}_stats"
+          @log "#{bench.namespace}_#{bench.key}::#{localStorage[key]}"
+      ), 2000
     @running = false
     @buttonsForIdle()
     

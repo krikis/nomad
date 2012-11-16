@@ -68,38 +68,52 @@ class @Bench
     @total = 0
     @count = 0
     setTimeout (=>
-      @setup.call(@, @testLoop)  
+      try
+        @setup.call(@, @testLoop)
+      catch error
+        @handleError error
     ), 100
 
   testLoop: () ->
     setTimeout (=>
-      if @count < @runs and not @suite?.stopped() 
-        @before.call(@, @testFunction)
-        @count++
-      else
-        @cleanup.call(@, @stop)
+      try
+        if @count < @runs and not @suite?.stopped() 
+          @before.call(@, @testFunction)
+          @count++
+        else
+          @cleanup.call(@, @stop)
+      catch error
+        @handleError error
     ), 100
 
   testFunction: ->
     setTimeout (=>
-      @baseline.call(@)
-      @test.call(@, @afterFunction)
+      try
+        @baseline.call(@)
+        @test.call(@, @afterFunction)
+      catch error
+        @handleError error
     ), 100
 
   afterFunction: ->
     @total += @record.call(@)
     setTimeout (=> 
-      @after.call(@, @testLoop)
+      try
+        @after.call(@, @testLoop)
+      catch error
+        @handleError error
     ), 100
 
   stop: ->
     setTimeout (=>
-      @suite?.log "[#{@category}] [#{@series}] [#{@count} runs]: #{@total}"
       @processResults()
       $(@button).attr('disabled': false) if @button?
       # return control to next bench if present
       @next?.call(@context)
     ), 100
+    
+  handleError: (error)->
+    @suite?.finish(error)
 
   processResults: ->
     runtime = if @count > 0 then @total / @count else 0
@@ -109,11 +123,10 @@ class @Bench
     @redrawChart()
     @saveStats()
 
-  updateStats: (runtime) ->
-    if @round
-      @stats.push Math.round runtime
-    else
-      @stats.push runtime
+  updateStats: (runtime) ->  
+    runtime = Math.round runtime if @round
+    @suite?.log "[#{@category}] [#{@series}] [#{@count} runs]: #{runtime}"
+    @stats.push runtime
       
   calculateMeasure: ->
     @previous = @[@measure] || 0
@@ -396,7 +409,10 @@ class @Bench
     else
       total += @TIMEOUT_INCREMENT
       setTimeout (=>
-        @_waitFor.apply(@, [check, callback, message, total])
+        try
+          @_waitFor.apply(@, [check, callback, message, total])
+        catch error
+          @handleError error          
       ), @TIMEOUT_INCREMENT
 
   # Generate four random hex digits.
