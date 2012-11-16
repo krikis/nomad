@@ -73,9 +73,7 @@ class @Bench
 
   testLoop: () ->
     setTimeout (=>
-      if @suite?.stopped() 
-        @stop()
-      else if @count < @runs        
+      if @count < @runs and not @suite?.stopped() 
         @before.call(@, @testFunction)
         @count++
       else
@@ -84,20 +82,14 @@ class @Bench
 
   testFunction: ->
     setTimeout (=>
-      if @suite?.stopped() 
-        @stop()
-      else  
-        @baseline.call(@)
-        @test.call(@, @afterFunction)
+      @baseline.call(@)
+      @test.call(@, @afterFunction)
     ), 100
 
   afterFunction: ->
     @total += @record.call(@)
-    setTimeout (=>
-      if @suite?.stopped()
-        @stop()
-      else  
-        @after.call(@, @testLoop)
+    setTimeout (=> 
+      @after.call(@, @testLoop)
     ), 100
 
   stop: ->
