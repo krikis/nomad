@@ -132,15 +132,9 @@ class @Bench
     @previous = @[@measure] || 0
     switch @measure
       when 'mean'
-        sum = _.reduce @stats, (memo, value) -> memo + value
-        value = sum / @stats.length
+        value = Math.mean(@stats)
       when 'median'
-        stats = @stats.slice().sort(@numerical)
-        length = stats.length
-        if stats.length % 2 == 0
-          value = (stats[(length / 2) - 1] + stats[(length / 2)]) / 2
-        else
-          value = stats[Math.round(length / 2) - 1]
+        value = Math.median(@stats)
     if @round
       @[@measure] = Math.round(value)
     else

@@ -17,7 +17,9 @@
         %h3 Logging
       .modal-body
       .modal-footer
-        %a.btn{:href => '#', :'data-dismiss' => 'modal'} Close  
+        %a.btn{:href => '#', :'data-dismiss' => 'modal'} Close
 
   .well
-    %div{:id => "#{tab}_chartContainer"}
+    .row
+      .span6{:id => "#{tab}_chartContainer"}
+      .span5{:id => "#{tab}_lineChartContainer"}

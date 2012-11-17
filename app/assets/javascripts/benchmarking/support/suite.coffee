@@ -37,6 +37,7 @@ class @Suite
     @allSeries  = JSON.parse(localStorage["system_#{@name}_allSeries" ] || "[]")
     if not localStorage.system_current? and $("##{@container}").hasClass('active')
       @chart = new Highcharts.Chart @chartConfig(options)
+      @lineChart = new Highcharts.Chart @lineChartConfig(options)
     $("a[href='##{@container}']").click =>
       unless @running
         @resetChart(options)
@@ -60,6 +61,7 @@ class @Suite
               easing: 'swing'
       else
         @chart = new Highcharts.Chart @chartConfig(options)
+        @lineChart = new Highcharts.Chart @lineChartConfig(options)
     ), 200
 
   chartConfig: (options = {}) ->
@@ -109,6 +111,50 @@ class @Suite
           JSON.parse(localStorage["system_#{@name}_#{series}_#{category}_#{@measure}"] || 0)
         )
     allData
+      
+  lineChartConfig: (options = {})->
+    unit = @unit
+    chart:
+      renderTo: "#{options.container}_lineChartContainer"
+      backgroundColor: 'whiteSmoke'
+      type: "line"
+    title:
+      text: options.title
+    subtitle:
+      text: options.subtitle
+    xAxis:  
+      tickInterval: 1
+      labels:
+        enabled: false
+    yAxis:
+      min: 0
+      max: options.yMax
+      title:
+        text: "#{@unit} (#{@unitLong})"
+        align: "high"
+      labels:
+        overflow: "justify"
+    tooltip:
+      formatter: ->
+        "#{@series.name}: #{@y} #{unit}"
+    credits:
+      enabled: false
+    series: @lineChartData()
+    exporting:
+      width: 2048    
+  
+  lineChartData: ->  
+    allData = []
+    _.each @allSeries, (series) =>
+      _.each @categories, (category) =>
+        currentSeries =
+          name: "#{series}_#{category}"
+          data: []
+        stats = JSON.parse(localStorage["system_#{@name}_#{series}_#{category}_stats"] || [0])
+        _.each [1...stats.length], (scope)->
+          currentSeries.data.push Math.median(_.first(stats, scope))
+        allData.push currentSeries
+    allData    
 
   initButtons: (options = {}) ->
     suite = @
@@ -274,7 +320,7 @@ class @Suite
           last.css('color', 'white')
       }
     )
-    console.log message
+    console.log message  
 
 
 
