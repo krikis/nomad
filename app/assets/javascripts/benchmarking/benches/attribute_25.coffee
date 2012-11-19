@@ -8,25 +8,25 @@ Benches.setupAttribute25 = (next) ->
   next.call @
 
 Benches.beforeAttribute25 = (next) ->
-  @answerOriginal = @randomObject()
+  @answerOriginal = Util.randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
-  deleteCount  = @randomFrom(0, 2)
-  changeCount  = @randomFrom(1, 4)
-  createCount  = @randomFrom(1, 2)
+  deleteCount  = Util.randomFrom(0, 2)
+  changeCount  = Util.randomFrom(1, 4)
+  createCount  = Util.randomFrom(1, 2)
   textChange   = 8
   stringChange = 3
-  @answer.set @randomVersion(@answerOriginal,
-                             deleteCount,   
-                             changeCount,   
-                             createCount,   
-                             textChange,   
-                             stringChange)
-  @dummyOriginal = @randomVersion(@answerOriginal,
-                                  deleteCount,   
-                                  changeCount,   
-                                  createCount,   
-                                  textChange,   
-                                  stringChange)
+  @answer.set Util.randomVersion(@answerOriginal,
+                                 deleteCount,   
+                                 changeCount,   
+                                 createCount,   
+                                 textChange,   
+                                 stringChange)
+  @dummyOriginal = Util.randomVersion(@answerOriginal,
+                                      deleteCount,   
+                                      changeCount,   
+                                      createCount,   
+                                      textChange,   
+                                      stringChange)
   @dummy = new @Answer _.deepClone @dummyOriginal
   next.call @
 

@@ -9,25 +9,25 @@ Benches.setupSerialized50 = (next) ->
   next.call @
 
 Benches.beforeSerialized50 = (next) ->
-  @answerOriginal = @randomObject()
+  @answerOriginal = Util.randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
-  deleteCount  = @randomFrom(1, 3)
-  changeCount  = @randomFrom(4, 8)
-  createCount  = @randomFrom(1, 3)
+  deleteCount  = Util.randomFrom(1, 3)
+  changeCount  = Util.randomFrom(4, 8)
+  createCount  = Util.randomFrom(1, 3)
   textChange   = 15
   stringChange = 5
-  @answer.set @randomVersion(@answerOriginal,
-                             deleteCount,   
-                             changeCount,   
-                             createCount,   
-                             textChange,   
-                             stringChange)
-  @dummyOriginal = @randomVersion(@answerOriginal,
-                                  deleteCount,   
-                                  changeCount,   
-                                  createCount,   
-                                  textChange,   
-                                  stringChange)
+  @answer.set Util.randomVersion(@answerOriginal,
+                                 deleteCount,   
+                                 changeCount,   
+                                 createCount,   
+                                 textChange,   
+                                 stringChange)
+  @dummyOriginal = Util.randomVersion(@answerOriginal,
+                                      deleteCount,   
+                                      changeCount,   
+                                      createCount,   
+                                      textChange,   
+                                      stringChange)
   @dummy = new @Answer _.deepClone @dummyOriginal
   next.call @
 

@@ -10,29 +10,29 @@ Benches.setupAttribute50 = (next) ->
 
 Benches.beforeAttribute50 = (next) ->
   # create the original data object
-  @answerOriginal = @randomObject()
+  @answerOriginal = Util.randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
   # specify the amount of random change
-  deleteCount  = @randomFrom(1, 3)
-  changeCount  = @randomFrom(4, 8)
-  createCount  = @randomFrom(1, 3)
+  deleteCount  = Util.randomFrom(1, 3)
+  changeCount  = Util.randomFrom(4, 8)
+  createCount  = Util.randomFrom(1, 3)
   textChange   = 15
   stringChange = 5
   # perform the winning data update
-  @dummyOriginal = @randomVersion(@answerOriginal,
-                                  deleteCount,   
-                                  changeCount,   
-                                  createCount,   
-                                  textChange,   
-                                  stringChange)
+  @dummyOriginal = Util.randomVersion(@answerOriginal,
+                                      deleteCount,   
+                                      changeCount,   
+                                      createCount,   
+                                      textChange,   
+                                      stringChange)
   @dummy = new @Answer _.deepClone @dummyOriginal
   # perform the losing data update
-  @answer.set @randomVersion(@answerOriginal,
-                             deleteCount,   
-                             changeCount,   
-                             createCount,   
-                             textChange,   
-                             stringChange)
+  @answer.set Util.randomVersion(@answerOriginal,
+                                 deleteCount,   
+                                 changeCount,   
+                                 createCount,   
+                                 textChange,   
+                                 stringChange)
   next.call @
 
 Benches.attribute50 = (next) ->

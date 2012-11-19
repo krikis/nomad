@@ -28,7 +28,7 @@ Benches.setupSyncCreate = (next) ->
   @secondCollection._cleanLocalStorage()
   # clear server data store
   @secondCollection.fayeClient._resetDb()
-  @waitsFor (->
+  Util.waitsFor (->
     @dbResetSpy.callCount >= 1
   ), 'second client to be in sync', (->
     # reset all spies
@@ -42,14 +42,14 @@ Benches.setupSyncCreate = (next) ->
 Benches.beforeSyncCreate = (next) ->
   @model = new @Post
     title: 'some_title'
-    content: @benchmarkData()
+    content: Util.benchmarkData()
   @collection.create @model
   next.call(@)
   return
 
 Benches.syncCreate = (next) ->
   @collection.syncModels()
-  @waitsFor (->
+  Util.waitsFor (->
     @createSpy.callCount >= 1 and @secondCreateSpy.callCount >= 1
   ), 'create multicast', (->
     next.call(@)
