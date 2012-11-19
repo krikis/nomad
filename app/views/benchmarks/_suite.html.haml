@@ -1,10 +1,32 @@
 .box
   %form
     .buttons
-      .run.btn.btn-primary Run Suite
-      #stop.btn{:disabled => true} Stop Suite
-      #clear.btn Clear Chart
-      #seed.btn Seed Chart
+      .btn-group
+        #stop.btn{:disabled => true} Stop Suite
+        #clear.btn Clear Chart
+        #seed.btn Seed Chart
+    .buttons
+      .btn-group
+        .btn.btn-primary.run Run Suite
+        .btn.btn-primary.dropdown-toggle{:'data-toggle' => 'dropdown'}
+          .caret
+        %ul.dropdown-menu
+          %li
+            %a#data{href: '#'}
+              %i.icon-
+              Raw Data
+          %li
+            %a#mean{href: '#'}
+              %i.icon-
+              Running Mean
+          %li
+            %a#median{href: '#'}
+              %i.icon-
+              Running Median
+          %li
+            %a#results{href: '#'}
+              %i.icon-ok
+              Final Results
     .logcontainer
       .fadetop
       .faderight
@@ -20,6 +42,4 @@
         %a.btn{:href => '#', :'data-dismiss' => 'modal'} Close
 
   .well
-    .row
-      .span6{:id => "#{tab}_chartContainer"}
-      .span5{:id => "#{tab}_lineChartContainer"}
+    %div{:id => "#{tab}_chartContainer"}

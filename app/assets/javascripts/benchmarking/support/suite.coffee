@@ -5,6 +5,10 @@ class @Suite
 
   constructor: (options = {}) ->
     @name      = options.name
+    @container = options.container
+    @title     = options.title
+    @subtitle  = options.subtitle
+    @yMax      = options.yMax
     @measure   = options.measure   || 'median'
     @benchData = options.benchData
     @benchRuns = options.benchRuns
@@ -17,7 +21,8 @@ class @Suite
     @unit      = options.unit      || 'ms'
     @unitLong  = options.unitLong  || 'Milliseconds'
     @benches   = []
-    @initChart(options)
+    @_initChartSetup()
+    @_drawChart()
     @initButtons(options)
 
   bench: (options = {}) ->
@@ -30,137 +35,90 @@ class @Suite
     options.unitLong ||= @unitLong
     bench = new Bench options
     @benches.push bench
+    category = bench.getCategory()
+    series = bench.getSeries()
+    unless category in @categories
+      @categories.push category 
+    unless series in @allSeries
+      @allSeries.push series
+    @_saveChartSetup()
+    @chart?.addBench
+      series: series
+      category: category
 
-  initChart: (options = {}) ->
-    @container = options.container
-    @categories = JSON.parse(localStorage["system_#{@name}_categories"] || "[]")
-    @allSeries  = JSON.parse(localStorage["system_#{@name}_allSeries" ] || "[]")
+  _initChartSetup: ->
+    @chartType = localStorage["system_#{@name}_chartType"] || 'finalResults'
+    @categories = []
+    @allSeries  = []
+    
+  _saveChartSetup: ->  
+    localStorage["system_#{@name}_chartType"] = @chartType
+
+  _drawChart: ->
     if not localStorage.system_current? and $("##{@container}").hasClass('active')
-      @chart = new Highcharts.Chart @chartConfig(options)
-      @lineChart = new Highcharts.Chart @lineChartConfig(options)
+      @chart = new Chart(@_chartOptions())
     $("a[href='##{@container}']").click =>
       unless @running
-        @resetChart(options)
+        if not @chart
+          setTimeout (=>   
+              @chart = new Chart(@_chartOptions())
+            ), 200
+        else
+          @chart.redraw(data: @_chartData())
 
-  resetChart: (options = {}) ->
-    if @chart?
-      seriesIndex = 0
-      _.each @allSeries, (series) =>
-        categoryIndex = 0
-        _.each @categories, (category) =>
-          @chart.series[seriesIndex].data[categoryIndex].update 0, true, false
-          categoryIndex++
-        seriesIndex++
-    setTimeout (=>
-      if @chart?
-        _.each @benches, (bench) =>
-          bench.redrawChart
-            chart: @chart
-            animation:
-              duration: 1000
-              easing: 'swing'
-      else
-        @chart = new Highcharts.Chart @chartConfig(options)
-        @lineChart = new Highcharts.Chart @lineChartConfig(options)
-    ), 200
+  _chartOptions: ->  
+    namespace: @name
+    chartType: @chartType
+    container: @container
+    title: @title
+    subtitle: @subtitle
+    yMax: @yMax
+    unit: @unit
+    unitLong: @unitLong
+    allSeries: @allSeries
+    categories: @categories
+    data: @_chartData()
+    
+  _chartData: ->
+    data = {}
+    _.each @benches, (bench) ->
+      data[bench.getSeries()] ||= {}
+      data[bench.getSeries()][bench.getCategory()] = bench.getStats()
+    data
 
-  chartConfig: (options = {}) ->
-    unit = @unit
-    chart:
-      renderTo: "#{options.container}_chartContainer"
-      backgroundColor: 'whiteSmoke'
-      type: "bar"
-    title:
-      text: options.title
-    subtitle:
-      text: options.subtitle
-    xAxis:
-      categories: @categories
-      title:
-        text: null
-    yAxis:
-      min: 0
-      max: options.yMax
-      title:
-        text: "#{@unit} (#{@unitLong})"
-        align: "high"
-      labels:
-        overflow: "justify"
-    tooltip:
-      formatter: ->
-        "#{@x} #{@series.name}: #{@y} #{unit}"
-    plotOptions:
-      bar:
-        dataLabels:
-          enabled: true
-    credits:
-      enabled: false
-    series: @chartData()
-    exporting:
-      width: 2048
-
-  chartData: ->
-    allData = []
-    _.each @allSeries, (series) =>
-      currentSeries =
-        name: series
-        data: []
-      allData.push currentSeries
-      _.each @categories, (category) =>
-        currentSeries.data.push(
-          JSON.parse(localStorage["system_#{@name}_#{series}_#{category}_#{@measure}"] || 0)
-        )
-    allData
-      
-  lineChartConfig: (options = {})->
-    unit = @unit
-    chart:
-      renderTo: "#{options.container}_lineChartContainer"
-      backgroundColor: 'whiteSmoke'
-      type: "line"
-    title:
-      text: options.title
-    subtitle:
-      text: options.subtitle
-    xAxis:  
-      tickInterval: 1
-      labels:
-        enabled: false
-    yAxis:
-      min: 0
-      max: options.yMax
-      title:
-        text: "#{@unit} (#{@unitLong})"
-        align: "high"
-      labels:
-        overflow: "justify"
-    tooltip:
-      formatter: ->
-        "#{@series.name}: #{@y} #{unit}"
-    credits:
-      enabled: false
-    series: @lineChartData()
-    exporting:
-      width: 2048    
-  
-  lineChartData: ->  
-    allData = []
-    _.each @allSeries, (series) =>
-      _.each @categories, (category) =>
-        currentSeries =
-          name: "#{series}_#{category}"
-          data: []
-        stats = JSON.parse(localStorage["system_#{@name}_#{series}_#{category}_stats"] || [0])
-        _.each [1...stats.length], (scope)->
-          currentSeries.data.push Math.median(_.first(stats, scope))
-        allData.push currentSeries
-    allData    
-
+  rawData: ->
+    @chartType = 'rawData'
+    @_saveChartSetup()
+    @chart = new Chart(@_chartOptions())
+    
+  runningMedian: ->
+    @chartType = 'runningMedian'
+    @_saveChartSetup()
+    @chart = new Chart(@_chartOptions())
+    
+  runningMean: ->
+    @chartType = 'runningMean'
+    @_saveChartSetup()
+    @chart = new Chart(@_chartOptions())
+    
+  finalResults: ->
+    @chartType = 'finalResults'
+    @_saveChartSetup()
+    @chart = new Chart(@_chartOptions())
+    
   initButtons: (options = {}) ->
     suite = @
     $("##{options.container} .run").click ->
       unless $(@).attr('disabled')?
         suite.run(@)
+    $("##{options.container} #data").click ->
+      suite.rawData()
+    $("##{options.container} #mean").click ->
+      suite.runningMean()
+    $("##{options.container} #median").click ->
+      suite.runningMedian()
+    $("##{options.container} #results").click ->
+      suite.finalResults()
     $("##{options.container} #stop").click ->
       unless $(@).attr('disabled')?
         suite.stop(@)
@@ -172,10 +130,10 @@ class @Suite
         suite.seed(@)
 
   setButtons: (button) ->
-    container    = $(button).parent()
-    @stopButton  ||= container.children('#stop')
-    @clearButton ||= container.children('#clear')
-    @seedButton  ||= container.children('#seed')
+    container    = $(button).parent().parent().parent()
+    @stopButton  ||= container.find('#stop')
+    @clearButton ||= container.find('#clear')
+    @seedButton  ||= container.find('#seed')
 
   buttonsForRunning: ->
     $('.run').attr('disabled': true)
@@ -200,27 +158,17 @@ class @Suite
   clear: (button) ->
     @setButtons button
     @clearButton?.attr('disabled': true)
-    seriesIndex = 0
-    _.each @allSeries, (series) =>
-      categoryIndex = 0
-      _.each @categories, (category) =>
-        localStorage["system_#{@name}_#{series}_#{category}_#{@measure}"] = 0
-        localStorage["system_#{@name}_#{series}_#{category}_stats"] = "[]"
-        @chart.series[seriesIndex].data[categoryIndex].update 0, true
-          animation:
-            duration: 1000
-            easing: 'swing'
-        categoryIndex++
-      seriesIndex++
+    _.each @benches, (bench) ->
+      bench.clearStats()
+    @chart.clear(true)
     @clearButton?.attr('disabled': false)
 
   seed: (button) ->
     @setButtons button
     @seedButton?.attr('disabled': true)
-    @saveChartSetup()
-    _.each @benches, (bench) =>
-      bench.seed
-        chart: @chart
+    _.each @benches, (bench) ->
+      bench.seed()
+    @chart.redraw(data: @_chartData())
     @seedButton?.attr('disabled': false)
 
   run: (button) ->
@@ -234,10 +182,6 @@ class @Suite
     # console.log '================================= Suite      ================================='
     @log "Suite started..."
     @runBench()
-
-  saveChartSetup: ->
-    localStorage["system_#{@name}_categories"] = JSON.stringify @categories
-    localStorage["system_#{@name}_allSeries" ] = JSON.stringify @allSeries
 
   runBench: ->
     @clearStorage()

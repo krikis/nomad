@@ -19,7 +19,6 @@ $('a').click ->
         'label-warning'
       else
         'label-important'
-      console.log className
       usedLabel = $('#localStorageSize')
       usedLabel.html("#{used}%")
       usedLabel.removeClass()

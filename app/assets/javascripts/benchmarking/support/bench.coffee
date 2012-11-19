@@ -29,10 +29,16 @@ class @Bench
   initStats: ->
     @key        = "#{@series}_#{@category}"
     @namespace  = @suite?.name || ""
-    @stats      = @stats()
+    @stats      = @getStats()
     
-  stats: ()-> 
+  getStats: -> 
     JSON.parse(localStorage["system_#{@namespace}_#{@key}_stats"] || "[]")
+    
+  getSeries: ->
+    @series
+    
+  getCategory: ->
+    @category
 
   initChart: ->
     unless @series in @allSeries
@@ -51,6 +57,13 @@ class @Bench
 
   saveStats: ->
     localStorage["system_#{@namespace}_#{@key}_stats"] = JSON.stringify @stats
+    
+  clearStats: ->
+    localStorage["system_#{@namespace}_#{@key}_stats"] = JSON.stringify []
+
+  seed: ->
+    @stats = @seeds
+    @saveStats()
 
   run: (options = {}) ->
     @next      = options.next
@@ -134,32 +147,6 @@ class @Bench
     if @round
       @[@measure] = Math.round(value)
     else
-      @[@measure] = value
-      
-  redrawChart: (options = {}) ->
-    @chart = options.chart if options.chart?
-    seriesIndex = _.indexOf(@allSeries, @series)
-    categoryIndex = _.indexOf(@categories, @category)
-    animation = options.animation || true
-    if @suite?.chartType == 'finalResults'
-      @chart.series[seriesIndex].data[categoryIndex].update @[@measure], true, animation
-    else
-      @chart.series[seriesIndex + categoryIndex].addPoint @[@measure], true, false, animation
-      
-  seed: ->
-    @stats = @seeds
-    @saveStats()  
-    
-  # seed: (options = {}) ->
-  #   @chart = options.chart if options.chart?
-  #   @initStats()
-  #   @stats = @seeds
-  #   @calculateMeasure()
-  #   @redrawChart
-  #     all: true
-  #     animation:
-  #       duration: 1000
-  #       easing: 'swing'
-  #   @saveStats()    
+      @[@measure] = value   
 
 
