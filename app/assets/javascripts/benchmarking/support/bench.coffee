@@ -23,7 +23,6 @@ class @Bench
     @chart    = options.chart    if options.chart?
     @seeds    = options.seeds
     @initStats()
-    # @initChart()
     @saveStats()
 
   initStats: ->
@@ -39,21 +38,6 @@ class @Bench
     
   getCategory: ->
     @category
-
-  initChart: ->
-    unless @series in @allSeries
-      @allSeries.push @series
-      @chart?.addSeries
-        name: @series
-        data: []
-    unless @category in @categories
-      @categories.push @category
-      @chart.xAxis[0].setCategories @categories if @chart?
-    if @chart?
-      seriesIndex = 0
-      _.each @chart.series, (series) =>
-        while series.data.length < @categories.length
-          series.addPoint 0
 
   saveStats: ->
     localStorage["system_#{@namespace}_#{@key}_stats"] = JSON.stringify @stats
@@ -118,18 +102,19 @@ class @Bench
       @processResults()
       $(@button).attr('disabled': false) if @button?
       # return control to next bench if present
-      @next?.call(@context)
+      @next?.call(@context, @count > 0)
     ), 100
     
   handleError: (error)->
     @suite?.finish(error)
 
   processResults: ->
-    runtime = if @count > 0 then @total / @count else 0
-    @initStats()
-    @updateStats(runtime)
-    @calculateMeasure()
-    @saveStats()
+    if @count > 0 
+      runtime = @total / @count
+      @initStats()
+      @updateStats(runtime)
+      @calculateMeasure()
+      @saveStats()
 
   updateStats: (runtime) ->  
     runtime = Math.round runtime if @round

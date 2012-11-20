@@ -30,14 +30,14 @@ class @Chart
         name: "#{series}_#{category}"
         data: []
     
-  addDataPoint: (series, category, data, animation = true, reset = false)->      
+  addDataPoint: (series, category, data, animation = true, reset = false)->   
     seriesIndex = _.indexOf(@allSeries, series)
     categoryIndex = _.indexOf(@categories, category)
     if @chartType == 'finalResults'
       @chart.series[seriesIndex].data[categoryIndex].
         update Math.median(data || [], @round) || 0, true, animation
     else
-      if reset?
+      if reset
         data = if @chartType == 'rawData'
           data
         else if @chartType == 'runningMean'

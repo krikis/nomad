@@ -213,14 +213,15 @@ class @Suite
         @finish()
       ), 50
 
-  nextBench: ->
+  nextBench: (updateChart = true)->
     bench = @benches[@benchIndex]
     # let iteration converge when oscillations become smaller than 1%
     if Math.abs(bench.previous - bench[@measure]) > bench[@measure] / 100
       @rerunSuite = true
-    @chart.addDataPoint(bench.getSeries(),
-                        bench.getCategory(),
-                        bench.getStats())
+    if updateChart
+      @chart.addDataPoint(bench.getSeries(),
+                          bench.getCategory(),
+                          bench.getStats())
     @benchIndex++
     if @benchIndex < @benches.length
       @runBench()
@@ -254,10 +255,8 @@ class @Suite
         @log new Date
         @log @benchData if @benchData?
         @log JSON.stringify @categories
-        @log JSON.stringify @chartData()
         _.each @benches, (bench) =>
-          key = "system_#{bench.namespace}_#{bench.key}_stats"
-          @log "#{bench.namespace}_#{bench.key}::#{localStorage[key]}"
+          @log "#{bench.namespace}_#{bench.key}::#{JSON.stringify bench.getStats()}"
       ), 2000
     @running = false
     @buttonsForIdle()
