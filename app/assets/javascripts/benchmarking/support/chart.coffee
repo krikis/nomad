@@ -5,7 +5,11 @@ class @Chart
     @chartType = options.chartType
     @allSeries = options.allSeries
     @categories = options.categories
+    @round = options.round
     @chart = new Highcharts.Chart @_chartConfig(options)
+    
+  destroy: ->
+    @chart?.destroy()
       
   addBench: (options = {})->
     if options.category? and options.category not in @categories
@@ -26,30 +30,45 @@ class @Chart
         name: "#{series}_#{category}"
         data: []
     
-  addDataPoint: (series, category, data, animation = true)->  
+  addDataPoint: (series, category, data, animation = true, reset = false)->  
     seriesIndex = _.indexOf(@allSeries, series)
     categoryIndex = _.indexOf(@categories, category)
     if @chartType == 'finalResults'
       @chart.series[seriesIndex].data[categoryIndex].
-        update Math.median(data || []) || 0, true, animation
+        update Math.median(data || [], @round) || 0, true, animation
     else
-      point = if @chartType == 'rawData'
-        _.last(data)
-      else if @chartType == 'runningMean'
-        Math.mean(data)
+      if reset?
+        data = if @chartType == 'rawData'
+          data
+        else if @chartType == 'runningMean'
+          Math.runningMean(data, @round)
+        else
+          Math.runningMedian(data, @round)
+        if data?
+          @chart.series[seriesIndex * @categories.length + categoryIndex].
+            setData data
       else
-        Math.median(data)
-      if point?
-        @chart.series[seriesIndex * @categories.length + categoryIndex].
-          addPoint point, true, false, animation
+        point = if @chartType == 'rawData'
+          _.last(data)
+        else if @chartType == 'runningMean'
+          Math.mean(data, @round)
+        else
+          Math.median(data, @round)
+        if point?
+          @chart.series[seriesIndex * @categories.length + categoryIndex].
+            addPoint point, true, false, animation
         
   clear: (animation = false)->
     _.each @allSeries, (series) =>
       _.each @categories, (category) =>
+        seriesIndex = _.indexOf(@allSeries, series)
+        categoryIndex = _.indexOf(@categories, category)
         if @chartType == 'finalResults'
-          @addDataPoint(series, category, [0], animation)
+          @chart.series[seriesIndex].data[categoryIndex].
+            update 0, true, animation
         else
-          @addDataPoint(series, category, [], animation)
+          @chart.series[seriesIndex * @categories.length + categoryIndex].
+            setData []
       
   redraw: (options = {})->
     options.animation ||= true
@@ -60,7 +79,8 @@ class @Chart
             @addDataPoint(series, 
                           category, 
                           options.data[series][category], 
-                          options.animation)
+                          options.animation,
+                          true)
       ), 200
       
   _chartConfig: (options = {})->
@@ -125,7 +145,7 @@ class @Chart
       allData.push currentSeries
       _.each @categories, (category) =>
         data = options.data[series][category]
-        currentSeries.data.push Math.median(data || []) || 0
+        currentSeries.data.push Math.median(data || [], @round) || 0
     allData   
 
   _lineChartData: (options = {})->
@@ -137,13 +157,11 @@ class @Chart
           name: "#{series}_#{category}"
           data: []
         if data.length > 0
-          if @chartType == 'rawData'
-            currentSeries.data = data
+          currentSeries.data = if @chartType == 'rawData'
+            data
+          else if @chartType == 'runningMean'
+            Math.runningMean(data, true, @round)
           else
-            _.each [1..data.length], (scope)->
-              if @chartType == 'runningMean'
-                currentSeries.data.push Math.mean(_.first(data, scope))
-              else
-                currentSeries.data.push Math.median(_.first(data, scope))
+            Math.runningMedian(data, true, @round)
         allData.push currentSeries
     allData

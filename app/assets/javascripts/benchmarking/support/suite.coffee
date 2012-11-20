@@ -56,10 +56,11 @@ class @Suite
 
   _drawChart: ->
     if not localStorage.system_current? and $("##{@container}").hasClass('active')
+      @chart?.destroy()
       @chart = new Chart(@_chartOptions())
     $("a[href='##{@container}']").click =>
       unless @running
-        if not @chart
+        if not @chart?
           setTimeout (=>   
               @chart = new Chart(@_chartOptions())
             ), 200
@@ -69,6 +70,7 @@ class @Suite
   _chartOptions: ->  
     namespace: @name
     chartType: @chartType
+    round: @round
     container: @container
     title: @title
     subtitle: @subtitle
@@ -89,21 +91,25 @@ class @Suite
   rawData: ->
     @chartType = 'rawData'
     @_saveChartSetup()
+    @chart?.destroy()
     @chart = new Chart(@_chartOptions())
     
   runningMedian: ->
     @chartType = 'runningMedian'
     @_saveChartSetup()
+    @chart?.destroy()
     @chart = new Chart(@_chartOptions())
     
   runningMean: ->
     @chartType = 'runningMean'
     @_saveChartSetup()
+    @chart?.destroy()
     @chart = new Chart(@_chartOptions())
     
   finalResults: ->
     @chartType = 'finalResults'
     @_saveChartSetup()
+    @chart?.destroy()
     @chart = new Chart(@_chartOptions())
     
   initButtons: ->  
