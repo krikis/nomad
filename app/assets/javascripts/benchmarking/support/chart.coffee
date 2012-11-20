@@ -30,7 +30,7 @@ class @Chart
         name: "#{series}_#{category}"
         data: []
     
-  addDataPoint: (series, category, data, animation = true, reset = false)->  
+  addDataPoint: (series, category, data, animation = true, reset = false)->      
     seriesIndex = _.indexOf(@allSeries, series)
     categoryIndex = _.indexOf(@categories, category)
     if @chartType == 'finalResults'
@@ -86,7 +86,10 @@ class @Chart
   _chartConfig: (options = {})->
     config = @_defaultConfig(options)
     if @chartType == 'finalResults'
-      config.chart.type = 'bar'
+      config.chart.type = 'bar'      
+      config.chart.animation =
+          duration: 1000
+          easing: 'swing'
       config.xAxis = 
         categories: @categories
         title:
@@ -116,9 +119,6 @@ class @Chart
     chart:
       renderTo: "#{options.container}_chartContainer"
       backgroundColor: 'whiteSmoke'
-      animation:
-        duration: 1000
-        easing: 'swing'
     title:
       text: options.title
     subtitle:

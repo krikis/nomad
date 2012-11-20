@@ -190,7 +190,6 @@ class @Suite
     @running = true
     @setButtons button
     @buttonsForRunning()
-    @saveChartSetup()
     @runs = 1
     @stableRuns = 0
     @benchIndex = 0
@@ -219,6 +218,9 @@ class @Suite
     # let iteration converge when oscillations become smaller than 1%
     if Math.abs(bench.previous - bench[@measure]) > bench[@measure] / 100
       @rerunSuite = true
+    @chart.addDataPoint(bench.getSeries(),
+                        bench.getCategory(),
+                        bench.getStats())
     @benchIndex++
     if @benchIndex < @benches.length
       @runBench()

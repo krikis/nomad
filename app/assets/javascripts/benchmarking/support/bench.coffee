@@ -128,8 +128,7 @@ class @Bench
     runtime = if @count > 0 then @total / @count else 0
     @initStats()
     @updateStats(runtime)
-    # @calculateMeasure()
-    # @redrawChart()
+    @calculateMeasure()
     @saveStats()
 
   updateStats: (runtime) ->  
