@@ -23,7 +23,7 @@ class @Suite
     @benches   = []
     @_initChartSetup()
     @_drawChart()
-    @initButtons(options)
+    @initButtons()
 
   bench: (options = {}) ->
     options.suite    = @
@@ -106,26 +106,35 @@ class @Suite
     @_saveChartSetup()
     @chart = new Chart(@_chartOptions())
     
-  initButtons: (options = {}) ->
+  initButtons: ->  
+    $("##{@container} ##{@chartType}").find('i').addClass('icon-ok')
     suite = @
-    $("##{options.container} .run").click ->
+    $("##{@container} .run").click ->
       unless $(@).attr('disabled')?
         suite.run(@)
-    $("##{options.container} #data").click ->
+    $("##{@container} #rawData").click ->
+      $(@).parent().parent().find('i').removeClass('icon-ok')
+      $(@).find('i').addClass('icon-ok')
       suite.rawData()
-    $("##{options.container} #mean").click ->
+    $("##{@container} #runningMean").click ->
+      $(@).parent().parent().find('i').removeClass('icon-ok')
+      $(@).find('i').addClass('icon-ok')
       suite.runningMean()
-    $("##{options.container} #median").click ->
+    $("##{@container} #runningMedian").click ->
+      $(@).parent().parent().find('i').removeClass('icon-ok')
+      $(@).find('i').addClass('icon-ok')
       suite.runningMedian()
-    $("##{options.container} #results").click ->
+    $("##{@container} #finalResults").click ->
+      $(@).parent().parent().find('i').removeClass('icon-ok')
+      $(@).find('i').addClass('icon-ok')
       suite.finalResults()
-    $("##{options.container} #stop").click ->
+    $("##{@container} #stop").click ->
       unless $(@).attr('disabled')?
         suite.stop(@)
-    $("##{options.container} #clear").click ->
+    $("##{@container} #clear").click ->
       unless $(@).attr('disabled')?
         suite.clear(@)
-    $("##{options.container} #seed").click ->
+    $("##{@container} #seed").click ->
       unless $(@).attr('disabled')?
         suite.seed(@)
 
