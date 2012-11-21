@@ -1,7 +1,7 @@
 class @Suite
 
   MIN_STABLE_RUNS: 3
-  MAX_NR_OF_RUNS: 20
+  MAX_NR_OF_RUNS: 50
 
   constructor: (options = {}) ->
     @name      = options.name
@@ -9,7 +9,7 @@ class @Suite
     @title     = options.title
     @subtitle  = options.subtitle
     @yMax      = options.yMax
-    @measure   = options.measure   || 'median'
+    @measure   = options.measure   || 'mean'
     @benchData = options.benchData
     @benchRuns = options.benchRuns
     @timeout   = options.timeout
@@ -218,6 +218,7 @@ class @Suite
     # let iteration converge when oscillations become smaller than 1%
     unless bench.hasConverged()
       @rerunSuite = true
+      @stableRuns = 0
     if updateChart
       @chart.addDataPoint(bench.getSeries(),
                           bench.getCategory(),
@@ -233,7 +234,6 @@ class @Suite
     @rerunSuite = true if @stableRuns < @minStable
     if @rerunSuite and @runs < @maxRuns
       @rerunSuite = false
-      @stableRuns = 0
       @runs++
       @benchIndex = 0
       @runBench()
