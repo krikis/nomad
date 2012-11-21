@@ -71,6 +71,7 @@ class @Suite
     namespace: @name
     chartType: @chartType
     round: @round
+    measure: @measure
     container: @container
     title: @title
     subtitle: @subtitle

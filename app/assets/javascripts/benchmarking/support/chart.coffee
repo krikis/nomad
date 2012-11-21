@@ -6,6 +6,7 @@ class @Chart
     @allSeries = options.allSeries
     @categories = options.categories
     @round = options.round
+    @measure = options.measure
     @chart = new Highcharts.Chart @_chartConfig(options)
     
   destroy: ->
@@ -35,7 +36,7 @@ class @Chart
     categoryIndex = _.indexOf(@categories, category)
     if @chartType == 'finalResults'
       @chart.series[seriesIndex].data[categoryIndex].
-        update Math.median(data || [], @round) || 0, true, animation
+        update @_dataPoint(data), true, animation
     else
       if reset
         data = if @chartType == 'rawData'
@@ -82,6 +83,13 @@ class @Chart
                           options.animation,
                           true)
       ), 200
+      
+  _dataPoint: (data)->
+    point = if @measure == 'mean'
+      Math.mean(data || [], @round)
+    else
+      Math.median(data || [], @round)
+    point || 0
       
   _chartConfig: (options = {})->
     config = @_defaultConfig(options)
@@ -145,7 +153,7 @@ class @Chart
       allData.push currentSeries
       _.each @categories, (category) =>
         data = options.data[series][category]
-        currentSeries.data.push Math.median(data || [], @round) || 0
+        currentSeries.data.push @_dataPoint(data)
     allData   
 
   _lineChartData: (options = {})->
