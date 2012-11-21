@@ -73,7 +73,7 @@ Benches.beforePreSyncConflict = (next) ->
         @
       # create a conflicting update
       _.last(@secondCollection.models).save
-        content: Util.benchmarkData()
+        content: Util.benchmarkData(@benchData)
       next.call(@)
     )
   )

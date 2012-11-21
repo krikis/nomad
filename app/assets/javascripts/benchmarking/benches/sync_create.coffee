@@ -42,7 +42,7 @@ Benches.setupSyncCreate = (next) ->
 Benches.beforeSyncCreate = (next) ->
   @model = new @Post
     title: 'some_title'
-    content: Util.benchmarkData()
+    content: Util.benchmarkData(@benchData)
   @collection.create @model
   next.call(@)
   return

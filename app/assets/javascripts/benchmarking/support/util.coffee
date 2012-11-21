@@ -1,6 +1,6 @@
 @Util =
-  benchmarkData: ->
-    switch @benchData
+  benchmarkData: (dataSize)->
+    switch dataSize
       when 'data70KB'
         Benches['data70KB']
       when 'data140KB'
@@ -42,7 +42,7 @@
         Benches['data70KB'] +
         Benches['data70KB']
       else
-        @benchData
+        dataSize
       
   randomObject: ->
     object = {}
