@@ -14,6 +14,7 @@ class @Bench
     @cleanup  = options.cleanup  || (next) -> next.call(@)
     @baseline = options.baseline || -> @start = new Date
     @record   = options.record   || -> new Date - @start
+    @converge = options.converge || -> Math.abs(@previous - @current) < @current / 100
     @round    = true
     @round    = options.round    if options.round?
     @unit     = options.unit
@@ -131,7 +132,11 @@ class @Bench
     if @round
       @[@measure] = Math.round(value)
     else
-      @[@measure] = value   
+      @[@measure] = value
+    @current = @[@measure]
+      
+  hasConverged: ->
+    @converge.call(@)
 
   TIMEOUT_INCREMENT: 10
 

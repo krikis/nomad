@@ -216,7 +216,7 @@ class @Suite
   nextBench: (updateChart = true)->
     bench = @benches[@benchIndex]
     # let iteration converge when oscillations become smaller than 1%
-    if Math.abs(bench.previous - bench[@measure]) > bench[@measure] / 100
+    unless bench.hasConverged()
       @rerunSuite = true
     if updateChart
       @chart.addDataPoint(bench.getSeries(),
@@ -233,11 +233,12 @@ class @Suite
     @rerunSuite = true if @stableRuns < @minStable
     if @rerunSuite and @runs < @maxRuns
       @rerunSuite = false
+      @stableRuns = 0
       @runs++
       @benchIndex = 0
       @runBench()
     else
-      setTimeout (->
+      setTimeout (=>
           @finish()
         ), 1000
 
