@@ -36,7 +36,7 @@ Benches.setupSyncConflict = (next) ->
   # clear server data store
   @secondCollection.fayeClient._resetDb()
   # wait for the second client to be successfully subscribed at the server 
-  Util.waitsFor (->
+  @waitsFor (->
     @dbResetSpy.callCount >= 1
   ), 'second client to be subscribed', (->
     # reset all spies
@@ -60,7 +60,7 @@ Benches.beforeSyncConflict = (next) ->
   @collection.create @model
   # sync it to the other node in the network
   @collection.syncModels()
-  Util.waitsFor (->
+  @waitsFor (->
     @createSpy.callCount >= 1 and @secondCreateSpy.callCount >= 1
   ), 'create multicast', (->    
     # make sure the second client misses the first client update
@@ -69,7 +69,7 @@ Benches.beforeSyncConflict = (next) ->
     @model.save
       title: 'other_title'
     @collection.syncModels()
-    Util.waitsFor (->
+    @waitsFor (->
       @updateSpy.callCount >= 2 and @secondUpdateSpy.callCount >= 2
     ), 'update multicast', (->    
       @updateSpy.reset()
@@ -94,7 +94,7 @@ Benches.syncConflict = (next) ->
   # synchronize conflicting update
   @secondCollection.syncModels()
   # wait for synchronization and conflict resolution completes
-  Util.waitsFor (->
+  @waitsFor (->
     @updateSpy.callCount >= 1 and @secondUpdateSpy.callCount >= 2
   ), 'final update multicast', (->
     next.call(@)

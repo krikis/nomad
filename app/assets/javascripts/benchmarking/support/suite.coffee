@@ -259,7 +259,7 @@ class @Suite
           @log "#{bench.namespace}_#{bench.key}::#{JSON.stringify bench.getStats()}"
       ), 2000
     @running = false
-    @buttonsForIdle()
+    @buttonsForIdle()    
     
   clearStorage: ->
     _.each _.properties(localStorage), (property) ->

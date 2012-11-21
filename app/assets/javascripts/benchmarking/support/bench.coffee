@@ -133,4 +133,26 @@ class @Bench
     else
       @[@measure] = value   
 
+  TIMEOUT_INCREMENT: 10
+
+  waitsFor: (check, message, callback) ->
+    @_waitFor(check, callback, message, 0)
+
+  _waitFor: (check, callback, message, total) ->
+    if check.apply(@)
+      callback.apply(@) if _.isFunction(callback)
+    else if total >= @timeout
+      @suite?.log "Timed out afer #{total} msec waiting for #{message}!"
+      # gracefully restart benchmark
+      @suite?.runBench()
+      return
+    else
+      total += @TIMEOUT_INCREMENT
+      setTimeout (=>
+        try
+          @_waitFor.apply(@, [check, callback, message, total])
+        catch error
+          @handleError error          
+      ), @TIMEOUT_INCREMENT
+
 

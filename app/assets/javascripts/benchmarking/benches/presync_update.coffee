@@ -30,7 +30,7 @@ Benches.setupPreSyncUpdate = (next) ->
   @secondCollection._cleanLocalStorage()
   # clear server data store
   @secondCollection.fayeClient._resetDb()
-  Util.waitsFor (->
+  @waitsFor (->
     @dbResetSpy.callCount >= 1
   ), 'second client to be in sync', (->
     # reset all spies
@@ -49,7 +49,7 @@ Benches.beforePreSyncUpdate = (next) ->
     content: 'some_content'
   @collection.create @model
   @collection.preSync()
-  Util.waitsFor (->
+  @waitsFor (->
     @createSpy.callCount >= 1 and @secondCreateSpy.callCount >= 1
   ), 'create multicast', (->    
     @updateSpy.reset()
@@ -63,7 +63,7 @@ Benches.beforePreSyncUpdate = (next) ->
 
 Benches.preSyncUpdate = (next) ->
   @collection.preSync()
-  Util.waitsFor (->
+  @waitsFor (->
     @updateSpy.callCount >= 2 and @secondUpdateSpy.callCount >= 1
   ), 'update multicast', (->
     next.call(@)
