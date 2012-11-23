@@ -14,21 +14,21 @@ class @Chart
       
   addBench: (options = {})->
     unless options.category in @categories
-      category = @categories.push options.category
+      categoryAdded = @categories.push options.category
     unless options.series in @allSeries
-      series = @allSeries.push options.series
+      seriesAdded = @allSeries.push options.series
     if @chartType == 'finalResults'
       @chart.xAxis[0].setCategories @categories
-      if series?
+      if seriesAdded?
         @chart.addSeries
-          name: series
+          name: options.series
           data: []
       _.each @chart.series, (series) =>
         while series.data.length < @categories.length
           series.addPoint 0
-    else if series? or category?
+    else if seriesAdded? or categoryAdded?
       @chart.addSeries
-        name: "#{series}_#{category}"
+        name: "#{options.series}_#{options.category}"
         data: []
     
   addDataPoint: (series, category, data, animation = true, reset = false)->   
