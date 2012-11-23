@@ -1,6 +1,6 @@
 class @Suite
 
-  MIN_STABLE_RUNS: 3
+  MIN_STABLE_RUNS: 20
   MAX_NR_OF_RUNS: 50
 
   constructor: (options = {}) ->
