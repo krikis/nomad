@@ -78,8 +78,8 @@ class @Suite
     yMax: @yMax
     unit: @unit
     unitLong: @unitLong
-    allSeries: @allSeries
-    categories: @categories
+    allSeries: @allSeries.slice()
+    categories: @categories.slice()
     data: @_chartData()
     
   _chartData: ->
