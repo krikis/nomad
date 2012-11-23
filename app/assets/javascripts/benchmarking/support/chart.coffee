@@ -130,7 +130,7 @@ class @Chart
     title:
       text: options.title
     subtitle:
-      text: options.subtitle
+      text: @_extendSubtitle(options.subtitle)
     yAxis:
       min: 0
       max: options.yMax
@@ -143,6 +143,19 @@ class @Chart
       enabled: false
     exporting:
       width: 2048
+      
+  _extendSubtitle: (subtitle)->
+    subtitle += if @chartType == 'finalResults'
+      if @measure == 'mean'
+        ' [Final Mean]'
+      else
+        ' [Final Median]'
+    else if @chartType == 'rawData'
+      ' [Raw Data]'
+    else if @chartType == 'runningMean'
+      ' [Running Mean]'
+    else
+      ' [Running Median]'
 
   _chartData: (options = {})->
     allData = []

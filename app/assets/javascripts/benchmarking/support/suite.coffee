@@ -47,7 +47,7 @@ class @Suite
       category: category
 
   _initChartSetup: ->
-    @chartType = localStorage["system_#{@name}_chartType"] || 'finalResults'
+    @chartType = localStorage["system_#{@name}_chartType"] || 'runningMean'
     @categories = []
     @allSeries  = []
     
