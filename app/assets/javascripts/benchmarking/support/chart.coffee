@@ -13,9 +13,9 @@ class @Chart
     @chart?.destroy()
       
   addBench: (options = {})->
-    if options.category? and options.category not in @categories
+    unless options.category in @categories
       category = @categories.push options.category
-    if options.series? and options.series not in @allSeries
+    unless options.series in @allSeries
       series = @allSeries.push options.series
     if @chartType == 'finalResults'
       @chart.xAxis[0].setCategories @categories
