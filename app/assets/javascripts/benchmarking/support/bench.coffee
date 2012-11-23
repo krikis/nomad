@@ -14,7 +14,7 @@ class @Bench
     @cleanup  = options.cleanup  || (next) -> next.call(@)
     @baseline = options.baseline || -> @start = new Date
     @record   = options.record   || -> new Date - @start
-    @converge = options.converge || -> Math.abs(@previous - @current) < @current / 100
+    @converge = options.converge || -> Math.abs(@previous - @current) < @current / 20
     @round    = true
     @round    = options.round    if options.round?
     @unit     = options.unit

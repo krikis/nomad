@@ -219,7 +219,6 @@ class @Suite
 
   nextBench: (updateChart = true)->
     bench = @benches[@benchIndex]
-    # let iteration converge when oscillations become smaller than 1%
     unless bench.hasConverged()
       @rerunSuite = true
       @stableRuns = 0
