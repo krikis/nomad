@@ -48,7 +48,7 @@ class @Chart
         else
           Math.runningMedian(data, @round)
         if data?
-          @chart.series[seriesIndex * @categories.length + categoryIndex].
+          @chart.series[categoryIndex * @allSeries.length + seriesIndex].
             setData data
       else
         point = if @chartType == 'rawData'
@@ -58,7 +58,7 @@ class @Chart
         else
           Math.median(data, @round)
         if point?
-          @chart.series[seriesIndex * @categories.length + categoryIndex].
+          @chart.series[categoryIndex * @allSeries.length + seriesIndex].
             addPoint point, true, false, animation
         
   clear: (animation = false)->
@@ -70,7 +70,7 @@ class @Chart
           @chart.series[seriesIndex].data[categoryIndex].
             update 0, true, animation
         else
-          @chart.series[seriesIndex * @categories.length + categoryIndex].
+          @chart.series[categoryIndex * @allSeries.length + seriesIndex].
             setData []
       
   redraw: (options = {})->
@@ -173,8 +173,8 @@ class @Chart
 
   _lineChartData: (options = {})->
     allData = []
-    _.each @allSeries, (series) =>
-      _.each @categories, (category) =>
+    _.each @categories, (category) =>
+      _.each @allSeries, (series) =>
         data = options.data[series][category]
         currentSeries =
           name: "#{series}_#{category}"
