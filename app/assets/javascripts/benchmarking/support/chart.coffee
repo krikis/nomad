@@ -25,13 +25,13 @@ class @Chart
           data: []
       _.each @chart.series, (series) =>
         while series.data.length < @categories.length
-          series.addPoint @_dataPoint(data)
+          series.addPoint @_dataPoint(options.data)
     else 
       seriesName = "#{options.series}_#{options.category}"
       unless seriesName in _.map(@chart.series, (series)-> series.name) 
         @chart.addSeries
           name: seriesName
-          data: @_dataSeries(data)
+          data: @_dataSeries(options.data)
     
   addDataPoint: (series, category, data, animation = true, reset = false)->   
     seriesIndex = _.indexOf(@allSeries, series)
