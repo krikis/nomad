@@ -9,8 +9,9 @@ Math.mean ||= (data, round = false)->
     
 Math.runningMean ||= (data, round = false)->
   out = []
-  _.each [1..data.length], (scope)->
-    out.push Math.mean(_.first(data, scope), round)
+  if data.length > 0
+    _.each [1..data.length], (scope)->
+      out.push Math.mean(_.first(data, scope), round)
   out
     
 Math.median ||= (data, round = false)->
@@ -28,8 +29,9 @@ Math.median ||= (data, round = false)->
 
 Math.runningMedian ||= (data, round = false)->
   out = []
-  _.each [1..data.length], (scope)->
-    out.push Math.median(_.first(data, scope), round)
+  if data.length > 0
+    _.each [1..data.length], (scope)->
+      out.push Math.median(_.first(data, scope), round)
   out
     
 Sort = {}

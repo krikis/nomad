@@ -14,7 +14,7 @@ class @Chart
       
   addBench: (options = {})->
     unless options.category in @categories
-      categoryAdded = @categories.push options.category
+      @categories.push options.category
     unless options.series in @allSeries
       seriesAdded = @allSeries.push options.series
     if @chartType == 'finalResults'
@@ -26,10 +26,12 @@ class @Chart
       _.each @chart.series, (series) =>
         while series.data.length < @categories.length
           series.addPoint 0
-    else if seriesAdded? or categoryAdded?
-      @chart.addSeries
-        name: "#{options.series}_#{options.category}"
-        data: []
+    else 
+      seriesName = "#{options.series}_#{options.category}"
+      unless seriesName in _.map(@chart.series, (series)-> series.name) 
+        @chart.addSeries
+          name: seriesName
+          data: []
     
   addDataPoint: (series, category, data, animation = true, reset = false)->   
     seriesIndex = _.indexOf(@allSeries, series)
