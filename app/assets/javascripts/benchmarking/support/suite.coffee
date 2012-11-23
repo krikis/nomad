@@ -1,6 +1,7 @@
 class @Suite
-
-  MIN_STABLE_RUNS: 20
+  
+  MIN_NR_OF_RUNS: 20
+  MIN_STABLE_RUNS: 5
   MAX_NR_OF_RUNS: 50
 
   constructor: (options = {}) ->
@@ -13,6 +14,7 @@ class @Suite
     @benchData = options.benchData
     @benchRuns = options.benchRuns
     @timeout   = options.timeout
+    @minRuns   = options.minRuns   || @MIN_NR_OF_RUNS
     @minStable = options.minStable || @MIN_STABLE_RUNS
     @maxRuns   = options.maxRuns   || @MAX_NR_OF_RUNS
     @baseline  = options.baseline
@@ -233,7 +235,8 @@ class @Suite
 
   runSuite: ->
     @stableRuns++ unless @rerunSuite
-    @rerunSuite = true if @stableRuns < @minStable
+    if @runs < @minRuns or @stableRuns < @minStable
+      @rerunSuite = true 
     if @rerunSuite and @runs < @maxRuns
       @rerunSuite = false
       @runs++
