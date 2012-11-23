@@ -25,13 +25,13 @@ class @Chart
           data: []
       _.each @chart.series, (series) =>
         while series.data.length < @categories.length
-          series.addPoint 0
+          series.addPoint @_dataPoint(data)
     else 
       seriesName = "#{options.series}_#{options.category}"
       unless seriesName in _.map(@chart.series, (series)-> series.name) 
         @chart.addSeries
           name: seriesName
-          data: []
+          data: @_dataSeries(data)
     
   addDataPoint: (series, category, data, animation = true, reset = false)->   
     seriesIndex = _.indexOf(@allSeries, series)
@@ -41,23 +41,10 @@ class @Chart
         update @_dataPoint(data), true, animation
     else
       if reset
-        data = if @chartType == 'rawData'
-          data
-        else if @chartType == 'runningMean'
-          Math.runningMean(data, @round)
-        else
-          Math.runningMedian(data, @round)
-        if data?
-          @chart.series[categoryIndex * @allSeries.length + seriesIndex].
-            setData data
+        @chart.series[categoryIndex * @allSeries.length + seriesIndex].
+          setData @_dataSeries(data)
       else
-        point = if @chartType == 'rawData'
-          _.last(data)
-        else if @chartType == 'runningMean'
-          Math.mean(data, @round)
-        else
-          Math.median(data, @round)
-        if point?
+        if point = @_dataLinePoint(data)
           @chart.series[categoryIndex * @allSeries.length + seriesIndex].
             addPoint point, true, false, animation
         
@@ -92,6 +79,24 @@ class @Chart
     else
       Math.median(data || [], @round)
     point || 0
+    
+  _dataLinePoint: (data)->
+    data ||= []
+    if @chartType == 'rawData'
+      _.last(data)
+    else if @chartType == 'runningMean'
+      Math.mean(data, @round)
+    else
+      Math.median(data, @round)
+      
+  _dataSeries: (data)->
+    data ||= []
+    if @chartType == 'rawData'
+      data
+    else if @chartType == 'runningMean'
+      Math.runningMean(data, true, @round)
+    else
+      Math.runningMedian(data, true, @round)
       
   _chartConfig: (options = {})->
     config = @_defaultConfig(options)
@@ -178,13 +183,6 @@ class @Chart
         data = options.data[series][category]
         currentSeries =
           name: "#{series}_#{category}"
-          data: []
-        if data.length > 0
-          currentSeries.data = if @chartType == 'rawData'
-            data
-          else if @chartType == 'runningMean'
-            Math.runningMean(data, true, @round)
-          else
-            Math.runningMedian(data, true, @round)
+          data: @_dataSeries(data)
         allData.push currentSeries
     allData

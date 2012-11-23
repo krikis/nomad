@@ -43,6 +43,7 @@ class @Suite
       @allSeries.push series
     @_saveChartSetup()
     @chart?.addBench
+      data: bench.getStats()
       series: series
       category: category
 
