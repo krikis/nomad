@@ -180,8 +180,9 @@
     if @versioning == 'structured_content_diff'
       patches = _(@_versioning.patches)
       # apply all patches to the new data
-      patches.all (patch) =>
+      result = _.map patches, (patch) =>
         dummy._applyPatch(patch.patch_text)
+      false not in result
     # if a merged diff object is used
     else
       patcher = new Patcher @
