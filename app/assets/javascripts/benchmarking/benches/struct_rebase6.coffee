@@ -9,31 +9,14 @@ Benches.setupStructRebase6 = (next) ->
   next.call @
 
 Benches.beforeStructRebase6 = (next) ->
-  # instantiate a data object with outdated data
-  @answerOriginal = Util.randomObject()
-  @answer = new @Answer _.deepClone @answerOriginal
-  # instantiate a data object with up to date data
-  deleteCount  = Util.randomFrom(0, 2)
-  changeCount  = Util.randomFrom(1, 4)
-  createCount  = Util.randomFrom(1, 2)
-  textChange   = 8
-  stringChange = 3
-  @upToDate = Util.randomVersion(_.deepClone(@answerOriginal),
-                                 deleteCount,   
-                                 changeCount,   
-                                 createCount,   
-                                 textChange,   
-                                 stringChange)
-  @dummy = new @Answer @upToDate
-  # perform a number of conflicting updates
-  _.each [1..6], =>
-    @answerOriginal = Util.randomVersion(@answerOriginal,
-                                         deleteCount,   
-                                         changeCount,   
-                                         createCount,   
-                                         textChange,   
-                                         stringChange)
-    @answer.set _.deepClone @answerOriginal
+  @answer = new @Answer Benches.fixedAnswer()
+  @answer.set Benches.fixedAnswerV1u1()
+  @answer.set Benches.fixedAnswerV1u2()
+  @answer.set Benches.fixedAnswerV1u3()
+  @answer.set Benches.fixedAnswerV1u1()
+  @answer.set Benches.fixedAnswerV1u2()
+  @answer.set Benches.fixedAnswerV1u3()
+  @dummy = new @Answer Benches.fixedAnswerV2()
   next.call @
 
 Benches.structRebase6 = (next) ->
