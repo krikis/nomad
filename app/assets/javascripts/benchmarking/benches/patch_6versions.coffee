@@ -14,9 +14,9 @@ Benches.beforePatch6 = (next) ->
   next.call @
 
 Benches.patch6 = (next) ->  
-  deleteCount  = Util.randomFrom(1, 3)
+  deleteCount  = Util.randomFrom(0, 2)
   changeCount  = Util.randomFrom(4, 8)
-  createCount  = Util.randomFrom(1, 3)
+  createCount  = Util.randomFrom(0, 2)
   textChange   = 15
   stringChange = 5
   _.each [1..6], =>
