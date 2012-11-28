@@ -44,12 +44,12 @@
       else
         dataSize
       
-  randomObject: ->
+  randomObject: (options = {})->
     object = {}
     propCount = @randomFrom(10, 30)
     for prop in [1..propCount]
       do (prop) =>
-        object[@randomProp()] = @randomValue()
+        object[@randomProp()] = @randomValue(options)
     object
   
   randomProp: ->
@@ -81,14 +81,15 @@
         version[@randomProp()] = @randomValue()
     version
     
-  randomValue: ->
+  randomValue: (options = {})->
+    options.typeOdds ||= [1, 1, 2, 4]
     values = [
       @randomBoolean,
       @randomNumber,
       @randomString,
       @loremIpsum
     ]
-    @randomFrom(values).call(@)
+    @randomFrom(values, options.typeOdds).call(@)
       
   randomBoolean: ->
     @randomFrom [true, false]    
@@ -121,8 +122,19 @@
   randomFrom: ->
     # select random entry from array or string
     if _.isArray(arguments[0]) or _.isString(arguments[0])
-      index = Math.floor(Math.random() * arguments[0].length)
-      arguments[0][index]
+      selectFrom = arguments[0]
+      # select with predefined probability
+      if _.isArray(arguments[1])
+        frequencies = arguments[1]
+        values = selectFrom.slice()
+        selectFrom = []
+        _.each values, (value, index)->
+          frequency = parseInt(frequencies[index])
+          if frequency > 0
+            _.each [1..frequency], ->
+              selectFrom.push value       
+      index = Math.floor(Math.random() * selectFrom.length)
+      selectFrom[index]
     # generate random float
     else if arguments.length == 1 and _.isNumber(arguments[0])
       Math.random() * arguments[0]
