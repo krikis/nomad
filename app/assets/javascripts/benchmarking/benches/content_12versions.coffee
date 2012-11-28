@@ -7,21 +7,23 @@ Benches.setupContent12 = (next) ->
   @Answer = Answer
   next.call @
 
-Benches.beforeContent12 = (next) ->
-  @answer = new @Answer Benches.fixedAnswer()
+Benches.beforeContent12 = (next) ->  
+  @answerOriginal = Util.randomObject()
+  @answer = new @Answer _.deepClone @answerOriginal
   next.call @
 
-Benches.content12 = (next) ->
-  @answer.set Benches.fixedAnswerV1u1()
-  @answer.set Benches.fixedAnswerV1u2()
-  @answer.set Benches.fixedAnswerV1u3()
-  @answer.set Benches.fixedAnswerV1u1()
-  @answer.set Benches.fixedAnswerV1u2()
-  @answer.set Benches.fixedAnswerV1u3()
-  @answer.set Benches.fixedAnswerV1u1()
-  @answer.set Benches.fixedAnswerV1u2()
-  @answer.set Benches.fixedAnswerV1u3()
-  @answer.set Benches.fixedAnswerV1u1()
-  @answer.set Benches.fixedAnswerV1u2()
-  @answer.set Benches.fixedAnswerV1u3()
+Benches.content12 = (next) ->  
+  deleteCount  = Util.randomFrom(0, 2)
+  changeCount  = Util.randomFrom(1, 4)
+  createCount  = Util.randomFrom(1, 2)
+  textChange   = 8
+  stringChange = 3
+  _.each [1..12], =>
+    @answerOriginal = Util.randomVersion(@answerOriginal,
+                                         deleteCount,   
+                                         changeCount,   
+                                         createCount,   
+                                         textChange,   
+                                         stringChange)
+    @answer.set _.deepClone @answerOriginal
   next.call @
