@@ -5,6 +5,7 @@ suite = @memory = new Suite
   subtitle:  'Memory footprint for recording local changes'
   baseline:  ->
   record:    ->
+    @count += 1
     (JSON.stringify(@answer._versioning.patches).length / JSON.stringify(@answer.attributes).length) * 100
   unit:      '%'
   unitLong:  'Portion of original data'
