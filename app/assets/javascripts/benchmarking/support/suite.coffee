@@ -68,7 +68,7 @@ class @Suite
               @chart = new Chart(@_chartOptions())
             ), 200
         else
-          @chart.redraw(data: @_chartData())
+          @chart.redraw(data: @_chartData(), clear: true)
 
   _chartOptions: ->  
     namespace: @name

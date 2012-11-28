@@ -26,7 +26,7 @@ class @Chart
       _.each @chart.series, (series) =>
         while series.data.length < @categories.length
           series.addPoint @_dataPoint(options.data)
-    else 
+    else
       seriesName = "#{options.series}_#{options.category}"
       unless seriesName in _.map(@chart.series, (series)-> series.name) 
         @chart.addSeries
@@ -62,7 +62,7 @@ class @Chart
       
   redraw: (options = {})->
     options.animation ||= true
-    @clear()
+    @clear() if options.clear
     setTimeout (=>
         _.each @allSeries, (series) =>
           _.each @categories, (category) =>
