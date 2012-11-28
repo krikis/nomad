@@ -12,13 +12,12 @@ Benches.beforeContent12 = (next) ->
   @answer = new @Answer _.deepClone @answerOriginal
   next.call @
 
-Benches.content12 = (next) ->    
-  # specify the amount of random change
-  deleteCount  = Util.randomFrom(1, 3)
-  changeCount  = Util.randomFrom(4, 8)
-  createCount  = Util.randomFrom(1, 3)
-  textChange   = 15
-  stringChange = 5
+Benches.content12 = (next) ->  
+  deleteCount  = Util.randomFrom(0, 2)
+  changeCount  = Util.randomFrom(1, 4)
+  createCount  = Util.randomFrom(1, 2)
+  textChange   = 8
+  stringChange = 3
   _.each [1..12], =>
     @answerOriginal = Util.randomVersion(@answerOriginal,
                                          deleteCount,   

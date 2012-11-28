@@ -12,13 +12,12 @@ Benches.beforeStructRebase6 = (next) ->
   # instantiate a data object with outdated data
   @answerOriginal = Util.randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
-  # specify the amount of random change
-  deleteCount  = Util.randomFrom(1, 3)
-  changeCount  = Util.randomFrom(4, 8)
-  createCount  = Util.randomFrom(1, 3)
-  textChange   = 15
-  stringChange = 5
   # instantiate a data object with up to date data
+  deleteCount  = Util.randomFrom(0, 2)
+  changeCount  = Util.randomFrom(1, 4)
+  createCount  = Util.randomFrom(1, 2)
+  textChange   = 8
+  stringChange = 3
   @upToDate = Util.randomVersion(_.deepClone(@answerOriginal),
                                  deleteCount,   
                                  changeCount,   
