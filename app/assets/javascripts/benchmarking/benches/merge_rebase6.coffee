@@ -36,6 +36,6 @@ Benches.beforeMergeRebase6 = (next) ->
   next.call @
 
 Benches.mergeRebase6 = (next) ->
-  @answer._applyPatchesTo @dummy
+  @success = @answer._applyPatchesTo @dummy
   window.merge = JSON.stringify @dummy._sortPropertiesIn @dummy.attributes
   next.call @

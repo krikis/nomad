@@ -6,6 +6,7 @@ suite = @resolution = new Suite
   yMax:      100
   baseline:  ->
   record:    ->
+    @count += 1
     @success * 100
   unit:      '%'
   unitLong:  'Successfully resolved'

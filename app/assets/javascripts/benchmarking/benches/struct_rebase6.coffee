@@ -37,6 +37,6 @@ Benches.beforeStructRebase6 = (next) ->
   next.call @
 
 Benches.structRebase6 = (next) ->
-  @answer._applyPatchesTo @dummy
+  @success = @answer._applyPatchesTo @dummy
   window.struct = JSON.stringify @dummy._sortPropertiesIn @dummy.attributes
   next.call @

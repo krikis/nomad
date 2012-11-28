@@ -12,8 +12,15 @@ class @Bench
     @test     = options.test     || (next) -> next.call(@)
     @after    = options.after    || (next) -> next.call(@)
     @cleanup  = options.cleanup  || (next) -> next.call(@)
-    @baseline = options.baseline || -> @start = new Date
-    @record   = options.record   || -> new Date - @start
+    @baseline = options.baseline || ->
+      @success = true
+      @start = new Date
+    @record   = options.record   || -> 
+      if @success
+        @count += 1
+        new Date - @start
+      else
+        0
     @converge = options.converge || -> Math.abs(@previous - @current) < @current / 20
     @round    = true
     @round    = options.round    if options.round?
@@ -73,7 +80,6 @@ class @Bench
       try
         if @count < @runs and not @suite?.stopped() 
           @before.call(@, @testFunction)
-          @count++
         else
           @cleanup.call(@, @stop)
       catch error
