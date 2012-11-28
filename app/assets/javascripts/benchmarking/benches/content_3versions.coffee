@@ -16,11 +16,11 @@ Benches.beforeContent3 = (next) ->
 
 # update this object three times
 Benches.content3 = (next) ->
-  deleteCount  = Util.randomFrom(0, 2)
-  changeCount  = Util.randomFrom(1, 4)
-  createCount  = Util.randomFrom(1, 2)
-  textChange   = 8
-  stringChange = 3
+  deleteCount  = Util.randomFrom(1, 3)
+  changeCount  = Util.randomFrom(4, 8)
+  createCount  = Util.randomFrom(1, 3)
+  textChange   = 15
+  stringChange = 5
   _.each [1..3], =>
     @answerOriginal = Util.randomVersion(@answerOriginal,
                                          deleteCount,   
