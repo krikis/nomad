@@ -57,13 +57,15 @@
   
   randomVersion: (object, delPropCount, changePropCount, newPropCount, loremChange, stringChange) ->
     version = _.deepClone object
-    delPropCount ||= @randomFrom(1, 3)
-    for prop in [1..delPropCount]
-      do (prop) =>
+    unless delPropCount?
+      delPropCount = @randomFrom(1, 3)
+    for prop in [0...delPropCount]
+      do =>
         delete version[@randomFrom(_.keys(version))]
-    changePropCount ||= @randomFrom(4, 7)
-    for prop in [1..changePropCount]
-      do (prop) =>
+    unless changePropCount?
+      changePropCount = @randomFrom(4, 7)
+    for prop in [0...changePropCount]
+      do =>
         property = @randomFrom(_.keys(version))
         original = version[property]
         if _.isNumber original
@@ -75,9 +77,10 @@
             version[property] = @loremIpsumVersion version[property], loremChange
           else
             version[property] = @stringVersion version[property], stringChange
-    newPropCount ||= @randomFrom(1, 3)
-    for prop in [1..newPropCount]
-      do (prop) =>
+    unless newPropCount?
+      newPropCount = @randomFrom(1, 3)
+    for prop in [0...newPropCount]
+      do =>
         version[@randomProp()] = @randomValue()
     version
     
@@ -95,7 +98,8 @@
     @randomFrom [true, false]    
       
   randomNumber: (decimals) ->
-    decimals ||= @randomFrom(1, 5)
+    unless decimals?
+      decimals = @randomFrom(1, 5)
     numberSet = '0123456789'
     nonzeroSet = '123456789'
     randomNumbers = [@randomFrom(nonzeroSet)]
@@ -104,7 +108,8 @@
     parseInt randomNumbers.join('')
 
   randomString: (stringSize, charSet) ->
-    stringSize ||= @randomFrom(5, 15)
+    unless stringSize?
+      stringSize = @randomFrom(5, 15)
     charSet ||= 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
     randomString = []
     while randomString.length < stringSize

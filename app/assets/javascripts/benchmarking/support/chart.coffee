@@ -61,7 +61,8 @@ class @Chart
             setData []
       
   redraw: (options = {})->
-    options.animation ||= true
+    unless options.animation?
+      options.animation = true
     @clear() if options.clear
     setTimeout (=>
         _.each @allSeries, (series) =>

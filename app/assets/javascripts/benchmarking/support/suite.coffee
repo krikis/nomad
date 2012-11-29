@@ -32,7 +32,8 @@ class @Suite
     options.chart    ||= @chart
     options.baseline ||= @baseline
     options.record   ||= @record
-    options.round    ||= @round
+    unless options.round?
+      options.round    = @round
     options.unit     ||= @unit
     options.unitLong ||= @unitLong
     bench = new Bench options
