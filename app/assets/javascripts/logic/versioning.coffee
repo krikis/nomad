@@ -56,7 +56,7 @@
   _sortPropertiesIn: (object) ->
     return object unless _.isObject(object)
     sorted = {}
-    keys = _.keys(object).sort()
+    keys = _.properties(object).sort()
     _.each keys, (key) =>
       sorted[key] = @_sortPropertiesIn object[key]
     sorted

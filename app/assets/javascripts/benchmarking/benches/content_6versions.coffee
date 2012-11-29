@@ -9,6 +9,7 @@ Benches.setupContent6 = (next) ->
 
 Benches.beforeContent6 = (next) ->
   @answerOriginal = Util.randomObject()
+  @answerVersion = _.deepClone @answerOriginal
   @answer = new @Answer _.deepClone @answerOriginal
   next.call @
 
@@ -19,11 +20,13 @@ Benches.content6 = (next) ->
   textChange   = 15
   stringChange = 5
   _.each [1..6], =>
-    @answerOriginal = Util.randomVersion(@answerOriginal,
-                                         deleteCount,   
-                                         changeCount,   
-                                         createCount,   
-                                         textChange,   
-                                         stringChange)
-    @answer.set _.deepClone @answerOriginal
+    [@answerVersion, deleted] = Util.randomVersion(@answerVersion,
+                                                   deleteCount,   
+                                                   changeCount,   
+                                                   createCount,   
+                                                   textChange,   
+                                                   stringChange)
+    @answer.set _.deepClone @answerVersion
+    _.each deleted, (property)=>
+      @answer.unset property
   next.call @

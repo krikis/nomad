@@ -251,7 +251,7 @@ describe 'Versioning', ->
         last: 'value'
         first: 'value'
       ordered = @model._sortPropertiesIn(object)
-      expect(_.keys(ordered)[0]).toEqual('first')
+      expect(_.properties(ordered)[0]).toEqual('first')
 
     it 'sorts the attributes of nested objects', ->
       object =
@@ -259,7 +259,7 @@ describe 'Versioning', ->
           last: 'value'
           first: 'value'
       ordered = @model._sortPropertiesIn(object)
-      expect(_.keys(ordered.nested)[0]).toEqual('first')
+      expect(_.properties(ordered.nested)[0]).toEqual('first')
 
   describe '#_tickVersion', ->
     beforeEach ->

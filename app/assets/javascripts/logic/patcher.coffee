@@ -48,7 +48,7 @@ class @Patcher
 
   _changedAttributes: (now, previous = {}) ->
     changed = {}
-    attributes = _.union(_.keys(now), _.keys(previous))
+    attributes = _.union(_.properties(now), _.properties(previous))
     _.each attributes, (attribute) ->
       unless _.isEqual(previous[attribute], now[attribute])
         changed[attribute] = now[attribute]

@@ -16,19 +16,24 @@ Benches.beforeSerialized50 = (next) ->
   createCount  = Util.randomFrom(1, 3)
   textChange   = 15
   stringChange = 5
-  @answer.set Util.randomVersion(@answerOriginal,
-                                 deleteCount,   
-                                 changeCount,   
-                                 createCount,   
-                                 textChange,   
-                                 stringChange)
-  @dummyOriginal = Util.randomVersion(@answerOriginal,
-                                      deleteCount,   
-                                      changeCount,   
-                                      createCount,   
-                                      textChange,   
-                                      stringChange)
+  # perform the winning update
+  [@dummyOriginal, deleted] = Util.randomVersion(@answerOriginal,
+                                                 deleteCount,   
+                                                 changeCount,   
+                                                 createCount,   
+                                                 textChange,   
+                                                 stringChange)
   @dummy = new @Answer _.deepClone @dummyOriginal
+  # perform the losing update
+  [version, deleted] = Util.randomVersion(@answerOriginal,
+                                          deleteCount,   
+                                          changeCount,   
+                                          createCount,   
+                                          textChange,   
+                                          stringChange)
+  @answer.set version
+  _.each deleted, (property)=>
+    @answer.unset property
   next.call @
 
 Benches.serialized50 = (next) ->
@@ -36,9 +41,9 @@ Benches.serialized50 = (next) ->
     if @answer._applyPatchesTo @dummy
       @success = 1
       # console.log '================================= Serialized ================================='
-      _.each _.union(_.keys(@answerOriginal),
-                     _.keys(@dummyOriginal),
-                     _.keys(@answer.attributes)), (key) =>
+      _.each _.union(_.properties(@answerOriginal),
+                     _.properties(@dummyOriginal),
+                     _.properties(@answer.attributes)), (key) =>
         if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) or
            not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
           if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and

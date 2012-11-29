@@ -57,16 +57,19 @@
   
   randomVersion: (object, delPropCount, changePropCount, newPropCount, loremChange, stringChange) ->
     version = _.deepClone object
+    deleted = []
     unless delPropCount?
       delPropCount = @randomFrom(1, 3)
     for prop in [0...delPropCount]
       do =>
-        delete version[@randomFrom(_.keys(version))]
+        property = @randomFrom(_.properties(version))
+        deleted.push property
+        delete version[property]
     unless changePropCount?
       changePropCount = @randomFrom(4, 7)
     for prop in [0...changePropCount]
       do =>
-        property = @randomFrom(_.keys(version))
+        property = @randomFrom(_.properties(version))
         original = version[property]
         if _.isNumber original
           version[property] = @randomNumber()
@@ -82,7 +85,7 @@
     for prop in [0...newPropCount]
       do =>
         version[@randomProp()] = @randomValue()
-    version
+    [version, deleted]
     
   randomValue: (options = {})->
     options.typeOdds ||= [1, 1, 2, 4]

@@ -81,7 +81,7 @@ describe 'Patcher', ->
       @patcher._updatePatchFor(@patch, 
                                @changedAttributes,
                                @previousAttributes)
-      expect(_.keys(@patch)).toContain('number')
+      expect(_.properties(@patch)).toContain('number')
 
     it 'records the original version of all text attributes', ->
       @patcher._updatePatchFor(@patch, 

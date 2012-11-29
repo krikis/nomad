@@ -6,7 +6,7 @@ suite = @memory = new Suite
   baseline:  ->
   record:    ->
     @count += 1
-    (JSON.stringify(@answer._versioning.patches).length / JSON.stringify(@answer.attributes).length) * 100
+    (JSON.stringify(@answer._versioning.patches).length / JSON.stringify(@answerOriginal).length) * 100
   unit:      '%'
   unitLong:  'Portion of original data'
   # benchRuns: 1
