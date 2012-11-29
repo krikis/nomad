@@ -57,29 +57,32 @@
   
   randomVersion: (object, delPropCount, changePropCount, newPropCount, loremChange, stringChange) ->
     version = _.deepClone object
+    properties = _.properties(version)
     deleted = []
     unless delPropCount?
       delPropCount = @randomFrom(1, 3)
     for prop in [0...delPropCount]
       do =>
-        property = @randomFrom(_.properties(version))
-        deleted.push property
-        delete version[property]
+        if properties.length > 0
+          property = @randomFrom(properties)
+          deleted.push property
+          delete version[property]
     unless changePropCount?
       changePropCount = @randomFrom(4, 7)
     for prop in [0...changePropCount]
       do =>
-        property = @randomFrom(_.properties(version))
-        original = version[property]
-        if _.isNumber original
-          version[property] = @randomNumber()
-        else if _.isBoolean original
-          version[property] = @randomBoolean()
-        else if _.isString original
-          if ' ' in original
-            version[property] = @loremIpsumVersion version[property], loremChange
-          else
-            version[property] = @stringVersion version[property], stringChange
+        if properties.length > 0
+          property = @randomFrom(properties)
+          original = version[property]
+          if _.isNumber original
+            version[property] = @randomNumber()
+          else if _.isBoolean original
+            version[property] = @randomBoolean()
+          else if _.isString original
+            if ' ' in original
+              version[property] = @loremIpsumVersion version[property], loremChange
+            else
+              version[property] = @stringVersion version[property], stringChange
     unless newPropCount?
       newPropCount = @randomFrom(1, 3)
     for prop in [0...newPropCount]
@@ -140,7 +143,7 @@
           frequency = parseInt(frequencies[index])
           if frequency > 0
             _.each [1..frequency], ->
-              selectFrom.push value       
+              selectFrom.push value   
       index = Math.floor(Math.random() * selectFrom.length)
       selectFrom[index]
     # generate random float
