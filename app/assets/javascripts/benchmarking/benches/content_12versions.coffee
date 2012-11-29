@@ -15,9 +15,9 @@ Benches.beforeContent12 = (next) ->
 
 Benches.content12 = (next) ->    
   _.each [1..12], =>
-    deleteCount  = Util.randomFrom(0, 2)
+    deleteCount  = 0
     changeCount  = Util.randomFrom(4, 8)
-    createCount  = Util.randomFrom(0, 2)
+    createCount  = 0
     textChange   = 15
     stringChange = 5
     [@answerVersion, deleted] = Util.randomVersion(@answerVersion,
