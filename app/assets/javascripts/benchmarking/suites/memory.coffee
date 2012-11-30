@@ -18,7 +18,7 @@ suite.bench
   setup:    Benches.  setupPatch12
   before:   Benches. beforePatch12
   test:     Benches.       patch12
-  seeds:    [150,122,120,125,135,150,149,119,138,131,124,141,129,118,124,156,119,104,120,127]
+  seeds:    [253,232,199,224,274,270,264,242,316,293,257,236,259,350,269,300,338,296,283,315]
 
 suite.bench
   category: 'merged'
@@ -26,7 +26,7 @@ suite.bench
   setup:    Benches.  setupContent12
   before:   Benches. beforeContent12
   test:     Benches.       content12
-  seeds:    [30,24,25,30,31,31,34,35,32,29,36,26,27,23,38,37,27,23,28,33]
+  seeds:    [98,101,99,97,98,99,99,97,99,99,100,97,99,97,101,97,100,95,98,98]
 
 suite.bench
   category: 'incremental'
@@ -34,7 +34,7 @@ suite.bench
   setup:    Benches.  setupPatch6
   before:   Benches. beforePatch6
   test:     Benches.       patch6
-  seeds:    [77,83,87,76,95,80,91,90,97,80,91,80,64,86,84,102,96,87,85,81]
+  seeds:    [165,124,116,164,125,128,125,121,137,139,141,127,157,166,124,134,124,155,143,129]
 
 suite.bench
   category: 'merged'
@@ -42,7 +42,7 @@ suite.bench
   setup:    Benches.  setupContent6
   before:   Benches. beforeContent6
   test:     Benches.       content6
-  seeds:    [33,23,33,27,42,26,30,32,35,32,34,34,29,26,30,35,25,25,34,22]
+  seeds:    [80,89,85,87,87,90,77,81,82,79,87,84,86,84,93,79,82,83,90,78]
 
 suite.bench
   category: 'incremental'
@@ -50,7 +50,7 @@ suite.bench
   setup:    Benches.  setupPatch3
   before:   Benches. beforePatch3
   test:     Benches.       patch3
-  seeds:    [69,49,52,45,78,49,87,67,47,51,57,60,65,53,52,57,47,59,51,52]
+  seeds:    [67,68,78,57,57,67,56,90,72,60,84,66,53,73,90,67,66,63,82,80]
 
 suite.bench
   category: 'merged'
@@ -58,5 +58,5 @@ suite.bench
   setup:    Benches.  setupContent3
   before:   Benches. beforeContent3
   test:     Benches.       content3
-  seeds:    [17,16,22,24,23,18,28,21,25,14,29,27,28,29,22,21,30,32,40,17]
+  seeds:    [65,51,50,54,56,62,66,66,65,50,62,64,49,59,62,53,70,71,54,74]
 
