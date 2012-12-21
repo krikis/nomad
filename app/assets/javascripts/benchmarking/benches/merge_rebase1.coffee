@@ -1,24 +1,24 @@
 Benches = @Benches ||= {}
 
-Benches.setupMergeRebase6 = (next) ->
+Benches.setupMergeRebase1 = (next) ->
+  # define a model
   class Answer extends Backbone.Model
     collection:
       url: '/some/url'
   @Answer = Answer
   next.call @
 
-Benches.beforeMergeRebase6 = (next) ->
-  @answer = new @Answer Benches.fixedAnswer()
-  @answer.set Benches.fixedAnswerV1u1()
-  @answer.set Benches.fixedAnswerV1u2()
-  @answer.set Benches.fixedAnswerV1u3()
-  @answer.set Benches.fixedAnswerV1u4()
-  @answer.set Benches.fixedAnswerV1u5()
-  @answer.set Benches.fixedAnswerV1u6()
+Benches.beforeMergeRebase1 = (next) ->  
+  # instantiate a data object with up to date data
   @dummy = new @Answer Benches.fixedAnswerV2()
+  # instantiate a data object with outdated data
+  @answer = new @Answer Benches.fixedAnswer()
+  # perform a number of conflicting updates
+  @answer.set Benches.fixedAnswerV1u1()
   next.call @
 
-Benches.mergeRebase6 = (next) ->
+Benches.mergeRebase1 = (next) ->
+  # resolve the conflicts
   @success = @answer._applyPatchesTo @dummy
   window.merge = JSON.stringify @dummy._sortPropertiesIn @dummy.attributes
   next.call @

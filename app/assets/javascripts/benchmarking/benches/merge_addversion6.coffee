@@ -15,7 +15,7 @@ Benches.mergeAddVersion6 = (next) ->
   @answer.set Benches.fixedAnswerV1u1()
   @answer.set Benches.fixedAnswerV1u2()
   @answer.set Benches.fixedAnswerV1u3()
-  @answer.set Benches.fixedAnswerV1u1()
-  @answer.set Benches.fixedAnswerV1u2()
-  @answer.set Benches.fixedAnswerV1u3()
+  @answer.set Benches.fixedAnswerV1u4()
+  @answer.set Benches.fixedAnswerV1u5()
+  @answer.set Benches.fixedAnswerV1u6()
   next.call @

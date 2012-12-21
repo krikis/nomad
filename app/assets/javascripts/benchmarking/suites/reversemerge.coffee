@@ -70,3 +70,35 @@ suite.bench
   test:     Benches.       mergeAddVersion3
   seeds:    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 
+suite.bench
+  category: 'structured'
+  series:   'reconcile(1)'
+  setup:    Benches.  setupStructRebase1
+  before:   Benches. beforeStructRebase1
+  test:     Benches.       structRebase1
+  seeds:    []
+
+suite.bench
+  category: 'merged'
+  series:   'reconcile(1)'
+  setup:    Benches.  setupMergeRebase1
+  before:   Benches. beforeMergeRebase1
+  test:     Benches.       mergeRebase1
+  seeds:    []
+
+suite.bench
+  category: 'structured'
+  series:   'version(1)'
+  setup:    Benches.  setupStructAddVersion1
+  before:   Benches. beforeStructAddVersion1
+  test:     Benches.       structAddVersion1
+  seeds:    []
+
+suite.bench
+  category: 'merged'
+  series:   'version(1)'
+  setup:    Benches.  setupMergeAddVersion1
+  before:   Benches. beforeMergeAddVersion1
+  test:     Benches.       mergeAddVersion1
+  seeds:    []
+
