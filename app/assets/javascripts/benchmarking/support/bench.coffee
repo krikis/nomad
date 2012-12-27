@@ -165,5 +165,13 @@ class @Bench
         catch error
           @handleError error          
       ), @TIMEOUT_INCREMENT
-
+  
+  # Generate four random hex digits.
+  S4 = ->
+    (((1 + Math.random()) * 0x10000) | 0).toString(16).substring 1
+  
+  # Generate a pseudo-GUID by concatenating random hexadecimal.
+  uid: ->
+    S4() + S4()
+  
 
