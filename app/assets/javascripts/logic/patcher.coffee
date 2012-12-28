@@ -7,7 +7,7 @@ class @Patcher
   updatePatches: ->
     # initialize diff object should it fail to exist
     if not (patch = _.last @model.patches()) or
-       patch.base in @model.syncingVersions()
+       (patch.base + 1) in @model.syncingVersions()
       @model.patches().push
         _patch: {}
         base: @model.localClock() || 0
@@ -35,8 +35,8 @@ class @Patcher
           # just record the property key
           patch[attribute] = null
       # when recursion is indicated
-      if _.isObject(patch[attribute]) and 
-         _.isObject(previousValue) and 
+      if _.isObject(patch[attribute]) and
+         _.isObject(previousValue) and
          _.isObject(value)
         # calculate the set of changed properties in the nested object
         changedAttributes = @_changedAttributes(changed[attribute],
@@ -94,7 +94,7 @@ class @Patcher
                     originalValue, currentValue) ->
     if _.isString(currentValue)
       # when a diff can be generated
-      if _.isString(originalValue) and 
+      if _.isString(originalValue) and
          _.isString(attributesToPatch[attribute])
         # patch attribute with diff between original and current
         @_patchString(attribute, attributesToPatch,
@@ -117,9 +117,9 @@ class @Patcher
       attributesToPatch[attribute] = currentValue
       true
 
-  # patch a new string value using the diff 
+  # patch a new string value using the diff
   # of the original and current value
-  _patchString: (attribute, attributesToPatch, 
+  _patchString: (attribute, attributesToPatch,
                  originalValue, currentValue) ->
     # calculate the diff and patch
     diff = @dmp.diff_main originalValue,

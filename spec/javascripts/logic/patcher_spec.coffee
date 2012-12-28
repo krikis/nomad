@@ -42,7 +42,7 @@ describe 'Patcher', ->
         ,
           base: 1
         ]
-        @syncingVersions = [1]
+        @syncingVersions = [2]
 
       it 'appends a new patch to the list of patches', ->
         @patcher.updatePatches()
