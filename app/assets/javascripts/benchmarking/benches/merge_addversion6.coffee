@@ -11,11 +11,16 @@ Benches.beforeMergeAddVersion6 = (next) ->
   @answer = new @Answer Benches.fixedAnswer()
   next.call @
 
-Benches.mergeAddVersion6 = (next) ->
+Benches.mergeAddVersion6 = (next) ->  
   @answer.set Benches.fixedAnswerV1u1()
+  @answer.updateSyncingVersions()
   @answer.set Benches.fixedAnswerV1u2()
+  @answer.updateSyncingVersions()
   @answer.set Benches.fixedAnswerV1u3()
+  @answer.updateSyncingVersions()
   @answer.set Benches.fixedAnswerV1u4()
+  @answer.updateSyncingVersions()
   @answer.set Benches.fixedAnswerV1u5()
+  @answer.updateSyncingVersions()
   @answer.set Benches.fixedAnswerV1u6()
   next.call @
