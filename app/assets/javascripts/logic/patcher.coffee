@@ -6,7 +6,7 @@ class @Patcher
   # update the merged diff object o reflect the latest data change
   updatePatches: ->
     # initialize diff object should it fail to exist
-    if not (patch = @model.patches()[0]) or
+    if not (patch = _.last @model.patches()) or
        patch.base in @model.syncingVersions()
       @model.patches().push
         _patch: {}

@@ -39,8 +39,10 @@ describe 'Patcher', ->
       beforeEach ->
         @patches = [
           base: 0
+        ,
+          base: 1
         ]
-        @syncingVersions = [0]
+        @syncingVersions = [1]
 
       it 'appends a new patch to the list of patches', ->
         @patcher.updatePatches()

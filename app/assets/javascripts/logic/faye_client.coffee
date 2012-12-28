@@ -1,7 +1,7 @@
 @BackboneSync ||= {}
 
-# @FAYE_SERVER = "http://195.240.7.166:9292/faye"
-@FAYE_SERVER = 'http://129.125.147.34:9292/faye'
+@FAYE_SERVER = 'http://195.240.7.166:9292/faye'
+# @FAYE_SERVER = 'http://129.125.147.34:9292/faye'
 
 class @BackboneSync.FayeClient
   constructor: (collection, options = {}) ->
