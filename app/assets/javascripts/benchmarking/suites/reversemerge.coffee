@@ -8,34 +8,34 @@ suite = @reverseMerge = new Suite
   
 suite.bench
   category: 'structured'
-  series:   'reconcile(50%)'
-  setup:    Benches.  setupStructRebase50
-  before:   Benches. beforeStructRebase50
-  test:     Benches.       structRebase50
+  series:   'reconcile(37%)'
+  setup:    Benches.  setupStructRebase37
+  before:   Benches. beforeStructRebase37
+  test:     Benches.       structRebase37
   seeds:    []
 
 suite.bench
   category: 'merged'
-  series:   'reconcile(50%)'
-  setup:    Benches.  setupMergeRebase50
-  before:   Benches. beforeMergeRebase50
-  test:     Benches.       mergeRebase50
+  series:   'reconcile(37%)'
+  setup:    Benches.  setupMergeRebase37
+  before:   Benches. beforeMergeRebase37
+  test:     Benches.       mergeRebase37
   seeds:    []
 
 suite.bench
   category: 'structured'
-  series:   'version(50%)'
-  setup:    Benches.  setupStructAddVersion50
-  before:   Benches. beforeStructAddVersion50
-  test:     Benches.       structAddVersion50
+  series:   'version(37%)'
+  setup:    Benches.  setupStructAddVersion37
+  before:   Benches. beforeStructAddVersion37
+  test:     Benches.       structAddVersion37
   seeds:    []
 
 suite.bench
   category: 'merged'
-  series:   'version(50%)'
-  setup:    Benches.  setupMergeAddVersion50
-  before:   Benches. beforeMergeAddVersion50
-  test:     Benches.       mergeAddVersion50
+  series:   'version(37%)'
+  setup:    Benches.  setupMergeAddVersion37
+  before:   Benches. beforeMergeAddVersion37
+  test:     Benches.       mergeAddVersion37
   seeds:    []
 
 suite.bench
