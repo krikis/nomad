@@ -19,7 +19,7 @@ suite.bench
   setup:    Benches.  setupSerialized50
   before:   Benches. beforeSerialized50
   test:     Benches.       serialized50
-  seeds:    [0,0,20,10,0,20,10,10,0,0,10,10,0,0,0,0,10,0,10,0]
+  seeds:    [0,0,0,0,0,0,0,0,0,0,10,0,0,0,0,10,0,0,0,0,0,0,0,0]
 
 suite.bench
   category: 'serialized'
@@ -27,7 +27,7 @@ suite.bench
   setup:    Benches.  setupSerialized25
   before:   Benches. beforeSerialized25
   test:     Benches.       serialized25
-  seeds:    [30,50,30,40,40,40,10,30,10,30,50,70,30,0,40,10,40,40,20,20]
+  seeds:    [40,30,40,30,30,40,30,20,50,30,20,30,10,30,40,20,30,30,10,30,20,20,20,30]
 
 suite.bench
   category: 'serialized'
@@ -35,7 +35,7 @@ suite.bench
   setup:    Benches.  setupSerialized12
   before:   Benches. beforeSerialized12
   test:     Benches.       serialized12
-  seeds:    [60,70,90,70,80,50,70,40,80,80,30,60,80,80,70,50,90,70,80,30]
+  seeds:    [70,80,40,80,40,70,80,60,70,80,70,60,30,70,70,70,90,70,100,80,90,70,60,60]
 
 suite.bench
   category: 'attributes'
@@ -43,7 +43,7 @@ suite.bench
   setup:    Benches.  setupAttribute50
   before:   Benches. beforeAttribute50
   test:     Benches.       attribute50
-  seeds:    [90,60,100,60,80,70,90,90,70,80,80,100,70,90,80,60,70,90,90,80]
+  seeds:    [30,50,40,60,60,40,60,60,50,50,60,80,30,50,50,70,50,50,60,30,30,80,50,50]
 
 suite.bench
   category: 'attributes'
@@ -51,7 +51,7 @@ suite.bench
   setup:    Benches.  setupAttribute25
   before:   Benches. beforeAttribute25
   test:     Benches.       attribute25
-  seeds:    [90,100,90,90,100,90,100,100,90,90,100,100,90,90,100,100,100,90,90,80]
+  seeds:    [90,100,100,90,80,100,90,90,90,80,80,70,90,90,100,90,90,80,80,90,90,90,80,100]
 
 suite.bench
   category: 'attributes'
@@ -59,6 +59,6 @@ suite.bench
   setup:    Benches.  setupAttribute12
   before:   Benches. beforeAttribute12
   test:     Benches.       attribute12
-  seeds:    [100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100]
+  seeds:    [100,100,100,100,100,100,90,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100]
 
 
