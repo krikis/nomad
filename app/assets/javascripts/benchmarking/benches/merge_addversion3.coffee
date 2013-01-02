@@ -16,8 +16,6 @@ Benches.beforeMergeAddVersion3 = (next) ->
 # perform three updates on data object 
 Benches.mergeAddVersion3 = (next) ->
   @answer.set Benches.fixedAnswerV1u1()
-  @answer.updateSyncingVersions()
   @answer.set Benches.fixedAnswerV1u2()
-  @answer.updateSyncingVersions()
   @answer.set Benches.fixedAnswerV1u3()
   next.call @

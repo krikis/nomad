@@ -15,9 +15,7 @@ Benches.beforeMergeRebase3 = (next) ->
   @answer = new @Answer Benches.fixedAnswer()
   # perform a number of conflicting updates
   @answer.set Benches.fixedAnswerV1u1()
-  @answer.updateSyncingVersions()
   @answer.set Benches.fixedAnswerV1u2()
-  @answer.updateSyncingVersions()
   @answer.set Benches.fixedAnswerV1u3()
   next.call @
 

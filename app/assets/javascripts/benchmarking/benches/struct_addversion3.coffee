@@ -14,8 +14,6 @@ Benches.beforeStructAddVersion3 = (next) ->
 
 Benches.structAddVersion3 = (next) ->
   @answer.set Benches.fixedAnswerV1u1()
-  @answer.updateSyncingVersions()
   @answer.set Benches.fixedAnswerV1u2()
-  @answer.updateSyncingVersions()
   @answer.set Benches.fixedAnswerV1u3()
   next.call @

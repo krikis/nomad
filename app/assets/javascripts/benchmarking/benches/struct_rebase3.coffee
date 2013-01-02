@@ -11,9 +11,7 @@ Benches.setupStructRebase3 = (next) ->
 Benches.beforeStructRebase3 = (next) ->
   @answer = new @Answer Benches.fixedAnswer()
   @answer.set Benches.fixedAnswerV1u1()
-  @answer.updateSyncingVersions()
   @answer.set Benches.fixedAnswerV1u2()
-  @answer.updateSyncingVersions()
   @answer.set Benches.fixedAnswerV1u3()
   @dummy = new @Answer Benches.fixedAnswerV2()
   next.call @
