@@ -55,20 +55,21 @@
   randomProp: ->
     @randomString(5, 'abcdefghijklmnopqrstuvwxyz')
   
-  randomVersion: (object, delPropCount, changePropCount, newPropCount, loremChange, stringChange) ->
+  randomVersion: (object, amountOfChange)->
+    unless amountOfChange > 0 and amountOfChange < 1
+      amountOfChange = @randomFrom([0.3, 0.4, 0.5, 0.6, 0.7])
     version = _.deepClone object
     properties = _.properties(version)
+    nrOfProperties = properties.length
     deleted = []
-    unless delPropCount?
-      delPropCount = @randomFrom(1, 3)
+    delPropCount = Math.floor(nrOfProperties * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
     for prop in [0...delPropCount]
       do =>
         if properties.length > 0
           property = @randomFrom(properties)
           deleted.push property
           delete version[property]
-    unless changePropCount?
-      changePropCount = @randomFrom(4, 7)
+    changePropCount = Math.floor(nrOfProperties * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))
     for prop in [0...changePropCount]
       do =>
         if properties.length > 0
@@ -80,11 +81,10 @@
             version[property] = @randomBoolean()
           else if _.isString original
             if ' ' in original
-              version[property] = @loremIpsumVersion version[property], loremChange
+              version[property] = @loremIpsumVersion version[property], amountOfChange
             else
-              version[property] = @stringVersion version[property], stringChange
-    unless newPropCount?
-      newPropCount = @randomFrom(1, 3)
+              version[property] = @stringVersion version[property], amountOfChange
+    newPropCount = Math.floor(nrOfProperties * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
     for prop in [0...newPropCount]
       do =>
         version[@randomProp()] = @randomValue()
@@ -122,13 +122,27 @@
       randomString.push @randomFrom(charSet)
     randomString.join('')
 
-  stringVersion: (string, change = 5) ->
-    begin = @randomFrom(0, string.length)
-    end = Math.min(begin + @randomFrom(0, change), string.length)
-    prefix = string.substring(0, begin)
-    postfix = string.substring(end)
-    infix = @randomString @randomFrom(0, change)
-    prefix + infix + postfix
+  stringVersion: (string, amountOfChange) ->
+    unless amountOfChange > 0 and amountOfChange < 1
+      amountOfChange = @randomFrom([0.3, 0.4, 0.5, 0.6, 0.7])
+    nrOfChars = string.length
+    out = string.slice()
+    delCharCount = Math.floor(nrOfChars * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))    
+    for char in [0...delCharCount]
+      do =>
+        index = @randomFrom([0...out.length])
+        out = out.slice(0, index) + out.slice(index + 1)
+    changeCharCount = Math.floor(nrOfChars * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))
+    for char in [0...changeCharCount]
+      do =>
+        index = @randomFrom([0...out.length])
+        out = out.slice(0, index) + @randomString(1) + out.slice(index + 1)
+    newCharCount = Math.floor(nrOfChars * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
+    for char in [0...newCharCount]
+      do =>
+        index = @randomFrom([0...out.length])
+        out = out.slice(0, index) + @randomString(1) + out.slice(index)
+    out
 
   randomFrom: ->
     # select random entry from array or string
@@ -189,19 +203,41 @@
         out.push word
     out.join(' ')
   
-  loremIpsumVersion: (text, change = 15) ->
-    out = text.split(' ')
-    begin = @randomFrom(0, out.length)
-    end = Math.min(begin + @randomFrom(0, change), out.length)
-    first = out.slice(0, begin).join(' ')
-    last = out.slice(end).join(' ')
-    middle = @loremIpsum @randomFrom(0, change)
-    unless _.isEmpty middle
-      unless (_.last(first) == '.') or _.isEmpty(first)
-        middle = middle[0].toLowerCase() + middle.substring(1)
-      unless /[A-Z]/.test(_.first(last)) or _.isEmpty(last)
-        middle = middle.substring(0, middle.length - 1)
-    [first, middle, last].join(' ')
+  loremIpsumVersion: (text, amountOfChange)->
+    unless amountOfChange > 0 and amountOfChange < 1
+      amountOfChange = @randomFrom([0.3, 0.4, 0.5, 0.6, 0.7])
+    out = _.flatten _.map text.split('. '), (sentence)-> sentence.split(', ')
+    nrOfParts = out.length
+    delPartCount = Math.floor(nrOfParts * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))    
+    for part in [0...delPartCount]
+      do =>
+        index = @randomFrom([0...out.length])
+        out = out.slice(0, index).concat out.slice(index + 1)
+        out[index] += '.' if _.isEmpty(out[index + 1])
+    changePartCount = Math.floor(nrOfParts * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))
+    for part in [0...changePartCount]
+      do =>
+        index = @randomFrom([0...out.length])
+        subsentence = @loremIpsum(@randomFrom(3, 7))
+        unless /[A-Z]/.test(_.first(out[index]))
+          subsentence = subsentence[0].toLowerCase() + subsentence.substring(1)
+        unless _.isEmpty(out[index + 1])
+          subsentence = subsentence.substring(0, subsentence.length - 1)
+        out = out.slice(0, index).concat [subsentence].concat out.slice(index + 1)
+    newPartCount = Math.floor(nrOfParts * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
+    for part in [0...newPartCount]
+      do =>
+        index = @randomFrom([0..out.length])
+        subsentence = @loremIpsum(@randomFrom(3, 7))
+        unless _.isEmpty(out[index])
+          subsentence = subsentence.substring(0, subsentence.length - 1)
+        out = out.slice(0, index).concat [subsentence].concat out.slice(index)
+    _.each [0...out.length - 1], (index)->
+      if /[A-Z]/.test(_.first(out[index + 1]))
+        out[index] += '.'
+      else
+        out[index] += ','
+    out.join(' ')
 
   loremIpsumWordBank: [
     "lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipisicing",
@@ -250,4 +286,3 @@
     "alias", "consequatur", "aut", "perferendis", "doloribus", "asperiores",
     "repellat"
   ]
-  

@@ -10,26 +10,11 @@ Benches.setupAttribute25 = (next) ->
 Benches.beforeAttribute25 = (next) ->
   @answerOriginal = Util.randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
-  deleteCount  = Util.randomFrom(0, 2)
-  changeCount  = Util.randomFrom(1, 4)
-  createCount  = Util.randomFrom(1, 2)
-  textChange   = 8
-  stringChange = 3  
   # perform the winning update
-  [@dummyOriginal, deleted] = Util.randomVersion(@answerOriginal,
-                                                 deleteCount,   
-                                                 changeCount,   
-                                                 createCount,   
-                                                 textChange,   
-                                                 stringChange)
+  [@dummyOriginal, deleted] = Util.randomVersion(@answerOriginal, 0.25)
   @dummy = new @Answer _.deepClone @dummyOriginal
   # perform the losing update
-  [version, deleted] = Util.randomVersion(@answerOriginal,
-                                          deleteCount,   
-                                          changeCount,   
-                                          createCount,   
-                                          textChange,   
-                                          stringChange)
+  [version, deleted] = Util.randomVersion(@answerOriginal, 0.25)
   @answer.set version
   _.each deleted, (property)=>
     @answer.unset property

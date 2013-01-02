@@ -9,28 +9,14 @@ Benches.setupSerialized12 = (next) ->
   next.call @
 
 Benches.beforeSerialized12 = (next) ->
+  # create the original data version
   @answerOriginal = Util.randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
-  deleteCount  = Util.randomFrom(0, 1)
-  changeCount  = Util.randomFrom(1, 2)
-  createCount  = Util.randomFrom(0, 1)
-  textChange   = 4
-  stringChange = 1
   # perform the winning update
-  [@dummyOriginal, deleted] = Util.randomVersion(@answerOriginal,
-                                                 deleteCount,   
-                                                 changeCount,   
-                                                 createCount,   
-                                                 textChange,   
-                                                 stringChange)
+  [@dummyOriginal, deleted] = Util.randomVersion(@answerOriginal, 0.125)
   @dummy = new @Answer _.deepClone @dummyOriginal
   # perform the losing update
-  [version, deleted] = Util.randomVersion(@answerOriginal,
-                                          deleteCount,   
-                                          changeCount,   
-                                          createCount,   
-                                          textChange,   
-                                          stringChange)
+  [version, deleted] = Util.randomVersion(@answerOriginal, 0.125)
   @answer.set version
   _.each deleted, (property)=>
     @answer.unset property
