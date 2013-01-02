@@ -178,7 +178,7 @@
   _applyPatchesTo: (dummy) ->
     # if the incremental log is used
     if @versioning == 'structured_content_diff'
-      patches = _(@_versioning.patches)
+      patches = _(@_versioning?.patches)
       # apply all patches to the new data
       patches.all (patch) =>
         dummy._applyPatch(patch.patch_text)
