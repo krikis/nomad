@@ -69,7 +69,7 @@
           property = @randomFrom(properties)
           deleted.push property
           delete version[property]
-    changePropCount = Math.floor(nrOfProperties * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))
+    changePropCount = Math.ceil(nrOfProperties * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))
     for prop in [0...changePropCount]
       do =>
         if properties.length > 0
@@ -132,7 +132,7 @@
       do =>
         index = @randomFrom([0...out.length])
         out = out.slice(0, index) + out.slice(index + 1)
-    changeCharCount = Math.floor(nrOfChars * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))
+    changeCharCount = Math.ceil(nrOfChars * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))
     for char in [0...changeCharCount]
       do =>
         index = @randomFrom([0...out.length])
