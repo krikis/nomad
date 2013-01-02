@@ -18,3 +18,9 @@ _.deepExtend ||= (obj) ->
       obj[prop] = _.deepClone source[prop]
   obj
   
+_.prettyInspect ||= (object, name='Object') ->
+  "-------------------#{name}-------------------\n" +
+  _.map(_.properties(object).sort(), (property)->
+    "- #{property}: #{object[property]}"
+  ).join('\n')
+  
