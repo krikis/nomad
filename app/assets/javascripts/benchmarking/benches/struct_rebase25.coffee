@@ -25,5 +25,11 @@ Benches.beforeStructRebase25 = (next) ->
 
 Benches.structRebase25 = (next) ->
   # resolve the conflicts
-  @success = @answer._applyPatchesTo @dummy
-  next.call @
+  try
+    @success = @answer._applyPatchesTo @dummy
+  catch error
+    @suite?.log error.message
+    @suite?.log error.stack
+    @success = false
+  finally
+    next.call @
