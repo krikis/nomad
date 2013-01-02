@@ -22,5 +22,4 @@ Benches.beforeMergeRebase3 = (next) ->
 Benches.mergeRebase3 = (next) ->
   # resolve the conflicts
   @success = @answer._applyPatchesTo @dummy
-  window.merge = JSON.stringify @dummy._sortPropertiesIn @dummy.attributes
   next.call @

@@ -13,12 +13,11 @@ Benches.beforeMergeRebase1 = (next) ->
   @dummy = new @Answer Benches.fixedAnswerV2()
   # instantiate a data object with outdated data
   @answer = new @Answer Benches.fixedAnswer()
-  # perform a number of conflicting updates
+  # perform a conflicting update
   @answer.set Benches.fixedAnswerV1u1()
   next.call @
 
 Benches.mergeRebase1 = (next) ->
   # resolve the conflicts
   @success = @answer._applyPatchesTo @dummy
-  window.merge = JSON.stringify @dummy._sortPropertiesIn @dummy.attributes
   next.call @

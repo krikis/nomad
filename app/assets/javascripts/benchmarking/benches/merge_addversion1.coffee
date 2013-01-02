@@ -13,7 +13,7 @@ Benches.beforeMergeAddVersion1 = (next) ->
   @answer = new @Answer Benches.fixedAnswer()
   next.call @
 
-# perform three updates on data object 
+# perform one update on data object 
 Benches.mergeAddVersion1 = (next) ->
   @answer.set Benches.fixedAnswerV1u1()
   next.call @
