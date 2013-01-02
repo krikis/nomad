@@ -62,29 +62,29 @@
     properties = _.properties(version)
     nrOfProperties = properties.length
     deleted = []
-    delPropCount = Math.floor(nrOfProperties * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
+    delPropCount = Math.round(nrOfProperties * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
     for prop in [0...delPropCount]
       do =>
         if properties.length > 0
           property = @randomFrom(properties)
           deleted.push property
           delete version[property]
-    changePropCount = Math.ceil(nrOfProperties * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))
+    changePropCount = _.max [1, Math.round(nrOfProperties * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))]
     for prop in [0...changePropCount]
       do =>
         if properties.length > 0
           property = @randomFrom(properties)
           original = version[property]
           if _.isNumber original
-            version[property] = @randomNumber()
+            version[property] += @randomNumber()
           else if _.isBoolean original
-            version[property] = @randomBoolean()
+            version[property] = not version[property]
           else if _.isString original
             if ' ' in original
               version[property] = @loremIpsumVersion version[property], amountOfChange
             else
               version[property] = @stringVersion version[property], amountOfChange
-    newPropCount = Math.floor(nrOfProperties * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
+    newPropCount = Math.round(nrOfProperties * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
     for prop in [0...newPropCount]
       do =>
         version[@randomProp()] = @randomValue()
@@ -127,17 +127,17 @@
       amountOfChange = @randomFrom([0.3, 0.4, 0.5, 0.6, 0.7])
     nrOfChars = string.length
     out = string.slice()
-    delCharCount = Math.floor(nrOfChars * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))    
+    delCharCount = Math.round(nrOfChars * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))    
     for char in [0...delCharCount]
       do =>
         index = @randomFrom([0...out.length])
         out = out.slice(0, index) + out.slice(index + 1)
-    changeCharCount = Math.ceil(nrOfChars * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))
+    changeCharCount = _.max [1, Math.round(nrOfChars * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))]
     for char in [0...changeCharCount]
       do =>
         index = @randomFrom([0...out.length])
         out = out.slice(0, index) + @randomString(1) + out.slice(index + 1)
-    newCharCount = Math.floor(nrOfChars * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
+    newCharCount = Math.round(nrOfChars * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
     for char in [0...newCharCount]
       do =>
         index = @randomFrom([0...out.length])
@@ -208,13 +208,13 @@
       amountOfChange = @randomFrom([0.3, 0.4, 0.5, 0.6, 0.7])
     out = _.flatten _.map text.split('. '), (sentence)-> sentence.split(', ')
     nrOfParts = out.length
-    delPartCount = Math.floor(nrOfParts * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))    
+    delPartCount = Math.round(nrOfParts * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))    
     for part in [0...delPartCount]
       do =>
         index = @randomFrom([0...out.length])
         out = out.slice(0, index).concat out.slice(index + 1)
         out[index] += '.' if _.isEmpty(out[index + 1])
-    changePartCount = Math.ceil(nrOfParts * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))
+    changePartCount = _.max [1, Math.round(nrOfParts * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))]
     for part in [0...changePartCount]
       do =>
         index = @randomFrom([0...out.length])
@@ -224,7 +224,7 @@
         unless _.isEmpty(out[index + 1])
           subsentence = subsentence.substring(0, subsentence.length - 1)
         out = out.slice(0, index).concat [subsentence].concat out.slice(index + 1)
-    newPartCount = Math.floor(nrOfParts * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
+    newPartCount = Math.round(nrOfParts * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
     for part in [0...newPartCount]
       do =>
         index = @randomFrom([0..out.length])
