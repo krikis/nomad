@@ -12,27 +12,11 @@ Benches.beforeMergeRebase12 = (next) ->
   # create the original data version
   @answerOriginal = Util.randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
-  # specify the amount of random change
-  deleteCount  = Util.randomFrom(0, 1)
-  changeCount  = Util.randomFrom(1, 2)
-  createCount  = Util.randomFrom(0, 1)
-  textChange   = 4
-  stringChange = 1
   # perform the winning update
-  [dummyVersion, deleted] = Util.randomVersion(@answerOriginal,
-                                               deleteCount,   
-                                               changeCount,   
-                                               createCount,   
-                                               textChange,   
-                                               stringChange)
+  [dummyVersion, deleted] = Util.randomVersion(@answerOriginal, 0.125)
   @dummy = new @Answer _.deepClone dummyVersion
   # perform the losing update
-  [version, deleted] = Util.randomVersion(@answerOriginal,
-                                          deleteCount,   
-                                          changeCount,   
-                                          createCount,   
-                                          textChange,   
-                                          stringChange)
+  [version, deleted] = Util.randomVersion(@answerOriginal, 0.125)
   @answer.set version
   _.each deleted, (property)=>
     @answer.unset property

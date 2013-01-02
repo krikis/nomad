@@ -17,18 +17,7 @@ Benches.beforeStructAddVersion50 = (next) ->
 
 # perform update on data object
 Benches.structAddVersion50 = (next) ->
-  # specify the amount of random change
-  deleteCount  = Util.randomFrom(1, 3)
-  changeCount  = Util.randomFrom(4, 8)
-  createCount  = Util.randomFrom(1, 3)
-  textChange   = 15
-  stringChange = 5
-  [version, deleted] = Util.randomVersion(@answerOriginal,
-                                          deleteCount,   
-                                          changeCount,   
-                                          createCount,   
-                                          textChange,   
-                                          stringChange)
+  [version, deleted] = Util.randomVersion(@answerOriginal, 0.5)
   @answer.set version
   _.each deleted, (property)=>
     @answer.unset property
