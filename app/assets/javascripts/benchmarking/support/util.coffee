@@ -170,7 +170,7 @@
       Math.floor(Math.random() * (end - begin)) + begin
 
   loremIpsum: (textSize) ->
-    textSize ||= @randomFrom(15, 100)
+    textSize ||= @randomFrom(20, 100)
     minSentence = 5
     maxSentence = 15
     minSubSentence = 3
@@ -214,7 +214,7 @@
         index = @randomFrom([0...out.length])
         out = out.slice(0, index).concat out.slice(index + 1)
         out[index] += '.' if _.isEmpty(out[index + 1])
-    changePartCount = Math.floor(nrOfParts * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))
+    changePartCount = Math.ceil(nrOfParts * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))
     for part in [0...changePartCount]
       do =>
         index = @randomFrom([0...out.length])
