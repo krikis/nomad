@@ -77,8 +77,8 @@ Benches.attribute12 = (next) ->
       # console.log 'Patching failed!!!'
       @success = 0
   catch error
-    # console.error error.message
-    # console.log error.stack
+    @suite?.log error.message
+    @suite?.log error.stack
     @success = 0
   finally
     next.call @
