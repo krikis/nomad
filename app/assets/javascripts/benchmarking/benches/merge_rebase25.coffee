@@ -20,11 +20,11 @@ Benches.beforeMergeRebase25 = (next) ->
   stringChange = 3
   # perform the winning update
   [dummyVersion, deleted] = Util.randomVersion(@answerOriginal,
-                                                 deleteCount,   
-                                                 changeCount,   
-                                                 createCount,   
-                                                 textChange,   
-                                                 stringChange)
+                                               deleteCount,   
+                                               changeCount,   
+                                               createCount,   
+                                               textChange,   
+                                               stringChange)
   @dummy = new @Answer _.deepClone dummyVersion
   # perform the losing update
   [version, deleted] = Util.randomVersion(@answerOriginal,
