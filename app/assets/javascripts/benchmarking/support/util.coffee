@@ -62,14 +62,18 @@
     properties = _.properties(version)
     nrOfProperties = properties.length
     deleted = []
-    delPropCount = Math.round(nrOfProperties * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
+    delPropCount = @randomFrom([0.1, 0.2, 0.3])
+    changePropCount = @randomFrom([0.5, 0.6, 0.7])
+    newPropCount = @randomFrom([0.1, 0.2, 0.3])
+    totalChange = delPropCount + changePropCount + newPropCount
+    delPropCount = Math.round(nrOfProperties * amountOfChange * delPropCount / totalChange)
     for prop in [0...delPropCount]
       do =>
         if properties.length > 0
           property = @randomFrom(properties)
           deleted.push property
           delete version[property]
-    changePropCount = _.max [1, Math.round(nrOfProperties * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))]
+    changePropCount = _.max [1, Math.round(nrOfProperties * amountOfChange * changePropCount / totalChange)]
     for prop in [0...changePropCount]
       do =>
         if properties.length > 0
@@ -84,7 +88,7 @@
               version[property] = @loremIpsumVersion version[property], amountOfChange
             else
               version[property] = @stringVersion version[property], amountOfChange
-    newPropCount = Math.round(nrOfProperties * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
+    newPropCount = Math.round(nrOfProperties * amountOfChange * newPropCount / totalChange)
     for prop in [0...newPropCount]
       do =>
         version[@randomProp()] = @randomValue()
@@ -127,17 +131,21 @@
       amountOfChange = @randomFrom([0.3, 0.4, 0.5, 0.6, 0.7])
     nrOfChars = string.length
     out = string.slice()
-    delCharCount = Math.round(nrOfChars * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))    
+    delCharCount = @randomFrom([0.1, 0.2, 0.3])
+    changeCharCount = @randomFrom([0.5, 0.6, 0.7])
+    newCharCount = @randomFrom([0.1, 0.2, 0.3])
+    totalChange = delCharCount + changeCharCount + newCharCount
+    delCharCount = Math.round(nrOfChars * amountOfChange * delCharCount / totalChange)    
     for char in [0...delCharCount]
       do =>
         index = @randomFrom([0...out.length])
         out = out.slice(0, index) + out.slice(index + 1)
-    changeCharCount = _.max [1, Math.round(nrOfChars * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))]
+    changeCharCount = _.max [1, Math.round(nrOfChars * amountOfChange * changeCharCount / totalChange)]
     for char in [0...changeCharCount]
       do =>
         index = @randomFrom([0...out.length])
         out = out.slice(0, index) + @randomString(1) + out.slice(index + 1)
-    newCharCount = Math.round(nrOfChars * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
+    newCharCount = Math.round(nrOfChars * amountOfChange * newCharCount / totalChange)
     for char in [0...newCharCount]
       do =>
         index = @randomFrom([0...out.length])
@@ -208,13 +216,17 @@
       amountOfChange = @randomFrom([0.3, 0.4, 0.5, 0.6, 0.7])
     out = _.flatten _.map text.split('. '), (sentence)-> sentence.split(', ')
     nrOfParts = out.length
-    delPartCount = Math.round(nrOfParts * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))    
+    delPartCount = @randomFrom([0.1, 0.2, 0.3])
+    changePartCount = @randomFrom([0.5, 0.6, 0.7])
+    newPartCount = @randomFrom([0.1, 0.2, 0.3])
+    totalChange = delPartCount + changePartCount + newPartCount
+    delPartCount = Math.round(nrOfParts * amountOfChange * delPartCount / totalChange)    
     for part in [0...delPartCount]
       do =>
         index = @randomFrom([0...out.length])
         out = out.slice(0, index).concat out.slice(index + 1)
         out[index] += '.' if _.isEmpty(out[index + 1])
-    changePartCount = _.max [1, Math.round(nrOfParts * amountOfChange * @randomFrom([0.5, 0.6, 0.7]))]
+    changePartCount = _.max [1, Math.round(nrOfParts * amountOfChange * changePartCount / totalChange)]
     for part in [0...changePartCount]
       do =>
         index = @randomFrom([0...out.length])
@@ -224,7 +236,7 @@
         unless _.isEmpty(out[index + 1])
           subsentence = subsentence.substring(0, subsentence.length - 1)
         out = out.slice(0, index).concat [subsentence].concat out.slice(index + 1)
-    newPartCount = Math.round(nrOfParts * amountOfChange * @randomFrom([0.1, 0.2, 0.3]))
+    newPartCount = Math.round(nrOfParts * amountOfChange * newPartCount / totalChange)
     for part in [0...newPartCount]
       do =>
         index = @randomFrom([0..out.length])
