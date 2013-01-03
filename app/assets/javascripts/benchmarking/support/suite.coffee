@@ -28,14 +28,16 @@ class @Suite
     @initButtons()
 
   bench: (options = {}) ->
-    options.suite    = @
-    options.chart    ||= @chart
-    options.baseline ||= @baseline
-    options.record   ||= @record
+    options.suite       = @
+    options.chart     ||= @chart
+    options.baseline  ||= @baseline
+    options.record    ||= @record
     unless options.round?
-      options.round    = @round
-    options.unit     ||= @unit
-    options.unitLong ||= @unitLong
+      options.round     = @round
+    options.unit      ||= @unit
+    options.unitLong  ||= @unitLong
+    options.measure   ||= @measure
+    options.benchData ||= @benchData
     bench = new Bench options
     @benches.push bench
     category = bench.getCategory()
@@ -209,8 +211,6 @@ class @Suite
         next:    @nextBench
         context: @
         chart:   @chart
-        measure: @measure
-        data:    @benchData
         runs:    @benchRuns
         timeout: @timeout
     else

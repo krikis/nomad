@@ -3,33 +3,34 @@ class @Bench
   DEFAULT_TIMEOUT: 1000
 
   constructor: (options = {}) ->
-    @suite    = options.suite
-    @measure  = options.measure  || @suite?.measure
-    @category = options.category || @uid()
-    @series   = options.series   || @uid()
-    @setup    = options.setup    || (next) -> next.call(@)
-    @before   = options.before   || (next) -> next.call(@)
-    @test     = options.test     || (next) -> next.call(@)
-    @after    = options.after    || (next) -> next.call(@)
-    @cleanup  = options.cleanup  || (next) -> next.call(@)
-    @baseline = options.baseline || ->
-      @success = true
-      @start = new Date
-    @record   = options.record   || -> 
-      if @success
-        @count += 1
-        new Date - @start
-      else
-        0
-    @converge = options.converge || -> Math.abs(@previous - @current) < @current / 20
-    @round    = true
-    @round    = options.round    if options.round?
-    @unit     = options.unit
-    @unitLong = options.unitLong
-    @runs     = options.runs     || @DEFAULT_NR_OF_RUNS
-    @timeout  = options.timeout  || @DEFAULT_TIMEOUT
-    @chart    = options.chart    if options.chart?
-    @seeds    = options.seeds
+    @suite     = options.suite
+    @measure   = options.measure   || 'mean'
+    @category  = options.category  || @uid()
+    @series    = options.series    || @uid()
+    @setup     = options.setup     || (next) -> next.call(@)
+    @before    = options.before    || (next) -> next.call(@)
+    @test      = options.test      || (next) -> next.call(@)
+    @after     = options.after     || (next) -> next.call(@)
+    @cleanup   = options.cleanup   || (next) -> next.call(@)
+    @benchData = options.benchData || 'data70KB'
+    @baseline  = options.baseline  || ->
+      @success = true              
+      @start   = new Date          
+    @record    = options.record    || -> 
+      if @success                  
+        @count += 1                
+        new Date - @start          
+      else                         
+        0                          
+    @converge  = options.converge  || -> Math.abs(@previous - @current) < @current / 20
+    @round     = true              
+    @round     = options.round     if options.round?
+    @unit      = options.unit      || 'ms'
+    @unitLong  = options.unitLong  || 'Milliseconds'
+    @runs      = options.runs      || @DEFAULT_NR_OF_RUNS
+    @timeout   = options.timeout   || @DEFAULT_TIMEOUT
+    @chart     = options.chart     if options.chart?
+    @seeds     = options.seeds
     @initStats()
     @saveStats()
 
@@ -61,7 +62,6 @@ class @Bench
     @next      = options.next
     @context   = options.context
     @chart     = options.chart   if options.chart?
-    @benchData = options.data    || 'data70KB'
     @runs      = options.runs    if options.runs
     @timeout   = options.timeout if options.timeout
     @button    = options.button
