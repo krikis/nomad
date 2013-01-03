@@ -36,7 +36,9 @@
 
   # generates random property key
   randomProp: ->
-    @randomString(5, 'abcdefghijklmnopqrstuvwxyz')
+    @randomString
+      stringSize: 5
+      charSet: 'abcdefghijklmnopqrstuvwxyz'
     
   # generates attribute of random type
   randomValue: (options={})->
@@ -182,7 +184,7 @@
           property = @randomFrom(properties)
           original = version[property]
           if _.isNumber original
-            version[property] += @randomNumber()
+            version[property] += @randomNumber(decimals: 3)
           else if _.isBoolean original
             version[property] = not version[property]
           else if _.isString original
@@ -215,12 +217,12 @@
     for char in [0...changeCharCount]
       do =>
         index = @randomFrom([0...out.length])
-        out = out.slice(0, index) + @randomString(1) + out.slice(index + 1)
+        out = out.slice(0, index) + @randomString(stringSize: 1) + out.slice(index + 1)
     newCharCount = Math.round(nrOfChars * amountOfChange * newCharCount / totalChange)
     for char in [0...newCharCount]
       do =>
         index = @randomFrom([0...out.length])
-        out = out.slice(0, index) + @randomString(1) + out.slice(index)
+        out = out.slice(0, index) + @randomString(stringSize: 1) + out.slice(index)
     out
 
   # generates clone of text with random changes proportional to amountOfChange
@@ -243,7 +245,7 @@
     for part in [0...changePartCount]
       do =>
         index = @randomFrom([0...out.length])
-        subsentence = @loremIpsum(@randomFrom(3, 7))
+        subsentence = @loremIpsum(textSize: @randomFrom(3, 7))
         unless /[A-Z]/.test(_.first(out[index]))
           subsentence = subsentence[0].toLowerCase() + subsentence.substring(1)
         unless _.isEmpty(out[index + 1])
@@ -253,7 +255,7 @@
     for part in [0...newPartCount]
       do =>
         index = @randomFrom([0..out.length])
-        subsentence = @loremIpsum(@randomFrom(3, 7))
+        subsentence = @loremIpsum(textSize: @randomFrom(3, 7))
         unless _.isEmpty(out[index])
           subsentence = subsentence.substring(0, subsentence.length - 1)
         out = out.slice(0, index).concat [subsentence].concat out.slice(index)
