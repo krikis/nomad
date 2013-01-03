@@ -7,78 +7,6 @@ suite = @preSync = new Suite
 
 suite.bench
   category: 'traditional'
-  series:   'resolve 420KB'
-  data:     'data420KB'
-  runs:     2
-  setup:    Benches.  setupSyncConflict
-  before:   Benches. beforeSyncConflict
-  test:     Benches.       syncConflict
-  after:    Benches.  afterSyncConflict
-  cleanup:  Benches.cleanupSyncConflict
-  seeds:    []
-
-suite.bench
-  category: 'preventive'
-  series:   'resolve 420KB'
-  data:     'data420KB'
-  runs:     2
-  setup:    Benches.  setupPreSyncConflict
-  before:   Benches. beforePreSyncConflict
-  test:     Benches.       preSyncConflict
-  after:    Benches.  afterPreSyncConflict
-  cleanup:  Benches.cleanupPreSyncConflict
-  seeds:    []
-
-suite.bench
-  category: 'traditional'
-  series:   'update 420KB'
-  data:     'data420KB'
-  runs:     2
-  setup:    Benches.  setupSyncUpdate
-  before:   Benches. beforeSyncUpdate
-  test:     Benches.       syncUpdate
-  after:    Benches.  afterSyncUpdate
-  cleanup:  Benches.cleanupSyncUpdate
-  seeds:    []
-
-suite.bench
-  category: 'preventive'
-  series:   'update 420KB'
-  data:     'data420KB'
-  runs:     2
-  setup:    Benches.  setupPreSyncUpdate
-  before:   Benches. beforePreSyncUpdate
-  test:     Benches.       preSyncUpdate
-  after:    Benches.  afterPreSyncUpdate
-  cleanup:  Benches.cleanupPreSyncUpdate
-  seeds:    []
-
-suite.bench
-  category: 'traditional'
-  series:   'create 420KB'
-  data:     'data420KB'
-  runs:     2
-  setup:    Benches.  setupSyncCreate
-  before:   Benches. beforeSyncCreate
-  test:     Benches.       syncCreate
-  after:    Benches.  afterSyncCreate
-  cleanup:  Benches.cleanupSyncCreate
-  seeds:    []
-
-suite.bench
-  category: 'preventive'
-  series:   'create 420KB'
-  data:     'data420KB'
-  runs:     2
-  setup:    Benches.  setupPreSyncCreate
-  before:   Benches. beforePreSyncCreate
-  test:     Benches.       preSyncCreate
-  after:    Benches.  afterPreSyncCreate
-  cleanup:  Benches.cleanupPreSyncCreate
-  seeds:    []
-
-suite.bench
-  category: 'traditional'
   series:   'resolve 210KB'
   data:     'data210KB'
   runs:     4
@@ -148,3 +76,76 @@ suite.bench
   after:    Benches.  afterPreSyncCreate
   cleanup:  Benches.cleanupPreSyncCreate
   seeds:    [2780,2786,2817,2740,3005,3504,3004,3004,3004,3254,2790,2745,3263,3005,3005,2797,2814,3005,3255,2787,2853,2806,3036,3004,3004,2723,2768,3048,3004,3005,3004,3004,3013,3004]
+
+suite.bench
+  category: 'traditional'
+  series:   'resolve 420KB'
+  data:     'data420KB'
+  runs:     2
+  setup:    Benches.  setupSyncConflict
+  before:   Benches. beforeSyncConflict
+  test:     Benches.       syncConflict
+  after:    Benches.  afterSyncConflict
+  cleanup:  Benches.cleanupSyncConflict
+  seeds:    []
+
+suite.bench
+  category: 'preventive'
+  series:   'resolve 420KB'
+  data:     'data420KB'
+  runs:     2
+  setup:    Benches.  setupPreSyncConflict
+  before:   Benches. beforePreSyncConflict
+  test:     Benches.       preSyncConflict
+  after:    Benches.  afterPreSyncConflict
+  cleanup:  Benches.cleanupPreSyncConflict
+  seeds:    []
+
+suite.bench
+  category: 'traditional'
+  series:   'update 420KB'
+  data:     'data420KB'
+  runs:     2
+  setup:    Benches.  setupSyncUpdate
+  before:   Benches. beforeSyncUpdate
+  test:     Benches.       syncUpdate
+  after:    Benches.  afterSyncUpdate
+  cleanup:  Benches.cleanupSyncUpdate
+  seeds:    []
+
+suite.bench
+  category: 'preventive'
+  series:   'update 420KB'
+  data:     'data420KB'
+  runs:     2
+  setup:    Benches.  setupPreSyncUpdate
+  before:   Benches. beforePreSyncUpdate
+  test:     Benches.       preSyncUpdate
+  after:    Benches.  afterPreSyncUpdate
+  cleanup:  Benches.cleanupPreSyncUpdate
+  seeds:    []
+
+suite.bench
+  category: 'traditional'
+  series:   'create 420KB'
+  data:     'data420KB'
+  runs:     2
+  setup:    Benches.  setupSyncCreate
+  before:   Benches. beforeSyncCreate
+  test:     Benches.       syncCreate
+  after:    Benches.  afterSyncCreate
+  cleanup:  Benches.cleanupSyncCreate
+  seeds:    []
+
+suite.bench
+  category: 'preventive'
+  series:   'create 420KB'
+  data:     'data420KB'
+  runs:     2
+  setup:    Benches.  setupPreSyncCreate
+  before:   Benches. beforePreSyncCreate
+  test:     Benches.       preSyncCreate
+  after:    Benches.  afterPreSyncCreate
+  cleanup:  Benches.cleanupPreSyncCreate
+  seeds:    []
+
