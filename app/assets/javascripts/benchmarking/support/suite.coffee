@@ -216,7 +216,7 @@ class @Suite
     else
       setTimeout (=>
         @finish()
-      ), 50
+      ), 100
 
   nextBench: (updateChart = true)->
     bench = @benches[@benchIndex]
