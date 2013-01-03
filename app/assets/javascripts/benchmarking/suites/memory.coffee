@@ -30,6 +30,22 @@ suite.bench
 
 suite.bench
   category: 'incremental'
+  series:   '9 versions'
+  setup:    Benches.  setupPatch9
+  before:   Benches. beforePatch9
+  test:     Benches.       patch9
+  seeds:    []
+
+suite.bench
+  category: 'merged'
+  series:   '9 versions'
+  setup:    Benches.  setupContent9
+  before:   Benches. beforeContent9
+  test:     Benches.       content9
+  seeds:    []
+
+suite.bench
+  category: 'incremental'
   series:   '6 versions'
   setup:    Benches.  setupPatch6
   before:   Benches. beforePatch6

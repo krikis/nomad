@@ -1,23 +1,21 @@
 Benches = @Benches ||= {}
 
-# setup a model
-Benches.setupContent3 = (next) ->
+Benches.setupPatch9 = (next) ->
   class Answer extends Backbone.Model
+    versioning: 'structured_content_diff'
     collection:
       url: '/some/url'
   @Answer = Answer
   next.call @
 
-# create a data object
-Benches.beforeContent3 = (next) ->
+Benches.beforePatch9 = (next) ->
   @answerOriginal = Util.randomObject()
   @answerVersion = _.deepClone @answerOriginal
   @answer = new @Answer _.deepClone @answerOriginal
   next.call @
 
-# update this object three times
-Benches.content3 = (next) ->
-  _.each [1..3], =>
+Benches.patch9 = (next) ->  
+  _.each [1..9], =>
     [@answerVersion, deleted] = Util.randomVersion(@answerVersion, 0.5)
     @answer.set _.deepClone @answerVersion
     _.each deleted, (property)=>
