@@ -16,17 +16,7 @@ Benches.beforePatch12 = (next) ->
 
 Benches.patch12 = (next) ->  
   _.each [1..12], =>
-    deleteCount  = 0
-    changeCount  = Util.randomFrom(4, 8)
-    createCount  = 0
-    textChange   = 15
-    stringChange = 5
-    [@answerVersion, deleted] = Util.randomVersion(@answerVersion,
-                                                   deleteCount,   
-                                                   changeCount,   
-                                                   createCount,   
-                                                   textChange,   
-                                                   stringChange)
+    [@answerVersion, deleted] = Util.randomVersion(@answerVersion)
     @answer.set _.deepClone @answerVersion
     _.each deleted, (property)=>
       @answer.unset property
