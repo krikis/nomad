@@ -11,7 +11,9 @@ $('#fayeServer').html(FAYE_SERVER)
 $('a').click ->
   if $(this).attr('href') == '#tab5'
     window.updateSettings = setInterval (->
+      $('#clientId').html(Nomad.clientId || 'UNKNOWN')
       $('#fayeStatus').html(window.client?.getState() || 'UNKNOWN')
+      $('#fayeId').html(window.client?.getClientId() || 'UNKNOWN')
       used = Math.round(JSON.stringify(localStorage).length / 26214.47)
       className = if used < 50
         'label-success'
