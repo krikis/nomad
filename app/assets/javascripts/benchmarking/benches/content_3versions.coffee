@@ -18,7 +18,7 @@ Benches.beforeContent3 = (next) ->
 # update this object three times
 Benches.content3 = (next) ->
   _.each [1..3], =>
-    [@answerVersion, deleted] = Util.randomVersion(@answerVersion, 0.5)
+    [@answerVersion, deleted] = Util.randomVersion(@answerVersion, 0.25)
     @answer.set _.deepClone @answerVersion
     _.each deleted, (property)=>
       @answer.unset property
