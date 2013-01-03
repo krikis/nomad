@@ -1,57 +1,40 @@
 @Util =
-  benchmarkData: (dataSize)->
-    switch dataSize
-      when 'data70KB'
-        Benches['data70KB']
-      when 'data140KB'
-        Benches['data70KB'] +
-        Benches['data70KB']
-      when 'data210KB'
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB']
-      when 'data280KB'
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB']
-      when 'data560KB'
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB']
-      when 'data1120KB'
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB'] +
-        Benches['data70KB']
-      else
-        dataSize
-      
-  randomObject: (options = {})->
+  # generates object with random attributes
+  randomObject: (options={})->
     object = {}
-    propCount = @randomFrom(10, 30)
+    propCount = options.propCount || @randomFrom(10, 30)
     for prop in [1..propCount]
       do (prop) =>
         object[@randomProp()] = @randomValue(options)
     object
+
+  # multipurpose randomizer utility function
+  randomFrom: ->
+    # select random entry from array or string
+    if _.isArray(arguments[0]) or _.isString(arguments[0])
+      selectFrom = arguments[0]
+      # select with predefined probability
+      if _.isArray(arguments[1])
+        frequencies = arguments[1]
+        values = selectFrom.slice()
+        selectFrom = []
+        _.each values, (value, index)->
+          frequency = parseInt(frequencies[index])
+          if frequency > 0
+            _.each [1..frequency], ->
+              selectFrom.push value   
+      index = Math.floor(Math.random() * selectFrom.length)
+      selectFrom[index]
+    # generate random float
+    else if arguments.length == 1 and _.isNumber(arguments[0])
+      Math.random() * arguments[0]
+    # generate random integer within range
+    else
+      begin = arguments[0]
+      end = arguments[1] + 1
+      Math.floor(Math.random() * (end - begin)) + begin
   
+  # generates random property key
   randomProp: ->
     @randomString(5, 'abcdefghijklmnopqrstuvwxyz')
   
@@ -94,7 +77,7 @@
         version[@randomProp()] = @randomValue()
     [version, deleted]
     
-  randomValue: (options = {})->
+  randomValue: (options={})->
     options.typeOdds ||= [1, 1, 2, 4]
     values = [
       @randomBoolean,
@@ -102,14 +85,13 @@
       @randomString,
       @loremIpsum
     ]
-    @randomFrom(values, options.typeOdds).call(@)
+    @randomFrom(values, options.typeOdds).call(@, options)
       
   randomBoolean: ->
     @randomFrom [true, false]    
       
-  randomNumber: (decimals) ->
-    unless decimals?
-      decimals = @randomFrom(1, 5)
+  randomNumber: (options={})->
+    decimals = options.decimals || @randomFrom(1, 5)
     numberSet = '0123456789'
     nonzeroSet = '123456789'
     randomNumbers = [@randomFrom(nonzeroSet)]
@@ -117,10 +99,9 @@
       randomNumbers.push @randomFrom(numberSet)
     parseInt randomNumbers.join('')
 
-  randomString: (stringSize, charSet) ->
-    unless stringSize?
-      stringSize = @randomFrom(5, 15)
-    charSet ||= 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+  randomString: (options={}) ->
+    stringSize = options.stringSize || @randomFrom(5, 15)
+    charSet = options.charSet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
     randomString = []
     while randomString.length < stringSize
       randomString.push @randomFrom(charSet)
@@ -152,33 +133,8 @@
         out = out.slice(0, index) + @randomString(1) + out.slice(index)
     out
 
-  randomFrom: ->
-    # select random entry from array or string
-    if _.isArray(arguments[0]) or _.isString(arguments[0])
-      selectFrom = arguments[0]
-      # select with predefined probability
-      if _.isArray(arguments[1])
-        frequencies = arguments[1]
-        values = selectFrom.slice()
-        selectFrom = []
-        _.each values, (value, index)->
-          frequency = parseInt(frequencies[index])
-          if frequency > 0
-            _.each [1..frequency], ->
-              selectFrom.push value   
-      index = Math.floor(Math.random() * selectFrom.length)
-      selectFrom[index]
-    # generate random float
-    else if arguments.length == 1 and _.isNumber(arguments[0])
-      Math.random() * arguments[0]
-    # generate random integer within range
-    else
-      begin = arguments[0]
-      end = arguments[1] + 1
-      Math.floor(Math.random() * (end - begin)) + begin
-
-  loremIpsum: (textSize) ->
-    textSize ||= @randomFrom(20, 100)
+  loremIpsum: (options={}) ->
+    textSize = options.textSize || @randomFrom(20, 100)
     minSentence = 5
     maxSentence = 15
     minSubSentence = 3
@@ -298,3 +254,50 @@
     "alias", "consequatur", "aut", "perferendis", "doloribus", "asperiores",
     "repellat"
   ]
+  
+  benchmarkData: (dataSize)->
+    switch dataSize
+      when 'data70KB'
+        Benches['data70KB']
+      when 'data140KB'
+        Benches['data70KB'] +
+        Benches['data70KB']
+      when 'data210KB'
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB']
+      when 'data280KB'
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB']
+      when 'data560KB'
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB']
+      when 'data1120KB'
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB']
+      else
+        dataSize
+      
+  
