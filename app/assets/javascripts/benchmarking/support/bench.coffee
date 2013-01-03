@@ -73,7 +73,7 @@ class @Bench
         @setup.call(@, @testLoop)
       catch error
         @handleError error
-    ), 200
+    ), 100
 
   testLoop: () ->
     setTimeout (=>
@@ -84,7 +84,7 @@ class @Bench
           @cleanup.call(@, @stop)
       catch error
         @handleError error
-    ), 200
+    ), 100
 
   testFunction: ->
     setTimeout (=>
@@ -93,7 +93,7 @@ class @Bench
         @test.call(@, @afterFunction)
       catch error
         @handleError error
-    ), 200
+    ), 100
 
   afterFunction: ->
     @total += @record.call(@)
@@ -102,7 +102,7 @@ class @Bench
         @after.call(@, @testLoop)
       catch error
         @handleError error
-    ), 200
+    ), 100
 
   stop: ->
     setTimeout (=>
@@ -110,7 +110,7 @@ class @Bench
       $(@button).attr('disabled': false) if @button?
       # return control to next bench if present
       @next?.call(@context, @count > 0)
-    ), 200
+    ), 100
     
   handleError: (error)->
     @suite?.finish(error)
