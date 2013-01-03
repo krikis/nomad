@@ -28,17 +28,17 @@ class @Suite
     @initButtons()
 
   bench: (options = {}) ->
-    options.suite       = @
-    options.chart     ||= @chart
-    options.baseline  ||= @baseline
-    options.record    ||= @record
+    options.suite      = @
+    options.chart    ||= @chart
+    options.baseline ||= @baseline
+    options.record   ||= @record
     unless options.round?
-      options.round     = @round
-    options.unit      ||= @unit
-    options.unitLong  ||= @unitLong
-    options.measure   ||= @measure
-    options.benchData ||= @benchData
-    options.runs      ||= @benchRuns
+      options.round    = @round
+    options.unit     ||= @unit
+    options.unitLong ||= @unitLong
+    options.measure  ||= @measure
+    options.data     ||= @benchData
+    options.runs     ||= @benchRuns
     bench = new Bench options
     @benches.push bench
     category = bench.getCategory()
