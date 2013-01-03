@@ -3,13 +3,85 @@ suite = @preSync = new Suite
   container: 'tab1'
   title:     'Traditional Synchronization vs. Preventive Reconciliation'
   subtitle:  'Network latency during different sync operations'
-  benchData: 'data210KB'
-  benchRuns: 4
   timeout:   60000
 
 suite.bench
   category: 'traditional'
-  series:   'conflict'
+  series:   'resolve 420KB'
+  benchData: 'data420KB'
+  benchRuns: 2
+  setup:    Benches.  setupSyncConflict
+  before:   Benches. beforeSyncConflict
+  test:     Benches.       syncConflict
+  after:    Benches.  afterSyncConflict
+  cleanup:  Benches.cleanupSyncConflict
+  seeds:    []
+
+suite.bench
+  category: 'preventive'
+  series:   'resolve 420KB'
+  benchData: 'data420KB'
+  benchRuns: 2
+  setup:    Benches.  setupPreSyncConflict
+  before:   Benches. beforePreSyncConflict
+  test:     Benches.       preSyncConflict
+  after:    Benches.  afterPreSyncConflict
+  cleanup:  Benches.cleanupPreSyncConflict
+  seeds:    []
+
+suite.bench
+  category: 'traditional'
+  series:   'update 420KB'
+  benchData: 'data420KB'
+  benchRuns: 2
+  setup:    Benches.  setupSyncUpdate
+  before:   Benches. beforeSyncUpdate
+  test:     Benches.       syncUpdate
+  after:    Benches.  afterSyncUpdate
+  cleanup:  Benches.cleanupSyncUpdate
+  seeds:    []
+
+suite.bench
+  category: 'preventive'
+  series:   'update 420KB'
+  benchData: 'data420KB'
+  benchRuns: 2
+  setup:    Benches.  setupPreSyncUpdate
+  before:   Benches. beforePreSyncUpdate
+  test:     Benches.       preSyncUpdate
+  after:    Benches.  afterPreSyncUpdate
+  cleanup:  Benches.cleanupPreSyncUpdate
+  seeds:    []
+
+suite.bench
+  category: 'traditional'
+  series:   'create 420KB'
+  benchData: 'data420KB'
+  benchRuns: 2
+  setup:    Benches.  setupSyncCreate
+  before:   Benches. beforeSyncCreate
+  test:     Benches.       syncCreate
+  after:    Benches.  afterSyncCreate
+  cleanup:  Benches.cleanupSyncCreate
+  seeds:    []
+
+suite.bench
+  category: 'preventive'
+  series:   'create 420KB'
+  benchData: 'data420KB'
+  benchRuns: 2
+  setup:    Benches.  setupPreSyncCreate
+  before:   Benches. beforePreSyncCreate
+  test:     Benches.       preSyncCreate
+  after:    Benches.  afterPreSyncCreate
+  cleanup:  Benches.cleanupPreSyncCreate
+  seeds:    []
+
+suite.bench
+  category: 'traditional'
+  series:   'resolve 210KB'
+  benchData: 'data210KB'
+  benchRuns: 4
   setup:    Benches.  setupSyncConflict
   before:   Benches. beforeSyncConflict
   test:     Benches.       syncConflict
@@ -19,7 +91,9 @@ suite.bench
 
 suite.bench
   category: 'preventive'
-  series:   'conflict'
+  series:   'resolve 210KB'
+  benchData: 'data210KB'
+  benchRuns: 4
   setup:    Benches.  setupPreSyncConflict
   before:   Benches. beforePreSyncConflict
   test:     Benches.       preSyncConflict
@@ -29,7 +103,9 @@ suite.bench
 
 suite.bench
   category: 'traditional'
-  series:   'update'
+  series:   'update 210KB'
+  benchData: 'data210KB'
+  benchRuns: 4
   setup:    Benches.  setupSyncUpdate
   before:   Benches. beforeSyncUpdate
   test:     Benches.       syncUpdate
@@ -39,7 +115,9 @@ suite.bench
 
 suite.bench
   category: 'preventive'
-  series:   'update'
+  series:   'update 210KB'
+  benchData: 'data210KB'
+  benchRuns: 4
   setup:    Benches.  setupPreSyncUpdate
   before:   Benches. beforePreSyncUpdate
   test:     Benches.       preSyncUpdate
@@ -49,7 +127,9 @@ suite.bench
 
 suite.bench
   category: 'traditional'
-  series:   'create'
+  series:   'create 210KB'
+  benchData: 'data210KB'
+  benchRuns: 4
   setup:    Benches.  setupSyncCreate
   before:   Benches. beforeSyncCreate
   test:     Benches.       syncCreate
@@ -59,7 +139,9 @@ suite.bench
 
 suite.bench
   category: 'preventive'
-  series:   'create'
+  series:   'create 210KB'
+  benchData: 'data210KB'
+  benchRuns: 4
   setup:    Benches.  setupPreSyncCreate
   before:   Benches. beforePreSyncCreate
   test:     Benches.       preSyncCreate
