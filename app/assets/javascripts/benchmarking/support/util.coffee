@@ -279,6 +279,13 @@
         Benches['data70KB'] +
         Benches['data70KB'] +
         Benches['data70KB']
+      when 'data420KB'
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB'] +
+        Benches['data70KB']
       when 'data280KB'
         Benches['data70KB'] +
         Benches['data70KB'] +
