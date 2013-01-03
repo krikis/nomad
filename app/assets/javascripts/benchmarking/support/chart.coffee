@@ -44,7 +44,7 @@ class @Chart
         @chart.series[categoryIndex * @allSeries.length + seriesIndex].
           setData @_dataSeries(data)
       else
-        if point = @_dataLinePoint(data)
+        if (point = @_dataLinePoint(data))?
           @chart.series[categoryIndex * @allSeries.length + seriesIndex].
             addPoint point, true, false, animation
         
