@@ -15,6 +15,15 @@ Benches.beforeStructRebase1 = (next) ->
   next.call @
 
 Benches.structRebase1 = (next) ->
-  @success = @answer._applyPatchesTo @dummy
-  window.struct = JSON.stringify @dummy._sortPropertiesIn @dummy.attributes
-  next.call @
+  # resolve the conflicts
+  try
+    @success = @answer._applyPatchesTo @dummy
+  catch error
+    if error.name == 'SyntaxError'
+      @suite?.log "JSON format broken!"
+    else
+      @suite?.log error.message
+      @suite?.log error.stack
+    @success = false
+  finally
+    next.call @

@@ -75,8 +75,11 @@ Benches.attribute25 = (next) ->
       # console.log 'Patching failed!!!'
       @success = 0
   catch error
-    @suite?.log error.message
-    @suite?.log error.stack
+    if error.name == 'SyntaxError'
+      @suite?.log "JSON format broken!"
+    else
+      @suite?.log error.message
+      @suite?.log error.stack
     @success = 0
   finally
     next.call @

@@ -27,8 +27,11 @@ Benches.mergeRebase37 = (next) ->
   try
     @success = @answer._applyPatchesTo @dummy
   catch error
-    @suite?.log error.message
-    @suite?.log error.stack
+    if error.name == 'SyntaxError'
+      @suite?.log "JSON format broken!"
+    else
+      @suite?.log error.message
+      @suite?.log error.stack
     @success = false
   finally
     next.call @

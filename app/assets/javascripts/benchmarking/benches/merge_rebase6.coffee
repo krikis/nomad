@@ -19,5 +19,15 @@ Benches.beforeMergeRebase6 = (next) ->
   next.call @
 
 Benches.mergeRebase6 = (next) ->
-  @success = @answer._applyPatchesTo @dummy
-  next.call @
+  # resolve the conflicts
+  try
+    @success = @answer._applyPatchesTo @dummy
+  catch error
+    if error.name == 'SyntaxError'
+      @suite?.log "JSON format broken!"
+    else
+      @suite?.log error.message
+      @suite?.log error.stack
+    @success = false
+  finally
+    next.call @
