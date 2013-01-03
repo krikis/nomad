@@ -62,7 +62,6 @@ class @Bench
     @next      = options.next
     @context   = options.context
     @chart     = options.chart   if options.chart?
-    @runs      = options.runs    if options.runs
     @timeout   = options.timeout if options.timeout
     @button    = options.button
     $(@button).attr('disabled': true) if @button?

@@ -38,6 +38,7 @@ class @Suite
     options.unitLong  ||= @unitLong
     options.measure   ||= @measure
     options.benchData ||= @benchData
+    options.runs      ||= @benchRuns
     bench = new Bench options
     @benches.push bench
     category = bench.getCategory()
@@ -211,7 +212,6 @@ class @Suite
         next:    @nextBench
         context: @
         chart:   @chart
-        runs:    @benchRuns
         timeout: @timeout
     else
       setTimeout (=>
