@@ -12,7 +12,7 @@ suite.bench
   setup:    Benches.  setupStructRebase37
   before:   Benches. beforeStructRebase37
   test:     Benches.       structRebase37
-  seeds:    [13,21,18,24,31,26,22,33,26,34,19,16,20,20,13,18,31,20,19,18,25,20,16,32,13,20,14,15,27,31]
+  seeds:    [10,31,13,18,13,16,14,30,24,18,22,26,21,18,16,21,17,15,9,20,19,17,15,29,22,14,23,21,18,14,16,26,22,27,16,32,24,31,32,26,18,21,20,10,20,12,18,26]
 
 suite.bench
   category: 'merged'
@@ -20,7 +20,7 @@ suite.bench
   setup:    Benches.  setupMergeRebase37
   before:   Benches. beforeMergeRebase37
   test:     Benches.       mergeRebase37
-  seeds:    [3,5,5,5,5,8,5,3,3,6,5,4,3,5,5,4,2,4,4,4,5,4,8,6,10,5,6,3,7,4]
+  seeds:    [4,3,5,7,6,6,5,7,5,6,6,6,3,5,4,7,6,6,5,7,5,5,4,8,7,5,10,5,6,4,6,2,3,4,3,2,6,7,5,5,5,3,6,4,4,5,5,7]
 
 suite.bench
   category: 'structured'
@@ -28,7 +28,7 @@ suite.bench
   setup:    Benches.  setupStructAddVersion37
   before:   Benches. beforeStructAddVersion37
   test:     Benches.       structAddVersion37
-  seeds:    [46,21,37,30,56,42,33,36,21,28,18,22,28,31,41,39,35,42,26,11,15,29,35,32,31,53,46,49,41,24]
+  seeds:    [39,35,41,38,28,37,32,37,47,35,25,24,22,25,20,20,29,15,41,34,34,34,24,31,22,35,37,40,42,37,28,41,34,21,41,31,13,32,20,22,13,45,51,35,20,20,41,24]
 
 suite.bench
   category: 'merged'
@@ -36,7 +36,7 @@ suite.bench
   setup:    Benches.  setupMergeAddVersion37
   before:   Benches. beforeMergeAddVersion37
   test:     Benches.       mergeAddVersion37
-  seeds:    [1,1,1,1,2,1,1,1,1,1,2,1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,2,1,1,1]
+  seeds:    [2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,2,2,2,1,2,1,2,2,2,1,1,1,2,1,1,2,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1]
 
 suite.bench
   category: 'structured'
@@ -44,7 +44,7 @@ suite.bench
   setup:    Benches.  setupStructRebase25
   before:   Benches. beforeStructRebase25
   test:     Benches.       structRebase25
-  seeds:    [10,15,14,15,11,11,8,10,13,7,8,9,10,15,19,14,7,10,15,9,9,13,15,11,7,13,6,5,6,10]
+  seeds:    [10,10,9,7,15,19,10,8,12,18,10,15,9,12,24,8,11,13,26,7,8,13,20,7,7,7,13,11,17,15,13,8,6,7,8,13,10,18,14,9,9,11,17,10,15,9,14,7]
 
 suite.bench
   category: 'merged'
@@ -52,7 +52,7 @@ suite.bench
   setup:    Benches.  setupMergeRebase25
   before:   Benches. beforeMergeRebase25
   test:     Benches.       mergeRebase25
-  seeds:    [4,3,2,3,1,1,2,3,2,2,2,2,2,2,4,3,3,3,1,4,2,2,2,3,2,2,2,1,3,4]
+  seeds:    [2,3,3,1,2,3,2,3,2,2,4,2,4,2,4,2,2,1,2,3,1,3,3,2,3,4,3,1,3,4,3,3,1,2,2,3,3,1,3,2,2,2,6,4,3,3,2,2]
 
 suite.bench
   category: 'structured'
@@ -60,7 +60,7 @@ suite.bench
   setup:    Benches.  setupStructAddVersion25
   before:   Benches. beforeStructAddVersion25
   test:     Benches.       structAddVersion25
-  seeds:    [9,15,21,16,12,12,8,14,9,6,11,9,8,15,21,19,17,13,13,11,9,13,10,13,10,12,19,13,10,9]
+  seeds:    [15,8,14,11,14,10,16,14,16,11,15,21,19,13,17,13,12,9,19,20,29,18,9,21,14,21,12,20,11,8,9,14,11,10,14,9,9,19,17,14,9,9,15,21,18,9,19,9]
 
 suite.bench
   category: 'merged'
@@ -68,7 +68,7 @@ suite.bench
   setup:    Benches.  setupMergeAddVersion25
   before:   Benches. beforeMergeAddVersion25
   test:     Benches.       mergeAddVersion25
-  seeds:    [1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2]
+  seeds:    [1,1,1,1,1,1,1,1,1,2,3,2,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,2,1,1,1,1,1,1,1,1,1,1]
 
 suite.bench
   category: 'structured'
@@ -76,7 +76,7 @@ suite.bench
   setup:    Benches.  setupStructRebase12
   before:   Benches. beforeStructRebase12
   test:     Benches.       structRebase12
-  seeds:    [4,2,3,4,3,3,6,3,2,3,8,4,2,4,3,6,4,3,3,3,3,3,4,4,2,6,5,6,2,6]
+  seeds:    [5,4,5,2,6,4,6,8,5,4,2,4,2,3,2,3,4,4,4,4,6,6,6,3,5,5,2,4,2,3,4,1,3,3,2,3,6,7,5,4,3,4,3,3,2,4,2,2]
 
 suite.bench
   category: 'merged'
@@ -84,7 +84,7 @@ suite.bench
   setup:    Benches.  setupMergeRebase12
   before:   Benches. beforeMergeRebase12
   test:     Benches.       mergeRebase12
-  seeds:    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,1,0,1,1,1]
+  seeds:    [1,1,1,0,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,0,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1]
 
 suite.bench
   category: 'structured'
@@ -92,7 +92,7 @@ suite.bench
   setup:    Benches.  setupStructAddVersion12
   before:   Benches. beforeStructAddVersion12
   test:     Benches.       structAddVersion12
-  seeds:    [4,6,3,4,3,2,3,4,4,4,1,3,2,4,5,2,7,6,3,4,4,2,2,3,5,3,4,5,4,2]
+  seeds:    [2,2,5,3,2,3,10,3,5,5,2,2,3,3,8,1,4,3,2,3,3,3,3,3,8,9,3,2,6,6,4,3,3,5,3,3,4,5,2,3,2,6,2,4,3,9,3,3]
 
 suite.bench
   category: 'merged'
@@ -100,7 +100,7 @@ suite.bench
   setup:    Benches.  setupMergeAddVersion12
   before:   Benches. beforeMergeAddVersion12
   test:     Benches.       mergeAddVersion12
-  seeds:    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1]
+  seeds:    [0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1]
 
 # suite.bench
 #   category: 'structured'
