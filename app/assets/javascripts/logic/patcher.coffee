@@ -128,6 +128,8 @@ class @Patcher
       [patched_value, results] = @_patchString(originalValue, 
                                                attributesToPatch[attribute],
                                                currentValue)
+      # record that the patch was applied in reverse order
+      @model._versioning.reversePatch = true
     if false not in results
       # set the new value on success
       attributesToPatch[attribute] = patched_value

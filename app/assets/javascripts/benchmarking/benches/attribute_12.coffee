@@ -61,6 +61,8 @@ Benches.attribute12 = (next) ->
               well.append $("<h3><small>Merged Changes</small></h3>")
               well.append $("#{dmp.diff_prettyHtml diff3}")
               box = $("<div class='box'>")
+              if @answer._versioning.reversePatch
+                box.addClass('reverse')
               box.append well
               $('#tab4 #attr').append box
             # console.log "#{@answerOriginal[key]}"

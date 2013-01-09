@@ -460,7 +460,7 @@ describe 'Patcher', ->
       @updatePatchForStub = sinon.stub(Patcher::,
                                        '_updatePatchFor',
                                        -> 'new_patch')
-      @patcher = new Patcher
+      @patcher = new Patcher(_versioning: {})
       @attribute = 'text'
       @attributesToPatch =
         text: 'model_text'
