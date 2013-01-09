@@ -117,29 +117,37 @@ class @Patcher
       attributesToPatch[attribute] = currentValue
       true
 
-  # patch a new string value using the diff
-  # of the original and current value
+  # patch a string attribute given the original and current value
   _patchStringAttribute: (attribute, attributesToPatch,
-                 originalValue, currentValue) ->
+                          originalValue, currentValue) ->
+    # apply the patch
+    [patched_value, results] = @_patchString(originalValue, currentValue,
+                                             attributesToPatch[attribute])
+    if false in results
+      # apply the patch in reverse order
+      [patched_value, results] = @_patchString(originalValue, 
+                                               attributesToPatch[attribute],
+                                               currentValue)
+    if false not in results
+      # set the new value on success
+      attributesToPatch[attribute] = patched_value
+      true
+    else    
+      # keep the current value when patching fails
+      attributesToPatch[attribute] = currentValue
+      # TODO: handle failed patch
+      false
+
+  # patch a string value using the diff
+  # of the original and current value
+  _patchString: (originalValue, currentValue, valueToPatch) ->
     # calculate the diff and patch
     diff = @dmp.diff_main originalValue,
                           currentValue
     patch = @dmp.patch_make originalValue,
                             diff
     # apply the patch
-    [patched_value, results] = @dmp.patch_apply(
-      patch,
-      attributesToPatch[attribute]
-    )
-    if false not in results
-      # set the new value on success
-      attributesToPatch[attribute] = patched_value
-      true
-    else
-      # keep the current value when patching fails
-      attributesToPatch[attribute] = currentValue
-      # TODO: handle failed patch
-      false
+    @dmp.patch_apply patch, valueToPatch
 
 
 

@@ -72,21 +72,21 @@ describe 'Patcher', ->
       @model =
         patches: => @patches ||= sinon.stub()
       @patcher = new Patcher(@model)
-      
+
     it 'records an empty object for all nested objects', ->
-      @patcher._updatePatchFor(@patch, 
+      @patcher._updatePatchFor(@patch,
                                @changedAttributes,
                                @previousAttributes)
       expect(@patch.object).toEqual({})
 
     it 'records all keys of no-text attributes', ->
-      @patcher._updatePatchFor(@patch, 
+      @patcher._updatePatchFor(@patch,
                                @changedAttributes,
                                @previousAttributes)
       expect(_.properties(@patch)).toContain('number')
 
     it 'records the original version of all text attributes', ->
-      @patcher._updatePatchFor(@patch, 
+      @patcher._updatePatchFor(@patch,
                                @changedAttributes,
                                @previousAttributes)
       expect(@patch.text).toEqual('original_text')
@@ -98,11 +98,11 @@ describe 'Patcher', ->
           number: 'was_text_previously'
           object: {}
           other_object: {}
-        @changedAttributes.object = 'some_text'  
+        @changedAttributes.object = 'some_text'
         @changedAttributes.other_object = 5
 
       it 'leaves the recorded attribute unchanged', ->
-        @patcher._updatePatchFor(@patch, 
+        @patcher._updatePatchFor(@patch,
                                  @changedAttributes,
                                  @previousAttributes)
         expect(@patch.text).toEqual('original_text')
@@ -112,7 +112,7 @@ describe 'Patcher', ->
 
     context 'when the changed attributes concerns an object', ->
       beforeEach ->
-        @patch = 
+        @patch =
           object: @patchObject = sinon.stub()
         @changedAttributes =
           object:
@@ -126,19 +126,19 @@ describe 'Patcher', ->
         )
 
       it 'filters out the changed attributes for the object', ->
-        @patcher._updatePatchFor(@patch, 
+        @patcher._updatePatchFor(@patch,
                                  @changedAttributes,
                                  @previousAttributes)
         expect(@changedAttributesStub).
           toHaveBeenCalledWith({all: 'attributes'}, {previous: 'attributes'})
 
       it 'recursively updates the patch for this object', ->
-        @patcher._updatePatchFor(@patch, 
+        @patcher._updatePatchFor(@patch,
                                  @changedAttributes,
                                  @previousAttributes)
         expect(@updatePatchForSpy).
           toHaveBeenCalledWith(@patchObject,
-                               {changed: 'attributes'}, 
+                               {changed: 'attributes'},
                                {previous: 'attributes'})
 
   describe '#_changedAttributes', ->
@@ -184,7 +184,7 @@ describe 'Patcher', ->
       @applyPatchStub = sinon.stub(@patcher, '_applyPatch')
       @dummy =
         attributes: @attributesToPatch = sinon.stub()
-        
+
     it 'creates a merge of the model patches', ->
       @patcher.applyPatchesTo(@dummy)
       expect(@mergePatchesStub).toHaveBeenCalledWith(@patches)
@@ -194,37 +194,37 @@ describe 'Patcher', ->
       expect(@applyPatchStub).toHaveBeenCalledWith('merged_patch',
                                                    @attributesToPatch,
                                                    @currentAttributes)
-                                                   
+
   describe '#_mergePatches', ->
     beforeEach ->
       @patches = []
       @patcher = new Patcher(@model)
       @mergeIntoStub = sinon.stub(@patcher, '_mergeInto')
       @deepCloneStub = sinon.stub(_, 'deepClone', => @firstClone ||= sinon.stub() )
-      
+
     afterEach ->
       @deepCloneStub.restore()
-      
+
     it 'creates a clone of the first patch', ->
       @patches = [(first = _patch :sinon.stub())]
       @patcher._mergePatches(@patches)
       expect(@deepCloneStub).toHaveBeenCalledWith(first._patch)
-      
+
     it 'merges the remaining patches into the clone', ->
       @patches = [sinon.stub(), (last = _patch: sinon.stub())]
       @patcher._mergePatches(@patches)
       expect(@mergeIntoStub).toHaveBeenCalledWith(@firstClone, last._patch)
-      
+
     it 'returns the merged patch', ->
       expect(@patcher._mergePatches(@patches)).toEqual(@firstClone)
-      
+
     context 'when no patches are defined', ->
       beforeEach ->
         @deepCloneStub.restore()
-        
+
       it 'returns undefined', ->
         expect(@patcher._mergePatches()).toEqual(undefined)
-      
+
   describe '#_mergeInto', ->
     beforeEach ->
       @patch =
@@ -234,44 +234,44 @@ describe 'Patcher', ->
         source: 'attribute'
         some: 'other_attribute'
         object: 'test'
-      @patcher = new Patcher  
+      @patcher = new Patcher
       @_mergeIntoSpy = sinon.spy(@patcher, '_mergeInto')
-      
+
     it 'sets the source attributes on the patch', ->
       @patcher._mergeInto(@patch, @source)
       expect(@patch.source).toEqual('attribute')
-        
+
     it 'retains attributes that are already set', ->
       @patcher._mergeInto(@patch, @source)
       expect(@patch.some).toEqual('attribute')
       expect(@patch.object).toEqual({})
-      
+
     context 'when the attribute is an object', ->
       beforeEach ->
         @patch =
           object: @patchObject  = sinon.stub()
         @source =
           object: @sourceObject = sinon.stub()
-          
+
       it 'recursively merges the patch objects', ->
         @patcher._mergeInto(@patch, @source)
         expect(@_mergeIntoSpy).
           toHaveBeenCalledWith(@patchObject, @sourceObject)
-          
+
       context 'and it is undefined in the patch', ->
         beforeEach ->
           @patch = {}
-        
+
         it 'is initializes as an empty object', ->
           @patcher._mergeInto(@patch, @source)
           expect(@_mergeIntoSpy).
             toHaveBeenCalledWith({}, @sourceObject)
-            
+
       context 'and it is null in the patch', ->
         beforeEach ->
           @patch =
             object: null
-          
+
         it 'does not go into recursion', ->
           @patcher._mergeInto(@patch, @source)
           expect(@_mergeIntoSpy).not.toHaveBeenCalledTwice()
@@ -441,14 +441,14 @@ describe 'Patcher', ->
 
       context 'and the value to patch is not text', ->
         beforeEach ->
-          @attributesToPatch = 
+          @attributesToPatch =
             text: sinon.stub()
-      
+
         it 'sets the current value on the model', ->
           @patcher._patchAttribute(@attribute, @attributesToPatch,
                                    @originalValue, @currentValue)
           expect(@attributesToPatch.text).toEqual(@currentValue)
-      
+
         it 'returns true', ->
           expect(
             @patcher._patchAttribute(@attribute, @attributesToPatch,
@@ -466,7 +466,91 @@ describe 'Patcher', ->
         text: 'model_text'
       @originalValue = 'original_text'
       @currentValue = 'current_text'
-      @patcher.dmp = @dmp = new diff_match_patch
+      @patchStringStub = sinon.stub(@patcher, '_patchString')
+      @patchStringStub.returns(['patched_value', [true]])
+
+    afterEach ->
+      @updatePatchForStub.restore()
+
+    it 'applies a patch on the model attribute', ->
+      @patcher._patchStringAttribute(@attribute, @attributesToPatch,
+                                     @originalValue, @currentValue)
+      expect(@patchStringStub).toHaveBeenCalledWith('original_text',
+                                                    'current_text',
+                                                    'model_text')
+
+    context 'and patching a text-attribute succeeds', ->
+      it 'sets the successfully patched attribute on the model', ->
+        @patcher._patchStringAttribute(@attribute, @attributesToPatch,
+                                       @originalValue, @currentValue)
+        expect(@attributesToPatch.text).toEqual('patched_value')
+
+      it 'returns true', ->
+        expect(
+          @patcher._patchStringAttribute(@attribute, @attributesToPatch,
+                                         @originalValue, @currentValue)
+        ).toBeTruthy()
+
+    context 'and patching a text-attribute fails the first time', ->
+      beforeEach ->
+        @patchStringStub.withArgs('original_text', 'current_text', 'model_text')
+                        .returns(['patched_value', [false]])
+
+      it 'patches the string attribute in reverse order', ->
+        @patcher._patchStringAttribute(@attribute, @attributesToPatch,
+                                       @originalValue, @currentValue)
+        expect(@patchStringStub).toHaveBeenCalledWith('original_text',
+                                                      'model_text',
+                                                      'current_text')
+
+      context 'but succeeds the second time', ->
+        it 'sets the successfully patched attribute on the model', ->
+          @patcher._patchStringAttribute(@attribute, @attributesToPatch,
+                                         @originalValue, @currentValue)
+          expect(@attributesToPatch.text).toEqual('patched_value')
+
+        it 'returns true', ->
+          expect(
+            @patcher._patchStringAttribute(@attribute, @attributesToPatch,
+                                           @originalValue, @currentValue)
+          ).toBeTruthy()
+
+      context 'and the second time too', ->
+        beforeEach ->
+          @patchStringStub.withArgs('original_text', 'model_text', 'current_text')
+                          .returns(['patched_value', [false]])
+
+        it 'sets the current value on the model', ->
+          @patcher._patchStringAttribute(@attribute, @attributesToPatch,
+                                         @originalValue, @currentValue)
+          expect(@attributesToPatch.text).toEqual('current_text')
+
+        it 'returns false', ->
+          expect(
+            @patcher._patchStringAttribute(@attribute, @attributesToPatch,
+                                           @originalValue, @currentValue)
+          ).toBeFalsy()
+
+    context 'and original and current value are equal', ->
+      beforeEach ->
+        @patchStringStub.returns(['patched_value', []])
+
+      it 'returns true', ->
+        expect(
+          @patcher._patchStringAttribute(@attribute, @attributesToPatch,
+                                         @originalValue, @currentValue)
+        ).toBeTruthy()
+
+  describe '#_patchString', ->
+    beforeEach ->
+      @updatePatchForStub = sinon.stub(Patcher::,
+                                       '_updatePatchFor',
+                                       -> 'new_patch')
+      @patcher        = new Patcher
+      @originalValue  = 'original_text'
+      @currentValue   = 'current_text'
+      @valueToPatch   = 'model_text'
+      @patcher.dmp    = @dmp = new diff_match_patch
       @dmpStub        = sinon.stub(window, 'diff_match_patch', => @dmp)
       @diffStub       = sinon.stub(@dmp, 'diff_main', -> 'some_diff')
       @patchStub      = sinon.stub(@dmp, 'patch_make', -> 'some_patch')
@@ -478,63 +562,15 @@ describe 'Patcher', ->
       @dmpStub.restore()
 
     it 'generates a diff for the attribute', ->
-      @patcher._patchStringAttribute(@attribute, @attributesToPatch,
-                            @originalValue, @currentValue)
+      @patcher._patchString(@originalValue, @currentValue, @valueToPatch)
       expect(@diffStub).toHaveBeenCalledWith(@originalValue, @currentValue)
 
     it 'generates a patch for the attribute', ->
-      @patcher._patchStringAttribute(@attribute, @attributesToPatch,
-                            @originalValue, @currentValue)
+      @patcher._patchString(@originalValue, @currentValue, @valueToPatch)
       expect(@patchStub).toHaveBeenCalledWith(@originalValue, 'some_diff')
 
     it 'applies a patch on the model attribute', ->
-      @patcher._patchStringAttribute(@attribute, @attributesToPatch,
-                            @originalValue, @currentValue)
-      expect(@patchApplyStub).toHaveBeenCalledWith('some_patch',
-                                                   'model_text')
-
-    context 'and patching a text-attribute succeeds', ->
-      it 'sets the successfully patched attribute on the model', ->
-        @patcher._patchStringAttribute(@attribute, @attributesToPatch,
-                              @originalValue, @currentValue)
-        expect(@attributesToPatch.text).toEqual('patched_value')
-
-      it 'returns true', ->
-        expect(
-          @patcher._patchStringAttribute(@attribute, @attributesToPatch,
-                                @originalValue, @currentValue)
-        ).toBeTruthy()
-
-    context 'and patching a text-attribute fails', ->
-      beforeEach ->
-        @patchApplyStub.restore()
-        @patchApplyStub = sinon.stub(@dmp,
-                                     'patch_apply',
-                                     -> ['patched_value', [false]])
-
-      it 'sets the current value on the model', ->
-        @patcher._patchStringAttribute(@attribute, @attributesToPatch,
-                                       @originalValue, @currentValue)
-        expect(@attributesToPatch.text).toEqual('current_text')
-
-      it 'returns false', ->
-        expect(
-          @patcher._patchStringAttribute(@attribute, @attributesToPatch,
-                                         @originalValue, @currentValue)
-        ).toBeFalsy()
-
-    context 'and original and current value are equal', ->
-      beforeEach ->
-        @currentValue = @originalValue
-        @patchApplyStub.restore()
-        @patchApplyStub = sinon.stub(@dmp, 'patch_apply',
-                                     -> ['patched_value', []])
-
-      it 'returns true', ->
-        expect(
-          @patcher._patchStringAttribute(@attribute, @attributesToPatch,
-                                         @originalValue, @currentValue)
-        ).toBeTruthy()
-
+      @patcher._patchString(@originalValue, @currentValue, @valueToPatch)
+      expect(@patchApplyStub).toHaveBeenCalledWith('some_patch', 'model_text')
 
 
