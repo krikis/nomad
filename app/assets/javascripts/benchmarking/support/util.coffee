@@ -240,7 +240,7 @@
       do =>
         index = @randomFrom([0...out.length])
         out = out.slice(0, index).concat out.slice(index + 1)
-        out[index] += '.' if _.isEmpty(out[index + 1])
+        out[index - 1] += '.' if _.isEmpty(out[index]) and not _.isEmpty(out[index - 1])
     changePartCount = _.max [1, Math.round(nrOfParts * amountOfChange * changePartCount / totalChange)]
     for part in [0...changePartCount]
       do =>
@@ -256,10 +256,7 @@
       do =>
         index = @randomFrom([0..out.length])
         subsentence = @loremIpsum(textSize: @randomFrom(3, 7))
-        if _.isEmpty(out[index])
-          unless _.isEmpty(lastSubsentence = out[index - 1])
-            out[index - 1] = lastSubsentence.substring(0, lastSubsentence.length - 1)
-        else
+        unless _.isEmpty(out[index])
           subsentence = subsentence.substring(0, subsentence.length - 1)
         out = out.slice(0, index).concat [subsentence].concat out.slice(index)
     _.each [0...out.length - 1], (index)->
