@@ -415,9 +415,9 @@ describe 'Patcher', ->
           text: 'model_text'
         @originalValue = 'original_text'
         @currentValue = 'current_text'
-        @patchStringStub = sinon.stub(@patcher, '_patchString')
+        @patchStringStub = sinon.stub(@patcher, '_patchStringAttribute')
 
-      it 'calls the _patchString method', ->
+      it 'calls the _patchStringAttribute method', ->
         @patcher._patchAttribute(@attribute, @attributesToPatch,
                                  @originalValue, @currentValue)
         expect(@patchStringStub).
@@ -455,7 +455,7 @@ describe 'Patcher', ->
                                      @originalValue, @currentValue)
           ).toBeTruthy()
 
-  describe '#_patchString', ->
+  describe '#_patchStringAttribute', ->
     beforeEach ->
       @updatePatchForStub = sinon.stub(Patcher::,
                                        '_updatePatchFor',
@@ -478,30 +478,30 @@ describe 'Patcher', ->
       @dmpStub.restore()
 
     it 'generates a diff for the attribute', ->
-      @patcher._patchString(@attribute, @attributesToPatch,
+      @patcher._patchStringAttribute(@attribute, @attributesToPatch,
                             @originalValue, @currentValue)
       expect(@diffStub).toHaveBeenCalledWith(@originalValue, @currentValue)
 
     it 'generates a patch for the attribute', ->
-      @patcher._patchString(@attribute, @attributesToPatch,
+      @patcher._patchStringAttribute(@attribute, @attributesToPatch,
                             @originalValue, @currentValue)
       expect(@patchStub).toHaveBeenCalledWith(@originalValue, 'some_diff')
 
     it 'applies a patch on the model attribute', ->
-      @patcher._patchString(@attribute, @attributesToPatch,
+      @patcher._patchStringAttribute(@attribute, @attributesToPatch,
                             @originalValue, @currentValue)
       expect(@patchApplyStub).toHaveBeenCalledWith('some_patch',
                                                    'model_text')
 
     context 'and patching a text-attribute succeeds', ->
       it 'sets the successfully patched attribute on the model', ->
-        @patcher._patchString(@attribute, @attributesToPatch,
+        @patcher._patchStringAttribute(@attribute, @attributesToPatch,
                               @originalValue, @currentValue)
         expect(@attributesToPatch.text).toEqual('patched_value')
 
       it 'returns true', ->
         expect(
-          @patcher._patchString(@attribute, @attributesToPatch,
+          @patcher._patchStringAttribute(@attribute, @attributesToPatch,
                                 @originalValue, @currentValue)
         ).toBeTruthy()
 
@@ -513,14 +513,14 @@ describe 'Patcher', ->
                                      -> ['patched_value', [false]])
 
       it 'sets the current value on the model', ->
-        @patcher._patchString(@attribute, @attributesToPatch,
-                              @originalValue, @currentValue)
+        @patcher._patchStringAttribute(@attribute, @attributesToPatch,
+                                       @originalValue, @currentValue)
         expect(@attributesToPatch.text).toEqual('current_text')
 
       it 'returns false', ->
         expect(
-          @patcher._patchString(@attribute, @attributesToPatch,
-                                @originalValue, @currentValue)
+          @patcher._patchStringAttribute(@attribute, @attributesToPatch,
+                                         @originalValue, @currentValue)
         ).toBeFalsy()
 
     context 'and original and current value are equal', ->
@@ -532,8 +532,8 @@ describe 'Patcher', ->
 
       it 'returns true', ->
         expect(
-          @patcher._patchString(@attribute, @attributesToPatch,
-                                @originalValue, @currentValue)
+          @patcher._patchStringAttribute(@attribute, @attributesToPatch,
+                                         @originalValue, @currentValue)
         ).toBeTruthy()
 
 

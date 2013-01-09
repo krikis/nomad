@@ -97,8 +97,8 @@ class @Patcher
       if _.isString(originalValue) and
          _.isString(attributesToPatch[attribute])
         # patch attribute with diff between original and current
-        @_patchString(attribute, attributesToPatch,
-                      originalValue, currentValue)
+        @_patchStringAttribute(attribute, attributesToPatch,
+                               originalValue, currentValue)
       else
         attributesToPatch[attribute] = currentValue
         true
@@ -119,7 +119,7 @@ class @Patcher
 
   # patch a new string value using the diff
   # of the original and current value
-  _patchString: (attribute, attributesToPatch,
+  _patchStringAttribute: (attribute, attributesToPatch,
                  originalValue, currentValue) ->
     # calculate the diff and patch
     diff = @dmp.diff_main originalValue,
