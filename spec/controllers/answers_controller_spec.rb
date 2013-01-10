@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe AnswersController do
+
   describe "GET index" do
     before { get :index }
 
@@ -15,22 +16,6 @@ describe AnswersController do
 
   describe "GET new" do
     before { get :new }
-
-    it "renders the 'answers' template" do
-      response.should render_template("answers")
-    end
-  end
-
-  describe "GET show" do
-    before { get :show }
-
-    it "renders the 'answers' template" do
-      response.should render_template("answers")
-    end
-  end
-
-  describe "GET edit" do
-    before { get :edit }
 
     it "renders the 'answers' template" do
       response.should render_template("answers")
