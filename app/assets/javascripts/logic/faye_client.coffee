@@ -72,10 +72,13 @@ class @BackboneSync.FayeClient
       @[event] eventArguments, processed
     # handle offline test mode
     return if @isOffline
-    if meta?.timestamp? and (meta.client == @clientId or 
-       meta.timestamp == @collection.lastSynced() + 1)
-      # update the collection sync state
-      @collection.setLastSynced(meta.timestamp)
+    if meta?.timestamp?
+      if (meta.client == @clientId or 
+         meta.timestamp == @collection.lastSynced() + 1)
+        # update the collection sync state
+        @collection.setLastSynced(meta.timestamp)
+      else
+        # implement fetching missing updates
     # sync all dirty models if this is presync feedback
     if meta?.preSync
       @collection.syncModels(afterPresync: true)
