@@ -91,7 +91,8 @@ end
 App.bind(:publish) do |client_id, channel, data|
   output = data.inspect
   filter_out_blobs(output)
-  output.scan(/\"id\"=>\"([^"]+)\"/).each do |keyword|
+  ids = output.scan(/\"id\"=>\"([^"]+)\"/).flatten
+  ids.each do |keyword|
     highlight_key(output, keyword, green_on(black))
   end
   ['new_versions', 'create', 'creates',
