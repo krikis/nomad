@@ -1,11 +1,6 @@
 Benches = @Benches ||= {}
 
 Benches.setupPreSyncConflict = (next) -> 
-  # cleanup faye and localStorage for old collections if any
-  @collection?.leave()
-  @collection?._cleanup()
-  @secondCollection?.leave()
-  @secondCollection?._cleanup()
   # delete window.client to speed up tests
   delete window.client
   class Post extends Backbone.Model
@@ -102,11 +97,11 @@ Benches.afterPreSyncConflict = (next) ->
   return
 
 Benches.cleanupPreSyncConflict = (next) ->
-  @collection.leave()
-  @secondCollection.leave()
+  @collection?.leave()
+  @secondCollection?.leave()
   # cleanup faye and localStorage for collections
-  @collection._cleanup()
-  @secondCollection._cleanup()
+  @collection?._cleanup()
+  @secondCollection?._cleanup()
   next.call(@)
   return
   

@@ -111,8 +111,25 @@ class @Bench
       @next?.call(@context, @count > 0)
     ), 100
     
-  handleError: (error)->
+  restartGracefully: ->  
+    setTimeout (=>
+      try
+        @setup.call(@, @testLoop)
+      catch error
+        @handleError error
+    ), 100    
+    
+  failGracefully: ->
+    error = @currentError
+    delete @currentError
     @suite?.finish(error)
+    
+  handleError: (error)->
+    @currentError = error
+    try
+      @cleanup.call(@, @failGracefully)
+    catch error
+      @suite?.finish(error)
 
   processResults: ->
     if @count > 0 
@@ -154,7 +171,10 @@ class @Bench
     else if total >= @timeout
       @suite?.log "Timed out afer #{total} msec waiting for #{message}!"
       # gracefully restart benchmark
-      @suite?.runBench()
+      try
+        @cleanup.call(@, @restartGracefully)
+      catch error
+        @handleError error
       return
     else
       total += @TIMEOUT_INCREMENT
