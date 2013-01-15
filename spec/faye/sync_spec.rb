@@ -71,9 +71,9 @@ describe Faye::Sync do
     end
 
     it 'initializes the unicast meta tag' do
-      subject.init_results({'client_id' => 'some_id'})['unicast']['meta'].
-        should eq({'client' => 'some_id',
-                   'unicast' => true})
+      results = subject.init_results({'client_id' => 'some_id'})
+      results['unicast']['meta'].should eq({'client' => 'some_id',
+                                            'unicast' => true})
     end
 
     it 'initializes the resolve list' do
@@ -144,13 +144,33 @@ describe Faye::Sync do
   end
 
   describe '#add_update_for' do
-    let(:object) { stub(:remote_id => 'some_id') }
-    let(:results) { {'update' => {}}}
+    let(:object) do
+      stub(:remote_id => 'some_id',
+           :last_update => @time = mock(:> => false))
+    end
+    let(:results) { {'update' => {}, 'meta' => {'timestamp' => mock}}}
     before { subject.stub(:json_for => 'some_json') }
 
     it 'adds an update for the object to the hash provided' do
       subject.add_update_for(object, results)
       results['update']['some_id'].should eq('some_json')
+    end
+
+    it 'does not update the timestamp when it exists' do
+      subject.add_update_for(object, results)
+      results['meta']['timestamp'].should_not eq(@time)
+    end
+
+    it 'updates the timestamp when it does not exist' do
+      results['meta'].delete 'timestamp'
+      subject.add_update_for(object, results)
+      results['meta']['timestamp'].should eq(@time)
+    end
+
+    it 'updates the timestamp when last_update supersedes it' do
+      object.stub(:last_update => @time = mock(:> => true))
+      subject.add_update_for(object, results)
+      results['meta']['timestamp'].should eq(@time)
     end
   end
 
