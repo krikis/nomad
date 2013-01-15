@@ -94,7 +94,7 @@ App.bind(:publish) do |client_id, channel, data|
   ['id'].each do |keyword|
     highlight_key(output, keyword, azure_on(black))
   end
-  ["[0-9e-f]{8}\-[0-9e-f]{4}\-[0-9e-f]{4}\-[0-9e-f]{4}\-[0-9e-f]{12}"].each do |keyword|
+  ["[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}"].each do |keyword|
     highlight_key(output, keyword, green_on(black))
   end
   ['new_versions', 'create', 'creates',
