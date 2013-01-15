@@ -59,28 +59,28 @@ def reset
 end
 
 def highlight_key(string, keyword, color)
-  string.gsub! /\"#{keyword}\"/,  "\"#{color}#{keyword}#{reset}\""
+  string.gsub! /\"(#{keyword})\"/,  "\"#{color}\\1#{reset}\""
 end
 
 def highlight_key_with_content(string, keyword, color)
-  string.gsub! /\"#{keyword}\"=>\"([^"]+)\"/,  "\"#{color}#{keyword}#{reset}\"=>\"\\1\""
-  string.gsub! /\"#{keyword}\"=>\[([^\]]+)\]/, "\"#{color}#{keyword}#{reset}\"=>[\\1]"
-  string.gsub! /\"#{keyword}\"=>\{([^\}]+)\}/, "\"#{color}#{keyword}#{reset}\"=>{\\1}"
+  string.gsub! /\"(#{keyword})\"=>\"([^"]+)\"/,  "\"#{color}\\1#{reset}\"=>\"\\2\""
+  string.gsub! /\"(#{keyword})\"=>\[([^\]]+)\]/, "\"#{color}\\1#{reset}\"=>[\\2]"
+  string.gsub! /\"(#{keyword})\"=>\{([^\}]+)\}/, "\"#{color}\\1#{reset}\"=>{\\2}"
 end
 
 def highlight_string_attribute(string, attribute, color, content_color)
-  string.gsub! /\"#{attribute}\"=>\"([^"]+)\"/,
-               "\"#{color}#{attribute}#{reset}\"=>\"#{content_color}\\1#{reset}\""
+  string.gsub! /\"(#{attribute})\"=>\"([^"]+)\"/,
+               "\"#{color}\\1#{reset}\"=>\"#{content_color}\\2#{reset}\""
 end
 
 def highlight_hash_attribute(string, attribute, color, content_color, container_only = false)
-  string.gsub! /\"#{attribute}\"=>\{([^\}]+)\}/,
-               "\"#{color}#{attribute}#{reset}\"=>#{content_color}{#{reset if container_only}\\1#{content_color if container_only}}#{reset}"
+  string.gsub! /\"(#{attribute})\"=>\{([^\}]+)\}/,
+               "\"#{color}\\1#{reset}\"=>#{content_color}{#{reset if container_only}\\2#{content_color if container_only}}#{reset}"
 end
 
 def highlight_array_attribute(string, attribute, color, content_color, container_only = false)
-  string.gsub! /\"#{attribute}\"=>\[([^\]]+)\]/,
-               "\"#{color}#{attribute}#{reset}\"=>#{content_color}[#{reset if container_only}\\1#{content_color if container_only}]#{reset}"
+  string.gsub! /\"(#{attribute})\"=>\[([^\]]+)\]/,
+               "\"#{color}\\1#{reset}\"=>#{content_color}[#{reset if container_only}\\2#{content_color if container_only}]#{reset}"
 end
 
 def filter_out_blobs(string)
@@ -91,9 +91,7 @@ end
 App.bind(:publish) do |client_id, channel, data|
   output = data.inspect
   filter_out_blobs(output)
-  ids = output.scan(/\"id\"=>\"([^"]+)\"/)
-  ids = ids.flatten.map{|id| id.gsub(/-/, '\-')}
-  error ids.inspect
+  ids = output.scan(/\"id\"=>\"([^"]+)\"/).flatten.map{|id| id.gsub(/-/, '\-')}
   ids.each do |keyword|
     highlight_key(output, keyword, green_on(black))
   end
