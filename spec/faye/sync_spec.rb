@@ -225,17 +225,22 @@ describe Faye::Sync do
     end
 
     it 'sets the object attributes' do
-      subject.should_receive(:set_attributes).with(object, create, time)
-      subject.process_create(model, create, 'Model', results)
-    end
-
-    it 'adds a create for the object when it was successfully created' do
-      subject.should_receive(:add_create_for).with(object, results)
+      subject.should_receive(:set_attributes).with(object, create)
       subject.process_create(model, create, 'Model', results)
     end
 
     it 'does not increment the lamport clock for the message model' do
       LamportClock.should_not_receive(:tick).with('Model')
+      subject.process_create(model, create, 'Model', results)
+    end
+
+    it 'sets the object last update time' do
+      object.should_receive(:update_attribute).with(:last_update, time)
+      subject.process_create(model, create, 'Model', results)
+    end
+
+    it 'adds a create for the object' do
+      subject.should_receive(:add_create_for).with(object, results)
       subject.process_create(model, create, 'Model', results)
     end
 
@@ -247,10 +252,36 @@ describe Faye::Sync do
         subject.process_create(model, create, 'Model', results)
       end
 
+      it 'does not increment the lamport clock when the object is invalid' do
+        object.stub(:valid? => false)
+        LamportClock.should_not_receive(:tick).with('Model')
+        subject.process_create(model, create, 'Model', results)
+      end
+
+      it 'sets the object last update time' do
+        LamportClock.stub(:tick => clock = mock)
+        object.should_receive(:update_attribute).with(:last_update, clock)
+        subject.process_create(model, create, 'Model', results)
+      end
+
       it 'adds the timestamp to the results' do
         LamportClock.stub(:tick => clock = mock)
         subject.process_create(model, create, 'Model', results)
         results['meta']['timestamp'].should eq(clock)
+      end
+    end
+
+    context 'when the object is not valid' do
+      before { object.stub(:valid? => false) }
+
+      it 'does not set the object last update time' do
+        object.should_not_receive(:update_attribute).with(:last_update, time)
+        subject.process_create(model, create, 'Model', results)
+      end
+
+      it 'does not add a create for the object' do
+        subject.should_not_receive(:add_create_for).with(object, results)
+        subject.process_create(model, create, 'Model', results)
       end
     end
   end
@@ -291,13 +322,6 @@ describe Faye::Sync do
       object.should_receive(:update_attribute).
         with(:remote_version, 'some_version')
       subject.set_attributes(object, attributes)
-    end
-
-    it 'sets the object last update time if provided' do
-      time = stub
-      object.should_receive(:update_attribute).
-        with(:last_update, time)
-      subject.set_attributes(object, attributes, time)
     end
 
     it 'sets the object created_at' do
@@ -420,17 +444,22 @@ describe Faye::Sync do
     end
 
     it 'sets the object attributes' do
-      subject.should_receive(:set_attributes).with(object, update, time)
-      subject.process_update(model, object, update, 'Model', results)
-    end
-
-    it 'adds an update for the object when it successfully updated' do
-      subject.should_receive(:add_update_for).with(object, results)
+      subject.should_receive(:set_attributes).with(object, update)
       subject.process_update(model, object, update, 'Model', results)
     end
 
     it 'does not increment the lamport clock for the message model' do
       LamportClock.should_not_receive(:tick).with('Model')
+      subject.process_update(model, object, update, 'Model', results)
+    end
+
+    it 'sets the object last update time' do
+      object.should_receive(:update_attribute).with(:last_update, time)
+      subject.process_update(model, object, update, 'Model', results)
+    end
+
+    it 'adds an update for the object' do
+      subject.should_receive(:add_update_for).with(object, results)
       subject.process_update(model, object, update, 'Model', results)
     end
 
@@ -442,10 +471,30 @@ describe Faye::Sync do
         subject.process_update(model, object, update, 'Model', results)
       end
 
+      it 'sets the object last update time' do
+        LamportClock.stub(:tick => clock = mock)
+        object.should_receive(:update_attribute).with(:last_update, clock)
+        subject.process_update(model, object, update, 'Model', results)
+      end
+
       it 'adds the timestamp to the results' do
         LamportClock.stub(:tick => clock = mock)
         subject.process_update(model, object, update, 'Model', results)
         results['meta']['timestamp'].should eq(clock)
+      end
+    end
+
+    context 'when the object is not valid' do
+      before { object.stub(:valid? => false) }
+
+      it 'does not set the object last update time' do
+        object.should_not_receive(:update_attribute).with(:last_update, time)
+        subject.process_update(model, object, update, 'Model', results)
+      end
+
+      it 'does not add an update for the object' do
+        subject.should_not_receive(:add_update_for).with(object, results)
+        subject.process_update(model, object, update, 'Model', results)
       end
     end
   end

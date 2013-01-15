@@ -68,18 +68,19 @@ module Faye::Sync
   end
 
   def process_create(model, create, model_name, successful_creates)
-    successful_creates['meta']['timestamp'] ||= LamportClock.tick model_name
     object = model.new
     model.transaction do
-      set_attributes(object, create, successful_creates['meta']['timestamp'])
+      set_attributes(object, create)
     end
     if object.valid?
+      successful_creates['meta']['timestamp'] ||= LamportClock.tick model_name
+      object.update_attribute(:last_update, successful_creates['meta']['timestamp'])
       add_create_for(object, successful_creates)
     end
   end
 
   # persist the local update on the master data copy
-  def set_attributes(object, attributes, last_update = nil)
+  def set_attributes(object, attributes)
     # persist the GUID
     unless object.remote_id.present?
       object.update_attribute(:remote_id, attributes['id'])
@@ -88,7 +89,6 @@ module Faye::Sync
     object.update_attributes(attributes['attributes'])
     # persist the data version and last_update timestamp
     object.update_attribute(:remote_version, attributes['version'])
-    object.update_attribute(:last_update, last_update) if last_update
     # persist the lifecycle timestamps
     object.update_attribute(:created_at, attributes['created_at'])
     object.update_attribute(:updated_at, attributes['updated_at'])
@@ -111,10 +111,11 @@ module Faye::Sync
   end
 
   def process_update(model, object, update, model_name, successful_updates)
-    successful_updates['meta']['timestamp'] ||= LamportClock.tick model_name
     object ||= model.new
-    set_attributes(object, update, successful_updates['meta']['timestamp'])
+    set_attributes(object, update)
     if object.valid?
+      successful_updates['meta']['timestamp'] ||= LamportClock.tick model_name
+      object.update_attribute(:last_update, successful_updates['meta']['timestamp'])
       add_update_for(object, successful_updates)
     end
   end
