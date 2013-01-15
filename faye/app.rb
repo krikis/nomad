@@ -91,6 +91,9 @@ end
 App.bind(:publish) do |client_id, channel, data|
   output = data.inspect
   filter_out_blobs(output)
+  output.scan(/\"id\"=>\"([^"]+)\"/).each do |keyword|
+    highlight_key(output, keyword, green_on(black))
+  end
   ['new_versions', 'create', 'creates',
    'versions',     'update', 'updates'].each do |keyword|
     highlight_key_with_content(output, keyword, azure_on(black))

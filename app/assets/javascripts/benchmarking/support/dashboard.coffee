@@ -5,8 +5,7 @@ $('#clearObjects').click ->
   _.each _.properties(localStorage), (property) ->
     unless /^system_/.test property
       localStorage.removeItem(property)
-  
-$('#clientId').html(Nomad.clientId || 'UNKNOWN').addClass('label-info')
+      
 $('#fayeServer').html(FAYE_SERVER).addClass('label-info') 
 
 # update localStorage info

@@ -7,7 +7,9 @@ Benches.setupSyncConflict = (next) ->
   delete window.client
   # setup first client
   class Post extends Backbone.Model
+    clientId: 'client'
   class TestCollection extends Backbone.Collection
+    clientId: 'client'
     model: Post
   @collection = new TestCollection
   # instantiate first client event spies

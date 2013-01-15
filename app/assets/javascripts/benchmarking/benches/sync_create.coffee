@@ -4,8 +4,10 @@ Benches.setupSyncCreate = (next) ->
   # delete window.client to speed up tests
   delete window.client
   class Post extends Backbone.Model
+    clientId: 'client'
   class TestCollection extends Backbone.Collection
     model: Post
+    clientId: 'client'
   @collection = new TestCollection
   @createSpy  = sinon.spy(@collection.fayeClient, 'create' )
   @Post = Post
