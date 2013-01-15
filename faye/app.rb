@@ -91,28 +91,30 @@ end
 App.bind(:publish) do |client_id, channel, data|
   output = data.inspect
   filter_out_blobs(output)
-  ids = output.scan(/\"id\"=>\"([^"]+)\"/).flatten.map{|id| id.gsub(/-/, '\-')}
-  ids.each do |keyword|
+  ['id'].each do |keyword|
+    highlight_key(output, keyword, azure_on(black))
+  end
+  ["[0-9e-f]{8}\-[0-9e-f]{4}\-[0-9e-f]{4}\-[0-9e-f]{4}\-[0-9e-f]{12}"].each do |keyword|
     highlight_key(output, keyword, green_on(black))
   end
   ['new_versions', 'create', 'creates',
    'versions',     'update', 'updates'].each do |keyword|
     highlight_key_with_content(output, keyword, azure_on(black))
   end
-  ['version', 'remote_version'].each do |keyword|
+  ['version', 'remote_version'].each do |attribute|
     highlight_hash_attribute(output,
-                             keyword,
+                             attribute,
                              green_on(black),
                              red_on(black))
   end
-  ['attributes'].each do |keyword|
+  ['attributes'].each do |attribute|
     highlight_hash_attribute(output,
-                             keyword,
+                             attribute,
                              azure_on(black),
                              red_on(black),
                              true)
   end
-  ['client_id', 'id'].each do |attribute|
+  ['client_id'].each do |attribute|
     highlight_string_attribute(output,
                                attribute,
                                azure_on(black),
