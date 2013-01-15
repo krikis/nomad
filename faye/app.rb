@@ -91,7 +91,7 @@ end
 App.bind(:publish) do |client_id, channel, data|
   output = data.inspect
   filter_out_blobs(output)
-  ids = output.scan(/\"id\"=>\"([^"]+)\"/).flatten
+  ids = output.scan(/\"id\"=>\"([^"]+)\"/).flatten.map{|id| id.gsub(/-/, '\-')}
   ids.each do |keyword|
     highlight_key(output, keyword, green_on(black))
   end
