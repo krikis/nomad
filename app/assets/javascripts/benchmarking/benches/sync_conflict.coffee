@@ -24,7 +24,7 @@ Benches.setupSyncConflict = (next) ->
     initialize: ->
       @fayeClient = new BackboneSync.FayeClient @,
         modelName: 'Post'
-        client: new Faye.Client(FAYE_SERVER)
+        client: window.secondClient = new Faye.Client(FAYE_SERVER)
   @secondCollection = new SecondCollection  
   # instantiate second client event spies
   @secondCreateSpy  = sinon.spy(@secondCollection.fayeClient, 'create')
