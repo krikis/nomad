@@ -9,81 +9,102 @@ Benches.setupSerialized25 = (next) ->
   next.call @
 
 Benches.beforeSerialized25 = (next) ->
+  changeRate = 0.25
   # create the original data version
-  @answerOriginal = Util.randomObject()
-  @answer = new @Answer _.deepClone @answerOriginal
-  # perform the winning update
-  [@dummyOriginal, deleted] = Util.randomVersion(@answerOriginal, 0.25)
-  @dummy = new @Answer _.deepClone @dummyOriginal
-  # perform the losing update
-  [version, deleted] = Util.randomVersion(@answerOriginal, 0.25)
-  @answer.set version
-  _.each deleted, (property)=>
-    @answer.unset property
+  @originalVersion = Util.randomObject()
+  # handle local update
+  [@localVersion, localDeleted] = Util.randomVersion(@originalVersion, changeRate)
+  @localAnswer = new @Answer _.deepClone @originalVersion
+  @localDummy = new @Answer _.deepClone @localVersion
+  @localAnswer.set @localVersion
+  _.each localDeleted, (property)=>
+    @localAnswer.unset property
+  # handle remote update
+  [@remoteVersion, remoteDeleted] = Util.randomVersion(@originalVersion, changeRate)
+  @remoteAnswer = new @Answer _.deepClone @originalVersion
+  @remoteDummy = new @Answer _.deepClone @remoteVersion
+  @remoteAnswer.set @remoteVersion
+  _.each remoteDeleted, (property)=>
+    @remoteAnswer.unset property
   next.call @
 
 Benches.serialized25 = (next) ->
   try
-    if @answer._applyPatchesTo @dummy
-      @success = 1
-      # console.log '================================= Serialized ================================='
-      _.each _.union(_.properties(@answerOriginal),
-                     _.properties(@dummyOriginal),
-                     _.properties(@answer.attributes)), (key) =>
-        if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) or
-           not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
-          if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
-             not _.isEqual(@answer.attributes[key], @dummyOriginal[key]) and
-             _.isEqual(@dummyOriginal[key], @dummy.attributes[key])
-            # console.error "--#{key}:"
-          else if not _.isEqual(@answer.attributes[key], @answerOriginal[key]) and
-                  not _.isEqual(@dummyOriginal[key],     @answerOriginal[key])
-            merge = true
-            # console.warn "--#{key}:"
-          else
-            # console.log "--#{key}:"
-          if _.isString(@answerOriginal[key]) and ' ' in @answerOriginal[key]
-            if merge and
-               _.isString(@answer.attributes[key]) and ' ' in @answer.attributes[key] and
-               _.isString(@dummyOriginal[key]    ) and ' ' in @dummyOriginal[key]
-              dmp = new diff_match_patch 
-              diff1 = dmp.diff_main @answerOriginal[key], @answer.attributes[key]
-              dmp.diff_cleanupSemantic diff1
-              diff2 = dmp.diff_main @answerOriginal[key], @dummyOriginal[key]
-              dmp.diff_cleanupSemantic diff2
-              diff3 = dmp.diff_main @answerOriginal[key], @dummy.attributes[key]
-              dmp.diff_cleanupSemantic diff3
-              well = $("<div class='well'>")
-              well.append $("<h3><small>Remote Changes</small></h3>")
-              well.append $("#{dmp.diff_prettyHtml diff2}")
-              well.append $("<h3><small>Local Changes</small></h3>")
-              well.append $("#{dmp.diff_prettyHtml diff1}")
-              well.append $("<h3><small>Merged Changes</small></h3>")
-              well.append $("#{dmp.diff_prettyHtml diff3}")
-              box = $("<div class='box'>")
-              if @answer._versioning.reversePatch
-                box.addClass('reverse')
-              box.append well
-              $('#tab4 #seri').append box
-            # console.log "#{@answerOriginal[key]}"
-            # console.log "-dum-> #{@dummyOriginal[key]}"
-            # console.log "-ans-> #{@answer.attributes[key]}"
-            # console.log "=mrg=> #{@dummy.attributes[key]}"
-          else
-            original = @answerOriginal[key]
-            padding = Array("#{original}".length + 1).join(' ')
-            # console.log "#{padding } -dum-> #{@dummyOriginal[key]    }"
-            # console.log "#{original} -ans-> #{@answer.attributes[key]}"
-            # console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
-    else  
-      # console.log 'Patching failed!!!'
-      @success = 0
-  catch error
+    if @success = @localAnswer._applyPatchesTo @remoteDummy
+      @dummy = @remoteDummmy
+  catch error    
+    @success = false
     if error.name == 'SyntaxError'
       @suite?.log "JSON format broken!"
     else
       @suite?.log error.message
-      @suite?.log error.stack
-    @success = 0
-  finally
-    next.call @
+      @suite?.log error.stack    
+
+  # apply patches in reverse order when patching fails
+  unless @success
+    try
+      if @success = @remoteAnswer._applyPatchesTo @localDummy
+        @dummy = @localDummy
+        @dummy._versioning.reversePatch = true
+    catch error    
+      @success = false
+      if error.name == 'SyntaxError'
+        @suite?.log "JSON format broken!"
+      else
+        @suite?.log error.message
+        @suite?.log error.stack
+
+  if @success
+    # console.log '================================= Serialized ================================='
+    _.each _.union(_.properties(@originalVersion),
+                   _.properties(@remoteVersion),
+                   _.properties(@localVersion)), (key) =>
+      if not _.isEqual(@localVersion[key], @originalVersion[key]) or
+         not _.isEqual(@remoteVersion[key], @originalVersion[key])
+        if not _.isEqual(@localVersion[key], @originalVersion[key]) and
+           not _.isEqual(@localVersion[key], @remoteVersion[key]) and
+           _.isEqual(@remoteVersion[key], @dummy.attributes[key])
+          # console.error "--#{key}:"
+        else if not _.isEqual(@localVersion[key], @originalVersion[key]) and
+                not _.isEqual(@remoteVersion[key], @originalVersion[key])
+          merge = true
+          # console.warn "--#{key}:"
+        else
+          # console.log "--#{key}:"
+        if _.isString(@originalVersion[key]) and ' ' in @originalVersion[key]
+          if merge and
+             _.isString(@localVersion[key]) and ' ' in @localVersion[key] and
+             _.isString(@remoteVersion[key]) and ' ' in @remoteVersion[key]
+            dmp = new diff_match_patch 
+            diff1 = dmp.diff_main @originalVersion[key], @localVersion[key]
+            dmp.diff_cleanupSemantic diff1
+            diff2 = dmp.diff_main @originalVersion[key], @remoteVersion[key]
+            dmp.diff_cleanupSemantic diff2
+            diff3 = dmp.diff_main @originalVersion[key], @dummy.attributes[key]
+            dmp.diff_cleanupSemantic diff3
+            well = $("<div class='well'>")
+            well.append $("<h3><small>Remote Changes</small></h3>")
+            well.append $("#{dmp.diff_prettyHtml diff2}")
+            well.append $("<h3><small>Local Changes</small></h3>")
+            well.append $("#{dmp.diff_prettyHtml diff1}")
+            well.append $("<h3><small>Merged Changes</small></h3>")
+            well.append $("#{dmp.diff_prettyHtml diff3}")
+            box = $("<div class='box'>")
+            if @dummy._versioning.reversePatch
+              box.addClass('reverse')
+            box.append well
+            $('#tab4 #seri').append box
+          # console.log "#{@originalVersion[key]}"
+          # console.log "-dum-> #{@remoteVersion[key]}"
+          # console.log "-ans-> #{@localVersion[key]}"
+          # console.log "=mrg=> #{@dummy.attributes[key]}"
+        else
+          original = @originalVersion[key]
+          padding = Array("#{original}".length + 1).join(' ')
+          # console.log "#{padding } -dum-> #{@remoteVersion[key]    }"
+          # console.log "#{original} -ans-> #{@localVersion[key]}"
+          # console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
+  else  
+    # console.log 'Patching failed!!!'
+  next.call @
+  
