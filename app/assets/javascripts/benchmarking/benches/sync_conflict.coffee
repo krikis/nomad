@@ -3,6 +3,11 @@ Benches = @Benches ||= {}
 # setup the environment for benchmarking the synchronization 
 # of a conflicting update
 Benches.setupSyncConflict = (next) ->
+  # cleanup faye and localStorage for old collections if any
+  @collection?.leave()
+  @collection?._cleanup()
+  @secondCollection?.leave()
+  @secondCollection?._cleanup()
   # delete window.client to speed up benchmark setup
   delete window.client
   # setup first client

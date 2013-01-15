@@ -1,6 +1,11 @@
 Benches = @Benches ||= {}
 
 Benches.setupSyncUpdate = (next) ->
+  # cleanup faye and localStorage for old collections if any
+  @collection?.leave()
+  @collection?._cleanup()
+  @secondCollection?.leave()
+  @secondCollection?._cleanup()
   # delete window.client to speed up tests
   delete window.client
   class Post extends Backbone.Model
