@@ -19,14 +19,11 @@ module Faye::Sync
   end
 
   def init_results(message = {})
-    lamport_clock = LamportClock.tick message['model_name']
     {'unicast'   => {'meta'    => {'client' => message['client_id'],
-                                   'timestamp' => lamport_clock,
                                    'unicast' => true},
                      'resolve' => [],
                      'update'  => {}},
-     'multicast' => {'meta'    => {'client' => message['client_id'],
-                                   'timestamp' => lamport_clock},
+     'multicast' => {'meta'    => {'client' => message['client_id']},
                      'create'  => {},
                      'update'  => {}}}
   end
@@ -46,13 +43,14 @@ module Faye::Sync
     end
     # add newly created model to master data copy
     if message['creates'].present?
-      handle_creates(model, message['creates'], results)
+      handle_creates(model, message['creates'], message['model_name'], results)
     end
     # add local update of model to master data copy
     if message['updates'].present?
       handle_updates(model,
                      message['updates'],
                      message['client_id'],
+                     message['model_name'],
                      results)
     end
   end
@@ -61,15 +59,16 @@ module Faye::Sync
     results['update'][object.remote_id] ||= json_for(object)
   end
 
-  def handle_creates(model, creates, results)
+  def handle_creates(model, creates, model_name, results)
     creates.each do |create|
       if check_new_version(model, create, results['unicast'])
-        process_create(model, create, results['multicast'])
+        process_create(model, create, model_name, results['multicast'])
       end
     end
   end
 
-  def process_create(model, create, successful_creates)
+  def process_create(model, create, model_name, successful_creates)
+    successful_creates['meta']['timestamp'] ||= LamportClock.tick model_name
     object = model.new
     model.transaction do
       set_attributes(object, create, successful_creates['meta']['timestamp'])
@@ -99,19 +98,20 @@ module Faye::Sync
     results['create'][object.remote_id] = json_for(object)
   end
 
-  def handle_updates(model, updates, client_id, results)
+  def handle_updates(model, updates, client_id, model_name, results)
     updates.each do |update|
       model.transaction do
         success, object = check_version(model, update,
                                         client_id, results['unicast'])
         if success
-          process_update(model, object, update, results['multicast'])
+          process_update(model, object, update, model_name, results['multicast'])
         end
       end
     end
   end
 
-  def process_update(model, object, update, successful_updates)
+  def process_update(model, object, update, model_name, successful_updates)
+    successful_updates['meta']['timestamp'] ||= LamportClock.tick model_name
     object ||= model.new
     set_attributes(object, update, successful_updates['meta']['timestamp'])
     if object.valid?

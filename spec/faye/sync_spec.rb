@@ -66,11 +66,6 @@ describe Faye::Sync do
     let(:time) { stub }
     before { LamportClock.stub(:tick).and_return(time) }
 
-    it 'increments the lamport clock for the message model' do
-      LamportClock.should_receive(:tick).with('Model')
-      subject.init_results 'model_name' => 'Model'
-    end
-
     it 'initializes the unicast message' do
       subject.init_results['unicast'].should be
     end
@@ -78,7 +73,6 @@ describe Faye::Sync do
     it 'initializes the unicast meta tag' do
       subject.init_results({'client_id' => 'some_id'})['unicast']['meta'].
         should eq({'client' => 'some_id',
-                   'timestamp' => time,
                    'unicast' => true})
     end
 
@@ -96,8 +90,7 @@ describe Faye::Sync do
 
     it 'initializes the multicast meta tag' do
       subject.init_results({'client_id' => 'some_id'})['multicast']['meta'].
-        should eq({'client' => 'some_id',
-                   'timestamp' => time})
+        should eq({'client' => 'some_id'})
     end
 
     it 'initializes the create list' do
@@ -131,16 +124,17 @@ describe Faye::Sync do
     end
 
     it 'handles creates if present' do
-      message = {'creates' => stub, 'client_id' => 'some_id'}
+      message = {'creates' => stub, 'client_id' => stub, 'model_name' => stub}
       subject.should_receive(:handle_creates).
-        with(model, message['creates'], results)
+        with(model, message['creates'], message['model_name'], results)
       subject.process_message(model, message, results)
     end
 
     it 'handles updates if present' do
-      message = {'updates' => stub, 'client_id' => 'some_id'}
+      message = {'updates' => stub, 'client_id' => stub, 'model_name' => stub}
       subject.should_receive(:handle_updates).
-        with(model, message['updates'], 'some_id', results)
+        with(model, message['updates'], message['client_id'],
+                    message['model_name'], results)
       subject.process_message(model, message, results)
     end
 
@@ -173,34 +167,34 @@ describe Faye::Sync do
     it 'checks the version of each create' do
       subject.should_receive(:check_new_version).
         with(model, create, an_instance_of(Hash))
-      subject.handle_creates(model, [create], results)
+      subject.handle_creates(model, [create], 'Model', results)
     end
 
     it 'files all id conflicts for unicast' do
       subject.stub(:check_new_version) do |_, _, unicast|
         unicast['id'] = 'conflict'
       end
-      subject.handle_creates(model, [create], results)
+      subject.handle_creates(model, [create], 'Model', results)
       results['unicast']['id'].should eq('conflict')
     end
 
     it 'issues a create when the version check is successful' do
       subject.should_receive(:process_create).
-        with(model, create, an_instance_of(Hash))
-      subject.handle_creates(model, [create], results)
+        with(model, create, 'Model', an_instance_of(Hash))
+      subject.handle_creates(model, [create], 'Model', results)
     end
 
     it 'issues no create when the version check is unsuccessful' do
       subject.stub(:check_new_version => false)
       subject.should_not_receive(:process_create)
-      subject.handle_creates(model, [create], results)
+      subject.handle_creates(model, [create], 'Model', results)
     end
 
     it 'files all successful creates for multicast' do
-      subject.stub(:process_create) do |_, _, multicast|
+      subject.stub(:process_create) do |_, _, _, multicast|
         multicast['successful'] = 'create'
       end
-      subject.handle_creates(model, [create], results)
+      subject.handle_creates(model, [create], 'Model', results)
       results['multicast']['successful'].should eq('create')
     end
   end
@@ -227,17 +221,37 @@ describe Faye::Sync do
 
     it 'creates a new object' do
       model.should_receive(:new).with()
-      subject.process_create(model, create, results)
+      subject.process_create(model, create, 'Model', results)
     end
 
     it 'sets the object attributes' do
       subject.should_receive(:set_attributes).with(object, create, time)
-      subject.process_create(model, create, results)
+      subject.process_create(model, create, 'Model', results)
     end
 
     it 'adds a create for the object when it was successfully created' do
       subject.should_receive(:add_create_for).with(object, results)
-      subject.process_create(model, create, results)
+      subject.process_create(model, create, 'Model', results)
+    end
+
+    it 'does not increment the lamport clock for the message model' do
+      LamportClock.should_not_receive(:tick).with('Model')
+      subject.process_create(model, create, 'Model', results)
+    end
+
+    context 'when no timestamp is set' do
+      let(:results) { {'meta' => {'timestamp' => nil}} }
+
+      it 'increments the lamport clock for the message model' do
+        LamportClock.should_receive(:tick).with('Model')
+        subject.process_create(model, create, 'Model', results)
+      end
+
+      it 'adds the timestamp to the results' do
+        LamportClock.stub(:tick => clock = mock)
+        subject.process_create(model, create, 'Model', results)
+        results['meta']['timestamp'].should eq(clock)
+      end
     end
   end
 
@@ -336,35 +350,35 @@ describe Faye::Sync do
     it 'checks the version of each update' do
       subject.should_receive(:check_version).
         with(model, update, 'client_id', an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', results)
+      subject.handle_updates(model, [update], 'client_id', 'Model', results)
     end
 
     it 'files all update conflicts for unicast' do
       subject.stub(:check_version) do |_, _, _, unicast|
         unicast['update'] = 'conflict'
       end
-      subject.handle_updates(model, [update], 'client_id', results)
+      subject.handle_updates(model, [update], 'client_id', 'Model', results)
       results['unicast']['update'].should eq('conflict')
     end
 
     it 'issues an update when the version check is successful' do
       subject.should_receive(:process_update).
-        with(model, object, update, an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', results)
+        with(model, object, update, 'Model', an_instance_of(Hash))
+      subject.handle_updates(model, [update], 'client_id', 'Model', results)
     end
 
     it 'issues no update when the version check is unsuccessful' do
       subject.stub(:check_version => [false, object])
       subject.should_not_receive(:process_update).
         with(model, object, update, an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', results)
+      subject.handle_updates(model, [update], 'client_id', 'Model', results)
     end
 
     it 'files all successful updates for multicast' do
-      subject.stub(:process_update) do |_, _, _, multicast|
+      subject.stub(:process_update) do |_, _, _, _, multicast|
         multicast['successful'] = 'update'
       end
-      subject.handle_updates(model, [update], 'client_id', results)
+      subject.handle_updates(model, [update], 'client_id', 'Model', results)
       results['multicast']['successful'].should eq('update')
     end
   end
@@ -394,25 +408,45 @@ describe Faye::Sync do
 
       it 'creates an object' do
         model.should_receive(:new).with()
-        subject.process_update(model, nil, update, results)
+        subject.process_update(model, nil, update, 'Model', results)
       end
     end
 
     context 'when an object is passed in' do
       it 'does not create a new object' do
         model.should_not_receive(:new)
-        subject.process_update(model, object, update, results)
+        subject.process_update(model, object, update, 'Model', results)
       end
     end
 
     it 'sets the object attributes' do
       subject.should_receive(:set_attributes).with(object, update, time)
-      subject.process_update(model, object, update, results)
+      subject.process_update(model, object, update, 'Model', results)
     end
 
     it 'adds an update for the object when it successfully updated' do
       subject.should_receive(:add_update_for).with(object, results)
-      subject.process_update(model, object, update, results)
+      subject.process_update(model, object, update, 'Model', results)
+    end
+
+    it 'does not increment the lamport clock for the message model' do
+      LamportClock.should_not_receive(:tick).with('Model')
+      subject.process_update(model, object, update, 'Model', results)
+    end
+
+    context 'when no timestamp is set' do
+      let(:results) { {'meta' => {'timestamp' => nil}} }
+
+      it 'increments the lamport clock for the message model' do
+        LamportClock.should_receive(:tick).with('Model')
+        subject.process_update(model, object, update, 'Model', results)
+      end
+
+      it 'adds the timestamp to the results' do
+        LamportClock.stub(:tick => clock = mock)
+        subject.process_update(model, object, update, 'Model', results)
+        results['meta']['timestamp'].should eq(clock)
+      end
     end
   end
 
