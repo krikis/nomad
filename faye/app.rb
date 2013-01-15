@@ -99,7 +99,7 @@ App.bind(:publish) do |client_id, channel, data|
   end
   ['new_versions', 'create', 'creates',
    'versions',     'update', 'updates'].each do |keyword|
-    highlight_key_with_content(output, keyword, azure_on(black))
+    highlight_key_with_content(output, keyword, pink_on(black))
   end
   ['version', 'remote_version'].each do |attribute|
     highlight_hash_attribute(output,
