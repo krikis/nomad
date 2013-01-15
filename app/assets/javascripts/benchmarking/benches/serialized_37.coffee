@@ -31,7 +31,7 @@ Benches.beforeSerialized37 = (next) ->
 Benches.serialized37 = (next) ->
   try
     if @success = @localAnswer._applyPatchesTo @remoteDummy
-      @dummy = @remoteDummmy
+      @dummy = @remoteDummy
   catch error    
     @success = false
     if error.name == 'SyntaxError'
