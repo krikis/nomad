@@ -10,7 +10,7 @@ class ServerSideClient
   # subscribe server-side client to all server synchronization channels
   def subscribe
     @client.subscribe('/server/*') do |message|
-      # hook in the message processing callback 
+      # hook in the message processing callback
       on_server_message(message)
     end
   end
@@ -21,7 +21,7 @@ class ServerSideClient
     if message['reset_db']
       error 'Resetting sqlite3 test db...'
       `cp db/test.sqlite3.clean db/test.sqlite3`
-      publish_results(message, 'unicast'=> {'_dbReset' => true})
+      publish_results(message, 'unicast'=> {'_dbReset' => true, 'meta' => {}})
     elsif model = message['model_name'].safe_constantize
       if model.respond_to? :find_by_remote_id
         # collect updates since last synchronization phase
