@@ -56,10 +56,6 @@ module Faye::Sync
   end
 
   def add_update_for(object, results)
-    if not results['meta']['timestamp'] or
-       object.last_update > results['meta']['timestamp']
-      results['meta']['timestamp'] = object.last_update
-    end
     results['update'][object.remote_id] ||= json_for(object)
   end
 

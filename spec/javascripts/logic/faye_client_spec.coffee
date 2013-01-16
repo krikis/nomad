@@ -187,43 +187,33 @@ describe 'FayeClient', ->
       @backboneClient.method_2 = ->
       @method1Stub = sinon.stub(@backboneClient, 'method_1')
       @method2Stub = sinon.stub(@backboneClient, 'method_2')
+      @message = 
+        meta:
+          client: 'some_client_id'
+        method_1: 'params'  
+        method_2: 'other_params'
       
     it 'calls a method for each actual entry in the message', ->
-      @backboneClient.receive
-        meta:
-          meta: 'information'
-        method_1: 'params'
-        method_2: 'other_params'
+      @backboneClient.receive @message
       expect(@backboneClient.meta).not.toHaveBeenCalled()
       expect(@method1Stub).
         toHaveBeenCalledWith('params', {})
       expect(@method2Stub).
         toHaveBeenCalledWith('other_params', {})
-        
-    it 'updates the collection sync state', ->
-      @backboneClient.receive
-        meta:
-          client: @clientId
-          timestamp: 'timestamp'
-      expect(@setLastSyncedStub).toHaveBeenCalledWith('timestamp')
+      
+    it 'does not update the collection sync state', ->
+      @backboneClient.receive @message
+      expect(@setLastSyncedStub).not.toHaveBeenCalled()
+  
+    it 'does not sync all dirty models to the server', ->
+      @backboneClient.receive @message
+      expect(@syncModelsStub).not.toHaveBeenCalled()
 
-    context 'when the message concerns presync feedback', ->
-      beforeEach ->
-        @message =
-          meta:
-            preSync: true
-          method_1: 'params'
-            
-      it 'syncs all dirty models to the server', ->
-        @backboneClient.receive @message
-        expect(@syncModelsStub).toHaveBeenCalledWith(afterPresync: true)
+    it 'does not sync all processed models to the server', ->
+      @backboneClient.receive @message
+      expect(@syncProcessedStub).not.toHaveBeenCalled()
         
-      it 'syncs all dirty models after processing the message', ->
-        @backboneClient.receive @message
-        expect(@syncModelsStub).
-          toHaveBeenCalledAfter(@backboneClient.method_1)
-
-    context 'when the message does not concern presync feedback', ->
+    context 'when the message originates from the client itself', ->   
       beforeEach ->
         @method1Stub.restore()
         @method1Stub = sinon.stub(@backboneClient, 'method_1', (params, processed) ->
@@ -233,44 +223,72 @@ describe 'FayeClient', ->
         @method2Stub = sinon.stub(@backboneClient, 'method_2', (params, processed) ->
           processed.updates = ['rebased']
         )
-        @message =
-          meta:
-            timestamp: 'timestamp'
-          method_1: 'params'
-          method_2: 'params'
+        @message['meta']['client'] = @clientId
 
       it 'syncs all processed models to the server', ->
-        @backboneClient.receive(@message)
+        @backboneClient.receive @message
         expect(@syncProcessedStub).
           toHaveBeenCalledWith
             creates: ['resolved']
             updates: ['rebased']
-        
+      
       it 'does not sync all dirty models to the server', ->
-        @backboneClient.receive(@message)
+        @backboneClient.receive @message
         expect(@syncModelsStub).not.toHaveBeenCalled()
-        
-    context 'when the client is offline', ->
-      beforeEach ->
-        @backboneClient.isOffline = true
-        
-      it 'does not updates the collection sync state', ->
-        @backboneClient.receive
-          meta:
-            timestamp: 'timestamp'
-        expect(@setLastSyncedStub).not.toHaveBeenCalled()    
-        
-      it 'does not sync all dirty models to the server', ->
-        @backboneClient.receive
-          meta:
-            timestamp: 'timestamp'
-        expect(@syncModelsStub).not.toHaveBeenCalled()
+    
+      context 'when the client is offline', ->
+        beforeEach ->
+          @backboneClient.isOffline = true
 
-      it 'does not sync all processed models to the server', ->
-        @backboneClient.receive
-          meta:
-            timestamp: 'timestamp'
-        expect(@syncProcessedStub).not.toHaveBeenCalled()
+        it 'does not sync all processed models to the server', ->
+          @backboneClient.receive @message
+          expect(@syncProcessedStub).not.toHaveBeenCalled()
+             
+      context 'and a timestamp is present', ->
+        beforeEach ->
+          @message['meta']['timestamp'] = 'timestamp'
+        
+        it 'updates the collection sync state', ->
+          @backboneClient.receive @message
+          expect(@setLastSyncedStub).toHaveBeenCalledWith('timestamp')
+        
+        it 'updates the collection sync state after processing the message', ->
+          @backboneClient.receive @message
+          expect(@setLastSyncedStub).
+            toHaveBeenCalledAfter(@backboneClient.method_1)
+        
+        context 'when the client is offline', ->
+          beforeEach ->
+            @backboneClient.isOffline = true
+      
+          it 'does not update the collection sync state', ->
+            @backboneClient.receive @message
+            expect(@setLastSyncedStub).not.toHaveBeenCalled()
+
+      context 'and the message concerns presync feedback', ->
+        beforeEach ->
+          @message['meta']['preSync'] = true
+            
+        it 'syncs all dirty models to the server', ->
+          @backboneClient.receive @message
+          expect(@syncModelsStub).toHaveBeenCalledWith(afterPresync: true)
+        
+        it 'syncs all dirty models after processing the message', ->
+          @backboneClient.receive @message
+          expect(@syncModelsStub).
+            toHaveBeenCalledAfter(@backboneClient.method_1)
+
+        it 'does not sync all processed models to the server', ->
+          @backboneClient.receive @message
+          expect(@syncProcessedStub).not.toHaveBeenCalled()
+        
+        context 'when the client is offline', ->
+          beforeEach ->
+            @backboneClient.isOffline = true
+    
+          it 'does not sync all dirty models to the server', ->
+            @backboneClient.receive @message
+            expect(@syncModelsStub).not.toHaveBeenCalled()
       
   describe '#create', ->
     beforeEach ->

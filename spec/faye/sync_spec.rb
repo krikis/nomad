@@ -155,23 +155,6 @@ describe Faye::Sync do
       subject.add_update_for(object, results)
       results['update']['some_id'].should eq('some_json')
     end
-
-    it 'does not update the timestamp when it exists' do
-      subject.add_update_for(object, results)
-      results['meta']['timestamp'].should_not eq(@time)
-    end
-
-    it 'updates the timestamp when it does not exist' do
-      results['meta'].delete 'timestamp'
-      subject.add_update_for(object, results)
-      results['meta']['timestamp'].should eq(@time)
-    end
-
-    it 'updates the timestamp when last_update supersedes it' do
-      object.stub(:last_update => @time = mock(:> => true))
-      subject.add_update_for(object, results)
-      results['meta']['timestamp'].should eq(@time)
-    end
   end
 
   describe '#handle_creates' do
