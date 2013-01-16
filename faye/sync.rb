@@ -61,17 +61,17 @@ module Faye::Sync
 
   def handle_creates(model, creates, model_name, results)
     creates.each do |create|
-      if check_new_version(model, create, results['unicast'])
-        process_create(model, create, model_name, results['multicast'])
+      model.transaction do
+        if check_new_version(model, create, results['unicast'])
+          process_create(model, create, model_name, results['multicast'])
+        end
       end
     end
   end
 
   def process_create(model, create, model_name, successful_creates)
     object = model.new
-    model.transaction do
-      set_attributes(object, create)
-    end
+    set_attributes(object, create)
     if object.valid?
       successful_creates['meta']['timestamp'] ||= LamportClock.tick model_name
       object.update_attribute(:last_update, successful_creates['meta']['timestamp'])

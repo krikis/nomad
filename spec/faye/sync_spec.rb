@@ -167,6 +167,13 @@ describe Faye::Sync do
                    :process_create => nil)
     end
 
+    it 'handles each create in a transaction' do
+      TestModel.should_receive(:transaction).once
+      subject.should_not_receive(:check_new_version)
+      subject.should_not_receive(:process_create)
+      subject.handle_creates(model, [create], 'Model', results)
+    end
+
     it 'checks the version of each create' do
       subject.should_receive(:check_new_version).
         with(model, create, an_instance_of(Hash))
@@ -372,6 +379,13 @@ describe Faye::Sync do
     before do
       subject.stub(:check_version => [true, object],
                    :process_update => nil)
+    end
+
+    it 'handles each update in a transaction' do
+      TestModel.should_receive(:transaction).once
+      subject.should_not_receive(:check_version)
+      subject.should_not_receive(:process_update)
+      subject.handle_updates(model, [update], 'client_id', 'Model', results)
     end
 
     it 'checks the version of each update' do

@@ -2,7 +2,7 @@
 # More info at https://github.com/guard/guard#readme
 
 guard 'spork', :rspec_env => { 'RAILS_ENV' => 'test' },
-               :wait => 60,
+               :wait => 120,
                :cucumber => false,
                :test_unit => false do
   watch('config/application.rb')
