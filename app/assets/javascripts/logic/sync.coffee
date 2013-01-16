@@ -24,13 +24,25 @@
       model.hasPatches() and model.isSynced()
 
   lastSynced: () ->
-    @localStorage.lastSynced
+    @localStorage.lastSynced?.timestamp
 
-  setLastSynced: (timestamp) ->
-    if timestamp?
-      if not @localStorage.lastSynced? or @localStorage.lastSynced < timestamp
-        @localStorage.lastSynced = timestamp
-        @localStorage.save()
+  setLastSynced: (message) ->
+    @localStorage.lastSynced ||=
+      timestamp: 0
+      pending: []
+    lastSynced = @localStorage.lastSynced
+    if message.timestamp? and lastSynced.timestamp < message.timestamp
+      if message.unicast or lastSynced.timestamp + 1 == message.timestamp
+        lastSynced.timestamp = message.timestamp
+        remaining = _.reject lastSynced.pending.sort(), (timestamp)->
+          if lastSynced.timestamp + 1 == timestamp
+            lastSynced.timestamp = timestamp
+          else if lastSynced.timestamp >= timestamp
+            timestamp
+        lastSynced.pending = remaining
+      else      
+        lastSynced.pending.push message.timestamp
+    @localStorage.save()
 
   handleCreates: (models) ->
     _(models).chain().map((attributes, id) =>

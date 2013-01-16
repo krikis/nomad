@@ -2,9 +2,9 @@ module Faye::Versioning
 
   def handle_new_versions(model, new_versions, results)
     new_versions.each do |version|
-      check_new_version(model, version, results['unicast'])
+      check_new_version(model, version, results)
     end
-    results['unicast']['meta']['preSync'] = true
+    results['meta']['preSync'] = true
   end
 
   def check_new_version(model, new_version, results)
@@ -20,9 +20,9 @@ module Faye::Versioning
 
   def handle_versions(model, versions, client_id, results)
     versions.each do |version|
-      check_version(model, version, client_id, results['unicast'])
+      check_version(model, version, client_id, results)
     end
-    results['unicast']['meta']['preSync'] = true
+    results['meta']['preSync'] = true
   end
 
   # compare the local data version with the version in the master data copy

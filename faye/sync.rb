@@ -1,9 +1,19 @@
 module Faye::Sync
 
+  # initialize the results object
+  def init_results(message = {})
+    {'unicast'   => {'meta'    => {'client' => message['client_id'],
+                                   'unicast' => true},
+                     'resolve' => [],
+                     'update'  => {}},
+     'multicast' => {'meta'    => {'client' => message['client_id']},
+                     'create'  => {},
+                     'update'  => {}}}
+  end
+
   # collect all updates since the last synchronization phase
-  def add_missed_updates(model, message)
+  def add_missed_objects(model, message, results)
     lamport_clock = message['last_synced']
-    results = init_results(message)
     # query all updates since the timestamp if present
     objects = if lamport_clock
       model.where(['last_update > ?', lamport_clock])
@@ -13,19 +23,10 @@ module Faye::Sync
     end
     # file all updates for unicast
     objects.each do |object|
-      add_update_for(object, results['unicast'])
+      add_update_for(object, results)
     end
-    results
-  end
-
-  def init_results(message = {})
-    {'unicast'   => {'meta'    => {'client' => message['client_id'],
-                                   'unicast' => true},
-                     'resolve' => [],
-                     'update'  => {}},
-     'multicast' => {'meta'    => {'client' => message['client_id']},
-                     'create'  => {},
-                     'update'  => {}}}
+    # set the most recent lamport clock
+    results['meta']['timestamp'] = objects.map(&:last_update).compact.max
   end
 
   # process a synchronization message
@@ -43,40 +44,42 @@ module Faye::Sync
     end
     # add newly created model to master data copy
     if message['creates'].present?
-      handle_creates(model, message['creates'], message['model_name'], results)
+      create_ids = handle_creates(model, message['creates'], results)
     end
     # add local update of model to master data copy
     if message['updates'].present?
-      handle_updates(model,
-                     message['updates'],
-                     message['client_id'],
-                     message['model_name'],
-                     results)
+      update_ids = handle_updates(model,
+                               message['updates'],
+                               message['client_id'],
+                               results)
     end
+    {:create_ids => create_ids, update_ids: update_ids}
   end
 
   def add_update_for(object, results)
     results['update'][object.remote_id] ||= json_for(object)
   end
 
-  def handle_creates(model, creates, model_name, results)
-    creates.each do |create|
-      model.transaction do
-        if check_new_version(model, create, results['unicast'])
-          process_create(model, create, model_name, results['multicast'])
-        end
-      end
+  def json_for(object)
+    object.attributes.reject do |key, value|
+      ['id', 'remote_id', 'last_update'].include? key.to_s or value.nil?
     end
   end
 
-  def process_create(model, create, model_name, successful_creates)
+  def handle_creates(model, creates, results)
+    creates.map do |create|
+      model.transaction do
+        if check_new_version(model, create, results)
+          process_create(model, create)
+        end
+      end
+    end.compact
+  end
+
+  def process_create(model, create)
     object = model.new
     set_attributes(object, create)
-    if object.valid?
-      successful_creates['meta']['timestamp'] ||= LamportClock.tick model_name
-      object.update_attribute(:last_update, successful_creates['meta']['timestamp'])
-      add_create_for(object, successful_creates)
-    end
+    object.id if object.valid?
   end
 
   # persist the local update on the master data copy
@@ -94,36 +97,53 @@ module Faye::Sync
     object.update_attribute(:updated_at, attributes['updated_at'])
   end
 
-  def add_create_for(object, results)
-    results['create'][object.remote_id] = json_for(object)
-  end
-
-  def handle_updates(model, updates, client_id, model_name, results)
-    updates.each do |update|
+  def handle_updates(model, updates, client_id, results)
+    updates.map do |update|
       model.transaction do
         success, object = check_version(model, update,
-                                        client_id, results['unicast'])
+                                        client_id, results)
         if success
-          process_update(model, object, update, model_name, results['multicast'])
+          process_update(model, object, update)
         end
+      end
+    end.compact
+  end
+
+  def process_update(model, object, update)
+    object ||= model.new
+    set_attributes(object, update)
+    object.id if object.valid?
+  end
+
+  def version_processed_objects(model, processed, model_name, results)
+    model.transaction do
+      unless processed[:create_ids].blank?
+        timestamp = LamportClock.tick model_name
+        model.where(:id => processed[:create_ids]).update_all(:last_update => timestamp)
+      end
+      unless processed[:update_ids].blank?
+        timestamp ||= LamportClock.tick model_name
+        model.where(:id => processed[:update_ids]).update_all(:last_update => timestamp)
+      end
+      results['meta']['timestamp'] = timestamp
+    end
+  end
+
+  def add_processed_objects(model, processed, results)
+    unless processed[:create_ids].blank?
+      model.where(:id => processed[:create_ids]).each do |object|
+        add_create_for(object, results)
+      end
+    end
+    unless processed[:update_ids].blank?
+      model.where(:id => processed[:update_ids]).each do |object|
+        add_update_for(object, results)
       end
     end
   end
 
-  def process_update(model, object, update, model_name, successful_updates)
-    object ||= model.new
-    set_attributes(object, update)
-    if object.valid?
-      successful_updates['meta']['timestamp'] ||= LamportClock.tick model_name
-      object.update_attribute(:last_update, successful_updates['meta']['timestamp'])
-      add_update_for(object, successful_updates)
-    end
-  end
-
-  def json_for(object)
-    object.attributes.reject do |key, value|
-      ['id', 'remote_id', 'last_update'].include? key.to_s or value.nil?
-    end
+  def add_create_for(object, results)
+    results['create'][object.remote_id] = json_for(object)
   end
 
 end

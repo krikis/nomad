@@ -16,26 +16,18 @@ describe Faye::Versioning do
   describe '#handle_new_versions' do
     let(:new_version) { stub }
     let(:model)       { TestModel }
-    let(:results)     { {'unicast' => {'meta' => {}}} }
+    let(:results)     { {'meta' => {}} }
     before { subject.stub(:check_new_version) }
 
     it 'checks the version of each entry' do
       subject.should_receive(:check_new_version).
-        with(model, new_version, an_instance_of(Hash))
+        with(model, new_version, results)
       subject.handle_new_versions(model, [new_version], results)
     end
 
     it 'flags the unicast results as preSync results' do
       subject.handle_new_versions(model, [new_version], results)
-      results['unicast']['meta']['preSync'].should be_true
-    end
-
-    it 'files all id conflicts for unicast' do
-      subject.stub(:check_new_version) do |_, _, unicast|
-        unicast['id'] = 'conflict'
-      end
-      subject.handle_new_versions(model, [new_version], results)
-      results['unicast']['id'].should eq('conflict')
+      results['meta']['preSync'].should be_true
     end
   end
 
@@ -77,26 +69,18 @@ describe Faye::Versioning do
   describe '#handle_versions' do
     let(:version) { stub }
     let(:model)   { TestModel }
-    let(:results) { {'unicast' => {'meta' => {}}} }
+    let(:results) { {'meta' => {}} }
     before { subject.stub(:check_version) }
 
     it 'checks the version of each entry' do
       subject.should_receive(:check_version).
-        with(model, version, 'client_id', an_instance_of(Hash))
+        with(model, version, 'client_id', results)
       subject.handle_versions(model, [version], 'client_id', results)
     end
 
     it 'flags the unicast results as preSync results' do
       subject.handle_versions(model, [version], 'client_id', results)
-      results['unicast']['meta']['preSync'].should be_true
-    end
-
-    it 'files all update conflicts for unicast' do
-      subject.stub(:check_version) do |_, _, _, unicast|
-        unicast['update'] = 'conflict'
-      end
-      subject.handle_versions(model, [version], 'client_id', results)
-      results['unicast']['update'].should eq('conflict')
+      results['meta']['preSync'].should be_true
     end
   end
 

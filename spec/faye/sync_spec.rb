@@ -18,52 +18,11 @@ class KlassWithFayeSync
 end
 
 describe Faye::Sync do
+
   subject { KlassWithFayeSync.new }
 
-  describe '#add_missing_updates' do
-    let(:model)         { TestModel }
-    let(:object)        { stub }
-    let(:results)       { stub(:[] => nil) }
-    let(:lamport_clock) { 5 }
-    before do
-      model.stub(:where => [object])
-      model.stub(:all => [])
-      subject.stub(:init_results => results,
-                   :add_update_for => nil)
-    end
-
-    it 'initializes the results hash' do
-      subject.should_receive(:init_results)
-      subject.add_missed_updates(model, {'last_synced' => 'lamport_clock'})
-    end
-
-    it 'queries the model for all recently updated/created objects' do
-      model.should_receive(:where).with(['last_update > ?', 'lamport_clock'])
-      subject.add_missed_updates(model, {'last_synced' => 'lamport_clock'})
-    end
-
-    it 'files each object for sync' do
-      unicast = stub
-      subject.stub(:init_results => {'unicast' => unicast})
-      subject.should_receive(:add_update_for).with(object, unicast)
-      subject.add_missed_updates(model, {'last_synced' => 'lamport_clock'})
-    end
-
-    context 'when no timestamp is given' do
-      it 'queries the model for all objects' do
-        model.should_receive(:all)
-        subject.add_missed_updates(model, {})
-      end
-    end
-
-    it 'returns the results' do
-      subject.add_missed_updates(model, {'last_synced' => 'lamport_clock'}).
-        should eq(results)
-    end
-  end
-
   describe '#initresults' do
-    let(:time) { stub }
+    let(:time) { mock }
     before { LamportClock.stub(:tick).and_return(time) }
 
     it 'initializes the unicast message' do
@@ -102,44 +61,38 @@ describe Faye::Sync do
     end
   end
 
-  describe '#process_message' do
-    let(:model)   { TestModel }
-    let(:results) { stub }
+  describe '#add_missed_objects' do
+    let(:lamport_clock) { 5 }
+    let(:model)         { TestModel }
+    let(:object)        { mock(:last_update => lamport_clock) }
+    let(:other_object)  { mock(:last_update => lamport_clock - 1) }
+    let(:results)       { {'meta' => {}} }
     before do
-      subject.stub(:publish_results => nil)
+      model.stub(:where => [object])
+      model.stub(:all => [object, other_object])
+      subject.stub(:add_update_for => nil)
     end
 
-    it 'handles new versions if present' do
-      message = {'new_versions' => stub, 'client_id' => 'some_id'}
-      subject.should_receive(:handle_new_versions).
-        with(model, message['new_versions'], results)
-      subject.process_message(model, message, results)
+    it 'queries the model for all recently updated/created objects' do
+      model.should_receive(:where).with(['last_update > ?', lamport_clock])
+      subject.add_missed_objects(model, {'last_synced' => lamport_clock}, results)
     end
 
-    it 'handles versions if present' do
-      message = {'versions' => stub, 'client_id' => 'some_id'}
-      subject.should_receive(:handle_versions).
-        with(model, message['versions'], 'some_id', results)
-      subject.process_message(model, message, results)
+    it 'files each object for sync' do
+      subject.should_receive(:add_update_for).with(object, results)
+      subject.add_missed_objects(model,
+                                 {'last_synced' => 'lamport_clock'},
+                                 results)
     end
 
-    it 'handles creates if present' do
-      message = {'creates' => stub, 'client_id' => stub, 'model_name' => stub}
-      subject.should_receive(:handle_creates).
-        with(model, message['creates'], message['model_name'], results)
-      subject.process_message(model, message, results)
+    it 'queries the model for all objects when no timestamp is given' do
+      model.should_receive(:all)
+      subject.add_missed_objects(model, {}, results)
     end
 
-    it 'handles updates if present' do
-      message = {'updates' => stub, 'client_id' => stub, 'model_name' => stub}
-      subject.should_receive(:handle_updates).
-        with(model, message['updates'], message['client_id'],
-                    message['model_name'], results)
-      subject.process_message(model, message, results)
-    end
-
-    it 'handles destroys if present' do
-
+    it 'sets the most recent lamport clock to the results' do
+      subject.add_missed_objects(model, {}, results)
+      results['meta']['timestamp'].should eq(lamport_clock)
     end
   end
 
@@ -157,55 +110,105 @@ describe Faye::Sync do
     end
   end
 
+  describe '#json_for' do
+    it 'filters out the id, remote_id and last_update attributes' do
+      object = stub(:attributes => {:attribute => 'value',
+                                    :id => 1,
+                                    :remote_id => 'some_id',
+                                    :last_update => 'last_update',
+                                    :remote_version => 'some_hash'})
+      json = subject.json_for(object)
+      json.should eq({:attribute => 'value', :remote_version => 'some_hash'})
+    end
+
+    it 'filters out attributes with no value' do
+      object = stub(:attributes => {:attribute => 'value',
+                                    :other_attribute => nil})
+      json = subject.json_for(object)
+      json.should eq({:attribute => 'value'})
+    end
+  end
+
+  describe '#process_message' do
+    let(:model)   { TestModel }
+    let(:message) { {'client_id' => 'some_id'} }
+    let(:results) { mock }
+    before do
+      subject.stub(:handle_creates => @create_ids = mock,
+                   :handle_updates => @update_ids = mock)
+    end
+
+    it 'handles new versions if present' do
+      subject.should_receive(:handle_new_versions).
+        with(model, message['new_versions'] = mock, results)
+      subject.process_message(model, message, results)
+    end
+
+    it 'handles versions if present' do
+      subject.should_receive(:handle_versions).
+        with(model, message['versions'] = mock, 'some_id', results)
+      subject.process_message(model, message, results)
+    end
+
+    it 'handles creates if present' do
+      subject.should_receive(:handle_creates).
+        with(model, message['creates'] = mock, results)
+      subject.process_message(model, message, results)
+    end
+
+    it 'handles updates if present' do
+      subject.should_receive(:handle_updates).
+        with(model, message['updates'] = mock, message['client_id'], results)
+      subject.process_message(model, message, results)
+    end
+
+    it 'handles destroys if present' do
+
+    end
+
+    it 'returns the ids of created and updated objects' do
+      message = {'client_id' => 'some_id', 'creates' => mock, 'updates' => mock}
+      processed = subject.process_message(model, message, results)
+      processed.should eq({:create_ids => @create_ids, :update_ids => @update_ids})
+    end
+  end
+
   describe '#handle_creates' do
     let(:create)  { stub }
     let(:model)   { TestModel }
-    let(:results) { {'unicast' =>   {'meta' => {}},
-                     'multicast' => {'meta' => {}}} }
+    let(:results) { {'meta' => {}} }
     before do
       subject.stub(:check_new_version => true,
                    :process_create => nil)
     end
 
-    it 'handles each create in a transaction' do
+    it 'handles each create in a single transaction' do
       TestModel.should_receive(:transaction).once
       subject.should_not_receive(:check_new_version)
       subject.should_not_receive(:process_create)
-      subject.handle_creates(model, [create], 'Model', results)
+      subject.handle_creates(model, [create], results)
     end
 
     it 'checks the version of each create' do
-      subject.should_receive(:check_new_version).
-        with(model, create, an_instance_of(Hash))
-      subject.handle_creates(model, [create], 'Model', results)
-    end
-
-    it 'files all id conflicts for unicast' do
-      subject.stub(:check_new_version) do |_, _, unicast|
-        unicast['id'] = 'conflict'
-      end
-      subject.handle_creates(model, [create], 'Model', results)
-      results['unicast']['id'].should eq('conflict')
+      subject.should_receive(:check_new_version).with(model, create, results)
+      subject.handle_creates(model, [create], results)
     end
 
     it 'issues a create when the version check is successful' do
-      subject.should_receive(:process_create).
-        with(model, create, 'Model', an_instance_of(Hash))
-      subject.handle_creates(model, [create], 'Model', results)
+      subject.should_receive(:process_create).with(model, create)
+      subject.handle_creates(model, [create], results)
     end
 
     it 'issues no create when the version check is unsuccessful' do
       subject.stub(:check_new_version => false)
       subject.should_not_receive(:process_create)
-      subject.handle_creates(model, [create], 'Model', results)
+      subject.handle_creates(model, [create], results)
     end
 
-    it 'files all successful creates for multicast' do
-      subject.stub(:process_create) do |_, _, _, multicast|
-        multicast['successful'] = 'create'
-      end
-      subject.handle_creates(model, [create], 'Model', results)
-      results['multicast']['successful'].should eq('create')
+    it 'returns the compacted output of the process_create method calls' do
+      subject.stub(:process_create).and_return(nil, create_id = mock)
+      create_ids = subject.handle_creates(model, [create, create], results)
+      create_ids.should eq([create_id])
     end
   end
 
@@ -219,9 +222,10 @@ describe Faye::Sync do
     let(:object) do
       stub(:update_attributes => nil,
            :update_attribute => nil,
-           :valid? => true)
+           :valid? => true,
+           :id => @id = mock)
     end
-    let(:time)    { stub }
+    let(:time)    { mock }
     let(:results) { {'meta' => {'timestamp' => time}} }
     before do
       model.stub(:new => object)
@@ -231,67 +235,23 @@ describe Faye::Sync do
 
     it 'creates a new object' do
       model.should_receive(:new).with()
-      subject.process_create(model, create, 'Model', results)
+      subject.process_create(model, create)
     end
 
     it 'sets the object attributes' do
       subject.should_receive(:set_attributes).with(object, create)
-      subject.process_create(model, create, 'Model', results)
+      subject.process_create(model, create)
     end
 
-    it 'does not increment the lamport clock for the message model' do
-      LamportClock.should_not_receive(:tick).with('Model')
-      subject.process_create(model, create, 'Model', results)
-    end
-
-    it 'sets the object last update time' do
-      object.should_receive(:update_attribute).with(:last_update, time)
-      subject.process_create(model, create, 'Model', results)
-    end
-
-    it 'adds a create for the object' do
-      subject.should_receive(:add_create_for).with(object, results)
-      subject.process_create(model, create, 'Model', results)
-    end
-
-    context 'when no timestamp is set' do
-      let(:results) { {'meta' => {'timestamp' => nil}} }
-
-      it 'increments the lamport clock for the message model' do
-        LamportClock.should_receive(:tick).with('Model')
-        subject.process_create(model, create, 'Model', results)
-      end
-
-      it 'does not increment the lamport clock when the object is invalid' do
-        object.stub(:valid? => false)
-        LamportClock.should_not_receive(:tick).with('Model')
-        subject.process_create(model, create, 'Model', results)
-      end
-
-      it 'sets the object last update time' do
-        LamportClock.stub(:tick => clock = mock)
-        object.should_receive(:update_attribute).with(:last_update, clock)
-        subject.process_create(model, create, 'Model', results)
-      end
-
-      it 'adds the timestamp to the results' do
-        LamportClock.stub(:tick => clock = mock)
-        subject.process_create(model, create, 'Model', results)
-        results['meta']['timestamp'].should eq(clock)
-      end
+    it 'returns the object id' do
+      subject.process_create(model, create).should eq(@id)
     end
 
     context 'when the object is not valid' do
       before { object.stub(:valid? => false) }
 
-      it 'does not set the object last update time' do
-        object.should_not_receive(:update_attribute).with(:last_update, time)
-        subject.process_create(model, create, 'Model', results)
-      end
-
-      it 'does not add a create for the object' do
-        subject.should_not_receive(:add_create_for).with(object, results)
-        subject.process_create(model, create, 'Model', results)
+      it 'does not return the object id' do
+        subject.process_create(model, create).should_not be
       end
     end
   end
@@ -359,21 +319,10 @@ describe Faye::Sync do
     end
   end
 
-  describe '#add_create_for' do
-    let(:object) { stub(:remote_id => 'some_id') }
-    let(:results) { {'create' => {}}}
-    before { subject.stub(:json_for => 'some_json') }
-
-    it 'adds a create for the object to the hash provided' do
-      subject.add_create_for(object, results)
-      results['create']['some_id'].should eq('some_json')
-    end
-  end
-
   describe '#handle_updates' do
-    let(:update)  { stub }
+    let(:update)  { mock }
     let(:model)   { TestModel }
-    let(:object)  { stub }
+    let(:object)  { mock }
     let(:results) { {'unicast' =>   {'meta' => {}},
                      'multicast' => {'meta' => {}}} }
     before do
@@ -381,46 +330,35 @@ describe Faye::Sync do
                    :process_update => nil)
     end
 
-    it 'handles each update in a transaction' do
+    it 'handles each update in a single transaction' do
       TestModel.should_receive(:transaction).once
       subject.should_not_receive(:check_version)
       subject.should_not_receive(:process_update)
-      subject.handle_updates(model, [update], 'client_id', 'Model', results)
+      subject.handle_updates(model, [update], 'client_id', results)
     end
 
     it 'checks the version of each update' do
       subject.should_receive(:check_version).
-        with(model, update, 'client_id', an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', 'Model', results)
-    end
-
-    it 'files all update conflicts for unicast' do
-      subject.stub(:check_version) do |_, _, _, unicast|
-        unicast['update'] = 'conflict'
-      end
-      subject.handle_updates(model, [update], 'client_id', 'Model', results)
-      results['unicast']['update'].should eq('conflict')
+        with(model, update, 'client_id', results)
+      subject.handle_updates(model, [update], 'client_id', results)
     end
 
     it 'issues an update when the version check is successful' do
       subject.should_receive(:process_update).
-        with(model, object, update, 'Model', an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', 'Model', results)
+        with(model, object, update)
+      subject.handle_updates(model, [update], 'client_id', results)
     end
 
     it 'issues no update when the version check is unsuccessful' do
       subject.stub(:check_version => [false, object])
-      subject.should_not_receive(:process_update).
-        with(model, object, update, an_instance_of(Hash))
-      subject.handle_updates(model, [update], 'client_id', 'Model', results)
+      subject.should_not_receive(:process_update)
+      subject.handle_updates(model, [update], 'client_id', results)
     end
 
-    it 'files all successful updates for multicast' do
-      subject.stub(:process_update) do |_, _, _, _, multicast|
-        multicast['successful'] = 'update'
-      end
-      subject.handle_updates(model, [update], 'client_id', 'Model', results)
-      results['multicast']['successful'].should eq('update')
+    it 'returns the compacted output of the process_update method calls' do
+      subject.stub(:process_update).and_return(nil, update_id = mock)
+      update_ids = subject.handle_updates(model, [update, update], 'client_id', results)
+      update_ids.should eq([update_id])
     end
   end
 
@@ -435,7 +373,8 @@ describe Faye::Sync do
       stub(:update_attributes => nil,
            :update_attribute => nil,
            :remote_id => 'some_id',
-           :valid? => true)
+           :valid? => true,
+           :id => @id = mock)
     end
     let(:time)    { stub }
     let(:results) { {'meta' => {'timestamp' => time}} }
@@ -449,89 +388,162 @@ describe Faye::Sync do
 
       it 'creates an object' do
         model.should_receive(:new).with()
-        subject.process_update(model, nil, update, 'Model', results)
+        subject.process_update(model, nil, update)
       end
     end
 
-    context 'when an object is passed in' do
-      it 'does not create a new object' do
-        model.should_not_receive(:new)
-        subject.process_update(model, object, update, 'Model', results)
-      end
+    it 'does not create a new object when an object is passed in' do
+      model.should_not_receive(:new)
+      subject.process_update(model, object, update)
     end
 
     it 'sets the object attributes' do
       subject.should_receive(:set_attributes).with(object, update)
-      subject.process_update(model, object, update, 'Model', results)
+      subject.process_update(model, object, update)
     end
 
-    it 'does not increment the lamport clock for the message model' do
-      LamportClock.should_not_receive(:tick).with('Model')
-      subject.process_update(model, object, update, 'Model', results)
-    end
-
-    it 'sets the object last update time' do
-      object.should_receive(:update_attribute).with(:last_update, time)
-      subject.process_update(model, object, update, 'Model', results)
-    end
-
-    it 'adds an update for the object' do
-      subject.should_receive(:add_update_for).with(object, results)
-      subject.process_update(model, object, update, 'Model', results)
-    end
-
-    context 'when no timestamp is set' do
-      let(:results) { {'meta' => {'timestamp' => nil}} }
-
-      it 'increments the lamport clock for the message model' do
-        LamportClock.should_receive(:tick).with('Model')
-        subject.process_update(model, object, update, 'Model', results)
-      end
-
-      it 'sets the object last update time' do
-        LamportClock.stub(:tick => clock = mock)
-        object.should_receive(:update_attribute).with(:last_update, clock)
-        subject.process_update(model, object, update, 'Model', results)
-      end
-
-      it 'adds the timestamp to the results' do
-        LamportClock.stub(:tick => clock = mock)
-        subject.process_update(model, object, update, 'Model', results)
-        results['meta']['timestamp'].should eq(clock)
-      end
+    it 'returns the object id' do
+      subject.process_update(model, object, update).should eq(@id)
     end
 
     context 'when the object is not valid' do
       before { object.stub(:valid? => false) }
 
-      it 'does not set the object last update time' do
-        object.should_not_receive(:update_attribute).with(:last_update, time)
-        subject.process_update(model, object, update, 'Model', results)
-      end
-
-      it 'does not add an update for the object' do
-        subject.should_not_receive(:add_update_for).with(object, results)
-        subject.process_update(model, object, update, 'Model', results)
+      it 'does not return the object id' do
+        subject.process_update(model, object, update).should_not be
       end
     end
   end
 
-  describe '#json_for' do
-    it 'filters out the id, remote_id and last_update attributes' do
-      object = stub(:attributes => {:attribute => 'value',
-                                    :id => 1,
-                                    :remote_id => 'some_id',
-                                    :last_update => 'last_update',
-                                    :remote_version => 'some_hash'})
-      json = subject.json_for(object)
-      json.should eq({:attribute => 'value', :remote_version => 'some_hash'})
+  describe '#version_processed_objects' do
+    let(:model) do
+      TestModel.tap do |model|
+        model.stub(:where => model)
+        model.stub(:update_all => nil)
+      end
+    end
+    let(:model_name) { "#{TestModel}" }
+    let!(:processed) do
+      {:create_ids => @create_ids = mock,
+       :update_ids => @update_ids = mock}
+    end
+    let(:results) { {'meta' => {}} }
+    before { LamportClock.stub(:tick => @clock = mock) }
+
+    it 'wraps the versioning in a single transaction' do
+      TestModel.should_receive(:transaction).once
+      LamportClock.should_not_receive(:tick)
+      model.should_not_receive(:update_all)
+      subject.version_processed_objects(model, processed, model_name, results)
     end
 
-    it 'filters out attributes with no value' do
-      object = stub(:attributes => {:attribute => 'value',
-                                    :other_attribute => nil})
-      json = subject.json_for(object)
-      json.should eq({:attribute => 'value'})
+    it 'increments the lamport clock for the model' do
+      LamportClock.should_receive(:tick).with(model_name).once
+      subject.version_processed_objects(model, processed, model_name, results)
+    end
+
+    it 'does not increment the lamport clock when nothing is processed' do
+      LamportClock.should_not_receive(:tick)
+      subject.version_processed_objects(model, {}, model_name, results)
+    end
+
+    it 'queries the created objects' do
+      model.should_receive(:where).with(:id => @create_ids)
+      subject.version_processed_objects(model, processed, model_name, results)
+    end
+
+    it 'sets the last_update timestamp of all created objects' do
+      model.stub(:where).with(:id => @create_ids)
+           .and_return(query_result = mock(:update_all => nil))
+      query_result.should_receive(:update_all).with(:last_update => @clock)
+      subject.version_processed_objects(model, processed, model_name, results)
+    end
+
+    it 'does not query created objects when no creates are processed' do
+      processed.delete :create_ids
+      model.should_not_receive(:where).with(:id => @create_ids)
+      subject.version_processed_objects(model, processed, model_name, results)
+    end
+
+    it 'queries the updated objects' do
+      model.should_receive(:where).with(:id => @update_ids)
+      subject.version_processed_objects(model, processed, model_name, results)
+    end
+
+    it 'sets the last_update timestamp of all updated objects' do
+      model.stub(:where).with(:id => @update_ids)
+           .and_return(query_result = mock(:update_all => nil))
+      query_result.should_receive(:update_all).with(:last_update => @clock)
+      subject.version_processed_objects(model, processed, model_name, results)
+    end
+
+    it 'does not query updated objects when no updates are processed' do
+      processed.delete :update_ids
+      model.should_not_receive(:where).with(:id => @update_ids)
+      subject.version_processed_objects(model, processed, model_name, results)
+    end
+
+    it 'sets the updated lamport clock in the results' do
+      subject.version_processed_objects(model, processed, model_name, results)
+      results['meta']['timestamp'].should eq(@clock)
+    end
+  end
+
+  describe '#add_processed_objects' do
+    let(:model) do
+      TestModel.tap do |model|
+        model.stub(:where => [])
+      end
+    end
+    let!(:processed) do
+      {:create_ids => @create_ids = mock,
+       :update_ids => @update_ids = mock}
+    end
+    let(:results) { {'meta' => {}} }
+
+    it 'queries the created objects' do
+      model.should_receive(:where).with(:id => @create_ids)
+      subject.add_processed_objects(model, processed, results)
+    end
+
+    it 'adds each created object to the results' do
+      model.stub(:where).with(:id => @create_ids).and_return([(object = mock)])
+      subject.should_receive(:add_create_for).with(object, results)
+      subject.add_processed_objects(model, processed, results)
+    end
+
+    it 'does not query created objects when no creates are processed' do
+      processed.delete :create_ids
+      model.should_not_receive(:where).with(:id => @create_ids)
+      subject.add_processed_objects(model, processed, results)
+    end
+
+    it 'queries the updated objects' do
+      model.should_receive(:where).with(:id => @update_ids)
+      subject.add_processed_objects(model, processed, results)
+    end
+
+    it 'adds each created object to the results' do
+      model.stub(:where).with(:id => @update_ids).and_return([(object = mock)])
+      subject.should_receive(:add_update_for).with(object, results)
+      subject.add_processed_objects(model, processed, results)
+    end
+
+    it 'does not query updated objects when no updates are processed' do
+      processed.delete :update_ids
+      model.should_not_receive(:where).with(:id => @update_ids)
+      subject.add_processed_objects(model, processed, results)
+    end
+  end
+
+  describe '#add_create_for' do
+    let(:object) { stub(:remote_id => 'some_id') }
+    let(:results) { {'create' => {}}}
+    before { subject.stub(:json_for => 'some_json') }
+
+    it 'adds a create for the object to the hash provided' do
+      subject.add_create_for(object, results)
+      results['create']['some_id'].should eq('some_json')
     end
   end
 

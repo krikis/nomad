@@ -126,7 +126,7 @@ describe 'Sync', ->
       @collection._cleanup()
 
     it 'returns the lastSynced property of the localStorage object', ->
-      @collection.localStorage.lastSynced = 'timestamp'
+      @collection.localStorage.lastSynced = {timestamp: 'timestamp'}
       expect(@collection.lastSynced()).toEqual('timestamp')
 
   describe '#setLastSynced', ->
@@ -134,39 +134,79 @@ describe 'Sync', ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @saveStorageStub = sinon.stub(@collection.localStorage, 'save')
-      @timestamp = 3
+      @message = {}
 
     afterEach ->
       @collection._cleanup()
       
-    context 'when the timestamp is not set', ->
-      it 'sets the last synced timestamp on the localStorage object', ->
-        @collection.setLastSynced(@timestamp)
-        expect(@collection.localStorage.lastSynced).toEqual(@timestamp)
-
-      it 'saves the localStorage object', ->
-        @collection.setLastSynced(@timestamp)
-        expect(@saveStorageStub).toHaveBeenCalled()
+    it 'saves the localStorage object', ->
+      @collection.setLastSynced(@message)
+      expect(@saveStorageStub).toHaveBeenCalled()
       
-    context 'when the timestamp is out of date', ->
+    context 'when the message timestamp supersedes the collection timestamp', ->   
       beforeEach ->
-        @collection.localStorage.lastSynced = 2
+        @message.timestamp = 3
+        
+      context 'when it concerns a unicast message', ->
+        beforeEach ->
+          @message.unicast = true
+          
+        it 'sets the timestamp on the model', ->
+          @collection.setLastSynced(@message)
+          expect(@collection.localStorage.lastSynced.timestamp).toEqual(3)
+          
+        it 'filters out pending timestamps', ->
+          @collection.localStorage.lastSynced = 
+            timestamp: 0
+            pending: [2,4,7]
+          @collection.setLastSynced(@message)
+          expect(@collection.localStorage.lastSynced.pending).toEqual([7])
+            
+        it 'consumes pending timestamps', ->
+          @collection.localStorage.lastSynced = 
+            timestamp: 0
+            pending: [4]
+          @collection.setLastSynced(@message)
+          expect(@collection.localStorage.lastSynced.timestamp).toEqual(4)
+          
+      context 'when the message timestamp directly supersedes the collection timestamp', ->
+        beforeEach ->          
+          @collection.localStorage.lastSynced = 
+            timestamp: 2
+            pending: []
 
-      it 'sets the last synced timestamp on the localStorage object', ->
-        @collection.setLastSynced(@timestamp)
-        expect(@collection.localStorage.lastSynced).toEqual(@timestamp)
+        it 'sets the timestamp on the model', ->
+          @collection.setLastSynced(@message)
+          expect(@collection.localStorage.lastSynced.timestamp).toEqual(3)
 
-      it 'saves the localStorage object', ->
-        @collection.setLastSynced(@timestamp)
-        expect(@saveStorageStub).toHaveBeenCalled()
+        it 'filters out pending timestamps', ->
+          @collection.localStorage.lastSynced.pending = [2,4,7]
+          @collection.setLastSynced(@message)
+          expect(@collection.localStorage.lastSynced.pending).toEqual([7])
 
-    context 'when the timestamp is already up to date', ->
-      beforeEach ->
-        @collection.localStorage.lastSynced = 3
-
-      it 'does not save the localStorage object', ->
-        @collection.setLastSynced(@timestamp)
-        expect(@saveStorageStub).not.toHaveBeenCalled()
+        it 'consumes pending timestamps', ->
+          @collection.localStorage.lastSynced.pending = [4]
+          @collection.setLastSynced(@message)
+          expect(@collection.localStorage.lastSynced.timestamp).toEqual(4)
+          
+      context 'when there is no unicast or direct superseding', ->    
+        it 'does not update the collection timestamp', ->
+          @collection.setLastSynced(@message)
+          expect(@collection.localStorage.lastSynced.timestamp).toEqual(0)
+          
+        it 'adds the timestamp to the pending timestamps', ->
+          @collection.setLastSynced(@message)
+          expect(@collection.localStorage.lastSynced.pending).toEqual([3])
+          
+    context 'when the message timestamp does not supersede the collection timestamp', ->
+      beforeEach ->      
+        @collection.localStorage.lastSynced = 
+          timestamp: 3
+          pending: []
+        
+      it 'does not add the timestamp to the pending timestamps', ->
+        @collection.setLastSynced(@message)
+        expect(@collection.localStorage.lastSynced.pending).toEqual([])
 
   describe '#handleCreates', ->
     beforeEach ->

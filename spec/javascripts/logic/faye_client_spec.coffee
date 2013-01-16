@@ -201,10 +201,17 @@ describe 'FayeClient', ->
         toHaveBeenCalledWith('params', {})
       expect(@method2Stub).
         toHaveBeenCalledWith('other_params', {})
-      
-    it 'does not update the collection sync state', ->
+    
+    it 'updates the collection sync state', ->
       @backboneClient.receive @message
-      expect(@setLastSyncedStub).not.toHaveBeenCalled()
+      expect(@setLastSyncedStub).toHaveBeenCalledWith
+        client: 'some_client_id'
+        timestamp: 'timestamp'
+    
+    it 'updates the collection sync state after processing the message', ->
+      @backboneClient.receive @message
+      expect(@setLastSyncedStub).
+        toHaveBeenCalledAfter(@backboneClient.method_1)
   
     it 'does not sync all dirty models to the server', ->
       @backboneClient.receive @message
@@ -212,7 +219,15 @@ describe 'FayeClient', ->
 
     it 'does not sync all processed models to the server', ->
       @backboneClient.receive @message
-      expect(@syncProcessedStub).not.toHaveBeenCalled()
+      expect(@syncProcessedStub).not.toHaveBeenCalled()      
+  
+    context 'when the client is offline', ->
+      beforeEach ->
+        @backboneClient.isOffline = true
+  
+      it 'does not update the collection sync state', ->
+        @backboneClient.receive @message
+        expect(@setLastSyncedStub).not.toHaveBeenCalled()
         
     context 'when the message originates from the client itself', ->   
       beforeEach ->
@@ -225,15 +240,6 @@ describe 'FayeClient', ->
           processed.updates = ['rebased']
         )
         @message['meta']['client'] = @clientId
-      
-      it 'updates the collection sync state', ->
-        @backboneClient.receive @message
-        expect(@setLastSyncedStub).toHaveBeenCalledWith('timestamp')
-      
-      it 'updates the collection sync state after processing the message', ->
-        @backboneClient.receive @message
-        expect(@setLastSyncedStub).
-          toHaveBeenCalledAfter(@backboneClient.method_1)
 
       it 'syncs all processed models to the server', ->
         @backboneClient.receive @message
@@ -249,10 +255,6 @@ describe 'FayeClient', ->
       context 'when the client is offline', ->
         beforeEach ->
           @backboneClient.isOffline = true
-    
-        it 'does not update the collection sync state', ->
-          @backboneClient.receive @message
-          expect(@setLastSyncedStub).not.toHaveBeenCalled()
 
         it 'does not sync all processed models to the server', ->
           @backboneClient.receive @message

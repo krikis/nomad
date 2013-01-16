@@ -4,6 +4,10 @@ require 'client'
 class TestModel
   def self.find_by_remote_id
   end
+
+  def self.where(*args)
+    []
+  end
 end
 
 describe ServerSideClient do
@@ -42,19 +46,42 @@ describe ServerSideClient do
       context 'and it responds to find_by_remote_id' do
         let(:model) { TestModel }
         let(:message) { {'model_name' => "#{model}"} }
-        let(:results) { stub }
-        before { subject.stub(:process_message => nil,
-                              :add_missed_updates => results,
+        let(:results) do
+          {'unicast' => @unicast = mock,
+           'multicast' => @multicast = mock}
+        end
+        before { subject.stub(:init_results => results,
+                              :add_missed_objects => nil,
+                              :process_message => @processed = mock,
+                              :version_processed_objects => nil,
+                              :add_processed_objects => nil,
                               :publish_results => nil) }
+
+        it 'initializes the results object' do
+          subject.should_receive(:init_results).with(message)
+          subject.on_server_message(message)
+        end
 
         it 'collects all missed updates' do
           message['last_synced'] = 'timestamp'
-          subject.should_receive(:add_missed_updates).with(model, message)
+          subject.should_receive(:add_missed_objects).with(model, message, @unicast)
           subject.on_server_message(message)
         end
 
         it 'processes the message' do
-          subject.should_receive(:process_message).with(model, message, results)
+          subject.should_receive(:process_message).with(model, message, @unicast)
+          subject.on_server_message(message)
+        end
+
+        it 'updates the versions of the processed objects' do
+          subject.should_receive(:version_processed_objects).
+            with(model, @processed, message['model_name'], @multicast)
+          subject.on_server_message(message)
+        end
+
+        it 'adds the processed objects to the results' do
+          subject.should_receive(:add_processed_objects).
+            with(model, @processed, @multicast)
           subject.on_server_message(message)
         end
 
