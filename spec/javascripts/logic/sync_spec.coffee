@@ -1,6 +1,6 @@
 describe 'Sync', ->
   beforeEach ->
-    fayeClient = 
+    fayeClient =
       publish: ->
       subscribe: ->
     @clientConstructorStub = sinon.stub(Faye, 'Client', -> fayeClient)
@@ -23,7 +23,7 @@ describe 'Sync', ->
       @publishStub = sinon.stub(@collection.fayeClient, "publish", (message) =>
         @message = message
       )
-      
+
     afterEach ->
       @collection._cleanup()
 
@@ -134,24 +134,38 @@ describe 'Sync', ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @saveStorageStub = sinon.stub(@collection.localStorage, 'save')
-      
+      @timestamp = 3
+
     afterEach ->
       @collection._cleanup()
-
-    it 'sets the last synced timestamp on the localStorage object', ->
-      @collection.setLastSynced('timestamp')
-      expect(@collection.localStorage.lastSynced).toEqual('timestamp')
-
-    it 'saves the localStorage object', ->
-      @collection.setLastSynced('timestamp')
-      expect(@saveStorageStub).toHaveBeenCalled()
       
+    context 'when the timestamp is not set', ->
+      it 'sets the last synced timestamp on the localStorage object', ->
+        @collection.setLastSynced(@timestamp)
+        expect(@collection.localStorage.lastSynced).toEqual(@timestamp)
+
+      it 'saves the localStorage object', ->
+        @collection.setLastSynced(@timestamp)
+        expect(@saveStorageStub).toHaveBeenCalled()
+      
+    context 'when the timestamp is out of date', ->
+      beforeEach ->
+        @collection.localStorage.lastSynced = 2
+
+      it 'sets the last synced timestamp on the localStorage object', ->
+        @collection.setLastSynced(@timestamp)
+        expect(@collection.localStorage.lastSynced).toEqual(@timestamp)
+
+      it 'saves the localStorage object', ->
+        @collection.setLastSynced(@timestamp)
+        expect(@saveStorageStub).toHaveBeenCalled()
+
     context 'when the timestamp is already up to date', ->
       beforeEach ->
-        @collection.localStorage.lastSynced = 'timestamp'
-      
+        @collection.localStorage.lastSynced = 3
+
       it 'does not save the localStorage object', ->
-        @collection.setLastSynced('timestamp')
+        @collection.setLastSynced(@timestamp)
         expect(@saveStorageStub).not.toHaveBeenCalled()
 
   describe '#handleCreates', ->
@@ -165,7 +179,7 @@ describe 'Sync', ->
         @output.pop()
       )
       @processCreateStub = sinon.stub(@collection, '_processCreate', -> 'process_create')
-      
+
     afterEach ->
       @collection._cleanup()
 
@@ -211,7 +225,7 @@ describe 'Sync', ->
       @setVersionStub = sinon.stub(@model, 'setVersion')
       @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
       @saveStub = sinon.stub(@model, 'save')
-      
+
     afterEach ->
       @collection._cleanup()
 
@@ -357,7 +371,7 @@ describe 'Sync', ->
       @dataForSyncStub = sinon.stub(@collection, '_dataForSync')
       @dataForSyncStub.withArgs(['new', 'models']).returns([new: 'data'])
       @dataForSyncStub.withArgs(['dirty', 'models']).returns([dirty: 'data'])
-      
+
     afterEach ->
       @collection._cleanup()
 
@@ -389,17 +403,17 @@ describe 'Sync', ->
       it 'publishes all new model data to the server', ->
         @collection.syncModels()
         expect(@message.creates).toEqual([new: 'data'])
-        
+
     context 'when no data was collected', ->
       beforeEach ->
         @dataForSyncStub.restore()
         @dataForSyncStub = sinon.stub(@collection, '_dataForSync', -> [])
-        
+
       it 'publishes an empty message to the server', ->
         @collection.syncModels()
         expect(@publishStub).toHaveBeenCalledWith(creates: [], updates: [])
-        
-      context 'and it is a follow up on presync', ->    
+
+      context 'and it is a follow up on presync', ->
         it 'does not publish to the server', ->
           @collection.syncModels(afterPresync: true)
           expect(@publishStub).not.toHaveBeenCalled()
@@ -418,7 +432,7 @@ describe 'Sync', ->
       @markAsSyncedStub = sinon.stub(@model, 'markAsSynced')
       @updateSyncingVersionsStub = sinon.stub(@model, 'updateSyncingVersions')
       @saveStub = sinon.stub(@model, 'save')
-      
+
     afterEach ->
       @collection._cleanup()
 
@@ -430,8 +444,8 @@ describe 'Sync', ->
         version: 'some_version'
         created_at: 'created_at'
         updated_at: 'updated_at'
-      ])  
-        
+      ])
+
     it 'updates the list of synced versions', ->
       versions = @collection._dataForSync([@model])
       expect(@updateSyncingVersionsStub).toHaveBeenCalled()
@@ -487,7 +501,7 @@ describe 'Sync', ->
       class TestCollection extends Backbone.Collection
       @collection = new TestCollection([], modelName: 'TestModel')
       @unsubscribeStub = sinon.stub(@collection.fayeClient, 'unsubscribe')
-      
+
     afterEach ->
       @collection._cleanup()
 

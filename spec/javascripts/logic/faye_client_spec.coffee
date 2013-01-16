@@ -190,6 +190,7 @@ describe 'FayeClient', ->
       @message = 
         meta:
           client: 'some_client_id'
+          timestamp: 'timestamp'
         method_1: 'params'  
         method_2: 'other_params'
       
@@ -224,6 +225,15 @@ describe 'FayeClient', ->
           processed.updates = ['rebased']
         )
         @message['meta']['client'] = @clientId
+      
+      it 'updates the collection sync state', ->
+        @backboneClient.receive @message
+        expect(@setLastSyncedStub).toHaveBeenCalledWith('timestamp')
+      
+      it 'updates the collection sync state after processing the message', ->
+        @backboneClient.receive @message
+        expect(@setLastSyncedStub).
+          toHaveBeenCalledAfter(@backboneClient.method_1)
 
       it 'syncs all processed models to the server', ->
         @backboneClient.receive @message
@@ -239,31 +249,14 @@ describe 'FayeClient', ->
       context 'when the client is offline', ->
         beforeEach ->
           @backboneClient.isOffline = true
+    
+        it 'does not update the collection sync state', ->
+          @backboneClient.receive @message
+          expect(@setLastSyncedStub).not.toHaveBeenCalled()
 
         it 'does not sync all processed models to the server', ->
           @backboneClient.receive @message
           expect(@syncProcessedStub).not.toHaveBeenCalled()
-             
-      context 'and a timestamp is present', ->
-        beforeEach ->
-          @message['meta']['timestamp'] = 'timestamp'
-        
-        it 'updates the collection sync state', ->
-          @backboneClient.receive @message
-          expect(@setLastSyncedStub).toHaveBeenCalledWith('timestamp')
-        
-        it 'updates the collection sync state after processing the message', ->
-          @backboneClient.receive @message
-          expect(@setLastSyncedStub).
-            toHaveBeenCalledAfter(@backboneClient.method_1)
-        
-        context 'when the client is offline', ->
-          beforeEach ->
-            @backboneClient.isOffline = true
-      
-          it 'does not update the collection sync state', ->
-            @backboneClient.receive @message
-            expect(@setLastSyncedStub).not.toHaveBeenCalled()
 
       context 'and the message concerns presync feedback', ->
         beforeEach ->

@@ -23,7 +23,7 @@ class @BackboneSync.FayeClient
     # client.disable('cross-origin-long-polling');
     # client.disable('callback-polling');
 
-  publish: (message) ->  
+  publish: (message) ->
     # handle offline test mode
     return if @isOffline
     message.client_id ||= @clientId
@@ -41,27 +41,27 @@ class @BackboneSync.FayeClient
     private_channel = "/sync/#{@modelName}/#{@clientId}"
     @client.subscribe private_channel, @receive, @
     @subscriptions.push(private_channel)
-    
+
   unsubscribe: (channel) ->
     subscriptions = [channel] if channel?
     subscriptions ||= _.clone @subscriptions
     _.each subscriptions, (subscription) =>
       @client.unsubscribe subscription
       @subscriptions.delete(subscription)
-      
+
   # convenience test method for taking a client offline
   _offline: () ->
     @isOffline = true
-    
+
   # convenience test method for bringing a client back online
   _online: () ->
     @isOffline = false
-    
+
   # convenience test method for resetting server db
   _resetDb: () ->
-    @publish 
+    @publish
       reset_db: true
-    
+
   receive: (message) ->
     # extract meta information
     meta = message.meta
@@ -73,16 +73,15 @@ class @BackboneSync.FayeClient
     # handle offline test mode
     return if @isOffline
     if meta.client == @clientId
-      if meta.timestamp?
-        # update the collection sync state
-        @collection.setLastSynced(meta.timestamp)
+      # update the collection sync state
+      @collection.setLastSynced(meta.timestamp)
       # sync all dirty models if this is presync feedback
-      if meta?.preSync
+      if meta.preSync
         @collection.syncModels(afterPresync: true)
       # sync only resolved and rebased models
       else
         @collection.syncProcessed(processed)
-      
+
   _dbReset: () ->
     # console.log 'The server database was successfully reset!'
 
