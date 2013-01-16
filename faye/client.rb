@@ -20,7 +20,7 @@ class ServerSideClient
   def on_server_message(message)
     # reset db for test purposes
     if message['reset_db']
-      reset_db
+      reset_db(message)
     elsif model = message['model_name'].safe_constantize
       if model.respond_to? :find_by_remote_id
         results = init_results(message)
