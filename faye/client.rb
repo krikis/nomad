@@ -70,7 +70,7 @@ class ServerSideClient
     error 'Resetting sqlite3 test db...'
     `cp db/test.sqlite3.clean db/test.sqlite3`
     @client.publish(unicast_channel(message),
-                    'unicast'=> {'_dbReset' => true, 'meta' => {}})
+                    '_dbReset' => true, 'meta' => {})
   end
 
 end
