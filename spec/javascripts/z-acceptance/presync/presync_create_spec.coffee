@@ -11,9 +11,11 @@ describe 'presync_create', ->
     @resolveSpy = sinon.spy(@collection.fayeClient, 'resolve')
     @createSpy  = sinon.spy(@collection.fayeClient, 'create' )
     @Post = Post
+    @pongSpy = sinon.spy(@collection.fayeClient, '_pong')
+    @collection.fayeClient._ping()
     waitsFor (->
-      @collection.fayeClient.client.getState() == 'CONNECTED'
-    ), 'client to connect', 1000
+      @pongSpy.callCount >= 1
+    ), 'client to be subscribed', 1000
 
   afterEach ->
     @collection.leave()

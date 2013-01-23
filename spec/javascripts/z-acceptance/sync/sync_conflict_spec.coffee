@@ -25,12 +25,11 @@ describe 'sync_conflict', ->
     @secondCollection = new SecondCollection
     @secondCreateSpy  = sinon.spy(@secondCollection.fayeClient, 'create')
     @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
-    @dbResetSpy       = sinon.spy(@secondCollection.fayeClient, '_dbReset')
-    # clear server data store
-    @secondCollection.fayeClient._resetDb()
+    @pongSpy = sinon.spy(@secondCollection.fayeClient, '_pong')
+    @secondCollection.fayeClient._ping()
     waitsFor (->
-      @dbResetSpy.callCount >= 1
-    ), 'second client to be connected', 1000
+      @pongSpy.callCount >= 1
+    ), 'second client to be subscribed', 1000
     runs ->
       # create model on first client
       @model = new Post

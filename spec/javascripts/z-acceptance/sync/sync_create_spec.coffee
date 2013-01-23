@@ -25,9 +25,11 @@ describe 'sync_create', ->
     @secondCollection = new SecondCollection
     @secondCreateSpy  = sinon.spy(@secondCollection.fayeClient, 'create')
     @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
+    @pongSpy = sinon.spy(@secondCollection.fayeClient, '_pong')
+    @secondCollection.fayeClient._ping()
     waitsFor (->
-      @secondCollection.fayeClient.client.getState() == 'CONNECTED'
-    ), 'second client to connect', 1000
+      @pongSpy.callCount >= 1
+    ), 'second client to be subscribed', 1000
 
   afterEach ->
     @collection.leave()

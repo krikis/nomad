@@ -26,9 +26,11 @@ describe 'presync_conflict', ->
       @secondCollection = new SecondCollection
       @secondCreateSpy  = sinon.spy(@secondCollection.fayeClient, 'create')
       @secondUpdateSpy  = sinon.spy(@secondCollection.fayeClient, 'update')
+      @pongSpy = sinon.spy(@secondCollection.fayeClient, '_pong')
+      @secondCollection.fayeClient._ping()
       waitsFor (->
-        @secondCollection.fayeClient.client.getState() == 'CONNECTED'
-      ), 'second client to connect', 1000
+        @pongSpy.callCount >= 1
+      ), 'second client to be subscribed', 1000
       runs ->
         # create model on first client
         @model = new Post

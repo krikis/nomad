@@ -10,9 +10,11 @@ describe 'presync_update', ->
     @collection = new TestCollection
     @createSpy  = sinon.spy(@collection.fayeClient, 'create' )
     @updateSpy  = sinon.spy(@collection.fayeClient, 'update' )
+    @pongSpy = sinon.spy(@collection.fayeClient, '_pong')
+    @collection.fayeClient._ping()
     waitsFor (->
-      @collection.fayeClient.client.getState() == 'CONNECTED'
-    ), 'client to connect', 1000
+      @pongSpy.callCount >= 1
+    ), 'client to be subscribed', 1000
     runs ->
       @model = new Post
         title: 'some_title'
