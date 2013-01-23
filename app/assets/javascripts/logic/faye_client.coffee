@@ -61,6 +61,11 @@ class @BackboneSync.FayeClient
   _resetDb: () ->
     @publish
       reset_db: true
+      
+  # convenience method testing connectivity
+  _ping: () ->
+    @publish
+      ping: true
 
   receive: (message) ->
     # extract meta information
@@ -82,8 +87,11 @@ class @BackboneSync.FayeClient
       else
         @collection.syncProcessed(processed)
 
-  _dbReset: () ->
+  _dbReset: ->
     # console.log 'The server database was successfully reset!'
+    
+  _pong: ->
+    # console.log 'pong received'
 
   resolve: (params, processed) ->
     # handle offline test mode

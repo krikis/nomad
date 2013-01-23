@@ -21,6 +21,8 @@ class ServerSideClient
     # reset db for test purposes
     if message['reset_db']
       reset_db(message)
+    elsif message['ping']
+      pong(message)
     elsif model = message['model_name'].safe_constantize
       if model.respond_to? :find_by_remote_id
         results = init_results(message)
@@ -71,6 +73,12 @@ class ServerSideClient
     `cp db/test.sqlite3.clean db/test.sqlite3`
     @client.publish(unicast_channel(message),
                     '_dbReset' => true, 'meta' => {})
+  end
+
+  def pong(message)
+    error 'ping received'
+    @client.publish(unicast_channel(message),
+                    '_pong' => true, 'meta' => {})
   end
 
 end
