@@ -69,7 +69,7 @@ Benches.beforeSyncConflict = (next) ->
     @secondCollection.fayeClient._offline()
     # update the model and sync it
     @model.save
-      title: 'other_title'
+      content: Util.benchmarkData(@benchData)
     @collection.syncModels()
     @waitsFor (->
       @updateSpy.callCount >= 2 and @secondUpdateSpy.callCount >= 2
