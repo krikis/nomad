@@ -66,10 +66,15 @@ describe Faye::Sync do
     let(:model)         { TestModel }
     let(:object)        { mock(:last_update => lamport_clock) }
     let(:other_object)  { mock(:last_update => lamport_clock - 1) }
-    let(:results)       { {'meta' => {}} }
+    let(:objects) do
+      mock(:where => [object]).tap do |mock|
+        mock.stub(:each){|&block| [object].each &block}
+        mock.stub(:map) {|&block| [object].map &block}
+      end
+    end
+    let(:results) { {'meta' => {}} }
     before do
-      model.stub(:where => [object])
-      model.stub(:all => [object, other_object])
+      model.stub(:where => objects, :all => objects)
       subject.stub(:add_update_for => nil)
     end
 
@@ -78,16 +83,28 @@ describe Faye::Sync do
       subject.add_missed_objects(model, {'last_synced' => lamport_clock}, results)
     end
 
+    it 'queries the model for all objects when no timestamp is given' do
+      model.should_receive(:all)
+      subject.add_missed_objects(model, {}, results)
+    end
+
+    it 'filters out objects that are already synced when sync sessions are specified' do
+      objects.should_receive(:where).with('last_update not in ?', [4, 6, 7])
+      subject.add_missed_objects(model,
+                                 {'sync_sessions' => [4, 6, 7]},
+                                 results)
+    end
+
+    it 'does not filter out objects when no sync sessions are specified' do
+      objects.should_not_receive(:where)
+      subject.add_missed_objects(model, {}, results)
+    end
+
     it 'files each object for sync' do
       subject.should_receive(:add_update_for).with(object, results)
       subject.add_missed_objects(model,
                                  {'last_synced' => 'lamport_clock'},
                                  results)
-    end
-
-    it 'queries the model for all objects when no timestamp is given' do
-      model.should_receive(:all)
-      subject.add_missed_objects(model, {}, results)
     end
 
     it 'sets the most recent lamport clock to the results' do

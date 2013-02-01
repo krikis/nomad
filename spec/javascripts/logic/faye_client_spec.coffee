@@ -91,6 +91,7 @@ describe 'FayeClient', ->
     beforeEach ->
       @backboneClient = new BackboneSync.FayeClient @collection
       @lastSyncedStub = sinon.stub(@collection, 'lastSynced', -> 'timestamp')
+      @syncSessionsStub = sinon.stub(@collection, 'syncSessions', -> [4, 6, 7])
 
     it 'adds the Nomad client id to the message', ->
       message = {}
@@ -116,6 +117,11 @@ describe 'FayeClient', ->
       message = {}
       @backboneClient.publish(message)
       expect(message.last_synced).toEqual('timestamp')
+      
+    it 'adds an array of non-successive synchronization sessions', ->
+      message = {}
+      @backboneClient.publish(message)
+      expect(message.sync_sessions).toEqual([4, 6, 7])
 
     it 'calls the publish method on the faye client object', ->
       message = sinon.stub()

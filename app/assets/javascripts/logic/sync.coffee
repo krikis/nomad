@@ -25,6 +25,9 @@
 
   lastSynced: () ->
     @localStorage.lastSynced?.timestamp
+    
+  syncSessions: ->
+    @localStorage.lastSynced?.pending
 
   setLastSynced: (message) ->
     @localStorage.lastSynced ||=

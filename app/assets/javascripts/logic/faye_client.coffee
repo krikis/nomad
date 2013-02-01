@@ -1,7 +1,8 @@
 @BackboneSync ||= {}
 
 # @FAYE_SERVER = 'http://195.240.7.166:9292/faye'
-@FAYE_SERVER = 'http://192.168.1.35:9292/faye'
+# @FAYE_SERVER = 'http://192.168.1.35:9292/faye'
+@FAYE_SERVER = 'http://nomad.dev:9292/faye'
 # @FAYE_SERVER = 'http://129.125.147.34:9292/faye'
 
 class @BackboneSync.FayeClient
@@ -29,6 +30,7 @@ class @BackboneSync.FayeClient
     message.client_id ||= @clientId
     message.model_name ||= @modelName
     message.last_synced ||= @collection.lastSynced()
+    message.sync_sessions ||= @collection.syncSessions()
     @client.publish "/server/" + @modelName, message
 
   # subscribe collection to synchronization channels

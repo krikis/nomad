@@ -128,6 +128,18 @@ describe 'Sync', ->
     it 'returns the lastSynced property of the localStorage object', ->
       @collection.localStorage.lastSynced = {timestamp: 'timestamp'}
       expect(@collection.lastSynced()).toEqual('timestamp')
+      
+  describe '#syncSessions', ->
+    beforeEach ->
+      class TestCollection extends Backbone.Collection
+      @collection = new TestCollection([], modelName: 'TestModel')
+    
+    afterEach ->
+      @collection._cleanup()
+    
+    it 'returns an array of non-successive synchronization sessions', ->
+      @collection.localStorage.lastSynced = {pending: [4, 6, 7]}
+      expect(@collection.syncSessions()).toEqual([4, 6, 7])
 
   describe '#setLastSynced', ->
     beforeEach ->
