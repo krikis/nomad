@@ -23,7 +23,7 @@ module Faye::Sync
     end
     # filter out objects that were already synced
     if message['sync_sessions'].present?
-      objects = objects.where('last_update not in ?', message['sync_sessions'])
+      objects = objects.where('last_update not in (?)', message['sync_sessions'])
     end
     # file all updates for unicast
     objects.each do |object|

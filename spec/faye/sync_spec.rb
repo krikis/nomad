@@ -89,7 +89,7 @@ describe Faye::Sync do
     end
 
     it 'filters out objects that are already synced when sync sessions are specified' do
-      objects.should_receive(:where).with('last_update not in ?', [4, 6, 7])
+      objects.should_receive(:where).with('last_update not in (?)', [4, 6, 7])
       subject.add_missed_objects(model,
                                  {'sync_sessions' => [4, 6, 7]},
                                  results)
