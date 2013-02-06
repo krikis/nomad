@@ -26,15 +26,15 @@ class ServerSideClient
     elsif model = message['model_name'].safe_constantize
       if model.respond_to? :find_by_remote_id
         results = init_results(message)
-        # collect updates since last synchronization phase
+        # collect missed updates since last synchronization phase
         add_missed_objects(model, message, results['unicast'])
         # process the synchronization message
         processed = process_message(model, message, results['unicast'])
-        # set lamport clock on processed objects
+        # set lamport clock on updated objects
         version_processed_objects(model, processed, message['model_name'], results['multicast'])
-        # add processed objects
+        # add updated objects to multicast message
         add_processed_objects(model, processed, results['multicast'])
-        # publish collected updates and synchronization results
+        # publish missed updates and updated objects
         publish_results(message, results)
       end
     end
