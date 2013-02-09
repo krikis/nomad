@@ -175,35 +175,36 @@
       changePropCount = @randomFrom([0.5, 0.6, 0.7])
       newPropCount = @randomFrom([0.1, 0.2, 0.3])
     totalChange = delPropCount + changePropCount + newPropCount
-    # normalize
-    delPropCount = Math.round(nrOfProperties * amountOfChange * delPropCount / totalChange)
-    for prop in [0...delPropCount]
-      do =>
-        if properties.length > 0
-          property = @randomFrom(properties)
-          deleted.push property
-          delete version[property]
-    # normalize
-    changePropCount = _.max [1, Math.round(nrOfProperties * amountOfChange * changePropCount / totalChange)]
-    for prop in [0...changePropCount]
-      do =>
-        if properties.length > 0
-          property = @randomFrom(properties)
-          original = version[property]
-          if _.isNumber original
-            version[property] += @randomNumber(decimals: 3)
-          else if _.isBoolean original
-            version[property] = not version[property]
-          else if _.isString original
-            if ' ' in original
-              version[property] = @loremIpsumVersion version[property], amountOfChange
-            else
-              version[property] = @stringVersion version[property], amountOfChange
-    # normalize
-    newPropCount = Math.round(nrOfProperties * amountOfChange * newPropCount / totalChange)
-    for prop in [0...newPropCount]
-      do =>
-        version[@randomProp()] = @randomValue()
+    if totalChange > 0
+      # normalize
+      delPropCount = Math.round(nrOfProperties * amountOfChange * delPropCount / totalChange)
+      for prop in [0...delPropCount]
+        do =>
+          if properties.length > 0
+            property = @randomFrom(properties)
+            deleted.push property
+            delete version[property]
+      # normalize
+      changePropCount = _.max [1, Math.round(nrOfProperties * amountOfChange * changePropCount / totalChange)]
+      for prop in [0...changePropCount]
+        do =>
+          if properties.length > 0
+            property = @randomFrom(properties)
+            original = version[property]
+            if _.isNumber original
+              version[property] += @randomNumber(decimals: 3)
+            else if _.isBoolean original
+              version[property] = not version[property]
+            else if _.isString original
+              if ' ' in original
+                version[property] = @loremIpsumVersion version[property], amountOfChange
+              else
+                version[property] = @stringVersion version[property], amountOfChange
+      # normalize
+      newPropCount = Math.round(nrOfProperties * amountOfChange * newPropCount / totalChange)
+      for prop in [0...newPropCount]
+        do =>
+          version[@randomProp()] = @randomValue()
     [version, deleted]
 
   # generates clone of string with random changes proportional to amountOfChange
