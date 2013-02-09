@@ -13,7 +13,7 @@
           frequency = parseInt(frequencies[index])
           if frequency > 0
             _.each [1..frequency], ->
-              selectFrom.push value   
+              selectFrom.push value
       index = Math.floor(Math.random() * selectFrom.length)
       selectFrom[index]
     # generate random float
@@ -39,7 +39,7 @@
     @randomString
       stringSize: 5
       charSet: 'abcdefghijklmnopqrstuvwxyz'
-    
+
   # generates attribute of random type
   randomValue: (options={})->
     options.typeOdds ||= [1, 1, 2, 4]
@@ -50,11 +50,11 @@
       @loremIpsum
     ]
     @randomFrom(values, options.typeOdds).call(@, options)
-      
+
   # generates random boolean
   randomBoolean: ->
-    @randomFrom [true, false]    
-      
+    @randomFrom [true, false]
+
   # generates random numerical of given decimals:
   randomNumber: (options={})->
     decimals = options.decimals || @randomFrom(1, 5)
@@ -96,13 +96,13 @@
           sentLength = @randomFrom(minSentence, maxSentence)
         if subSentence == 1
           subSentLength = @randomFrom(minSubSentence, maxSubSentence)
-        if number == textSize or 
-           (sentence == sentLength and 
+        if number == textSize or
+           (sentence == sentLength and
             textSize - number >= minSentence)
           word += '.'
           sentence = 0
           subSentence = 0
-        else if subSentence == subSentLength and 
+        else if subSentence == subSentLength and
                 sentLength - sentence >= minSubSentence
           word += ','
           subSentence = 0
@@ -156,20 +156,26 @@
     "sapiente", "delectus", "aut", "reiciendis", "voluptatibus", "maiores",
     "alias", "consequatur", "aut", "perferendis", "doloribus", "asperiores",
     "repellat"
-  ]  
-  
+  ]
+
   # generates clone of object with random changes proportional to amountOfChange
-  randomVersion: (object, amountOfChange)->
+  randomVersion: (object, options = {})->
+    amountOfChange = options['change']
     unless amountOfChange > 0 and amountOfChange < 1
       amountOfChange = @randomFrom([0.3, 0.4, 0.5, 0.6, 0.7])
     version = _.deepClone object
     properties = _.properties(version)
     nrOfProperties = properties.length
     deleted = []
-    delPropCount = @randomFrom([0.1, 0.2, 0.3])
-    changePropCount = @randomFrom([0.5, 0.6, 0.7])
-    newPropCount = @randomFrom([0.1, 0.2, 0.3])
+    changeOdds = options['changeOdds']
+    if changeOdds
+      [delPropCount, changePropCount, newPropCount] = changeOdds
+    else
+      delPropCount = @randomFrom([0.1, 0.2, 0.3])
+      changePropCount = @randomFrom([0.5, 0.6, 0.7])
+      newPropCount = @randomFrom([0.1, 0.2, 0.3])
     totalChange = delPropCount + changePropCount + newPropCount
+    # normalize
     delPropCount = Math.round(nrOfProperties * amountOfChange * delPropCount / totalChange)
     for prop in [0...delPropCount]
       do =>
@@ -177,6 +183,7 @@
           property = @randomFrom(properties)
           deleted.push property
           delete version[property]
+    # normalize
     changePropCount = _.max [1, Math.round(nrOfProperties * amountOfChange * changePropCount / totalChange)]
     for prop in [0...changePropCount]
       do =>
@@ -192,6 +199,7 @@
               version[property] = @loremIpsumVersion version[property], amountOfChange
             else
               version[property] = @stringVersion version[property], amountOfChange
+    # normalize
     newPropCount = Math.round(nrOfProperties * amountOfChange * newPropCount / totalChange)
     for prop in [0...newPropCount]
       do =>
@@ -208,7 +216,7 @@
     changeCharCount = @randomFrom([0.5, 0.6, 0.7])
     newCharCount = @randomFrom([0.1, 0.2, 0.3])
     totalChange = delCharCount + changeCharCount + newCharCount
-    delCharCount = Math.round(nrOfChars * amountOfChange * delCharCount / totalChange)    
+    delCharCount = Math.round(nrOfChars * amountOfChange * delCharCount / totalChange)
     for char in [0...delCharCount]
       do =>
         index = @randomFrom([0...out.length])
@@ -235,7 +243,7 @@
     changePartCount = @randomFrom([0.5, 0.6, 0.7])
     newPartCount = @randomFrom([0.1, 0.2, 0.3])
     totalChange = delPartCount + changePartCount + newPartCount
-    delPartCount = Math.round(nrOfParts * amountOfChange * delPartCount / totalChange)    
+    delPartCount = Math.round(nrOfParts * amountOfChange * delPartCount / totalChange)
     for part in [0...delPartCount]
       do =>
         index = @randomFrom([0...out.length])
@@ -268,7 +276,7 @@
       else
         out[index] += ','
     out.join(' ')
-  
+
   # generates lorem ipsum text block of given dataSize
   # supported sizes are 70KB, 140KB, 210KB, 280KB, 560KB and 1120KB
   benchmarkData: (dataSize)->
@@ -322,5 +330,5 @@
         Benches['data70KB']
       else
         dataSize
-      
-  
+
+

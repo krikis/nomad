@@ -16,7 +16,7 @@ Benches.beforePatch12 = (next) ->
 
 Benches.patch12 = (next) ->  
   _.each [1..12], =>
-    [@answerVersion, deleted] = Util.randomVersion(@answerVersion, 0.25)
+    [@answerVersion, deleted] = Util.randomVersion(@answerVersion, change: 0.25)
     @answer.set _.deepClone @answerVersion
     _.each deleted, (property)=>
       @answer.unset property

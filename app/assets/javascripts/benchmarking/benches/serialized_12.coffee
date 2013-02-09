@@ -13,14 +13,14 @@ Benches.beforeSerialized12 = (next) ->
   # create the original data version
   @originalVersion = Util.randomObject()
   # handle local update
-  [@localVersion, localDeleted] = Util.randomVersion(@originalVersion, changeRate)
+  [@localVersion, localDeleted] = Util.randomVersion(@originalVersion, change: changeRate)
   @localAnswer = new @Answer _.deepClone @originalVersion
   @localDummy = new @Answer _.deepClone @localVersion
   @localAnswer.set @localVersion
   _.each localDeleted, (property)=>
     @localAnswer.unset property
   # handle remote update
-  [@remoteVersion, remoteDeleted] = Util.randomVersion(@originalVersion, changeRate)
+  [@remoteVersion, remoteDeleted] = Util.randomVersion(@originalVersion, change: changeRate)
   @remoteAnswer = new @Answer _.deepClone @originalVersion
   @remoteDummy = new @Answer _.deepClone @remoteVersion
   @remoteAnswer.set @remoteVersion

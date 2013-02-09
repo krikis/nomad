@@ -14,10 +14,10 @@ Benches.beforeStructRebase25 = (next) ->
   @answerOriginal = Util.randomObject()
   @answer = new @Answer _.deepClone @answerOriginal
   # perform the winning update
-  [dummyVersion, deleted] = Util.randomVersion(@answerOriginal, 0.25)
+  [dummyVersion, deleted] = Util.randomVersion(@answerOriginal, change: 0.25)
   @dummy = new @Answer _.deepClone dummyVersion
   # perform the losing update
-  [version, deleted] = Util.randomVersion(@answerOriginal, 0.25)
+  [version, deleted] = Util.randomVersion(@answerOriginal, change: 0.25)
   @answer.set version
   _.each deleted, (property)=>
     @answer.unset property

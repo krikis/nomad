@@ -16,7 +16,7 @@ Benches.beforeMergeAddVersion12 = (next) ->
 
 # perform update on data object
 Benches.mergeAddVersion12 = (next) ->
-  [version, deleted] = Util.randomVersion(@answerOriginal, 0.125)
+  [version, deleted] = Util.randomVersion(@answerOriginal, change: 0.125)
   @answer.set version
   _.each deleted, (property)=>
     @answer.unset property
