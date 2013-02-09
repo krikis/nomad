@@ -38,6 +38,54 @@ suite.bench
   seeds:    [80,90,90,90,90,80,80,90,70,60,90,90,90,90,100,90,80,90,80,80,100,100,100,90,90,100,100,100,80,80,90,100,100,80,70,80,100,80,80,90,80,100,60,80,90,90,100,90,100,80]
 
 suite.bench
+  category: 'serialized'
+  series:   '37% change (only strings)'
+  setup:    Benches.  setupSerialized37String
+  before:   Benches. beforeSerialized37String
+  test:     Benches.       serialized37String
+  seeds:    []
+
+suite.bench
+  category: 'serialized'
+  series:   '25% change (only strings)'
+  setup:    Benches.  setupSerialized25String
+  before:   Benches. beforeSerialized25String
+  test:     Benches.       serialized25String
+  seeds:    []
+
+suite.bench
+  category: 'serialized'
+  series:   '12% change (only strings)'
+  setup:    Benches.  setupSerialized12String
+  before:   Benches. beforeSerialized12String
+  test:     Benches.       serialized12String
+  seeds:    []
+
+suite.bench
+  category: 'serialized'
+  series:   '37% change (no additions/deletions)'
+  setup:    Benches.  setupSerialized37Change
+  before:   Benches. beforeSerialized37Change
+  test:     Benches.       serialized37Change
+  seeds:    []
+
+suite.bench
+  category: 'serialized'
+  series:   '25% change (no additions/deletions)'
+  setup:    Benches.  setupSerialized25Change
+  before:   Benches. beforeSerialized25Change
+  test:     Benches.       serialized25Change
+  seeds:    []
+
+suite.bench
+  category: 'serialized'
+  series:   '12% change (no additions/deletions)'
+  setup:    Benches.  setupSerialized12Change
+  before:   Benches. beforeSerialized12Change
+  test:     Benches.       serialized12Change
+  seeds:    []
+
+suite.bench
   category: 'attributes'
   series:   '37% change'
   setup:    Benches.  setupAttribute37
@@ -61,4 +109,51 @@ suite.bench
   test:     Benches.       attribute12
   seeds:    [100,100,100,100,100,100,100,100,100,100,100,100,90,100,100,90,100,100,100,100,100,100,90,100,90,100,100,100,100,100,90,100,100,90,100,100,100,100,100,100,100,100,100,90,100,90,100,100,90,100]
 
+suite.bench
+  category: 'attributes'
+  series:   '37% change (only strings)'
+  setup:    Benches.  setupAttribute37String
+  before:   Benches. beforeAttribute37String
+  test:     Benches.       attribute37String
+  seeds:    []
+
+suite.bench
+  category: 'attributes'
+  series:   '25% change (only strings)'
+  setup:    Benches.  setupAttribute25String
+  before:   Benches. beforeAttribute25String
+  test:     Benches.       attribute25String
+  seeds:    []
+
+suite.bench
+  category: 'attributes'
+  series:   '12% change (only strings)'
+  setup:    Benches.  setupAttribute12String
+  before:   Benches. beforeAttribute12String
+  test:     Benches.       attribute12String
+  seeds:    []
+
+suite.bench
+  category: 'attributes'
+  series:   '37% change (no additions/deletions)'
+  setup:    Benches.  setupAttribute37Change
+  before:   Benches. beforeAttribute37Change
+  test:     Benches.       attribute37Change
+  seeds:    []
+
+suite.bench
+  category: 'attributes'
+  series:   '25% change (no additions/deletions)'
+  setup:    Benches.  setupAttribute25Change
+  before:   Benches. beforeAttribute25Change
+  test:     Benches.       attribute25Change
+  seeds:    []
+
+suite.bench
+  category: 'attributes'
+  series:   '12% change (no additions/deletions)'
+  setup:    Benches.  setupAttribute12Change
+  before:   Benches. beforeAttribute12Change
+  test:     Benches.       attribute12Change
+  seeds:    []
 
