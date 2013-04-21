@@ -8,13 +8,13 @@ suite = @memory = new Suite
     @count += 1
     (JSON.stringify(@answer._versioning.patches).length / JSON.stringify(@answerOriginal).length) * 100
   unit:      '%'
-  unitLong:  'Portion of original data'
+  unitLong:  'Proportion of original data'
   # benchRuns: 1
   # maxRuns:   1
 
 suite.bench
   category: 'incremental'
-  series:   '12 versions'
+  series:   '12 updates'
   setup:    Benches.  setupPatch12
   before:   Benches. beforePatch12
   test:     Benches.       patch12
@@ -22,7 +22,7 @@ suite.bench
 
 suite.bench
   category: 'merged'
-  series:   '12 versions'
+  series:   '12 updates'
   setup:    Benches.  setupContent12
   before:   Benches. beforeContent12
   test:     Benches.       content12
@@ -30,7 +30,7 @@ suite.bench
 
 suite.bench
   category: 'incremental'
-  series:   '9 versions'
+  series:   '9 updates'
   setup:    Benches.  setupPatch9
   before:   Benches. beforePatch9
   test:     Benches.       patch9
@@ -38,7 +38,7 @@ suite.bench
 
 suite.bench
   category: 'merged'
-  series:   '9 versions'
+  series:   '9 updates'
   setup:    Benches.  setupContent9
   before:   Benches. beforeContent9
   test:     Benches.       content9
@@ -46,7 +46,7 @@ suite.bench
 
 suite.bench
   category: 'incremental'
-  series:   '6 versions'
+  series:   '6 updates'
   setup:    Benches.  setupPatch6
   before:   Benches. beforePatch6
   test:     Benches.       patch6
@@ -54,7 +54,7 @@ suite.bench
 
 suite.bench
   category: 'merged'
-  series:   '6 versions'
+  series:   '6 updates'
   setup:    Benches.  setupContent6
   before:   Benches. beforeContent6
   test:     Benches.       content6
@@ -62,7 +62,7 @@ suite.bench
 
 suite.bench
   category: 'incremental'
-  series:   '3 versions'
+  series:   '3 updates'
   setup:    Benches.  setupPatch3
   before:   Benches. beforePatch3
   test:     Benches.       patch3
@@ -70,7 +70,7 @@ suite.bench
 
 suite.bench
   category: 'merged'
-  series:   '3 versions'
+  series:   '3 updates'
   setup:    Benches.  setupContent3
   before:   Benches. beforeContent3
   test:     Benches.       content3

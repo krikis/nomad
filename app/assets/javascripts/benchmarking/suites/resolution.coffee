@@ -15,7 +15,7 @@ suite = @resolution = new Suite
 
 suite.bench
   category: 'serialized'
-  series:   '37% change'
+  series:   '37%'
   setup:    Benches.  setupSerialized37
   before:   Benches. beforeSerialized37
   test:     Benches.       serialized37
@@ -23,7 +23,7 @@ suite.bench
 
 suite.bench
   category: 'serialized'
-  series:   '25% change'
+  series:   '25%'
   setup:    Benches.  setupSerialized25
   before:   Benches. beforeSerialized25
   test:     Benches.       serialized25
@@ -31,7 +31,7 @@ suite.bench
 
 suite.bench
   category: 'serialized'
-  series:   '12% change'
+  series:   '12%'
   setup:    Benches.  setupSerialized12
   before:   Benches. beforeSerialized12
   test:     Benches.       serialized12
@@ -87,7 +87,7 @@ suite.bench
 
 suite.bench
   category: 'attributes'
-  series:   '37% change'
+  series:   '37%'
   setup:    Benches.  setupAttribute37
   before:   Benches. beforeAttribute37
   test:     Benches.       attribute37
@@ -95,7 +95,7 @@ suite.bench
 
 suite.bench
   category: 'attributes'
-  series:   '25% change'
+  series:   '25%'
   setup:    Benches.  setupAttribute25
   before:   Benches. beforeAttribute25
   test:     Benches.       attribute25
@@ -103,7 +103,7 @@ suite.bench
 
 suite.bench
   category: 'attributes'
-  series:   '12% change'
+  series:   '12%'
   setup:    Benches.  setupAttribute12
   before:   Benches. beforeAttribute12
   test:     Benches.       attribute12

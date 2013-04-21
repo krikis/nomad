@@ -24,7 +24,7 @@ suite.bench
 
 suite.bench
   category: 'structured'
-  series:   'version(37%)'
+  series:   'record(37%)'
   setup:    Benches.  setupStructAddVersion37
   before:   Benches. beforeStructAddVersion37
   test:     Benches.       structAddVersion37
@@ -32,7 +32,7 @@ suite.bench
 
 suite.bench
   category: 'merged'
-  series:   'version(37%)'
+  series:   'record(37%)'
   setup:    Benches.  setupMergeAddVersion37
   before:   Benches. beforeMergeAddVersion37
   test:     Benches.       mergeAddVersion37
@@ -56,7 +56,7 @@ suite.bench
 
 suite.bench
   category: 'structured'
-  series:   'version(25%)'
+  series:   'record(25%)'
   setup:    Benches.  setupStructAddVersion25
   before:   Benches. beforeStructAddVersion25
   test:     Benches.       structAddVersion25
@@ -64,7 +64,7 @@ suite.bench
 
 suite.bench
   category: 'merged'
-  series:   'version(25%)'
+  series:   'record(25%)'
   setup:    Benches.  setupMergeAddVersion25
   before:   Benches. beforeMergeAddVersion25
   test:     Benches.       mergeAddVersion25
@@ -88,7 +88,7 @@ suite.bench
 
 suite.bench
   category: 'structured'
-  series:   'version(12%)'
+  series:   'record(12%)'
   setup:    Benches.  setupStructAddVersion12
   before:   Benches. beforeStructAddVersion12
   test:     Benches.       structAddVersion12
@@ -96,7 +96,7 @@ suite.bench
 
 suite.bench
   category: 'merged'
-  series:   'version(12%)'
+  series:   'record(12%)'
   setup:    Benches.  setupMergeAddVersion12
   before:   Benches. beforeMergeAddVersion12
   test:     Benches.       mergeAddVersion12
