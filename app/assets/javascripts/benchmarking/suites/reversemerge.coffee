@@ -2,7 +2,7 @@ suite = @reverseMerge = new Suite
   name:      'reversemerge'
   container: 'tab3'
   title:     'Serialized Data vs. Attribute Oriented Approach'
-  subtitle:  'Performance of data versioning and reconciliation'
+  subtitle:  'Performance of recording updates and reconciliation'
   # benchRuns: 1
   # maxRuns:   1
 
