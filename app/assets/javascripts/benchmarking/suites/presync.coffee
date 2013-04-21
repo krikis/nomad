@@ -2,7 +2,7 @@ suite = @preSync = new Suite
   name:      'presync'
   container: 'tab1'
   title:     'Traditional Synchronization vs. Preventive Reconciliation'
-  subtitle:  'Network latency during different sync operations'
+  subtitle:  'Network load during different synchronization operations'
   timeout:   60000
 
 suite.bench

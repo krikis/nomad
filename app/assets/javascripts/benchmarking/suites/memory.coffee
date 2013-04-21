@@ -2,7 +2,7 @@ suite = @memory = new Suite
   name:      'memory'
   container: 'tab2'
   title:     'Incremental vs. Merged Browser Log'
-  subtitle:  'Memory footprint for recording local changes'
+  subtitle:  'Memory footprint for recording local updates'
   baseline:  ->
   record:    ->
     @count += 1

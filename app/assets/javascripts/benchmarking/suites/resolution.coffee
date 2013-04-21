@@ -1,8 +1,8 @@
 suite = @resolution = new Suite
   name:      'resolution'
   container: 'tab4'
-  title:     'Patching Serialized Objects vs. Rebasing Individual Attributes'
-  subtitle:  'Outcome of the reconciliation process'
+  title:     'Serialized Data vs. Attribute Oriented Approach'
+  subtitle:  'Proportion successfully resolved conflicts'
   yMax:      100
   baseline:  ->
   record:    ->
