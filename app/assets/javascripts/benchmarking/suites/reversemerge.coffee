@@ -15,7 +15,7 @@ suite.bench
   seeds:    [10,31,13,18,13,16,14,30,24,18,22,26,21,18,16,21,17,15,9,20,19,17,15,29,22,14,23,21,18,14,16,26,22,27,16,32,24,31,32,26,18,21,20,10,20,12,18,26]
 
 suite.bench
-  category: 'attribute'
+  category: 'attributes'
   series:   'reconcile(37%)'
   setup:    Benches.  setupMergeRebase37
   before:   Benches. beforeMergeRebase37
@@ -31,7 +31,7 @@ suite.bench
   seeds:    [39,35,41,38,28,37,32,37,47,35,25,24,22,25,20,20,29,15,41,34,34,34,24,31,22,35,37,40,42,37,28,41,34,21,41,31,13,32,20,22,13,45,51,35,20,20,41,24]
 
 suite.bench
-  category: 'attribute'
+  category: 'attributes'
   series:   'record(37%)'
   setup:    Benches.  setupMergeAddVersion37
   before:   Benches. beforeMergeAddVersion37
@@ -47,7 +47,7 @@ suite.bench
   seeds:    [10,10,9,7,15,19,10,8,12,18,10,15,9,12,24,8,11,13,26,7,8,13,20,7,7,7,13,11,17,15,13,8,6,7,8,13,10,18,14,9,9,11,17,10,15,9,14,7]
 
 suite.bench
-  category: 'attribute'
+  category: 'attributes'
   series:   'reconcile(25%)'
   setup:    Benches.  setupMergeRebase25
   before:   Benches. beforeMergeRebase25
@@ -63,7 +63,7 @@ suite.bench
   seeds:    [15,8,14,11,14,10,16,14,16,11,15,21,19,13,17,13,12,9,19,20,29,18,9,21,14,21,12,20,11,8,9,14,11,10,14,9,9,19,17,14,9,9,15,21,18,9,19,9]
 
 suite.bench
-  category: 'attribute'
+  category: 'attributes'
   series:   'record(25%)'
   setup:    Benches.  setupMergeAddVersion25
   before:   Benches. beforeMergeAddVersion25
@@ -79,7 +79,7 @@ suite.bench
   seeds:    [5,4,5,2,6,4,6,8,5,4,2,4,2,3,2,3,4,4,4,4,6,6,6,3,5,5,2,4,2,3,4,1,3,3,2,3,6,7,5,4,3,4,3,3,2,4,2,2]
 
 suite.bench
-  category: 'attribute'
+  category: 'attributes'
   series:   'reconcile(12%)'
   setup:    Benches.  setupMergeRebase12
   before:   Benches. beforeMergeRebase12
@@ -95,7 +95,7 @@ suite.bench
   seeds:    [2,2,5,3,2,3,10,3,5,5,2,2,3,3,8,1,4,3,2,3,3,3,3,3,8,9,3,2,6,6,4,3,3,5,3,3,4,5,2,3,2,6,2,4,3,9,3,3]
 
 suite.bench
-  category: 'attribute'
+  category: 'attributes'
   series:   'record(12%)'
   setup:    Benches.  setupMergeAddVersion12
   before:   Benches. beforeMergeAddVersion12
@@ -111,7 +111,7 @@ suite.bench
 #   seeds:    [103,95,96,95,98,94,95,95,95,95,94,99,94,95,95,95,95,95,95,96,95,94,99,97]
 #
 # suite.bench
-#   category: 'attribute'
+#   category: 'attributes'
 #   series:   'reconcile(6)'
 #   setup:    Benches.  setupMergeRebase6
 #   before:   Benches. beforeMergeRebase6
@@ -127,7 +127,7 @@ suite.bench
 #   seeds:    [82,83,84,80,80,80,79,80,80,80,80,79,81,81,81,80,83,80,81,86,80,80,80,84]
 #
 # suite.bench
-#   category: 'attribute'
+#   category: 'attributes'
 #   series:   'version(6)'
 #   setup:    Benches.  setupMergeAddVersion6
 #   before:   Benches. beforeMergeAddVersion6
@@ -143,7 +143,7 @@ suite.bench
 #   seeds:    [42,41,43,44,41,41,41,41,41,43,41,44,44,42,41,41,43,41,41,44,41,41,41,41]
 #
 # suite.bench
-#   category: 'attribute'
+#   category: 'attributes'
 #   series:   'reconcile(3)'
 #   setup:    Benches.  setupMergeRebase3
 #   before:   Benches. beforeMergeRebase3
@@ -159,7 +159,7 @@ suite.bench
 #   seeds:    [37,36,35,34,34,34,35,34,37,34,35,36,35,36,34,36,35,36,37,36,34,36,35,36]
 #
 # suite.bench
-#   category: 'attribute'
+#   category: 'attributes'
 #   series:   'version(3)'
 #   setup:    Benches.  setupMergeAddVersion3
 #   before:   Benches. beforeMergeAddVersion3
@@ -175,7 +175,7 @@ suite.bench
 #   seeds:    [19,18,19,19,20,20,21,20,18,18,19,19,19,18,18,19,19,19,19,19,19,19,20,19]
 #
 # suite.bench
-#   category: 'attribute'
+#   category: 'attributes'
 #   series:   'reconcile(1)'
 #   setup:    Benches.  setupMergeRebase1
 #   before:   Benches. beforeMergeRebase1
@@ -191,7 +191,7 @@ suite.bench
 #   seeds:    [15,15,17,16,21,20,19,19,19,15,16,15,15,15,15,15,15,15,16,16,15,15,16,16]
 #
 # suite.bench
-#   category: 'attribute'
+#   category: 'attributes'
 #   series:   'version(1)'
 #   setup:    Benches.  setupMergeAddVersion1
 #   before:   Benches. beforeMergeAddVersion1
