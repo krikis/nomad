@@ -3,34 +3,37 @@ class @Bench
   DEFAULT_TIMEOUT: 1000
 
   constructor: (options = {}) ->
-    @suite     = options.suite
-    @measure   = options.measure  || 'mean'
-    @category  = options.category || @uid()
-    @series    = options.series   || @uid()
-    @setup     = options.setup    || (next) -> next.call(@)
-    @before    = options.before   || (next) -> next.call(@)
-    @test      = options.test     || (next) -> next.call(@)
-    @after     = options.after    || (next) -> next.call(@)
-    @cleanup   = options.cleanup  || (next) -> next.call(@)
-    @benchData = options.data     || 'data70KB'
-    @baseline  = options.baseline || ->
-      @success = true             
-      @start   = new Date         
-    @record    = options.record   || -> 
-      if @success                 
-        @count += 1               
-        new Date - @start         
-      else                        
-        0                         
-    @converge  = options.converge || -> Math.abs(@previous - @current) < @current / 20
-    @round     = true             
-    @round     = options.round    if options.round?
-    @unit      = options.unit     || 'ms'
-    @unitLong  = options.unitLong || 'Milliseconds'
-    @runs      = options.runs     || @DEFAULT_NR_OF_RUNS
-    @timeout   = options.timeout  || @DEFAULT_TIMEOUT
-    @chart     = options.chart    if options.chart?
-    @seeds     = options.seeds
+    @suite      = options.suite
+    @measure    = options.measure    || 'mean'
+    @category   = options.category   || @uid()
+    @series     = options.series     || @uid()
+    @setup      = options.setup      || (next) -> next.call(@)
+    @setupOpts  = options.setupOpts  || {}
+    @before     = options.before     || (next) -> next.call(@)
+    @beforeOpts = options.beforeOpts || {}
+    @test       = options.test       || (next) -> next.call(@)
+    @testOpts   = options.testOpts   || {}
+    @after      = options.after      || (next) -> next.call(@)
+    @cleanup    = options.cleanup    || (next) -> next.call(@)
+    @benchData  = options.data       || 'data70KB'
+    @baseline   = options.baseline   || ->
+      @success  = true
+      @start    = new Date
+    @record     = options.record     || ->
+      if @success
+        @count += 1
+        new Date - @start
+      else
+        0
+    @converge   = options.converge   || -> Math.abs(@previous - @current) < @current / 20
+    @round      = true
+    @round      = options.round      if options.round?
+    @unit       = options.unit       || 'ms'
+    @unitLong   = options.unitLong   || 'Milliseconds'
+    @runs       = options.runs       || @DEFAULT_NR_OF_RUNS
+    @timeout    = options.timeout    || @DEFAULT_TIMEOUT
+    @chart      = options.chart      if options.chart?
+    @seeds      = options.seeds
     @initStats()
     @saveStats()
 
@@ -38,19 +41,19 @@ class @Bench
     @key        = "#{@series}_#{@category}"
     @namespace  = @suite?.name || ""
     @stats      = @getStats()
-    
-  getStats: -> 
+
+  getStats: ->
     JSON.parse(localStorage["system_#{@namespace}_#{@key}_stats"] || "[]")
-    
+
   getSeries: ->
     @series
-    
+
   getCategory: ->
     @category
 
   saveStats: ->
     localStorage["system_#{@namespace}_#{@key}_stats"] = JSON.stringify @stats
-    
+
   clearStats: ->
     localStorage["system_#{@namespace}_#{@key}_stats"] = JSON.stringify []
 
@@ -69,7 +72,7 @@ class @Bench
     @count = 0
     setTimeout (=>
       try
-        @setup.call(@, @testLoop)
+        @setup.call(@, @testLoop, @setupOpts)
       catch error
         @handleError error
     ), 100
@@ -77,8 +80,8 @@ class @Bench
   testLoop: () ->
     setTimeout (=>
       try
-        if @count < @runs and not @suite?.stopped() 
-          @before.call(@, @testFunction)
+        if @count < @runs and not @suite?.stopped()
+          @before.call(@, @testFunction, @beforeOpts)
         else
           @cleanup.call(@, @stop)
       catch error
@@ -89,14 +92,14 @@ class @Bench
     setTimeout (=>
       try
         @baseline.call(@)
-        @test.call(@, @afterFunction)
+        @test.call(@, @afterFunction, @testOpts)
       catch error
         @handleError error
     ), 100
 
   afterFunction: ->
     @total += @record.call(@)
-    setTimeout (=> 
+    setTimeout (=>
       try
         @after.call(@, @testLoop)
       catch error
@@ -110,20 +113,20 @@ class @Bench
       # return control to next bench if present
       @next?.call(@context, @count > 0)
     ), 100
-    
-  restartGracefully: ->  
+
+  restartGracefully: ->
     setTimeout (=>
       try
         @setup.call(@, @testLoop)
       catch error
         @handleError error
-    ), 100    
-    
+    ), 100
+
   failGracefully: ->
     error = @currentError
     delete @currentError
     @suite?.finish(error)
-    
+
   handleError: (error)->
     @currentError = error
     try
@@ -132,18 +135,18 @@ class @Bench
       @suite?.finish(error)
 
   processResults: ->
-    if @count > 0 
+    if @count > 0
       runtime = @total / @count
       @initStats()
       @updateStats(runtime)
       @calculateMeasure()
       @saveStats()
 
-  updateStats: (runtime) ->  
+  updateStats: (runtime) ->
     runtime = Math.round runtime if @round
     @suite?.log "[#{@category}] [#{@series}] [#{@count} runs]: #{runtime}"
     @stats.push runtime
-      
+
   calculateMeasure: ->
     @previous = @[@measure] || 0
     switch @measure
@@ -156,7 +159,7 @@ class @Bench
     else
       @[@measure] = value
     @current = @[@measure]
-      
+
   hasConverged: ->
     @converge.call(@)
 
@@ -182,15 +185,15 @@ class @Bench
         try
           @_waitFor.apply(@, [check, callback, message, total])
         catch error
-          @handleError error          
+          @handleError error
       ), @TIMEOUT_INCREMENT
-  
+
   # Generate four random hex digits.
   S4 = ->
     (((1 + Math.random()) * 0x10000) | 0).toString(16).substring 1
-  
+
   # Generate a pseudo-GUID by concatenating random hexadecimal.
   uid: ->
     S4() + S4()
-  
+
 

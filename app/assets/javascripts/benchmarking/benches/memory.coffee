@@ -1,21 +1,23 @@
 Benches = @Benches ||= {}
 
-Benches.setupContent6 = (next) ->
+Benches.setupMemory = (next, options = {}) ->
   class Answer extends Backbone.Model
+    versioning: options.versioning
     collection:
       url: '/some/url'
   @Answer = Answer
   next.call @
 
-Benches.beforeContent6 = (next) ->
+Benches.beforeMemory = (next, options = {}) ->
   @answerOriginal = Util.randomObject()
   @answerVersion = _.deepClone @answerOriginal
   @answer = new @Answer _.deepClone @answerOriginal
   next.call @
 
-Benches.content6 = (next) ->  
-  _.each [1..6], =>
-    [@answerVersion, deleted] = Util.randomVersion(@answerVersion, change: 0.25)
+Benches.memory = (next, options = {}) ->
+  changeOdds = 0.25
+  _.each [1..options.nrOfUpdates], =>
+    [@answerVersion, deleted] = Util.randomVersion(@answerVersion, change: changeOdds)
     @answer.set _.deepClone @answerVersion
     _.each deleted, (property)=>
       @answer.unset property
