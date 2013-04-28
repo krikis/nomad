@@ -12,13 +12,15 @@ Benches.setupRecordOverhead = (next, options = {}) ->
 
 # create data object
 Benches.beforeRecordOverhead = (next, options = {}) ->
-  @answerOriginal = Util.randomObject()
+  @answerOriginal = Util.randomObject(typeOdds: options.typeOdds)
   @answer = new @Answer _.deepClone @answerOriginal
   next.call @
 
 # perform update on data object
 Benches.recordOverhead = (next, options = {}) ->
-  [version, deleted] = Util.randomVersion(@answerOriginal, change: options.changeRate)
+  [version, deleted] = Util.randomVersion(@answerOriginal,
+                                          change: options.changeRate,
+                                          changeOdds: options.changeOdds)
   @answer.set version
   _.each deleted, (property)=>
     @answer.unset property
@@ -37,13 +39,17 @@ Benches.setupReconcileOverhead = (next, options = {}) ->
 
 Benches.beforeReconcileOverhead = (next, options = {}) ->
   # create the original data version
-  @answerOriginal = Util.randomObject()
+  @answerOriginal = Util.randomObject(typeOdds: options.typeOdds)
   @answer = new @Answer _.deepClone @answerOriginal
   # perform the winning update
-  [dummyVersion, deleted] = Util.randomVersion(@answerOriginal, change: options.changeRate)
+  [dummyVersion, deleted] = Util.randomVersion(@answerOriginal,
+                                               change: options.changeRate,
+                                               changeOdds: options.changeOdds)
   @dummy = new @Answer _.deepClone dummyVersion
   # perform the losing update
-  [version, deleted] = Util.randomVersion(@answerOriginal, change: options.changeRate)
+  [version, deleted] = Util.randomVersion(@answerOriginal,
+                                          change: options.changeRate,
+                                          changeOdds: options.changeOdds)
   @answer.set version
   _.each deleted, (property)=>
     @answer.unset property
