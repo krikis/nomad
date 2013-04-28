@@ -1,5 +1,5 @@
-suite = @preSync = new Suite
-  name:      'presync'
+suite = @network = new Suite
+  name:      'network'
   container: 'tab1'
   title:     'Traditional Synchronization vs. Preventive Reconciliation'
   subtitle:  'Network load during different synchronization operations'

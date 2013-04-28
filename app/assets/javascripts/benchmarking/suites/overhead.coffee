@@ -1,5 +1,5 @@
-suite = @reverseMerge = new Suite
-  name:      'reversemerge'
+suite = @overhead = new Suite
+  name:      'overhead'
   container: 'tab3'
   title:     'Serialized Data vs. Attribute Oriented Approach'
   subtitle:  'Performance of recording updates and reconciliation'
