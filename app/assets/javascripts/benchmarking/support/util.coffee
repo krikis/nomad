@@ -197,9 +197,15 @@
               version[property] = not version[property]
             else if _.isString original
               if ' ' in original
-                version[property] = @loremIpsumVersion version[property], amountOfChange
+                newText = @loremIpsumVersion version[property], amountOfChange
+                while original is newText
+                  newText = @loremIpsumVersion version[property], amountOfChange
+                version[property] = newText
               else
-                version[property] = @stringVersion version[property], amountOfChange
+                newString = @stringVersion version[property], amountOfChange
+                while original is newString
+                  newString = @stringVersion version[property], amountOfChange
+                version[property] = newString
       # normalize
       newPropCount = Math.round(nrOfProperties * amountOfChange * newPropCount / totalChange)
       for prop in [0...newPropCount]
