@@ -1,52 +1,58 @@
 Benches = @Benches ||= {}
 
-Benches.setupSerialized25 = (next) ->
+Benches.setupResolution = (next, options = {}) ->
   class Answer extends Backbone.Model
-    versioning: 'structured_content_diff'
+    versioning: options.versioning
     collection:
       url: '/some/url'
   @Answer = Answer
   next.call @
 
-Benches.beforeSerialized25 = (next) ->
-  changeRate = 0.25
+Benches.beforeResolution = (next, options = {}) ->
   # create the original data version
-  @originalVersion = Util.randomObject()
+  @originalVersion = Util.randomObject(typeOdds: options.typeOdds)
   # handle local update
-  [@localVersion, localDeleted] = Util.randomVersion(@originalVersion, change: changeRate)
+  [@localVersion, localDeleted] = Util.randomVersion(@originalVersion,
+                                                     change: options.changeRate,
+                                                     changeOdds: options.changeOdds)
   @localAnswer = new @Answer _.deepClone @originalVersion
-  @localDummy = new @Answer _.deepClone @localVersion
   @localAnswer.set @localVersion
   _.each localDeleted, (property)=>
     @localAnswer.unset property
+  if @originalVersion.versioning == 'structured_content_diff'
+    @localDummy = new @Answer _.deepClone @localVersion
   # handle remote update
-  [@remoteVersion, remoteDeleted] = Util.randomVersion(@originalVersion, change: changeRate)
-  @remoteAnswer = new @Answer _.deepClone @originalVersion
+  [@remoteVersion, remoteDeleted] = Util.randomVersion(@originalVersion,
+                                                       change: options.changeRate,
+                                                       changeOdds: options.changeOdds)
   @remoteDummy = new @Answer _.deepClone @remoteVersion
-  @remoteAnswer.set @remoteVersion
-  _.each remoteDeleted, (property)=>
-    @remoteAnswer.unset property
+  if @originalVersion.versioning == 'structured_content_diff'
+    @remoteAnswer = new @Answer _.deepClone @originalVersion
+    @remoteAnswer.set @remoteVersion
+    _.each remoteDeleted, (property)=>
+      @remoteAnswer.unset property
   next.call @
 
-Benches.serialized25 = (next) ->
+Benches.resolution = (next, options = {}) ->
   try
     if @success = @localAnswer._applyPatchesTo @remoteDummy
       @dummy = @remoteDummy
-  catch error    
+      @reversePatch = @localAnswer._versioning?.reversePatch
+  catch error
     @success = false
     if error.name == 'SyntaxError'
       @suite?.log "JSON format broken!"
     else
       @suite?.log error.message
-      @suite?.log error.stack    
+      @suite?.log error.stack
 
   # apply patches in reverse order when patching fails
-  unless @success
+  if not @success and @remoteAnswer?
     try
       if @success = @remoteAnswer._applyPatchesTo @localDummy
         @dummy = @localDummy
-        @dummy._versioning.reversePatch = true
-    catch error    
+        @reversePatch = true
+    catch error
       @success = false
       if error.name == 'SyntaxError'
         @suite?.log "JSON format broken!"
@@ -75,7 +81,7 @@ Benches.serialized25 = (next) ->
           if merge and
              _.isString(@localVersion[key]) and ' ' in @localVersion[key] and
              _.isString(@remoteVersion[key]) and ' ' in @remoteVersion[key]
-            dmp = new diff_match_patch 
+            dmp = new diff_match_patch
             diff1 = dmp.diff_main @originalVersion[key], @localVersion[key]
             dmp.diff_cleanupSemantic diff1
             diff2 = dmp.diff_main @originalVersion[key], @remoteVersion[key]
@@ -90,10 +96,13 @@ Benches.serialized25 = (next) ->
             well.append $("<h3><small>Merged Changes</small></h3>")
             well.append $("#{dmp.diff_prettyHtml diff3}")
             box = $("<div class='box'>")
-            if @dummy._versioning.reversePatch
+            if @reversePatch
               box.addClass('reverse')
             box.append well
-            $('#tab4 #seri').append box
+            if @dummy.versioning == 'structured_content_diff'
+              $('#tab4 #seri').append box
+            else
+              $('#tab4 #attr').append box
           # console.log "#{@originalVersion[key]}"
           # console.log "-dum-> #{@remoteVersion[key]}"
           # console.log "-ans-> #{@localVersion[key]}"
@@ -104,7 +113,6 @@ Benches.serialized25 = (next) ->
           # console.log "#{padding } -dum-> #{@remoteVersion[key]    }"
           # console.log "#{original} -ans-> #{@localVersion[key]}"
           # console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
-  else  
+  else
     # console.log 'Patching failed!!!'
   next.call @
-  
