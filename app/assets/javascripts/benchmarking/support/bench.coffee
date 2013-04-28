@@ -15,7 +15,6 @@ class @Bench
     @testOpts   = options.testOpts   || {}
     @after      = options.after      || (next) -> next.call(@)
     @cleanup    = options.cleanup    || (next) -> next.call(@)
-    @benchData  = options.data       || 'data70KB'
     @baseline   = options.baseline   || ->
       @success  = true
       @start    = new Date

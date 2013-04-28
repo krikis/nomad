@@ -1,5 +1,5 @@
 class @Suite
-  
+
   MIN_NR_OF_RUNS: 20
   MIN_STABLE_RUNS: 5
   MAX_NR_OF_RUNS: 50
@@ -11,7 +11,6 @@ class @Suite
     @subtitle  = options.subtitle
     @yMax      = options.yMax
     @measure   = options.measure   || 'mean'
-    @benchData = options.benchData
     @benchRuns = options.benchRuns
     @timeout   = options.timeout
     @minRuns   = options.minRuns   || @MIN_NR_OF_RUNS
@@ -37,14 +36,13 @@ class @Suite
     options.unit     ||= @unit
     options.unitLong ||= @unitLong
     options.measure  ||= @measure
-    options.data     ||= @benchData
     options.runs     ||= @benchRuns
     bench = new Bench options
     @benches.push bench
     category = bench.getCategory()
     series = bench.getSeries()
     unless category in @categories
-      @categories.push category 
+      @categories.push category
     unless series in @allSeries
       @allSeries.push series
     @_saveChartSetup()
@@ -57,8 +55,8 @@ class @Suite
     @chartType = localStorage["system_#{@name}_chartType"] || 'runningMean'
     @categories = []
     @allSeries  = []
-    
-  _saveChartSetup: ->  
+
+  _saveChartSetup: ->
     localStorage["system_#{@name}_chartType"] = @chartType
 
   _drawChart: ->
@@ -68,13 +66,13 @@ class @Suite
     $("a[href='##{@container}']").click =>
       unless @running
         if not @chart?
-          setTimeout (=>   
+          setTimeout (=>
               @chart = new Chart(@_chartOptions())
             ), 200
         else
           @chart.redraw(data: @_chartData(), clear: true)
 
-  _chartOptions: ->  
+  _chartOptions: ->
     namespace: @name
     chartType: @chartType
     round: @round
@@ -88,7 +86,7 @@ class @Suite
     allSeries: @allSeries.slice()
     categories: @categories.slice()
     data: @_chartData()
-    
+
   _chartData: ->
     data = {}
     _.each @benches, (bench) ->
@@ -101,26 +99,26 @@ class @Suite
     @_saveChartSetup()
     @chart?.destroy()
     @chart = new Chart(@_chartOptions())
-    
+
   runningMedian: ->
     @chartType = 'runningMedian'
     @_saveChartSetup()
     @chart?.destroy()
     @chart = new Chart(@_chartOptions())
-    
+
   runningMean: ->
     @chartType = 'runningMean'
     @_saveChartSetup()
     @chart?.destroy()
     @chart = new Chart(@_chartOptions())
-    
+
   finalResults: ->
     @chartType = 'finalResults'
     @_saveChartSetup()
     @chart?.destroy()
     @chart = new Chart(@_chartOptions())
-    
-  initButtons: ->  
+
+  initButtons: ->
     $("##{@container} ##{@chartType}").find('i').addClass('icon-ok')
     suite = @
     $("##{@container} .run").click ->
@@ -174,7 +172,7 @@ class @Suite
     @running = false
     @setButtons button
     @buttonsForIdle()
-    
+
   stopped: ->
     not @running
 
@@ -236,7 +234,7 @@ class @Suite
   runSuite: ->
     @stableRuns++ unless @rerunSuite
     if @runs < @minRuns or @stableRuns < @minStable
-      @rerunSuite = true 
+      @rerunSuite = true
     if @rerunSuite and @runs < @maxRuns
       @rerunSuite = false
       @runs++
@@ -256,17 +254,16 @@ class @Suite
       @log "Converged after #{@runs} iterations"
     else
       @log "Maximum number of runs reached"
-    setTimeout (=>  
+    setTimeout (=>
         @log "=================== Results ========================"
         @log new Date
-        @log @benchData if @benchData?
         @log JSON.stringify @categories
         _.each @benches, (bench) =>
           @log "#{bench.namespace}_#{bench.key}::#{JSON.stringify bench.getStats()}"
       ), 2000
     @running = false
-    @buttonsForIdle()    
-    
+    @buttonsForIdle()
+
   clearStorage: ->
     _.each _.properties(localStorage), (property) ->
       unless /^system_/.test property
@@ -286,7 +283,7 @@ class @Suite
           last.css('color', 'white')
       }
     )
-    console.log message  
+    console.log message
 
 
 
