@@ -28,7 +28,7 @@ Benches.recordOverhead = (next, options = {}) ->
 
 #reconciling conflicting updates
 
-Benches.setupReconcileOverhead = (next, options = {}) ->
+Benches.setupResolveOverhead = (next, options = {}) ->
   # define a model
   class Answer extends Backbone.Model
     versioning: options.versioning
@@ -37,7 +37,7 @@ Benches.setupReconcileOverhead = (next, options = {}) ->
   @Answer = Answer
   next.call @
 
-Benches.beforeReconcileOverhead = (next, options = {}) ->
+Benches.beforeResolveOverhead = (next, options = {}) ->
   # create the original data version
   @answerOriginal = Util.randomObject(typeOdds: options.typeOdds)
   @answer = new @Answer _.deepClone @answerOriginal
@@ -55,7 +55,7 @@ Benches.beforeReconcileOverhead = (next, options = {}) ->
     @answer.unset property
   next.call @
 
-Benches.reconcileOverhead = (next, options = {}) ->
+Benches.resolveOverhead = (next, options = {}) ->
   # resolve the conflicts
   try
     @success = @answer._applyPatchesTo @dummy
