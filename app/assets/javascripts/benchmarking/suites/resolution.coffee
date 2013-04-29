@@ -51,7 +51,7 @@ suite.bench
 
 suite.bench
   category: 'serialized'
-  series:   '37% (only strings)'
+  series:   '37% (strings only)'
   setup:    Benches.setupResolution
   setupOpts:
     versioning: 'structured_content_diff'
@@ -64,7 +64,7 @@ suite.bench
 
 suite.bench
   category: 'serialized'
-  series:   '25% (only strings)'
+  series:   '25% (strings only)'
   setup:    Benches.setupResolution
   setupOpts:
     versioning: 'structured_content_diff'
@@ -77,7 +77,7 @@ suite.bench
 
 suite.bench
   category: 'serialized'
-  series:   '12% (only strings)'
+  series:   '12% (strings only)'
   setup:    Benches.setupResolution
   setupOpts:
     versioning: 'structured_content_diff'
@@ -90,7 +90,7 @@ suite.bench
 
 suite.bench
   category: 'serialized'
-  series:   '37% (no additions/deletions)'
+  series:   '37% (mods only)'
   setup:    Benches.setupResolution
   setupOpts:
     versioning: 'structured_content_diff'
@@ -103,7 +103,7 @@ suite.bench
 
 suite.bench
   category: 'serialized'
-  series:   '25% (no additions/deletions)'
+  series:   '25% (mods only)'
   setup:    Benches.setupResolution
   setupOpts:
     versioning: 'structured_content_diff'
@@ -116,7 +116,7 @@ suite.bench
 
 suite.bench
   category: 'serialized'
-  series:   '12% (no additions/deletions)'
+  series:   '12% (mods only)'
   setup:    Benches.setupResolution
   setupOpts:
     versioning: 'structured_content_diff'
@@ -159,7 +159,7 @@ suite.bench
 
 suite.bench
   category: 'attributes'
-  series:   '37% (only strings)'
+  series:   '37% (strings only)'
   setup:    Benches.setupResolution
   before:   Benches.beforeResolution
   beforeOpts:
@@ -170,7 +170,7 @@ suite.bench
 
 suite.bench
   category: 'attributes'
-  series:   '25% (only strings)'
+  series:   '25% (strings only)'
   setup:    Benches.setupResolution
   before:   Benches.beforeResolution
   beforeOpts:
@@ -181,7 +181,7 @@ suite.bench
 
 suite.bench
   category: 'attributes'
-  series:   '12% (only strings)'
+  series:   '12% (strings only)'
   setup:    Benches.setupResolution
   before:   Benches.beforeResolution
   beforeOpts:
@@ -192,7 +192,7 @@ suite.bench
 
 suite.bench
   category: 'attributes'
-  series:   '37% (no additions/deletions)'
+  series:   '37% (mods only)'
   setup:    Benches.setupResolution
   before:   Benches.beforeResolution
   beforeOpts:
@@ -203,7 +203,7 @@ suite.bench
 
 suite.bench
   category: 'attributes'
-  series:   '25% (no additions/deletions)'
+  series:   '25% (mods only)'
   setup:    Benches.setupResolution
   before:   Benches.beforeResolution
   beforeOpts:
@@ -214,7 +214,7 @@ suite.bench
 
 suite.bench
   category: 'attributes'
-  series:   '12% (no additions/deletions)'
+  series:   '12% (mods only)'
   setup:    Benches.setupResolution
   before:   Benches.beforeResolution
   beforeOpts:
