@@ -119,7 +119,7 @@ Benches.resolution = (next, options = {}) ->
           # console.log "#{original} -ans-> #{@localVersion[key]}"
           # console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
   else
-    if @dummy?.versioning == 'structured_content_diff'
+    if @localAnswer.versioning == 'structured_content_diff'
       @context.failure += 1
     # console.log 'Patching failed!!!'
   if @context.lastRun < @context.runs and @context.failure > 0
