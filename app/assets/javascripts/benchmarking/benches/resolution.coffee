@@ -34,9 +34,9 @@ Benches.beforeResolution = (next, options = {}) ->
   next.call @
 
 Benches.resolution = (next, options = {}) ->
-  @lastRun ||= 0
-  @json ||= 0
-  @failure ||= 0
+  @context.lastRun ||= 1
+  @context.json ||= 0
+  @context.failure ||= 0
   try
     if @success = @localAnswer._applyPatchesTo @remoteDummy
       @dummy = @remoteDummy
@@ -44,7 +44,7 @@ Benches.resolution = (next, options = {}) ->
   catch error
     @success = false
     if error.name == 'SyntaxError'
-      @json += 1
+      @context.json += 1
       @suite?.log "JSON format broken!"
     else
       @suite?.log error.message
@@ -59,7 +59,7 @@ Benches.resolution = (next, options = {}) ->
     catch error
       @success = false
       if error.name == 'SyntaxError'
-        @json += 1
+        @context.json += 1
         @suite?.log "JSON format broken!"
       else
         @suite?.log error.message
@@ -119,9 +119,9 @@ Benches.resolution = (next, options = {}) ->
           # console.log "#{original} -ans-> #{@localVersion[key]}"
           # console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
   else
-    @failure += 1
+    @context.failure += 1
     # console.log 'Patching failed!!!'
-  if @lastRun < @context.runs and @failure > 0
-    @lastRun = @context.runs
-    console.log "[#{@context.runs}]Invalid Data: #{(@json / @failure)}%"
+  if @context.lastRun < @context.runs and @context.failure > 0
+    @context.lastRun = @context.runs
+    @context.log "[#{@context.runs}] Invalid Data: #{(@context.json / @context.failure)}%"
   next.call @
