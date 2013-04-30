@@ -7,7 +7,7 @@ suite = @resolution = new Suite
   baseline:  ->
   record:    ->
     @count += 1
-    @success * 100
+    if @success then 100 else 0
   unit:      '%'
   unitLong:  'Successfully resolved'
   # benchRuns: 1
@@ -47,6 +47,63 @@ suite.bench
   beforeOpts:
     changeRate: 0.125
   test:     Benches.resolution
+  seeds:    [100,90,90,70,60,100,90,80,90,100,100,90,90,80,90,100,90,100,100,90,70,80,90,90,60,90,90,90,80,70,90,80,80,80,90,80,90,100,70,90,90,90,80,90,80,100,100,90,90]
+
+suite.bench
+  category: 'serialized'
+  series:   '37% (invalid data)'
+  setup:    Benches.setupResolution
+  setupOpts:
+    versioning: 'structured_content_diff'
+  before:   Benches.beforeResolution
+  beforeOpts:
+    changeRate: 0.375
+  test:     Benches.resolution
+  round: false
+  record:   ->
+    unless @success
+      @count += 1
+      if @invalid then 100 else 0
+    else
+      0
+  seeds:    [40,20,40,10,50,20,10,50,20,10,30,20,0,10,20,10,30,0,10,10,40,20,50,30,20,20,30,40,10,10,20,30,10,20,40,40,10,30,20,10,40,30,10,30,40,30,20,10,30]
+
+suite.bench
+  category: 'serialized'
+  series:   '25% (invalid data)'
+  setup:    Benches.setupResolution
+  setupOpts:
+    versioning: 'structured_content_diff'
+  before:   Benches.beforeResolution
+  beforeOpts:
+    changeRate: 0.25
+  test:     Benches.resolution
+  round: false
+  record:   ->
+    unless @success
+      @count += 1
+      if @invalid then 100 else 0
+    else
+      0
+  seeds:    [40,40,60,50,30,70,70,50,60,40,60,80,70,40,40,50,30,30,80,50,40,40,0,50,40,70,30,50,60,50,40,30,70,60,40,40,50,50,40,80,70,40,70,60,60,50,40,50,50]
+
+suite.bench
+  category: 'serialized'
+  series:   '12% (invalid data)'
+  setup:    Benches.setupResolution
+  setupOpts:
+    versioning: 'structured_content_diff'
+  before:   Benches.beforeResolution
+  beforeOpts:
+    changeRate: 0.125
+  test:     Benches.resolution
+  round: false
+  record:   ->
+    unless @success
+      @count += 1
+      if @invalid then 100 else 0
+    else
+      0
   seeds:    [100,90,90,70,60,100,90,80,90,100,100,90,90,80,90,100,90,100,100,90,70,80,90,90,60,90,90,90,80,70,90,80,80,80,90,80,90,100,70,90,90,90,80,90,80,100,100,90,90]
 
 suite.bench

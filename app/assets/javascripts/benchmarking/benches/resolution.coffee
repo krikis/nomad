@@ -34,19 +34,19 @@ Benches.beforeResolution = (next, options = {}) ->
   next.call @
 
 Benches.resolution = (next, options = {}) ->
-  @context.lastRun ||= 1
-  @context.json ||= 0
-  @context.failure ||= 0
   try
     if @success = @localAnswer._applyPatchesTo @remoteDummy
       @dummy = @remoteDummy
       @reversePatch = @localAnswer._versioning?.reversePatch
+    else
+      @invalid = false
   catch error
     @success = false
     if error.name == 'SyntaxError'
-      @context.json += 1
-      @suite?.log "JSON format broken!"
+      @invalid = true
+      # @suite?.log "JSON format broken!"
     else
+      @invalid = false
       @suite?.log error.message
       @suite?.log error.stack
 
@@ -56,12 +56,15 @@ Benches.resolution = (next, options = {}) ->
       if @success = @remoteAnswer._applyPatchesTo @localDummy
         @dummy = @localDummy
         @reversePatch = true
+      else
+        @invalid = false
     catch error
       @success = false
       if error.name == 'SyntaxError'
-        @context.json += 1
-        @suite?.log "JSON format broken!"
+        @invalid = true
+        # @suite?.log "JSON format broken!"
       else
+        @invalid = false
         @suite?.log error.message
         @suite?.log error.stack
 
@@ -119,10 +122,5 @@ Benches.resolution = (next, options = {}) ->
           # console.log "#{original} -ans-> #{@localVersion[key]}"
           # console.log "#{padding } =mrg=> #{@dummy.attributes[key] }"
   else
-    if @localAnswer.versioning == 'structured_content_diff'
-      @context.failure += 1
     # console.log 'Patching failed!!!'
-  if @context.lastRun < @context.runs and @context.failure > 0
-    @context.log "[#{@context.runs}] Invalid Data: #{(@context.json / @context.failure) * 100}%"
-    @context.lastRun = @context.runs
   next.call @
