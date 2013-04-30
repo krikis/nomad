@@ -51,7 +51,7 @@ suite.bench
 
 suite.bench
   category: 'serialized'
-  series:   '37% (invalid data)'
+  series:   '37% (mangled data)'
   setup:    Benches.setupResolution
   setupOpts:
     versioning: 'structured_content_diff'
@@ -70,7 +70,7 @@ suite.bench
 
 suite.bench
   category: 'serialized'
-  series:   '25% (invalid data)'
+  series:   '25% (mangled data)'
   setup:    Benches.setupResolution
   setupOpts:
     versioning: 'structured_content_diff'
@@ -89,7 +89,7 @@ suite.bench
 
 suite.bench
   category: 'serialized'
-  series:   '12% (invalid data)'
+  series:   '12% (mangled data)'
   setup:    Benches.setupResolution
   setupOpts:
     versioning: 'structured_content_diff'

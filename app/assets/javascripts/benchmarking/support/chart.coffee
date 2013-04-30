@@ -95,9 +95,9 @@ class @Chart
     if @chartType == 'rawData'
       data
     else if @chartType == 'runningMean'
-      Math.runningMean(data, true, round)
+      Math.runningMean(data, round)
     else
-      Math.runningMedian(data, true, round)
+      Math.runningMedian(data, round)
 
   _chartConfig: (options = {})->
     config = @_defaultConfig(options)
