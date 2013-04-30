@@ -48,6 +48,7 @@ class @Suite
     @_saveChartSetup()
     @chart?.addBench
       data: bench.getStats()
+      round: bench.round
       series: series
       category: category
 
@@ -75,7 +76,6 @@ class @Suite
   _chartOptions: ->
     namespace: @name
     chartType: @chartType
-    round: @round
     measure: @measure
     container: @container
     title: @title
@@ -92,6 +92,7 @@ class @Suite
     _.each @benches, (bench) ->
       data[bench.getSeries()] ||= {}
       data[bench.getSeries()][bench.getCategory()] = bench.getStats()
+      data[bench.getSeries()][bench.getCategory()].round = bench.round
     data
 
   rawData: ->

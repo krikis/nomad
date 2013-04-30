@@ -1,17 +1,16 @@
 class @Chart
-    
-  constructor: (options = {})-> 
+
+  constructor: (options = {})->
     @namespace = options.namespace
     @chartType = options.chartType
     @allSeries = options.allSeries
     @categories = options.categories
-    @round = options.round
     @measure = options.measure
     @chart = new Highcharts.Chart @_chartConfig(options)
-    
+
   destroy: ->
     @chart?.destroy()
-      
+
   addBench: (options = {})->
     unless options.category in @categories
       @categories.push options.category
@@ -25,30 +24,31 @@ class @Chart
           data: []
       _.each @chart.series, (series) =>
         while series.data.length < @categories.length
-          series.addPoint @_dataPoint(options.data)
+          series.addPoint @_dataPoint(options.data, options.round)
     else
       seriesName = "#{options.series}_#{options.category}"
-      unless seriesName in _.map(@chart.series, (series)-> series.name) 
+      unless seriesName in _.map(@chart.series, (series)-> series.name)
         @chart.addSeries
           name: seriesName
-          data: @_dataSeries(options.data)
-    
-  addDataPoint: (series, category, data, animation = true, reset = false)->   
+          data: @_dataSeries(options.data, options.round)
+
+  addDataPoint: (series, category, data, options = {}) ->
+    options.animation = true unless options.animation?
     seriesIndex = _.indexOf(@allSeries, series)
     categoryIndex = _.indexOf(@categories, category)
     if @chartType == 'finalResults'
       @chart.series[seriesIndex].data[categoryIndex].
-        update @_dataPoint(data), true, animation
+        update @_dataPoint(data, options.round), true, options.animation
     else
-      if reset
+      if options.reset
         @chart.series[categoryIndex * @allSeries.length + seriesIndex].
-          setData @_dataSeries(data)
+          setData @_dataSeries(data, options.round)
       else
-        if (point = @_dataLinePoint(data))?
+        if (point = @_dataLinePoint(data, options.round))?
           @chart.series[categoryIndex * @allSeries.length + seriesIndex].
-            addPoint point, true, false, animation
-        
-  clear: (animation = false)->
+            addPoint point, true, false, options.animation
+
+  clear: (animation = false) ->
     _.each @allSeries, (series) =>
       _.each @categories, (category) =>
         seriesIndex = _.indexOf(@allSeries, series)
@@ -59,68 +59,68 @@ class @Chart
         else
           @chart.series[categoryIndex * @allSeries.length + seriesIndex].
             setData []
-      
-  redraw: (options = {})->
-    unless options.animation?
-      options.animation = true
+
+  redraw: (options = {}) ->
     @clear() if options.clear
     setTimeout (=>
         _.each @allSeries, (series) =>
           _.each @categories, (category) =>
-            @addDataPoint(series, 
-                          category, 
-                          options.data[series][category], 
-                          options.animation,
-                          true)
+            data = options.data[series][category]
+            @addDataPoint(series,
+                          category,
+                          data,
+                          round: data?.round
+                          animation: options.animation
+                          reset: true)
       ), 200
-      
-  _dataPoint: (data)->
+
+  _dataPoint: (data, round = false) ->
     point = if @measure == 'mean'
-      Math.mean(data || [], @round)
+      Math.mean(data || [], round)
     else
-      Math.median(data || [], @round)
+      Math.median(data || [], round)
     point || 0
-    
-  _dataLinePoint: (data)->
+
+  _dataLinePoint: (data, round = false)->
     data ||= []
     if @chartType == 'rawData'
       _.last(data)
     else if @chartType == 'runningMean'
-      Math.mean(data, @round)
+      Math.mean(data, round)
     else
-      Math.median(data, @round)
-      
-  _dataSeries: (data)->
+      Math.median(data, round)
+
+  _dataSeries: (data, round = false)->
     data ||= []
     if @chartType == 'rawData'
       data
     else if @chartType == 'runningMean'
-      Math.runningMean(data, true, @round)
+      Math.runningMean(data, true, round)
     else
-      Math.runningMedian(data, true, @round)
-      
+      Math.runningMedian(data, true, round)
+
   _chartConfig: (options = {})->
     config = @_defaultConfig(options)
     if @chartType == 'finalResults'
-      config.chart.type = 'bar'      
+      config.chart.type = 'bar'
       config.chart.animation =
           duration: 1000
           easing: 'swing'
-      config.xAxis = 
+      config.xAxis =
         categories: @categories
         title:
           text: null
       config.plotOptions =
         bar:
           dataLabels:
-            enabled: true  
+            enabled: true
       config.tooltip =
         formatter: ->
           "#{@x} #{@series.name}: #{@y} #{options.unit}"
-      config.series = @_chartData(options)  
+      config.series = @_chartData(options)
     else
       config.chart.type = 'line'
-      config.xAxis = 
+      config.xAxis =
         tickInterval: 1
         labels:
           enabled: false
@@ -129,7 +129,7 @@ class @Chart
           "#{@series.name}: #{@y} #{options.unit}"
       config.series = @_lineChartData(options)
     config
-      
+
   _defaultConfig: (options = {})->
     unit = options.unit
     chart:
@@ -151,7 +151,7 @@ class @Chart
       enabled: false
     exporting:
       width: 2048
-      
+
   _extendSubtitle: (subtitle)->
     subtitle += if @chartType == 'finalResults'
       if @measure == 'mean'
@@ -174,8 +174,8 @@ class @Chart
       allData.push currentSeries
       _.each @categories, (category) =>
         data = options.data[series][category]
-        currentSeries.data.push @_dataPoint(data)
-    allData   
+        currentSeries.data.push @_dataPoint(data, data?.round)
+    allData
 
   _lineChartData: (options = {})->
     allData = []
@@ -184,6 +184,6 @@ class @Chart
         data = options.data[series][category]
         currentSeries =
           name: "#{series}_#{category}"
-          data: @_dataSeries(data)
+          data: @_dataSeries(data, data?.round)
         allData.push currentSeries
     allData
