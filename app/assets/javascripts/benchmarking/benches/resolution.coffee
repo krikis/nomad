@@ -122,6 +122,6 @@ Benches.resolution = (next, options = {}) ->
     @context.failure += 1
     # console.log 'Patching failed!!!'
   if @context.lastRun < @context.runs and @context.failure > 0
-    @context.lastRun = @context.runs
     @context.log "[#{@context.runs}] Invalid Data: #{(@context.json / @context.failure)}%"
+    @context.lastRun = @context.runs
   next.call @
