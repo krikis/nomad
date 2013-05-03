@@ -15,9 +15,8 @@ Benches.beforeMemory = (next, options = {}) ->
   next.call @
 
 Benches.memory = (next, options = {}) ->
-  changeRate = 0.25
   _.each [1..options.nrOfUpdates], =>
-    [@answerVersion, deleted] = Util.randomVersion(@answerVersion, change: changeRate)
+    [@answerVersion, deleted] = Util.randomVersion(@answerVersion, change: options.changeRate)
     @answer.set _.deepClone @answerVersion
     _.each deleted, (property)=>
       @answer.unset property
