@@ -225,7 +225,8 @@ class @Suite
     if updateChart
       @chart.addDataPoint(bench.getSeries(),
                           bench.getCategory(),
-                          bench.getStats())
+                          bench.getStats(),
+                          round: bench.round)
     @benchIndex++
     if @benchIndex < @benches.length
       @runBench()
