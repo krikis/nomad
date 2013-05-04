@@ -16,6 +16,30 @@ suite = @memory = new Suite
 
 suite.bench
   category: 'incremental'
+  series:   '18 updates (12%)'
+  setup:    Benches.setupMemory
+  setupOpts:
+    versioning: 'structured_content_diff'
+  before:   Benches.beforeMemory
+  test:     Benches.memory
+  testOpts:
+    changeRate: 0.125
+    nrOfUpdates: 18
+  seeds:    []
+
+suite.bench
+  category: 'merged'
+  series:   '18 updates (12%)'
+  setup:    Benches.setupMemory
+  before:   Benches.beforeMemory
+  test:     Benches.memory
+  testOpts:
+    changeRate: 0.125
+    nrOfUpdates: 18
+  seeds:    []
+
+suite.bench
+  category: 'incremental'
   series:   '15 updates (12%)'
   setup:    Benches.setupMemory
   setupOpts:
@@ -138,6 +162,30 @@ suite.bench
 
 suite.bench
   category: 'incremental'
+  series:   '18 updates (25%)'
+  setup:    Benches.setupMemory
+  setupOpts:
+    versioning: 'structured_content_diff'
+  before:   Benches.beforeMemory
+  test:     Benches.memory
+  testOpts:
+    changeRate: 0.25
+    nrOfUpdates: 18
+  seeds:    []
+
+suite.bench
+  category: 'merged'
+  series:   '18 updates (25%)'
+  setup:    Benches.setupMemory
+  before:   Benches.beforeMemory
+  test:     Benches.memory
+  testOpts:
+    changeRate: 0.25
+    nrOfUpdates: 18
+  seeds:    []
+
+suite.bench
+  category: 'incremental'
   series:   '15 updates (25%)'
   setup:    Benches.setupMemory
   setupOpts:
@@ -257,6 +305,30 @@ suite.bench
   seeds:    [54,53,48,48,51,50,46,49,47,53,39,47,48,45,54,45,36,47,40,52]
 
 # 37% change
+
+suite.bench
+  category: 'incremental'
+  series:   '18 updates (37%)'
+  setup:    Benches.setupMemory
+  setupOpts:
+    versioning: 'structured_content_diff'
+  before:   Benches.beforeMemory
+  test:     Benches.memory
+  testOpts:
+    changeRate: 0.375
+    nrOfUpdates: 18
+  seeds:    []
+
+suite.bench
+  category: 'merged'
+  series:   '18 updates (37%)'
+  setup:    Benches.setupMemory
+  before:   Benches.beforeMemory
+  test:     Benches.memory
+  testOpts:
+    changeRate: 0.375
+    nrOfUpdates: 18
+  seeds:    []
 
 suite.bench
   category: 'incremental'
