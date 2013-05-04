@@ -201,7 +201,7 @@ class @Suite
     @stableRuns = 0
     @benchIndex = 0
     # console.log '================================= Suite      ================================='
-    @log "Suite started..."
+    @log "Suite started at #{new Date}..."
     @runBench()
 
   runBench: ->
@@ -251,14 +251,13 @@ class @Suite
     if error?
       @log(error)
     else if not @running
-      @log "Suite stopped"
+      @log "Suite stopped at #{new Date}"
     else if @runs < @maxRuns
-      @log "Converged after #{@runs} iterations"
+      @log "Converged after #{@runs} iterations at #{new Date}"
     else
-      @log "Maximum number of runs reached"
+      @log "Maximum number of runs reached at #{new Date}"
     setTimeout (=>
         @log "=================== Results ========================"
-        @log new Date
         @log JSON.stringify @categories
         _.each @benches, (bench) =>
           @log "#{bench.namespace}_#{bench.key}::#{JSON.stringify bench.getStats()}"
