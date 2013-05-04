@@ -25,7 +25,7 @@ suite.bench
   testOpts:
     changeRate: 0.125
     nrOfUpdates: 18
-  seeds:    []
+  seeds:    [154,193,166,179,173,240,157,183,182,184,153,169,162,170,166,162,185,190,199,152]
 
 suite.bench
   category: 'merged'
@@ -36,7 +36,7 @@ suite.bench
   testOpts:
     changeRate: 0.125
     nrOfUpdates: 18
-  seeds:    []
+  seeds:    [85,86,86,78,89,87,91,86,87,93,89,85,83,90,92,78,86,84,84,88]
 
 suite.bench
   category: 'incremental'
@@ -49,7 +49,7 @@ suite.bench
   testOpts:
     changeRate: 0.125
     nrOfUpdates: 15
-  seeds:    [163,137,137,148,157,149,167,172,184,158,133,201,158,156,169,209,136,171,146,164]
+  seeds:    [165,183,151,159,164,165,163,153,145,154,132,201,129,148,143,168,169,169,159,189]
 
 suite.bench
   category: 'merged'
@@ -60,7 +60,7 @@ suite.bench
   testOpts:
     changeRate: 0.125
     nrOfUpdates: 15
-  seeds:    [77,82,78,79,74,71,81,80,79,82,83,73,85,83,82,76,82,83,79,79]
+  seeds:    [75,76,71,83,81,79,87,84,78,73,77,74,73,87,80,85,79,81,75,84]
 
 suite.bench
   category: 'incremental'
@@ -73,7 +73,7 @@ suite.bench
   testOpts:
     changeRate: 0.125
     nrOfUpdates: 12
-  seeds:    [130,127,127,120,96,139,113,117,150,108,108,126,121,151,142,110,138,107,135,124]
+  seeds:    [138,128,142,144,112,107,126,125,141,118,150,114,141,117,138,103,121,137,120,124]
 
 suite.bench
   category: 'merged'
@@ -84,7 +84,7 @@ suite.bench
   testOpts:
     changeRate: 0.125
     nrOfUpdates: 12
-  seeds:    [76,74,75,77,72,78,67,74,63,66,63,74,70,73,75,70,73,71,76,69]
+  seeds:    [71,69,68,71,76,73,72,69,69,68,73,67,61,74,77,78,79,75,75,73]
 
 suite.bench
   category: 'incremental'
@@ -97,7 +97,7 @@ suite.bench
   testOpts:
     changeRate: 0.125
     nrOfUpdates: 9
-  seeds:    [107,97,87,101,108,107,87,104,103,85,99,71,72,85,102,94,86,108,92,98]
+  seeds:    [93,91,109,94,104,109,108,114,90,126,95,111,90,93,95,87,108,98,99,83]
 
 suite.bench
   category: 'merged'
@@ -108,7 +108,7 @@ suite.bench
   testOpts:
     changeRate: 0.125
     nrOfUpdates: 9
-  seeds:    [58,62,60,63,65,61,66,64,59,63,55,63,70,59,69,57,60,60,59,67]
+  seeds:    [57,57,59,59,58,61,68,64,68,71,64,60,63,57,62,53,59,57,55,58]
 
 suite.bench
   category: 'incremental'
@@ -121,7 +121,7 @@ suite.bench
   testOpts:
     changeRate: 0.125
     nrOfUpdates: 6
-  seeds:    [66,77,56,67,65,68,67,60,61,58,56,54,69,72,58,63,67,50,65,69]
+  seeds:    [64,58,68,68,61,73,65,71,61,70,65,58,65,70,68,65,59,58,50,69]
 
 suite.bench
   category: 'merged'
@@ -132,7 +132,7 @@ suite.bench
   testOpts:
     changeRate: 0.125
     nrOfUpdates: 6
-  seeds:    [46,45,39,49,41,47,44,50,42,45,44,43,46,47,42,44,42,45,52,40]
+  seeds:    [47,56,45,40,43,42,47,51,45,43,32,34,41,37,48,52,45,39,43,45]
 
 suite.bench
   category: 'incremental'
@@ -145,7 +145,7 @@ suite.bench
   testOpts:
     changeRate: 0.125
     nrOfUpdates: 3
-  seeds:    [37,35,25,33,26,28,20,30,31,31,36,26,43,29,29,33,25,30,34,27]
+  seeds:    [37,35,36,29,35,34,32,25,28,26,31,26,25,26,27,34,33,28,29,33]
 
 suite.bench
   category: 'merged'
@@ -156,7 +156,7 @@ suite.bench
   testOpts:
     changeRate: 0.125
     nrOfUpdates: 3
-  seeds:    [27,29,26,24,22,33,30,32,25,24,27,23,26,37,27,22,31,32,26,37]
+  seeds:    [24,31,30,26,29,26,23,28,29,30,28,20,28,31,30,26,21,21,20,21]
 
 # 25% change
 
@@ -171,7 +171,7 @@ suite.bench
   testOpts:
     changeRate: 0.25
     nrOfUpdates: 18
-  seeds:    []
+  seeds:    [516,571,472,643,524,525,521,558,634,474,612,603,543,490,489,455,525,545,574,524]
 
 suite.bench
   category: 'merged'
@@ -182,7 +182,7 @@ suite.bench
   testOpts:
     changeRate: 0.25
     nrOfUpdates: 18
-  seeds:    []
+  seeds:    [105,104,104,106,100,108,101,103,103,105,102,102,101,103,107,105,105,106,105,103]
 
 suite.bench
   category: 'incremental'
@@ -195,7 +195,7 @@ suite.bench
   testOpts:
     changeRate: 0.25
     nrOfUpdates: 15
-  seeds:    [502,507,486,458,439,481,455,418,397,425,417,439,478,420,529,478,452,424,478,406]
+  seeds:    [459,464,469,507,410,414,499,465,408,493,420,526,496,473,442,419,449,420,496,449]
 
 suite.bench
   category: 'merged'
@@ -206,7 +206,7 @@ suite.bench
   testOpts:
     changeRate: 0.25
     nrOfUpdates: 15
-  seeds:    [101,98,105,101,103,103,103,101,97,101,104,103,105,101,98,102,101,101,99,104]
+  seeds:    [100,99,100,105,104,100,102,100,103,101,105,97,100,101,101,106,100,105,103,99]
 
 suite.bench
   category: 'incremental'
@@ -219,7 +219,7 @@ suite.bench
   testOpts:
     changeRate: 0.25
     nrOfUpdates: 12
-  seeds:    [332,340,330,382,344,376,349,406,324,334,342,339,323,335,352,353,358,373,361,332]
+  seeds:    [328,394,384,343,377,396,335,335,329,350,369,377,453,335,320,374,321,326,339,387]
 
 suite.bench
   category: 'merged'
@@ -230,7 +230,7 @@ suite.bench
   testOpts:
     changeRate: 0.25
     nrOfUpdates: 12
-  seeds:    [98,93,92,98,97,92,98,98,93,99,99,97,97,96,99,101,96,99,100,96]
+  seeds:    [94,96,94,101,99,100,96,91,95,99,97,93,103,100,93,96,98,93,92,96]
 
 suite.bench
   category: 'incremental'
@@ -243,7 +243,7 @@ suite.bench
   testOpts:
     changeRate: 0.25
     nrOfUpdates: 9
-  seeds:    [296,320,299,284,256,284,255,252,252,256,273,274,283,270,274,264,257,294,255,243]
+  seeds:    [276,283,297,239,265,253,294,278,288,273,242,244,296,260,263,260,248,251,231,275]
 
 suite.bench
   category: 'merged'
@@ -254,7 +254,7 @@ suite.bench
   testOpts:
     changeRate: 0.25
     nrOfUpdates: 9
-  seeds:    [89,88,85,87,91,80,83,90,81,90,95,85,89,86,89,83,85,97,88,92]
+  seeds:    [85,90,90,90,87,83,94,92,90,82,89,90,92,93,90,84,87,92,89,90]
 
 suite.bench
   category: 'incremental'
@@ -267,7 +267,7 @@ suite.bench
   testOpts:
     changeRate: 0.25
     nrOfUpdates: 6
-  seeds:    [181,194,196,186,179,165,174,207,186,172,173,169,152,166,188,167,185,180,190,183]
+  seeds:    [189,162,166,173,203,175,176,156,182,174,187,178,197,183,164,177,168,172,161,191]
 
 suite.bench
   category: 'merged'
@@ -278,7 +278,7 @@ suite.bench
   testOpts:
     changeRate: 0.25
     nrOfUpdates: 6
-  seeds:    [75,73,79,82,78,72,74,80,68,72,70,76,73,72,75,68,71,70,80,78]
+  seeds:    [72,67,75,77,74,68,73,74,79,79,77,69,82,75,68,80,64,80,71,72]
 
 suite.bench
   category: 'incremental'
@@ -291,7 +291,7 @@ suite.bench
   testOpts:
     changeRate: 0.25
     nrOfUpdates: 3
-  seeds:    [90,98,77,90,99,88,79,87,85,77,93,87,78,82,89,92,84,85,97,83]
+  seeds:    [74,80,92,91,75,77,94,102,91,93,103,94,88,89,88,91,86,97,84,103]
 
 suite.bench
   category: 'merged'
@@ -302,7 +302,7 @@ suite.bench
   testOpts:
     changeRate: 0.25
     nrOfUpdates: 3
-  seeds:    [54,53,48,48,51,50,46,49,47,53,39,47,48,45,54,45,36,47,40,52]
+  seeds:    [46,44,45,50,55,41,43,52,47,46,43,43,46,48,50,41,54,50,51,55]
 
 # 37% change
 
@@ -317,7 +317,7 @@ suite.bench
   testOpts:
     changeRate: 0.375
     nrOfUpdates: 18
-  seeds:    []
+  seeds:    [907,981,912,1003,930,955,1067,865,945,892,934,1131,818,986,962,901,1059,1016,941,1201]
 
 suite.bench
   category: 'merged'
@@ -328,7 +328,7 @@ suite.bench
   testOpts:
     changeRate: 0.375
     nrOfUpdates: 18
-  seeds:    []
+  seeds:    [111,107,111,107,107,109,109,110,106,109,109,108,109,109,109,109,108,108,110,110]
 
 suite.bench
   category: 'incremental'
@@ -341,7 +341,7 @@ suite.bench
   testOpts:
     changeRate: 0.375
     nrOfUpdates: 15
-  seeds:    [782,702,816,780,704,781,739,928,786,861,970,702,776,824,724,847,833,651,771,760]
+  seeds:    [749,855,840,799,787,739,802,741,862,684,796,853,763,865,698,939,923,889,771,866]
 
 suite.bench
   category: 'merged'
@@ -352,7 +352,7 @@ suite.bench
   testOpts:
     changeRate: 0.375
     nrOfUpdates: 15
-  seeds:    [105,105,109,106,108,106,106,111,110,104,106,108,108,108,107,108,106,106,105,108]
+  seeds:    [108,106,106,104,105,107,106,106,108,107,107,108,102,106,107,108,107,107,107,106]
 
 suite.bench
   category: 'incremental'
@@ -365,7 +365,7 @@ suite.bench
   testOpts:
     changeRate: 0.375
     nrOfUpdates: 12
-  seeds:    [721,623,517,633,639,668,698,594,635,625,593,706,623,661,663,600,623,639,656,725]
+  seeds:    [664,693,643,694,765,629,640,667,607,671,564,635,620,587,599,588,598,604,655,565]
 
 suite.bench
   category: 'merged'
@@ -376,7 +376,7 @@ suite.bench
   testOpts:
     changeRate: 0.375
     nrOfUpdates: 12
-  seeds:    [104,108,106,103,105,103,106,102,106,105,103,104,105,106,105,104,105,103,102,103]
+  seeds:    [106,108,104,105,102,104,103,104,105,106,104,104,104,104,99,103,104,104,104,104]
 
 suite.bench
   category: 'incremental'
@@ -389,7 +389,7 @@ suite.bench
   testOpts:
     changeRate: 0.375
     nrOfUpdates: 9
-  seeds:    [499,484,446,441,493,498,424,449,480,438,491,450,495,511,455,477,439,467,465,421]
+  seeds:    [485,459,486,457,443,404,532,480,464,466,408,502,401,415,478,451,479,438,428,472]
 
 suite.bench
   category: 'merged'
@@ -400,7 +400,7 @@ suite.bench
   testOpts:
     changeRate: 0.375
     nrOfUpdates: 9
-  seeds:    [95,103,100,97,103,104,101,101,99,100,100,102,104,101,103,100,100,97,98,102]
+  seeds:    [103,98,102,98,102,97,99,100,99,95,101,100,98,95,102,96,97,102,96,101]
 
 suite.bench
   category: 'incremental'
@@ -413,7 +413,7 @@ suite.bench
   testOpts:
     changeRate: 0.375
     nrOfUpdates: 6
-  seeds:    [285,318,282,308,274,288,312,262,303,316,342,282,314,277,278,277,290,300,307,269]
+  seeds:    [336,305,310,293,294,284,308,309,309,278,316,292,327,329,277,335,297,334,295,289]
 
 suite.bench
   category: 'merged'
@@ -424,7 +424,7 @@ suite.bench
   testOpts:
     changeRate: 0.375
     nrOfUpdates: 6
-  seeds:    [94,94,90,86,90,92,84,91,88,89,89,86,88,89,88,92,89,83,93,90]
+  seeds:    [79,86,93,87,84,83,91,81,87,89,88,94,93,89,89,93,85,91,85,92]
 
 suite.bench
   category: 'incremental'
@@ -437,7 +437,7 @@ suite.bench
   testOpts:
     changeRate: 0.375
     nrOfUpdates: 3
-  seeds:    [146,177,140,155,146,156,156,151,145,167,157,145,160,131,144,151,145,138,166,128]
+  seeds:    [141,151,152,161,180,152,122,162,147,157,149,141,143,144,143,138,133,155,135,159]
 
 suite.bench
   category: 'merged'
@@ -448,4 +448,4 @@ suite.bench
   testOpts:
     changeRate: 0.375
     nrOfUpdates: 3
-  seeds:    [64,66,55,66,63,63,67,63,56,61,65,65,61,66,60,59,61,56,66,64]
+  seeds:    [55,61,60,60,63,64,63,60,69,67,52,68,61,58,71,62,61,52,63,72]
