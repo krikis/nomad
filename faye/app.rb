@@ -123,5 +123,5 @@ App.bind(:publish) do |client_id, channel, data|
   ['unicast'].each do |keyword|
     highlight_key(output, keyword, pink_on(black))
   end
-  error "#{client_id} [#{channel}] #{output}"
+  error "[#{Time.now.strftime('%L')}] #{client_id} [#{channel}] #{output}"
 end
