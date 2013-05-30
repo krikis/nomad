@@ -92,90 +92,90 @@ suite.bench
   cleanup:  Benches.cleanupNetwork
   seeds:    [2645,2688,2623,2629,2582,2638,2702,2611,2579,2579,2636,2665,2540,2656,2676,2545,2623,2624,2555,2656]
 
-suite.bench
-  category: 'traditional'
-  series:   'resolve 420KB'
-  runs:     2
-  setup:    Benches.setupNetwork
-  before:   Benches.beforeConflict
-  beforeOpts:
-    data: 'data420KB'
-  test:     Benches.conflict
-  after:    Benches.afterNetwork
-  cleanup:  Benches.cleanupNetwork
-  seeds:    [9511,9437,9426,9390,9485,9643,9464,9345,9665,9452,9455,9427,9396,9464,9438,9360,9436,9576,9336,9412]
-
-suite.bench
-  category: 'preventive'
-  series:   'resolve 420KB'
-  runs:     2
-  setup:    Benches.setupNetwork
-  before:   Benches.beforeConflict
-  beforeOpts:
-    preSync: true
-    data: 'data420KB'
-  test:     Benches.conflict
-  testOpts:
-    preSync: true
-  after:    Benches.afterNetwork
-  cleanup:  Benches.cleanupNetwork
-  seeds:    [5304,5362,5374,5375,5342,5347,5338,5476,6022,5461,5445,5292,5284,5340,5294,5261,5354,5368,5299,5433]
-
-suite.bench
-  category: 'traditional'
-  series:   'update 420KB'
-  runs:     2
-  setup:    Benches.setupNetwork
-  before:   Benches.beforeUpdate
-  beforeOpts:
-    data: 'data420KB'
-  test:     Benches.update
-  after:    Benches.afterNetwork
-  cleanup:  Benches.cleanupNetwork
-  seeds:    [4796,4823,4858,4892,4864,4858,4809,4868,4807,4880,5010,4846,4787,4811,4814,4817,4905,4875,4758,4922]
-
-suite.bench
-  category: 'preventive'
-  series:   'update 420KB'
-  runs:     2
-  setup:    Benches.setupNetwork
-  before:   Benches.beforeUpdate
-  beforeOpts:
-    preSync: true
-    data: 'data420KB'
-  test:     Benches.update
-  testOpts:
-    preSync: true
-  after:    Benches.afterNetwork
-  cleanup:  Benches.cleanupNetwork
-  seeds:    [4873,4838,4892,4837,4980,4859,4915,4899,4857,4847,4861,4844,4828,4845,4900,4817,4844,4877,4863,4886]
-
-suite.bench
-  category: 'traditional'
-  series:   'create 420KB'
-  runs:     2
-  setup:    Benches.setupNetwork
-  before:   Benches.beforeCreate
-  beforeOpts:
-    data: 'data420KB'
-  test:     Benches.create
-  after:    Benches.afterNetwork
-  cleanup:  Benches.cleanupNetwork
-  seeds:    [4814,4880,4906,4899,4855,4835,4902,4880,4946,4907,4897,4991,4784,4840,4821,4776,4865,4852,4784,4900]
-
-suite.bench
-  category: 'preventive'
-  series:   'create 420KB'
-  runs:     2
-  setup:    Benches.setupNetwork
-  before:   Benches.beforeCreate
-  beforeOpts:
-    preSync: true
-    data: 'data420KB'
-  test:     Benches.create
-  testOpts:
-    preSync: true
-  after:    Benches.afterNetwork
-  cleanup:  Benches.cleanupNetwork
-  seeds:    [4908,5000,4872,5004,4944,4886,4937,4846,4918,4890,4918,4883,4851,4895,4839,4869,4843,4846,4891,4834]
-
+# suite.bench
+#   category: 'traditional'
+#   series:   'resolve 420KB'
+#   runs:     2
+#   setup:    Benches.setupNetwork
+#   before:   Benches.beforeConflict
+#   beforeOpts:
+#     data: 'data420KB'
+#   test:     Benches.conflict
+#   after:    Benches.afterNetwork
+#   cleanup:  Benches.cleanupNetwork
+#   seeds:    [9511,9437,9426,9390,9485,9643,9464,9345,9665,9452,9455,9427,9396,9464,9438,9360,9436,9576,9336,9412]
+#
+# suite.bench
+#   category: 'preventive'
+#   series:   'resolve 420KB'
+#   runs:     2
+#   setup:    Benches.setupNetwork
+#   before:   Benches.beforeConflict
+#   beforeOpts:
+#     preSync: true
+#     data: 'data420KB'
+#   test:     Benches.conflict
+#   testOpts:
+#     preSync: true
+#   after:    Benches.afterNetwork
+#   cleanup:  Benches.cleanupNetwork
+#   seeds:    [5304,5362,5374,5375,5342,5347,5338,5476,6022,5461,5445,5292,5284,5340,5294,5261,5354,5368,5299,5433]
+#
+# suite.bench
+#   category: 'traditional'
+#   series:   'update 420KB'
+#   runs:     2
+#   setup:    Benches.setupNetwork
+#   before:   Benches.beforeUpdate
+#   beforeOpts:
+#     data: 'data420KB'
+#   test:     Benches.update
+#   after:    Benches.afterNetwork
+#   cleanup:  Benches.cleanupNetwork
+#   seeds:    [4796,4823,4858,4892,4864,4858,4809,4868,4807,4880,5010,4846,4787,4811,4814,4817,4905,4875,4758,4922]
+#
+# suite.bench
+#   category: 'preventive'
+#   series:   'update 420KB'
+#   runs:     2
+#   setup:    Benches.setupNetwork
+#   before:   Benches.beforeUpdate
+#   beforeOpts:
+#     preSync: true
+#     data: 'data420KB'
+#   test:     Benches.update
+#   testOpts:
+#     preSync: true
+#   after:    Benches.afterNetwork
+#   cleanup:  Benches.cleanupNetwork
+#   seeds:    [4873,4838,4892,4837,4980,4859,4915,4899,4857,4847,4861,4844,4828,4845,4900,4817,4844,4877,4863,4886]
+#
+# suite.bench
+#   category: 'traditional'
+#   series:   'create 420KB'
+#   runs:     2
+#   setup:    Benches.setupNetwork
+#   before:   Benches.beforeCreate
+#   beforeOpts:
+#     data: 'data420KB'
+#   test:     Benches.create
+#   after:    Benches.afterNetwork
+#   cleanup:  Benches.cleanupNetwork
+#   seeds:    [4814,4880,4906,4899,4855,4835,4902,4880,4946,4907,4897,4991,4784,4840,4821,4776,4865,4852,4784,4900]
+#
+# suite.bench
+#   category: 'preventive'
+#   series:   'create 420KB'
+#   runs:     2
+#   setup:    Benches.setupNetwork
+#   before:   Benches.beforeCreate
+#   beforeOpts:
+#     preSync: true
+#     data: 'data420KB'
+#   test:     Benches.create
+#   testOpts:
+#     preSync: true
+#   after:    Benches.afterNetwork
+#   cleanup:  Benches.cleanupNetwork
+#   seeds:    [4908,5000,4872,5004,4944,4886,4937,4846,4918,4890,4918,4883,4851,4895,4839,4869,4843,4846,4891,4834]
+#

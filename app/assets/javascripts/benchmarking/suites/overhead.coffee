@@ -138,167 +138,167 @@ suite.bench
     changeRate: 0.125
   seeds:    [1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,0,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1]
 
-# strings & mods only
-
-suite.bench
-  category: 'serialized'
-  series:   'resolve 37% (strings & mods only)'
-  setup:    Benches.setupResolveOverhead
-  setupOpts:
-    versioning: 'structured_content_diff'
-  before:   Benches.beforeResolveOverhead
-  beforeOpts:
-    changeRate: 0.375
-    typeOdds: [0, 0, 1, 2]
-    changeOdds: [0, 1, 0]
-  test:     Benches.resolveOverhead
-  seeds:    [36,29,22,44,29,33,34,44,35,26,16,40,39,31,22,19,36,17,34,24,33,24,29,31,23,31,29,31,23,45,44,33,26,41,29,34,23,33,33,43,27,22,24,24,31,24,43,40,36,23]
-
-suite.bench
-  category: 'attributes'
-  series:   'resolve 37% (strings & mods only)'
-  setup:    Benches.setupResolveOverhead
-  before:   Benches.beforeResolveOverhead
-  beforeOpts:
-    changeRate: 0.375
-    typeOdds: [0, 0, 1, 2]
-    changeOdds: [0, 1, 0]
-  test:     Benches.resolveOverhead
-  seeds:    [13,10,10,14,12,10,12,15,11,16,8,12,13,10,9,12,9,18,12,10,12,11,13,9,9,12,13,11,10,11,9,12,11,11,10,12,12,12,15,10,10,10,12,8,10,11,9,12,12,7]
-
-suite.bench
-  category: 'serialized'
-  series:   'record 37% (strings & mods only)'
-  setup:    Benches.setupRecordOverhead
-  setupOpts:
-    versioning: 'structured_content_diff'
-  before:   Benches.beforeRecordOverhead
-  beforeOpts:
-    typeOdds: [0, 0, 1, 2]
-  test:     Benches.recordOverhead
-  testOpts:
-    changeRate: 0.375
-    changeOdds: [0, 1, 0]
-  seeds:    [56,39,43,50,45,36,52,42,43,49,37,45,32,33,41,54,60,47,58,30,34,42,52,44,34,45,48,25,48,40,39,33,45,49,34,39,53,62,34,49,33,37,46,48,61,33,47,52,46,47]
-
-suite.bench
-  category: 'attributes'
-  series:   'record 37% (strings & mods only)'
-  setup:    Benches.setupRecordOverhead
-  before:   Benches.beforeRecordOverhead
-  beforeOpts:
-    typeOdds: [0, 0, 1, 2]
-  test:     Benches.recordOverhead
-  testOpts:
-    changeRate: 0.375
-    changeOdds: [0, 1, 0]
-  seeds:    [1,1,1,1,1,1,2,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1]
-
-suite.bench
-  category: 'serialized'
-  series:   'resolve 25% (strings & mods only)'
-  setup:    Benches.setupResolveOverhead
-  setupOpts:
-    versioning: 'structured_content_diff'
-  before:   Benches.beforeResolveOverhead
-  beforeOpts:
-    changeRate: 0.25
-    typeOdds: [0, 0, 1, 2]
-    changeOdds: [0, 1, 0]
-  test:     Benches.resolveOverhead
-  seeds:    [23,13,13,16,13,13,17,13,17,17,8,17,12,12,15,15,21,9,14,16,21,19,7,23,18,23,14,13,14,10,11,20,14,8,23,14,12,12,15,14,13,21,16,13,13,13,15,17,8,17]
-
-suite.bench
-  category: 'attributes'
-  series:   'resolve 25% (strings & mods only)'
-  setup:    Benches.setupResolveOverhead
-  before:   Benches.beforeResolveOverhead
-  beforeOpts:
-    changeRate: 0.25
-    typeOdds: [0, 0, 1, 2]
-    changeOdds: [0, 1, 0]
-  test:     Benches.resolveOverhead
-  seeds:    [7,7,6,7,5,3,5,6,4,4,7,4,7,5,6,4,7,5,4,5,7,9,4,4,5,6,4,4,5,5,4,5,7,4,5,5,4,4,4,6,4,5,4,5,4,5,5,6,9,4]
-
-suite.bench
-  category: 'serialized'
-  series:   'record 25% (strings & mods only)'
-  setup:    Benches.setupRecordOverhead
-  setupOpts:
-    versioning: 'structured_content_diff'
-  before:   Benches.beforeRecordOverhead
-  beforeOpts:
-    typeOdds: [0, 0, 1, 2]
-  test:     Benches.recordOverhead
-  testOpts:
-    changeRate: 0.25
-    changeOdds: [0, 1, 0]
-  seeds:    [14,19,12,17,16,15,13,12,17,18,16,12,11,14,21,10,16,17,12,14,15,10,11,13,17,14,20,15,13,13,22,14,19,26,19,13,15,12,12,18,19,19,16,9,16,11,11,13,13,18]
-
-suite.bench
-  category: 'attributes'
-  series:   'record 25% (strings & mods only)'
-  setup:    Benches.setupRecordOverhead
-  before:   Benches.beforeRecordOverhead
-  beforeOpts:
-    typeOdds: [0, 0, 1, 2]
-  test:     Benches.recordOverhead
-  testOpts:
-    changeRate: 0.25
-    changeOdds: [0, 1, 0]
-  seeds:    [1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-
-suite.bench
-  category: 'serialized'
-  series:   'resolve 12% (strings & mods only)'
-  setup:    Benches.setupResolveOverhead
-  setupOpts:
-    versioning: 'structured_content_diff'
-  before:   Benches.beforeResolveOverhead
-  beforeOpts:
-    changeRate: 0.125
-    typeOdds: [0, 0, 1, 2]
-    changeOdds: [0, 1, 0]
-  test:     Benches.resolveOverhead
-  seeds:    [7,5,4,5,4,3,4,5,4,3,4,3,5,5,4,4,5,6,4,4,4,3,4,4,5,4,4,5,4,3,4,4,4,4,4,4,8,8,4,4,7,4,3,3,3,5,3,6,6,3]
-
-suite.bench
-  category: 'attributes'
-  series:   'resolve 12% (strings & mods only)'
-  setup:    Benches.setupResolveOverhead
-  before:   Benches.beforeResolveOverhead
-  beforeOpts:
-    changeRate: 0.125
-    typeOdds: [0, 0, 1, 2]
-    changeOdds: [0, 1, 0]
-  test:     Benches.resolveOverhead
-  seeds:    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1]
-
-suite.bench
-  category: 'serialized'
-  series:   'record 12% (strings & mods only)'
-  setup:    Benches.setupRecordOverhead
-  setupOpts:
-    versioning: 'structured_content_diff'
-  before:   Benches.beforeRecordOverhead
-  beforeOpts:
-    typeOdds: [0, 0, 1, 2]
-  test:     Benches.recordOverhead
-  testOpts:
-    changeRate: 0.125
-    changeOdds: [0, 1, 0]
-  seeds:    [8,2,3,4,3,4,3,3,5,3,3,4,3,4,3,3,3,3,4,2,4,3,6,6,4,3,8,5,4,7,2,3,8,3,3,6,2,5,4,3,3,4,2,7,3,4,3,5,4,3]
-
-suite.bench
-  category: 'attributes'
-  series:   'record 12% (strings & mods only)'
-  setup:    Benches.setupRecordOverhead
-  before:   Benches.beforeRecordOverhead
-  beforeOpts:
-    typeOdds: [0, 0, 1, 2]
-  test:     Benches.recordOverhead
-  testOpts:
-    changeRate: 0.125
-    changeOdds: [0, 1, 0]
-  seeds:    [1,1,1,1,0,1,1,0,1,1,0,0,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,1,0,0,1,1,1,1]
+# # strings & mods only
+#
+# suite.bench
+#   category: 'serialized'
+#   series:   'resolve 37% (strings & mods only)'
+#   setup:    Benches.setupResolveOverhead
+#   setupOpts:
+#     versioning: 'structured_content_diff'
+#   before:   Benches.beforeResolveOverhead
+#   beforeOpts:
+#     changeRate: 0.375
+#     typeOdds: [0, 0, 1, 2]
+#     changeOdds: [0, 1, 0]
+#   test:     Benches.resolveOverhead
+#   seeds:    [36,29,22,44,29,33,34,44,35,26,16,40,39,31,22,19,36,17,34,24,33,24,29,31,23,31,29,31,23,45,44,33,26,41,29,34,23,33,33,43,27,22,24,24,31,24,43,40,36,23]
+#
+# suite.bench
+#   category: 'attributes'
+#   series:   'resolve 37% (strings & mods only)'
+#   setup:    Benches.setupResolveOverhead
+#   before:   Benches.beforeResolveOverhead
+#   beforeOpts:
+#     changeRate: 0.375
+#     typeOdds: [0, 0, 1, 2]
+#     changeOdds: [0, 1, 0]
+#   test:     Benches.resolveOverhead
+#   seeds:    [13,10,10,14,12,10,12,15,11,16,8,12,13,10,9,12,9,18,12,10,12,11,13,9,9,12,13,11,10,11,9,12,11,11,10,12,12,12,15,10,10,10,12,8,10,11,9,12,12,7]
+#
+# suite.bench
+#   category: 'serialized'
+#   series:   'record 37% (strings & mods only)'
+#   setup:    Benches.setupRecordOverhead
+#   setupOpts:
+#     versioning: 'structured_content_diff'
+#   before:   Benches.beforeRecordOverhead
+#   beforeOpts:
+#     typeOdds: [0, 0, 1, 2]
+#   test:     Benches.recordOverhead
+#   testOpts:
+#     changeRate: 0.375
+#     changeOdds: [0, 1, 0]
+#   seeds:    [56,39,43,50,45,36,52,42,43,49,37,45,32,33,41,54,60,47,58,30,34,42,52,44,34,45,48,25,48,40,39,33,45,49,34,39,53,62,34,49,33,37,46,48,61,33,47,52,46,47]
+#
+# suite.bench
+#   category: 'attributes'
+#   series:   'record 37% (strings & mods only)'
+#   setup:    Benches.setupRecordOverhead
+#   before:   Benches.beforeRecordOverhead
+#   beforeOpts:
+#     typeOdds: [0, 0, 1, 2]
+#   test:     Benches.recordOverhead
+#   testOpts:
+#     changeRate: 0.375
+#     changeOdds: [0, 1, 0]
+#   seeds:    [1,1,1,1,1,1,2,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1]
+#
+# suite.bench
+#   category: 'serialized'
+#   series:   'resolve 25% (strings & mods only)'
+#   setup:    Benches.setupResolveOverhead
+#   setupOpts:
+#     versioning: 'structured_content_diff'
+#   before:   Benches.beforeResolveOverhead
+#   beforeOpts:
+#     changeRate: 0.25
+#     typeOdds: [0, 0, 1, 2]
+#     changeOdds: [0, 1, 0]
+#   test:     Benches.resolveOverhead
+#   seeds:    [23,13,13,16,13,13,17,13,17,17,8,17,12,12,15,15,21,9,14,16,21,19,7,23,18,23,14,13,14,10,11,20,14,8,23,14,12,12,15,14,13,21,16,13,13,13,15,17,8,17]
+#
+# suite.bench
+#   category: 'attributes'
+#   series:   'resolve 25% (strings & mods only)'
+#   setup:    Benches.setupResolveOverhead
+#   before:   Benches.beforeResolveOverhead
+#   beforeOpts:
+#     changeRate: 0.25
+#     typeOdds: [0, 0, 1, 2]
+#     changeOdds: [0, 1, 0]
+#   test:     Benches.resolveOverhead
+#   seeds:    [7,7,6,7,5,3,5,6,4,4,7,4,7,5,6,4,7,5,4,5,7,9,4,4,5,6,4,4,5,5,4,5,7,4,5,5,4,4,4,6,4,5,4,5,4,5,5,6,9,4]
+#
+# suite.bench
+#   category: 'serialized'
+#   series:   'record 25% (strings & mods only)'
+#   setup:    Benches.setupRecordOverhead
+#   setupOpts:
+#     versioning: 'structured_content_diff'
+#   before:   Benches.beforeRecordOverhead
+#   beforeOpts:
+#     typeOdds: [0, 0, 1, 2]
+#   test:     Benches.recordOverhead
+#   testOpts:
+#     changeRate: 0.25
+#     changeOdds: [0, 1, 0]
+#   seeds:    [14,19,12,17,16,15,13,12,17,18,16,12,11,14,21,10,16,17,12,14,15,10,11,13,17,14,20,15,13,13,22,14,19,26,19,13,15,12,12,18,19,19,16,9,16,11,11,13,13,18]
+#
+# suite.bench
+#   category: 'attributes'
+#   series:   'record 25% (strings & mods only)'
+#   setup:    Benches.setupRecordOverhead
+#   before:   Benches.beforeRecordOverhead
+#   beforeOpts:
+#     typeOdds: [0, 0, 1, 2]
+#   test:     Benches.recordOverhead
+#   testOpts:
+#     changeRate: 0.25
+#     changeOdds: [0, 1, 0]
+#   seeds:    [1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+#
+# suite.bench
+#   category: 'serialized'
+#   series:   'resolve 12% (strings & mods only)'
+#   setup:    Benches.setupResolveOverhead
+#   setupOpts:
+#     versioning: 'structured_content_diff'
+#   before:   Benches.beforeResolveOverhead
+#   beforeOpts:
+#     changeRate: 0.125
+#     typeOdds: [0, 0, 1, 2]
+#     changeOdds: [0, 1, 0]
+#   test:     Benches.resolveOverhead
+#   seeds:    [7,5,4,5,4,3,4,5,4,3,4,3,5,5,4,4,5,6,4,4,4,3,4,4,5,4,4,5,4,3,4,4,4,4,4,4,8,8,4,4,7,4,3,3,3,5,3,6,6,3]
+#
+# suite.bench
+#   category: 'attributes'
+#   series:   'resolve 12% (strings & mods only)'
+#   setup:    Benches.setupResolveOverhead
+#   before:   Benches.beforeResolveOverhead
+#   beforeOpts:
+#     changeRate: 0.125
+#     typeOdds: [0, 0, 1, 2]
+#     changeOdds: [0, 1, 0]
+#   test:     Benches.resolveOverhead
+#   seeds:    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1]
+#
+# suite.bench
+#   category: 'serialized'
+#   series:   'record 12% (strings & mods only)'
+#   setup:    Benches.setupRecordOverhead
+#   setupOpts:
+#     versioning: 'structured_content_diff'
+#   before:   Benches.beforeRecordOverhead
+#   beforeOpts:
+#     typeOdds: [0, 0, 1, 2]
+#   test:     Benches.recordOverhead
+#   testOpts:
+#     changeRate: 0.125
+#     changeOdds: [0, 1, 0]
+#   seeds:    [8,2,3,4,3,4,3,3,5,3,3,4,3,4,3,3,3,3,4,2,4,3,6,6,4,3,8,5,4,7,2,3,8,3,3,6,2,5,4,3,3,4,2,7,3,4,3,5,4,3]
+#
+# suite.bench
+#   category: 'attributes'
+#   series:   'record 12% (strings & mods only)'
+#   setup:    Benches.setupRecordOverhead
+#   before:   Benches.beforeRecordOverhead
+#   beforeOpts:
+#     typeOdds: [0, 0, 1, 2]
+#   test:     Benches.recordOverhead
+#   testOpts:
+#     changeRate: 0.125
+#     changeOdds: [0, 1, 0]
+#   seeds:    [1,1,1,1,0,1,1,0,1,1,0,0,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,1,0,0,1,1,1,1]
 
