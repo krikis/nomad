@@ -16,6 +16,8 @@
 /tmp
 
 /.rvmrc*
+.ruby-gemset
+.ruby-version
 public/assets/
 jhw.*
 .jhw-cache/
