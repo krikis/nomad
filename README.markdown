@@ -1,6 +1,6 @@
 # How to run the benchmarks
 
-Note: for realistic benchmark results, especially for network load, the source code should be deployed on a machine you can access through the internet (so, not a machine on your local area network). On this machine, do the following:
+Note: for realistic benchmark results, especially for network load, the source code of this project should be deployed on a computer you can access through the internet (so, not a machine on your local area network). From now on this machine is referred to as the `benchmark_server`. On this benchmark server, do the following:
 
 - Install Ruby, for instance by using the instructions on the [Ruby website](https://www.ruby-lang.org/en/downloads/).
 - Make sure you have an up to date version of RubyGems. If it is not already installed by the tool you used to install Ruby, install it using [these instructions](http://rubygems.org/pages/download).
@@ -19,9 +19,9 @@ RAILS_ENV='test' rake faye       # start the Faye WebSocket server on port 9292
 - Configure the Faye client by setting the following line in `app/assets/javascripts/logic/faye_client.coffee`:
 
 ```coffee
-@FAYE_SERVER = 'http://benchmark_machine:9292/faye'
+@FAYE_SERVER = 'http://benchmark_server:9292/faye'
 ```
 
-Now the benchmark environment is all set up. Navigate to `http://benchmark_machine:3000/benchmarks` to open the benchmark suite in your browser (use port forwarding if the benchmark machine is behind a firewall). You're ready to run the benchmarks!
+Now the benchmark environment is all set up. Navigate to `http://benchmark_server:3000/benchmarks` to open the benchmark suite in your browser (use port forwarding if the benchmark machine is behind a firewall). You're ready to run the benchmarks!
 
 For more information on this project, read the [thesis](https://github.com/krikis/nomad/blob/master/doc/thesis.pdf?raw=true).
