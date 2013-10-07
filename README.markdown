@@ -19,9 +19,9 @@ RAILS_ENV='test' rake faye       # start the Faye WebSocket server on port 9292
 - Configure the Faye client by setting the following line in `app/assets/javascripts/logic/faye_client.coffee`:
 
 ```coffee
-@FAYE_SERVER = 'http://ip_of_your_benchmark_machine:9292/faye'
+@FAYE_SERVER = 'http://benchmark_machine:9292/faye'
 ```
 
-Now the benchmark environment is all set up. Navigate to `http://ip_of_your_benchmark_machine:3000/benchmarks` to open the benchmark suite in your browser (use port forwarding if the benchmark machine is behind a firewall). You're ready to run the benchmarks!
+Now the benchmark environment is all set up. Navigate to `http://benchmark_machine:3000/benchmarks` to open the benchmark suite in your browser (use port forwarding if the benchmark machine is behind a firewall). You're ready to run the benchmarks!
 
 For more information on this project, read the [thesis](https://github.com/krikis/nomad/blob/master/doc/thesis.pdf?raw=true).
