@@ -20,7 +20,7 @@ bundle exec rails s                     # start a development server on port 300
 bundle exec rake update_test_db         # clean copy of the database for benchmarking
 RAILS_ENV='test' bundle exec rake faye  # start the Faye WebSocket server on port 9292
 ```
-- Configure the Faye client by setting the following line in `app/assets/javascripts/logic/faye_client.coffee`:
+- Configure the Faye client by replacing `benchmark_server` with the address of your benchmark server in the following line (in `app/assets/javascripts/logic/faye_client.coffee`):
 
 ```coffee
 @FAYE_SERVER = 'http://benchmark_server:9292/faye'
