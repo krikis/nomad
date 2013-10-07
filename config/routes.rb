@@ -1,5 +1,5 @@
 Nomad::Application.routes.draw do
-  match '/' => 'posts#index'
+  root to: 'benchmarks#index'
   resources  :benchmarks, :only => [:index] do
     collection do
       get :jslitmus
