@@ -8,17 +8,17 @@ For realistic benchmark results, especially for network load, the source code of
 - Open the root of the project in a terminal and issue the following commands:
 
 ```bash
-gem install bundler              # install a gem dependency manager
-bundle                           # install the project's gems
-bundle exec rake db:create       # instantiate an SQLite database
-bundle exec rake db:setup        # load the database schema
-bundle exec rails s              # start a development server on port 3000
+gem install bundler                     # install a gem dependency manager
+bundle                                  # install the project's gems
+bundle exec rake db:create              # instantiate an SQLite database
+bundle exec rake db:setup               # load the database schema
+bundle exec rails s                     # start a development server on port 3000
 ```
 - Open a new terminal window at the root of the project and do the following:
 
-```
-bundle exec rake update_test_db  # clean copy of the database for benchmarking
-RAILS_ENV='test' rake faye       # start the Faye WebSocket server on port 9292
+```bash
+bundle exec rake update_test_db         # clean copy of the database for benchmarking
+RAILS_ENV='test' bundle exec rake faye  # start the Faye WebSocket server on port 9292
 ```
 - Configure the Faye client by setting the following line in `app/assets/javascripts/logic/faye_client.coffee`:
 
