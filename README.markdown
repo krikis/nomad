@@ -27,6 +27,8 @@ RAILS_ENV='test' bundle exec rake faye  # start the Faye WebSocket server on por
 ```
 - If the benchmark server is behind a firewall, do not forget to set up port forwarding for the RAILS and FAYE servers (ports 3000 and 9292 respectively).
 
-The benchmark environment is all set up. Now drive to the computer you will use to run the benchmarks on. Install the [Chrome](https://www.google.com/intl/en/chrome/browser/) browser if you do not already have a version. Fire it up and navigate to `http://benchmark_server:3000/benchmarks` to open the benchmark suite. You're ready to run the benchmarks!
+The benchmark environment is all set up. Now drive to the computer you will use to run the benchmarks on. Install the [Chrome](https://www.google.com/intl/en/chrome/browser/) browser if you do not already have a version. Fire it up and navigate to `http://benchmark_server:3000` to open the benchmark suite. You're ready to run the benchmarks!
 
-For more information on this project, read the [thesis](https://github.com/krikis/nomad/blob/master/doc/thesis.pdf?raw=true).
+Got stuck somewhere halfway the instructions or in doubt on how to use the benchmark suite? Don't hesitate to contact me!
+
+For more information on this project, read the [master thesis](https://github.com/krikis/nomad/blob/master/doc/thesis.pdf?raw=true).
