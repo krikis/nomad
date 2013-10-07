@@ -6,6 +6,7 @@ Note: for realistic benchmark results, especially for network load, the source c
 - Make sure you have an up to date version of RubyGems. If it is not already installed by the tool you used to install Ruby, install it using [these instructions](http://rubygems.org/pages/download).
 - Download the compressed source code for this project [here](https://github.com/krikis/nomad/archive/master.zip) to a local folder and unzip it.
 - Open the root of the project in a terminal and issue the following commands:
+
 ```bash
 gem install bundler              # install a gem dependency manager
 bundle                           # install the project's gems
@@ -16,6 +17,7 @@ bundle exec rake update_test_db  # clean copy of the database for benchmarking
 RAILS_ENV='test' rake faye       # start the Faye WebSocket server on port 9292
 ```
 - Configure the Faye client by setting the following line in `app/assets/javascripts/logic/faye_client.coffee`:
+
 ```coffee
 @FAYE_SERVER = 'http://ip_of_your_benchmark_machine:9292/faye'
 ```
