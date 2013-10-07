@@ -31,4 +31,6 @@ The benchmark environment is all set up. Now drive to the computer you will use 
 
 Got stuck somewhere halfway the instructions or in doubt on how to use the benchmark suite? Don't hesitate to contact me!
 
+Samuel Esposito
+
 For more information on this project, read the [master thesis](https://github.com/krikis/nomad/blob/master/doc/thesis.pdf?raw=true).
