@@ -1,6 +1,6 @@
 # How to run the benchmarks
 
-For realistic benchmark results, especially for network load, the source code of this project should be deployed on a computer you can access through the internet (so, not a machine on your local area network). From now on this machine is referred to as the `benchmark_server`. On this benchmark server, do the following :
+For realistic benchmark results, especially on network load, the source code of this project should be deployed on a computer you can access through the internet (so, not a machine on your local area network). From now on this machine is referred to as the `benchmark_server`. On this benchmark server, do the following :
 
 - Install Ruby, for instance by using the instructions on the [Ruby website](https://www.ruby-lang.org/en/downloads/).
 - Make sure you have an up to date version of RubyGems. If it is not already installed by the tool you used to install Ruby, install it using [these instructions](http://rubygems.org/pages/download).
