@@ -6,7 +6,7 @@ Make sure you have an up to date version of RubyGems. If it is not already insta
 
 Download the compressed source code for this project [here](https://github.com/krikis/nomad/archive/master.zip) to a local folder and unzip it.
 
-Open the root of the project in a terminal to issue the following commands:
+Open the root of the project in a terminal and issue the following commands:
 
 ```bash
 gem install bundler              # install a gem dependency manager
@@ -24,6 +24,6 @@ Configure the Faye client by setting the following line in `app/assets/javascrip
 @FAYE_SERVER = 'http://localhost:9292/faye'
 ```
 
-Navigate to http://localhost:3000/benchmarks to open the benchmark suite in your browser. You're ready to run the benchmarks!
+Navigate to (http://localhost:3000/benchmarks) to open the benchmark suite in your browser. You're ready to run the benchmarks!
 
 For more information on this project, read the [thesis](https://github.com/krikis/nomad/blob/master/doc/thesis.pdf?raw=true).
