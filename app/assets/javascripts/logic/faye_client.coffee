@@ -1,9 +1,6 @@
 @BackboneSync ||= {}
 
-# @FAYE_SERVER = 'http://195.240.7.166:9292/faye'
-# @FAYE_SERVER = 'http://192.168.1.35:9292/faye'
-# @FAYE_SERVER = 'http://nomad.dev:9292/faye'
-@FAYE_SERVER = 'http://129.125.147.34:9292/faye'
+@FAYE_SERVER = 'http://benchmark_server:9292/faye'
 
 class @BackboneSync.FayeClient
   constructor: (collection, options = {}) ->
@@ -63,7 +60,7 @@ class @BackboneSync.FayeClient
   _resetDb: () ->
     @publish
       reset_db: true
-      
+
   # convenience method testing connectivity
   _ping: () ->
     @publish
@@ -91,7 +88,7 @@ class @BackboneSync.FayeClient
 
   _dbReset: ->
     # console.log 'The server database was successfully reset!'
-    
+
   _pong: ->
     # console.log 'pong received'
 
