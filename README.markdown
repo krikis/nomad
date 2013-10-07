@@ -25,7 +25,7 @@ RAILS_ENV='test' bundle exec rake faye  # start the Faye WebSocket server on por
 ```coffee
 @FAYE_SERVER = 'http://benchmark_server:9292/faye'
 ```
-- If the benchmark server is behind a firewall, do not forget to set up port forwarding for the RAILS and FAYE servers (ports 3000 and 9292 respectively).
+- If the benchmark server is behind a firewall, do not forget to set up port forwarding for the Rails and Faye servers (ports 3000 and 9292 respectively).
 
 The benchmark environment is all set up. Now drive to the computer you will use to run the benchmarks on. Install the [Chrome](https://www.google.com/intl/en/chrome/browser/) browser if you do not already have a version. Fire it up and navigate to `http://benchmark_server:3000` to open the benchmark suite. You're ready to run the benchmarks!
 
