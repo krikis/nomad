@@ -35,4 +35,4 @@ Samuel Esposito
 
 ***
 
-For more information on this project, read the [master thesis](https://github.com/krikis/nomad/blob/master/doc/thesis.pdf?raw=true).
+For more information on this project, please read the [master thesis](https://github.com/krikis/nomad/blob/master/doc/thesis.pdf?raw=true).
