@@ -4,7 +4,7 @@ For realistic benchmark results, especially for network load, the source code of
 
 - Install Ruby, for instance by using the instructions on the [Ruby website](https://www.ruby-lang.org/en/downloads/).
 - Make sure you have an up to date version of RubyGems. If it is not already installed by the tool you used to install Ruby, install it using [these instructions](http://rubygems.org/pages/download).
-- Download the compressed source code for this project [here](https://github.com/krikis/nomad/archive/master.zip) to a local folder and unzip it.
+- Download the compressed source code for this project [here](https://github.com/krikis/nomad/archive/master.zip) and unzip it in a local folder.
 - Open the root of the project in a terminal and issue the following commands:
 
 ```bash
