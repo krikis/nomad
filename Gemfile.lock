@@ -200,7 +200,7 @@ GEM
       railties (>= 3.0)
       rspec (~> 2.10.0)
     ruby-progressbar (0.0.10)
-    rubyzip (0.9.8)
+    rubyzip (1.3.0)
     ryansch-andand (1.3.2)
     sanitize (2.0.3)
       nokogiri (>= 1.4.4, < 1.6)
